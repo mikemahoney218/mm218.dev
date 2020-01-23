@@ -1,0 +1,19 @@
+[[redirects]]
+  from = "/orcid"
+  to = "https://orcid.org/0000-0003-2402-304X"
+  
+[[redirects]]
+  from = "/github"
+  to = "https://github.com/mikemahoney218"
+  
+[[redirects]]
+  from = "/linkedin"
+  to = "https://www.linkedin.com/in/mikemahoney218/"
+  
+[[redirects]]
+  from = "/researchgate"
+  to = "https://www.researchgate.net/profile/Michael_Mahoney13"
+
+[[redirects]]
+  from = "/"
+  to = "https://www.mikemahoney218.com"
