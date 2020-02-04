@@ -17,3 +17,8 @@
 [[redirects]]
   from = "/"
   to = "https://www.mikemahoney218.com"
+
+[[redirects]]
+  from = "/spacey"
+  to = "https://mikemahoney218.github.io/spacey/articles/introduction-to-spacey.html"
+
