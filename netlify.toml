@@ -22,3 +22,7 @@
   from = "/spacey"
   to = "https://mikemahoney218.github.io/spacey/articles/introduction-to-spacey.html"
 
+[[redirects]]
+  from = "/twitter"
+  to = "https://www.twitter.com/mikemahoney218"
+  
