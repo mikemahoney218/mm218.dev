@@ -3,6 +3,27 @@ output:
   tufte::tufte_html: default
 ---
 
+Software has been around since the 1940s. Which means that people have been faking their way through meetings about software, and the code that builds it, for generations. Now that software lives in our pockets, runs our cars and homes, and dominates our waking lives, ignorance is no longer acceptable. The world belongs to people who code. Those who don’t understand will be left behind. (Josh Tyrangiel, header)
+
+[...]
+
+A computer is a clock with benefits. They all work the same, doing second-grade math, one step at a time: Tick, take a number and put it in box one. Tick, take another number, put it in box two. Tick, operate (an operation might be addition or subtraction) on those two numbers and put the resulting number in box one. Tick, check if the result is zero, and if it is, go to some other box and follow a new set of instructions.
+
+[...]
+
+It’s a good and healthy exercise to ponder what your computer is doing right now. Maybe you’re reading this on a laptop: What are the steps and layers between what you’re doing and the Lilliputian mechanisms within? When you double-click an icon to open a program such as a word processor, the computer must know where that program is on the disk. It has some sort of accounting process to do that. And then it loads that program into its memory—which means that it loads an enormous to-do list into its memory and starts to step through it. What does that list look like?
+Maybe you’re reading this in print. No shame in that. In fact, thank you. The paper is the artifact of digital processes. Remember how we put that “a” on screen? See if you can get from some sleepy writer typing that letter on a keyboard in Brooklyn, N.Y., to the paper under your thumb. What framed that fearful symmetry?
+Thinking this way will teach you two things about computers: One, there’s no magic, no matter how much it looks like there is. There’s just work to make things look like magic. And two, it’s crazy in there.
+
+[...]
+
+You can tell how well code is organized from across the room. Or by squinting or zooming out. The shape of code from 20 feet away is incredibly informative. Clean code is idiomatic, as brief as possible, obvious even if it’s not heavily documented. Colloquial and friendly. As was written in Structure and Interpretation of Computer Programs (aka SICP), the seminal textbook of programming taught for years at MIT, “A computer language is not just a way of getting a computer to perform operations -- it is a novel formal medium for expressing ideas about methodology. Thus, programs must be written for people to read, and only incidentally for machines to execute.” A great program is a letter from current you to future you or to the person who inherits your code. A generous humanistic document.
+Of course all of this is nice and flowery; it needs to work, too.
+
+---[Paul Ford: What is Code?](https://www.bloomberg.com/graphics/2015-paul-ford-what-is-code/)
+
+<hr>
+
 The Postulates of Mathematics Were Not on the Stone Tablets that Moses Brought Down from Mt. Sinai. It is necessary to emphasize this. We begin with a vague concept in our minds, then we create various sets of postulates, and gradually we settle down to one particular set. In the rigorous postulational approach, the original concept is now replaced by what the postulates define. This makes further evolution of the concept rather difficult and as a result tends to slow down the evolution of mathematics. It is not that the postulation approach is wrong, only that its arbitrariness should be clearly recognized, and we should be prepared to change postulates when the need becomes apparent.
 
 --- Richard Hamming 
