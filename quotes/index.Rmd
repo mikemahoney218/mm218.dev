@@ -1,7 +1,10 @@
 ---
+title: Quotes
 output:
   tufte::tufte_html: default
 ---
+
+<hr>
 
 Software has been around since the 1940s. Which means that people have been faking their way through meetings about software, and the code that builds it, for generations. Now that software lives in our pockets, runs our cars and homes, and dominates our waking lives, ignorance is no longer acceptable. The world belongs to people who code. Those who don’t understand will be left behind. (Josh Tyrangiel, header)
 
@@ -12,15 +15,20 @@ A computer is a clock with benefits. They all work the same, doing second-grade 
 [...]
 
 It’s a good and healthy exercise to ponder what your computer is doing right now. Maybe you’re reading this on a laptop: What are the steps and layers between what you’re doing and the Lilliputian mechanisms within? When you double-click an icon to open a program such as a word processor, the computer must know where that program is on the disk. It has some sort of accounting process to do that. And then it loads that program into its memory—which means that it loads an enormous to-do list into its memory and starts to step through it. What does that list look like?
+
 Maybe you’re reading this in print. No shame in that. In fact, thank you. The paper is the artifact of digital processes. Remember how we put that “a” on screen? See if you can get from some sleepy writer typing that letter on a keyboard in Brooklyn, N.Y., to the paper under your thumb. What framed that fearful symmetry?
-Thinking this way will teach you two things about computers: One, there’s no magic, no matter how much it looks like there is. There’s just work to make things look like magic. And two, it’s crazy in there.
+
+Thinking this way will teach you two things about computers:   
+One, there’s no magic, no matter how much it looks like there is. There’s just work to make things look like magic.  
+And two, it’s crazy in there.
 
 [...]
 
 You can tell how well code is organized from across the room. Or by squinting or zooming out. The shape of code from 20 feet away is incredibly informative. Clean code is idiomatic, as brief as possible, obvious even if it’s not heavily documented. Colloquial and friendly. As was written in Structure and Interpretation of Computer Programs (aka SICP), the seminal textbook of programming taught for years at MIT, “A computer language is not just a way of getting a computer to perform operations -- it is a novel formal medium for expressing ideas about methodology. Thus, programs must be written for people to read, and only incidentally for machines to execute.” A great program is a letter from current you to future you or to the person who inherits your code. A generous humanistic document.
+
 Of course all of this is nice and flowery; it needs to work, too.
 
----[Paul Ford: What is Code?](https://www.bloomberg.com/graphics/2015-paul-ford-what-is-code/)
+--- [Paul Ford: What is Code?](https://www.bloomberg.com/graphics/2015-paul-ford-what-is-code/)
 
 <hr>
 
@@ -48,7 +56,7 @@ I note with fear and horror that even in 1980, language designers and users have
 
 I conclude that there are two ways of constructing a software design: One way is to make it so simple that there are obviously no deficiencies, and the other way is to make it so complicated that there are no obvious deficiencies. The first method is far more difficult. It demands the same skill, devotion, insight, and even inspiration as the discovery of the simple physical laws which underlie the complex phenomena of nature. It also requires a willingness to accept objectives which are limited by physical, logical, and technological constraints, and to accept a compromise when conflicting objectives cannot be met. No committee will ever do this until it is too late.
 
-[C.A.R. Hoare: The Emperor's Old Clothes](http://worrydream.com/refs/Hoare%20-%20The%20Emperors%20Old%20Clothes.pdf)
+--- [C.A.R. Hoare: The Emperor's Old Clothes](http://worrydream.com/refs/Hoare%20-%20The%20Emperors%20Old%20Clothes.pdf)
 <hr>
 
 
@@ -62,7 +70,7 @@ Discoverability is often cited as npm’s biggest flaw. Many blog posts -- scrat
 --- [Rich Harris: Small modules: it's not quite that simple](https://medium.com/@Rich_Harris/small-modules-it-s-not-quite-that-simple-3ca532d65de4)
 <hr>
 
-Brave to write it, all by itself, and then brave to show it. It is like opening your ribcage, and letting someone see the little bird you have inside. What if they don’t love the bird? It’s not like you can change it. I mean.. That’s your bird.
+Brave to write it, all by itself, and then brave to show it. It is like opening your ribcage, and letting someone see the little bird you have inside. What if they don’t love the bird? It’s not like you can change it.  I mean.. That’s your bird.
 
 --- [Tycho: Fan Fiction](https://www.penny-arcade.com/news/post/2014/12/12/fan-fiction) 
 <hr>
@@ -83,6 +91,7 @@ I hate abstraction. Here are some examples.
 <hr>
 
 I find that the single thing which inhibits young professionals, new students most severely, is their acceptance of standards that are too low. If I ask a student whether her design is as good as Chartres, she often smiles tolerantly at me as if to say, "Of course not, that isn't what I am trying to do.... I could never do that."
+
 Then, I express my disagreement, and tell her: "That standard must be our standard. If you are going to be a builder, no other standard is worthwhile. That is what I expect of myself in my own buildings, and it is what I expect of my students." Gradually, I show the students that they have a right to ask this of themselves, and must ask this of themselves. Once that level of standard is in their minds, they will be able to figure out, for themselves, how to do better, how to make something that is as profound as that.
 
 --- [Christopher Alexander: Foreward to Patterns of Software](http://www.dreamsongs.com/Files/PatternsOfSoftware.pdf) 
@@ -99,12 +108,14 @@ The Stone Age didn't end for lack of stone, and the Oil Age will end long before
 <hr>
 
 Ian is a game design teacher and a professional skeptic. People call him a “curmudgeon”, but they don’t really understand how much love, how much actual faith, that kind of skepticism takes. On a pretty regular basis one of us will IM the other something like “help” or “fuck” or “people are terrible”.
+
 Only when you fully believe in how wonderful something is supposed to be does every little daily indignity start to feel like some claw of malaise. At least, that’s how I explain Ian to other people.
 
 --- Leigh Alexander: The Unearthing 
 <hr>
 
 Q: So it’s fine to say, everybody should learn a little bit about how to program and this way of thinking because it’s valuable and important. But then maybe that’s just not realistic. Donald Knuth told me that he thinks two percent of the population have brains wired the right way to think about programming.
+
 A: That same logic would lead you to say that one percent of the US's population is wired to understand Mandarin. The reasoning there is equivalent.
 
 --- [Hal Abselson: Interview]
@@ -119,9 +130,9 @@ The typical course on programming teaches a “tinker until it works” approach
 [...]
 
 By “good programming,” we mean an approach to the creation of software that relies on systematic thought, planning, and understanding from the very beginning, at every stage, and for every step. To emphasize the point, we speak of systematic program design and systematically designed programs. Critically, the latter articulates the rationale of the desired functionality. Good programming also satisfies an aesthetic sense of accomplishment; the elegance of a good program is comparable to time-tested poems or the black-and-white photographs of a bygone era. In short, programming differs from good programming like crayon sketches in a diner from oil paintings in a museum.
-No, this book won’t turn anyone into a master painter. But, we would not have spent fifteen years writing this edition if we didn’t believe that
-_everyone can design programs_
-and
+No, this book won’t turn anyone into a master painter. But, we would not have spent fifteen years writing this edition if we didn’t believe that  
+_everyone can design programs_  
+and  
 _everyone can experience the satisfaction that comes with creative design._
 
 [...]
@@ -154,13 +165,16 @@ It seems like most people ask: "How can I throw my life away in the least unhapp
 <hr>
 
 Q: Are you ever afraid of someone stealing your thunder?
+
 A: I think anybody really good is going to want to do their own thing. Anybody who's not really good, you don't have to worry too much about.
  
 --- [Chris Hecker: Interview](https://kotaku.com/weve-got-jonathan-blow-the-witness-braid-and-chris-h-5923134)
 <hr>
 
 Living organisms are shaped by evolution to survive, not necessarily to get a clear picture of the universe. For example, frogs' brains are set up to recognize food as moving objects that are oblong in shape. So if we take a frog's normal food -- flies -- paralyze them with a little chloroform and put them in front of the frog, it will not notice them or try to eat them.
+
 It will starve in front of its food! But if we throw little rectangular pieces of cardboard at the frog it will eat them until it is stuffed! The frog only sees a little of the world we see, but it still thinks it perceives the whole world.
+
 Now, of course, we are not like frogs! Or are we?
 
 --- [Alan Kay: The Center of "Why?"](http://www.vpri.org/pdf/m2004002_center.pdf)
@@ -176,7 +190,7 @@ To an architect, imagination is mostly about the future. To invent the future, o
 --- [Danny Hillis: The Power of Conviction](https://www.piumarta.com/pov/points-of-view.pdf)
 <hr>
 
-If the first line of your #rstats script is setwd("C:\Users\jenny\path\that\only\I\have"), I will come into your lab and SET YOUR COMPUTER ON FIRE.
+If the first line of your [R] script is `setwd("C:\Users\jenny\path\that\only\I\have")`, I will come into your lab and SET YOUR COMPUTER ON FIRE.
 
 --- [Jenny Bryan: here, here](https://github.com/jennybc/here_here)
 <hr>
@@ -188,7 +202,9 @@ It becomes important in such a climate of opinion to emphasize that books do not
 
 People are much smarter when they can use their full intellect and when they can relate what they are learning to situations or phenomena which are real to them.
 The natural reaction, when someone is having trouble understanding what you are explaining, is to break up the explanation into smaller pieces and explain the pieces one by one. This tends not to work, so you back up even further and fill in even more details.
+
 But human minds do not work like computers: it is harder, not easier, to understand something broken down into all the precise little rules than to grasp it as a whole. It is very hard for a person to read a computer assembly language program and figure out what it is about...
+
 Studying mathematics one rule at a time is like studying a language by first memorizing the vocabulary and the detailed linguistic rules, then building phrases and sentences, and only afterwards learning to read, write, and converse. Native speakers of a language are not aware of the linguistic rules: they assimilate the language by focusing on a higher level, and absorbing the rules and patterns subconsciously. The rules and patterns are much harder for people to learn explicitly than is the language itself.
 
 --- [William Thurston: Mathematical Education](https://arxiv.org/pdf/math/0503081v1.pdf) 
@@ -199,13 +215,16 @@ A lot of the stuff going on [in AI] is not very ambitious. In machine learning, 
 --- [Stuart Russell](http://www.theatlantic.com/magazine/archive/2013/11/the-man-who-would-teach-machines-to-think/309529/)
 <hr>
 
-Like most readers, I had functionally consigned [our game] to the furnace. I had let it float away on one of those little lantern boats in a way that brought me closure, if no one else. Insufficient. Fucking insufficient.
+Like most readers, I had functionally consigned [our game] to the furnace. I had let it float away on one of those little lantern boats in a way that brought me closure, if no one else. Insufficient.  
+Fucking insufficient.
+
 You have to get back on the horse. Somehow, and I don't know how this kind of thing starts, we have started to lionize horseback-not-getting-on: these casual, a priori assertions of inevitable failure, which is nothing more than a gauze draped over your own pulsing terror. Every creative act is open war against The Way It Is. What you are saying when you make something is that the universe is not sufficient, and what it really needs is more you. And it does, actually; it does. Go look outside. You can't tell me that we are done making the world.
 
 --- [Tycho: A Matter of Scale](https://www.penny-arcade.com/news/post/2012/04/20) 
 <hr>
 
 Q: At the [NYU] Game Center, we're interested in the role of the university as an alternate place for thinking about games... What in your opinion are some of the big interesting problems that students should be working on?
+
 A: My advice for students is... I question the question. I don't think there are problems that students should be working on. I think students should be making games that are interesting and push the boundaries, and those will generate the problems.
 
 --- Chirs Hecker
@@ -222,6 +241,7 @@ We have this limited bubble of experience. We can only have so many experiences 
 <hr>
 
 John [McCarthy]'s world is a world of ideas, a world in which ideas don't belong to anyone, and when an idea is wrong, just the idea - not the person - is wrong. A world in which ideas are like young birds, and we catch them and proudly show them to our friends. The bird's beauty and the hunter's are distinct....
+
 Some people won't show you the birds they've caught until they are sure, certain, positive that they - the birds, or themselves - are gorgeous, or rare, or remarkable. When your mind can separate yourself from your bird, you will share it sooner, and the beauty of the bird will be sooner enjoyed. And what is a bird but for being enjoyed?
 
 --- [Richard Gabriel: The Design of Parallel Programming Languages](http://www.dreamsongs.com/10ideas.html)
