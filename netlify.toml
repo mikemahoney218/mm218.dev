@@ -25,4 +25,11 @@
 [[redirects]]
   from = "/twitter"
   to = "https://www.twitter.com/mikemahoney218"
-  
+
+[[redirects]]
+  from = "/cv"
+  to = "https://www.mikemahoney218.com/files/cv.pdf"
+
+[[redirects]]
+  from = "/resume"
+  to = "https://www.mikemahoney218.com/files/resume.pdf"
