@@ -1,0 +1,33 @@
+---
+title: "Introduction to Data Science"
+output: html_document
+---
+
+## Week One:
+
+### Readings
+
+#### Required
+
+* Monday: [R4DS Section 1.1 -> 1.6](https://r4ds.had.co.nz/introduction.html)
+    * Make sure you follow the instructions to install R, R Studio, and the 
+      tidyverse!
+* Wednesday: [R4DS Section 3.1 -> 3.6](https://r4ds.had.co.nz/data-visualisation.html)
+    * Code through it!
+* Friday: []()
+
+#### Optional
+
+* [What is Code?](https://www.bloomberg.com/graphics/2015-paul-ford-what-is-code/)
+    * Sections 1 through 5 are great for understanding this class. The rest is 
+      great for understanding our world. This is super long -- I want to 
+      empahsize that this one is definitely optional, but it's the best article 
+      I've ever read about programming.
+
+### Slides
+
+* [Intro to the Course and Plotting](01/01-intro-plotting.html)
+
+### Student Work
+
+* [Homework]

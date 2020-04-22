@@ -1,0 +1,540 @@
+---
+title: "Section One -- Intro to R & Plotting Data"
+author: "Mike Mahoney, April 2020"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: [default, hygge, ninjutsu]
+    nature:
+      ratio: 16:10
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+    self_contained: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(fig.width = 6, message = FALSE, warning = FALSE, comment = "", cache = FALSE, fig.retina = 3)
+library(flipbookr)
+library(tidyverse)
+```
+
+# Unit One
+
+* Welcome to the course!
+
+* What is code?
+
+* Your first program
+
+* Your first chart
+
+---
+
+# A quick introduction
+
+* My name: Mike Mahoney
+
+<img width="200" align="right" src="https://raw.githubusercontent.com/mikemahoney218/PersonalWebsite/master/content/authors/admin/avatar.jpg"></img>
+
+* Where I’m from: Boston, MA
+
+* What I do: PhD student (creating VR experiences from forest models!)
+
+* For fun: Backpacking; programming; advocacy 
+
+<br>
+<br>
+
+* Office hours:
+
+* Course website:
+
+* Instructor contact: 
+
+---
+
+# Quick Recap:
+
+--
+
+* All readings in this class: free and online
+    * So do them!
+
+--
+
+* Readings marked with *: code-throughs
+    * So do them!
+
+--
+
+* Required readings: required
+    * So do them!
+
+--
+
+* Today’s required reading included:
+    * Install R
+    * Install R Studio
+    * Install tidyverse
+    * So if you didn’t, probably should do that now
+
+---
+
+<iframe width="1000" height="600" align="center" src="https://www.youtube.com/embed/P86w6CHhmQ4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+---
+
+```{r, fig.width=10, fig.height=7, echo=FALSE}
+knitr::include_graphics("language-learning-app.jpg")
+```
+
+
+---
+
+# Let's get started
+
+Go ahead and open R Studio on your computer now.
+
+---
+class: center, middle, inverse, title-slide
+
+# Live Demo: Hello, World!
+<!-- Live demo time!
+Talk about different panes of R Studio 
+
+print("Hello, World!")>
+</!-->
+
+---
+
+<img src="https://lh4.googleusercontent.com/gOonnxlEYuaHiQruPKMKSX83z5YezyQwMbpoIwNIayN-1xflPTpWSkTm5QdGWS55zkXBJ5-Kg1SvX47-QScd_h7q5CpD8SlTYzxMtNsZ" width="1000" height="600"></img>
+
+---
+
+# What was that?
+
+--
+
+* We just used our first _function_: `print`
+
+--
+
+* _Functions_ take _arguments_ as inputs and then return an _output_.
+
+--
+
+* So we provided "Hello World!" as an argument, and `print` gave it right back
+  to us as an output!
+
+--
+
+* `print` is going to do the exact same thing with any input we give it -- 
+  try calling `print()` with your name as an argument instead!
+
+---
+
+# Other Functions
+
+* Of course, R can do a lot more than just print out things you provide it.
+
+* A lot of the functions built into R are dedicated to working with data.
+
+* R also comes with a few base datasets included,
+
+* We'll start using one of those, named `iris`.
+
+* Let's explore the dataset!
+
+---
+
+```{r data_explore, include=FALSE}
+# See the first few rows of the dataset
+head(iris)
+
+# See the "structure" of the dataset
+str(iris)
+
+# Get a basic summary of 
+# each of the variables
+summary(iris)
+```
+
+`r chunk_reveal("data_explore", break_type = "auto")`
+
+---
+
+We can get a lot more insight by plotting our data:
+
+```{r, fig.width=10, eval=FALSE}
+plot(iris)
+```
+
+---
+
+We can get a lot more insight by plotting our data:
+
+```{r, fig.width=10}
+plot(iris)
+```
+
+---
+
+We can also plot individual variables by specifying the x and y axes:
+
+```{r, eval=FALSE}
+plot(x = iris$Sepal.Length, y = iris$Sepal.Width)
+```
+
+---
+
+We can also plot individual variables by specifying the x and y axes:
+
+```{r, fig.width=10}
+plot(x = iris$Sepal.Length, y = iris$Sepal.Width)
+```
+
+---
+
+If we want to make better looking plots, we can use the `ggplot2` _package_. A 
+package is just a set of functions and data that someone in the R community 
+wrote and shared for other people to use. 
+
+We can install packages using the `install.packages()` function, and load them 
+to use in our code with the `library()` function.
+
+You already installed `ggplot2` as part of your homework when installing the 
+`tidyverse` package; let's load it with `library()` now:
+
+```{r eval=FALSE}
+library(ggplot2)
+
+ggplot(data = iris) +
+  aes(x = Sepal.Length, 
+      y = Sepal.Width) +
+  geom_point()
+```
+
+---
+
+```{r fig.width=8, fig.height=5}
+library(ggplot2)
+
+ggplot(data = iris) +
+  aes(x = Sepal.Length, 
+      y = Sepal.Width) +
+  geom_point()
+```
+
+```{r first_ggplot, fig.width=8, fig.height=5, include=FALSE}
+ggplot(data = iris) +
+  aes(x = Sepal.Length, 
+      y = Sepal.Width) +
+  geom_point()
+
+head(iris)
+```
+
+---
+
+`r chunk_reveal("first_ggplot")`
+
+---
+
+```{r add_variables, include=FALSE}
+ggplot(data = iris) + #BREAK
+  aes( #BREAK
+    x = Sepal.Length, #BREAK
+      y = Sepal.Width, #BREAK
+    color = Species, #BREAK2
+    size = Species, #BREAK3
+    shape = Species #BREAK4
+    ) + #BREAK
+  geom_point()
+```
+
+`r chunk_reveal("add_variables", break_type = "non_seq")`
+
+---
+
+# Now you try.
+
+Remember that there are other variables in the `iris` dataframe (you can see 
+them with `head()`, `str()`, or `summary()`). 
+
+<br>
+
+Try mixing and matching them with the aesthetics we have here 
+(including x and y!). 
+
+<br>
+
+What’s the difference between discrete or continuous variables?
+
+---
+class: center
+
+```{r, echo=FALSE, out.width='80%'}
+knitr::include_graphics("aesthetics.png")
+```
+
+---
+
+What happens if you try putting `Species` (a discrete variable) on the x axis?
+
+```{r, eval=FALSE}
+ggplot(iris, aes(Species, Sepal.Width)) +
+  geom_point()
+```
+
+--
+
+```{r, echo=FALSE, fig.width=10}
+ggplot(iris, aes(Species, Sepal.Width)) +
+  geom_point()
+```
+
+---
+
+We can't fix this with aesthetics alone!  
+Instead, we need to think about changing our _geom_:
+
+```{r, fig.width=10}
+ggplot(iris, aes(Species, Sepal.Width)) +
+  geom_point()
+```
+
+---
+
+We can't fix this with aesthetics alone!  
+Instead, we need to think about changing our _geom_:
+
+```{r, fig.width=10}
+ggplot(iris, aes(Species, Sepal.Width)) +
+  geom_jitter()
+```
+
+---
+
+We can't fix this with aesthetics alone!  
+Instead, we need to think about changing our _geom_:
+
+```{r, fig.width=10}
+ggplot(iris, aes(Species, Sepal.Width)) +
+  geom_boxplot()
+```
+
+---
+
+We can't fix this with aesthetics alone!  
+Instead, we need to think about changing our _geom_:
+
+```{r, fig.width=10}
+ggplot(iris, aes(Species, Sepal.Width)) +
+  geom_violin()
+```
+
+---
+
+There are _tons_ of geoms available in ggplot2 (and even more provided by other 
+packages) -- we'll just run through a few of the most useful:
+
+```{r, fig.width=10, fig.height=6}
+ggplot(iris, aes(Sepal.Width)) +
+  geom_histogram()
+```
+
+[Link: ggplot2 cheatsheet](https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+
+---
+
+There are _tons_ of geoms available in ggplot2 (and even more provided by other 
+packages) -- we'll just run through a few of the most useful:
+
+```{r, fig.width=10, fig.height=6}
+ggplot(iris, aes(Sepal.Length, Sepal.Width)) +
+  geom_smooth()
+```
+
+[Link: ggplot2 cheatsheet](https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+
+---
+
+There are _tons_ of geoms available in ggplot2 (and even more provided by other 
+packages) -- we'll just run through a few of the most useful:
+
+```{r, fig.width=10, fig.height=6}
+ggplot(iris, aes(Sepal.Length, Sepal.Width)) +
+  geom_line()
+```
+
+[Link: ggplot2 cheatsheet](https://rstudio.com/wp-content/uploads/2015/03/ggplot2-cheatsheet.pdf)
+
+---
+
+Hopefully you've started to see that we can make pretty much any graph we want 
+just by following a basic template:
+
+```r
+ggplot(data = <DATA>, aes(<MAPPINGS>)) + 
+  <GEOM_FUNCTION>()
+```
+
+---
+
+# Making _good_ graphs 
+
+Let's go back to our original graph.  
+This graphic is _fine_, but we want to make it look better!
+
+```{r, fig.width=8, fig.height=5}
+ggplot(data = iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point()
+```
+
+---
+
+One of the easiest ways to make our plots look better is via _themes_, which 
+provide better defaults for things like fonts and backgrounds:
+
+```{r, fig.width=8, fig.height=5}
+ggplot(data = iris, aes(x = Sepal.Length, y = Sepal.Width)) +
+  geom_point() +
+  theme_minimal()
+```
+
+---
+
+```{r good_plots, fig.width=8, fig.height=4, include=FALSE}
+ggplot(data = iris, aes(x = Sepal.Length, y = Sepal.Width)) + #BREAK
+  geom_point() + #BREAK
+  geom_smooth(aes(color = Species)) + #BREAK9
+  facet_wrap( #BREAK7
+    ~ Species, #BREAK7
+    ncol = 1 #BREAK8
+             ) + #BREAK7
+  theme_minimal() + #BREAK2
+  labs( #BREAK3
+    x = "Sepal length", #BREAK3
+    y = "Sepal width" #BREAK3
+    , title = "Sepal width increases alongside sepal length" #BREAK4
+    , subtitle = "Correlation confounded by species differences" #BREAK5
+    , caption = "Data from Fisher, R. A. (1936)" #BREAK6
+  ) #BREAK3
+```
+
+`r chunk_reveal("good_plots", break_type = "non_seq")`
+
+---
+
+```{r bad_plot, fig.width=8, fig.height=4, include=FALSE}
+cowplot::stamp_bad( #BREAK3
+  ggplot(data = iris) + #BREAK
+  geom_point(#BREAK
+    aes( #BREAK
+      x = Sepal.Length, #BREAK
+      y = Sepal.Width), #BREAK
+    size = 3) + #BREAK
+  geom_point(#BREAK2
+    aes(#BREAK2
+      x = Petal.Length, #BREAK2
+      y = Petal.Width), #BREAK2
+    size = 3, #BREAK2
+    shape = "triangle") #BREAK2
+) #BREAK3
+```
+
+`r chunk_reveal("bad_plot", "non_seq")`
+
+---
+
+```{r fine_plot, fig.width=8, fig.height=4, include=FALSE}
+cowplot::stamp_good( #BREAK2
+  ggplot(data = iris, #BREAK
+         aes( #BREAK
+           x = Sepal.Length, #BREAK
+           y = Sepal.Width) #BREAK
+         ) + #BREAK
+  geom_point(size = 3) + #BREAK
+  geom_point(size = 3, #BREAK
+             shape = "triangle") #BREAK
+) #BREAK2
+```
+
+`r chunk_reveal("fine_plot", "non_seq")`
+
+---
+
+```{r good_hist, include=FALSE}
+ggplot(iris, aes(Sepal.Length)) + #BREAK
+  geom_histogram(#BREAK
+    color = "black",#BREAK4
+    fill = "lightblue"#BREAK5
+  ) +#BREAK
+  scale_y_continuous(#BREAK6
+    expand = c(0, 0)#BREAK6
+  ) +#BREAK6
+  scale_x_continuous(#BREAK7
+    expand = c(0, 0) #BREAK8
+  ) +#BREAK7
+  facet_wrap(~ Species, ncol = 1) + #BREAK9
+  theme_classic() +#BREAK3
+  labs(#BREAK2
+    x = "Sepal length",#BREAK2
+    y = "Count"#BREAK2
+  )#BREAK2
+```
+
+`r chunk_reveal("good_hist", break_type = "non_seq")`
+
+---
+
+# Now you try.
+
+Make the plot below look better! Give it a theme, a different line color and 
+polygon fill, and some cleaner axis labels. 
+
+Can you add points above the violin plot (hint: remember there are two geoms for
+scatterplots)? How do you color those differently than the violin plot lines?
+
+Split it into facets -- is this a better plot? Why or why not?
+
+```{r, fig.width=8, fig.height=3}
+ggplot(iris, aes(Species, Sepal.Width)) +
+  geom_violin()
+```
+
+---
+
+# Things we've learned:
+
+### 1: _Functions_ take _arguments_ as inputs and return an _output_.
+
+Functions are predictable -- given the same inputs, they should always return 
+the same outputs; and changing the inputs should change the outputs in a 
+predictable way.
+
+```{r}
+print("Hello, World!")
+head(Orange)
+```
+
+---
+
+### 2: Many functions are designed to help you get familiar with your data.
+
+```{r, fig.height=3}
+str(iris)
+
+plot(iris)
+```
+
+---
+
+### 3: ggplot combines geoms and aesthetics to make plots.
+
+```{r, fig.height=4, fig.width=8}
+ggplot(iris, aes(Species, Sepal.Length, fill = Species)) + 
+  geom_violin() +
+  geom_jitter()
+```

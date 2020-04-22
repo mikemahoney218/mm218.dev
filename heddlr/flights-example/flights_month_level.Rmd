@@ -1,0 +1,7 @@
+
+### `r month.name[[MONTHNUM]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, MONTHNUM)
+```
+
