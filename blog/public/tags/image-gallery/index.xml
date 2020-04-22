@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>image gallery on Hugo tranquilpeak theme</title>
+    <link>/tags/image-gallery/</link>
+    <description>Recent content in image gallery on Hugo tranquilpeak theme</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Mon, 18 Feb 2013 00:00:00 +0000</lastBuildDate>
+    
+	<atom:link href="/tags/image-gallery/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>Image gallery showcase</title>
+      <link>/2013/02/image-gallery-showcase/</link>
+      <pubDate>Mon, 18 Feb 2013 00:00:00 +0000</pubDate>
+      
+      <guid>/2013/02/image-gallery-showcase/</guid>
+      <description>&lt;p&gt;And here is the image gallery!&lt;/p&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

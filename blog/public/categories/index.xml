@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Categories on Hugo tranquilpeak theme</title>
+    <link>/categories/</link>
+    <description>Recent content in Categories on Hugo tranquilpeak theme</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Thu, 23 Jul 2015 21:13:14 -0500</lastBuildDate>
+    
+	<atom:link href="/categories/index.xml" rel="self" type="application/rss+xml" />
+    
+    
+    <item>
+      <title>R</title>
+      <link>/categories/r/</link>
+      <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
+      
+      <guid>/categories/r/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>releases</title>
+      <link>/categories/releases/</link>
+      <pubDate>Mon, 15 Jun 2015 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/releases/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>tranquilpeak</title>
+      <link>/categories/tranquilpeak/</link>
+      <pubDate>Mon, 15 Jun 2015 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/tranquilpeak/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>showcase</title>
+      <link>/categories/showcase/</link>
+      <pubDate>Sun, 14 Jun 2015 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/showcase/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>features</title>
+      <link>/categories/features/</link>
+      <pubDate>Thu, 28 May 2015 00:00:00 +0000</pubDate>
+      
+      <guid>/categories/features/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
