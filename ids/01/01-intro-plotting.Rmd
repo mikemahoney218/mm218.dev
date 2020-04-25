@@ -107,27 +107,21 @@ print("Hello, World!")>
 </!-->
 
 ---
+class: middle, center
 
-<img src="https://lh4.googleusercontent.com/gOonnxlEYuaHiQruPKMKSX83z5YezyQwMbpoIwNIayN-1xflPTpWSkTm5QdGWS55zkXBJ5-Kg1SvX47-QScd_h7q5CpD8SlTYzxMtNsZ" width="1000" height="600"></img>
+![](yer.png)
 
 ---
 
 # What was that?
 
---
 
 * We just used our first _function_: `print`
 
---
-
 * _Functions_ take _arguments_ as inputs and then return an _output_.
-
---
 
 * So we provided "Hello World!" as an argument, and `print` gave it right back
   to us as an output!
-
---
 
 * `print` is going to do the exact same thing with any input we give it -- 
   try calling `print()` with your name as an argument instead!
@@ -170,11 +164,9 @@ We can get a lot more insight by plotting our data:
 plot(iris)
 ```
 
----
+--
 
-We can get a lot more insight by plotting our data:
-
-```{r, fig.width=10}
+```{r, fig.width=10, echo=FALSE}
 plot(iris)
 ```
 
@@ -186,40 +178,48 @@ We can also plot individual variables by specifying the x and y axes:
 plot(x = iris$Sepal.Length, y = iris$Sepal.Width)
 ```
 
----
+--
 
-We can also plot individual variables by specifying the x and y axes:
-
-```{r, fig.width=10}
+```{r, fig.width=10, echo=FALSE}
 plot(x = iris$Sepal.Length, y = iris$Sepal.Width)
 ```
 
 ---
+class: center, middle
 
-If we want to make better looking plots, we can use the `ggplot2` _package_. A 
-package is just a set of functions and data that someone in the R community 
-wrote and shared for other people to use. 
+![](ggplot2_exploratory.png)
+
+---
 
 We can install packages using the `install.packages()` function, and load them 
 to use in our code with the `library()` function.
 
+<br>
+
 You already installed `ggplot2` as part of your homework when installing the 
 `tidyverse` package; let's load it with `library()` now:
 
-```{r eval=FALSE}
+```{r}
 library(ggplot2)
+```
 
+<br>
+
+And now we can make our first plot with `ggplot2`:
+
+```{r, eval=FALSE}
+# note: plus sign goes at the end of the line!
 ggplot(data = iris) +
   aes(x = Sepal.Length, 
       y = Sepal.Width) +
   geom_point()
 ```
 
+
 ---
 
 ```{r fig.width=8, fig.height=5}
-library(ggplot2)
-
+# note: plus sign goes at the end of the line!
 ggplot(data = iris) +
   aes(x = Sepal.Length, 
       y = Sepal.Width) +
@@ -274,9 +274,7 @@ What’s the difference between discrete or continuous variables?
 ---
 class: center
 
-```{r, echo=FALSE, out.width='80%'}
-knitr::include_graphics("aesthetics.png")
-```
+![](aesthetics.png)
 
 ---
 
@@ -380,11 +378,18 @@ ggplot(data = <DATA>, aes(<MAPPINGS>)) +
   <GEOM_FUNCTION>()
 ```
 
+--
+
+```{r, fig.width=8, fig.height=5}
+ggplot(data = iris, aes(Sepal.Length, Sepal.Width)) +
+  geom_point()
+```
+
+
 ---
 
 # Making _good_ graphs 
 
-Let's go back to our original graph.  
 This graphic is _fine_, but we want to make it look better!
 
 ```{r, fig.width=8, fig.height=5}
@@ -538,3 +543,8 @@ ggplot(iris, aes(Species, Sepal.Length, fill = Species)) +
   geom_violin() +
   geom_jitter()
 ```
+
+---
+class: center, middle
+
+![](r_first_then.png)

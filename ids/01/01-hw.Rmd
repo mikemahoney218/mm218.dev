@@ -47,6 +47,7 @@ What happens if you make a scatterplot of class vs drv? Why is the plot not usef
 
 ```
 
+ANSWER: 
 
 ### Question 5
 
@@ -71,6 +72,8 @@ ggplot() +
   geom_smooth(data = mpg, aes(x = displ, y = hwy))
 ```
 
+ANSWER:
+
 ## Part Three: Make this graph!
 
 There are a number of datasets included with the ggplot2 package. We'll start 
@@ -87,7 +90,7 @@ code to make -- if you find yourself writing much more than that, you're
 probably going down a rabbit hole somewhere.
 
 ```{r}
-knitr::include_graphics("make_this_graph_1.png")
+knitr::include_graphics("https://www.mm218.dev/ids/01/make_this_graph_1.png")
 ```
 
 ```{r}
@@ -95,7 +98,7 @@ knitr::include_graphics("make_this_graph_1.png")
 ```
 
 ```{r}
-knitr::include_graphics("make_this_graph_2.png")
+knitr::include_graphics("https://www.mm218.dev/ids/01/make_this_graph_2.png")
 ```
 
 ```{r}
@@ -103,7 +106,7 @@ knitr::include_graphics("make_this_graph_2.png")
 ```
 
 ```{r}
-knitr::include_graphics("make_this_graph_3.png")
+knitr::include_graphics("https://www.mm218.dev/ids/01/make_this_graph_3.png")
 ```
 
 ```{r}
@@ -111,7 +114,7 @@ knitr::include_graphics("make_this_graph_3.png")
 ```
 
 ```{r}
-knitr::include_graphics("make_this_graph_4.png")
+knitr::include_graphics("https://www.mm218.dev/ids/01/make_this_graph_4.png")
 ```
 
 ```{r}

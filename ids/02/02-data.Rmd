@@ -130,6 +130,36 @@ FALSE == 0
 
 ---
 
+There's one more logical value in R: `NA`, used to represent missing values.
+
+```{r}
+class(NA)
+```
+
+Because `NA` represents a value that should exist but doesn't, it doesn't 
+cooperate with most functions -- almost every function returns `NA` when given
+`NA` as an input:
+
+```{r}
+NA + 5
+```
+
+In fact, NA isn't even equal to `NA` -- because we don't know what value the
+missing data _should_ be, we aren't able to tell whether it is or isn't equal
+to anything else.
+
+```{r}
+NA == NA
+```
+
+Instead, we use `is.na` to check whether a value is `NA` or not:
+
+```{r}
+is.na(NA)
+```
+
+---
+
 What will this code do?
 
 ```r
@@ -169,7 +199,10 @@ c(1, 4)
 
 <br>
 
---
+---
+
+We can then provide vectors to functions which are expecting only a single data 
+argument:
 
 ```{r eval=FALSE}
 sqrt(c(1, 4))
@@ -180,6 +213,23 @@ sqrt(c(1, 4))
 ```{r echo=FALSE}
 sqrt(c(1, 4))
 ```
+
+<br>
+
+Note that functions will usually do one of two different things when you're 
+passed a vector. 
+
+Some functions, like `sqrt`, do something to each value in the 
+vector separately and then return a vector of the same length; these are called 
+_vectorized_ functions.
+
+Some functions, however, will operate on the vector as a whole and return a 
+scalar output:
+
+```{r}
+sum(c(1, 4))
+```
+
 
 ---
 
@@ -208,7 +258,7 @@ class(c(1, "hello"))
 
 --
 
-```{r, echo=FALSE }
+```{r, echo=FALSE}
 class(c(1, "hello"))
 ```
 
@@ -418,251 +468,140 @@ iris[1:4, c("Sepal.Length", "Species")]
 When working with data frames, the order is always `[row, column]`
 
 ---
-class: center, middle, title
 
-# Exercise 1
-
----
-
-There's one more common way to subset our data, and that's by using a function 
-from the `dplyr` package. 
-
-`dplyr` was also installed when you installed `tidyverse`, so let's just load it
-now:
+There's one more way to store data in R, called a _list_:
 
 ```{r}
-library(dplyr)
+list(x = c("one", "two"),
+           y = c(9, 8))
 ```
 
 <br>
 
-`dplyr` gives us the `select()` function, which works a little differently. We 
-call it like `sqrt()` or `plot()` functions, and pass it our data frame as the 
-first argument, then the names of the columns we want to access:
-
-```{r}
-head(
-  select(iris, Sepal.Length, Sepal.Width) # Note: no quotes!
-)
-```
+Lists are a special type of vector, which function a lot like data frames. 
 
 ---
 
-You'll notice that `select()` returns a data frame, just like `[]`. Actually, 
-all `dplyr` functions return (and usually take as inputs) data frames -- that's 
-what the `d` in `dplyr` stands for!
+Similarly to a data frame, lists can store vectors of different data types. 
+Uniquely, however, lists are able to store vectors of different _lengths_, 
+too:
+
+```{r}
+list(x = c("one", "two"),
+           y = c(9, 8, 7, 6, 5))
+```
+
+<br>
+
+This makes lists very useful for a lot of programming purposes, but they don't 
+really lend themselves to data analysis -- its hard to have tidy datasets when 
+your vectors can be any length and aren't stored in a nice tabular format.
+
+---
+
+That said, some R functions return list objects, so we should go over the basics
+of how you work with lists.
+
+<br>
+
+Let's say we have some list called `our_list`:
+
+```{r}
+our_list <- list(x = c("one", "two"),
+           y = c(9, 8, 7, 6, 5))
+
+our_list
+```
+
+<br>
+
+(See that `<-`? That's the `assignment operator` -- we can use it to store 
+anything we create in R as an _object_. We can then just use the _name_ of that
+object to get our original _value_ back.)
+
+---
+
+We can then subset using the same tricks we use for dataframes, with a few 
+small differences.
+
+<br>
+
+First, using `[]` to subset will return a list, instead of a dataframe:
+
+```{r}
+our_list[1]
+```
 
 --
 
-But `dplyr` provides a lot more than just `select()`. For instance, let's say we
-wanted to find all the irises with sepals that are more than 5 cm long.
+Second, we can't use pull specific values from a list using `[[]]` or 
+`[row, number]` format. 
 
 <br>
 
-We already know how to get R to tell us if each sepal length is longer than 5 cm,
-using logical operators:
-
-<br>
-
-```{r, message=FALSE}
-head(
-  iris$Sepal.Length > 5
-)
-```
-
----
-
-We can combine that with the `filter()` function from `dplyr` to return the full
-row every time that condition is `TRUE` -- so in this case, each row where 
-Sepal.Length is greater than 5:
-
-<br>
+Instead, we need to use `[[]]` or `$` to extract a vector, then subset that 
+vector again to get specific values:
 
 ```{r}
-head(
-  # don't need to subset iris, since we provided it as an argument
-  filter(iris, Sepal.Length > 5)
-)
-```
-
----
-
-Now, what if we wanted to do both of those -- if we wanted to filter our dataset
-_and_ select specific columns?
-
-One way we can do things like this is by _nesting functions_ -- that is, 
-putting a function entirely inside of another function. For instance, we can 
-replace the data argument in `select()` with the entire `filter()` call:
-
-```{r}
-head(
-  select(
-    # We replaced the iris dataset with the filtered one --
-    # since it returns a data frame, we can use it as the data 
-    # argument to select
-    filter(iris, Sepal.Length > 5),
-    # The other arguments to select are the same:
-    Sepal.Length, 
-    Sepal.Width)
-)
-```
-
----
-
-We've done this before, when making plots too:
-
-```r
-## aes is a function inside a function!
-ggplot(<data>, aes(<mapping>))
-```
-
----
-
-This starts to get hard to read, though, particularly once we chain together 
-more than two or three steps.
-
-<br>
-
-Luckily, `dplyr` provides another operator to let us write things in a more 
-readable manner. The `%>%` operator, known as the _pipe_, lets us write code 
-that reads from right to left -- we take the output on the left side of the 
-pipe, then use it as the first argument in the function on the right. 
-
-<br>
-
-Personally, I always think of the pipe as a way to say "and then...":
-
-```{r}
-iris %>% # Take the iris dataset, and then...
-  filter(Sepal.Length > 5) %>% # filter the data, and then...
-  select(Sepal.Length, Sepal.Width) %>% # ...select columns, and then...
-  head() # ...select the top rows of the data.
-```
-
----
-
-So now we're able to subset our data in all sorts of different ways. That's 
-cool, but it would be helpful for us to actually manipulate the data as well!
-
-<br>
-
-`dplyr` comes in handy again here, with a number of functions for manipulating 
-data. Chief among these is `mutate`, which we can use to create a new column in 
-our data frame:
-
-```{r}
-iris %>% 
-  mutate(total = Sepal.Length + Sepal.Width + Petal.Length + Petal.Width) %>% 
-  head()
+our_list[[2]][3:5]
 ```
 
 <br>
 
-Note that `mutate` will do the same thing to each row of your dataset, and will
-give you an output that's the same length as the input data frame.
+Again, we won't be using lists too much in this early section of the course, so 
+don't worry if they seem confusing right now!
 
 ---
 
-We can even combine this with our subsetting functions! 
+# Things We've Learned:
 
-<br>
-
-See if you can combine `mutate` and `filter` to find the flower with the largest
-difference between its sepal length and width.
-
---
+### 1: All data in R is one of several types of data -- and a vector can only be one type of data:
 
 ```{r}
-iris %>% 
-  mutate(sepal_difference = abs(Sepal.Length - Sepal.Width)) %>% 
-  filter(sepal_difference == max(sepal_difference))
-```
+class(1)
 
-<br>
+class("hello world")
 
-(What do you think abs() does?)
+class(TRUE)
 
----
-class: center, middle, inverse, title-slide
-
-# Exercise 2
-
----
-
-This is cool, but what if we wanted to find the flower of each species with the 
-largest difference? We might try adding a condition to our `filter` function:
-
-```{r}
-iris %>% 
-  mutate(sepal_difference = abs(Sepal.Length - Sepal.Width)) %>% 
-  filter(Species == "setosa" & # "&" means both conditions need to be TRUE
-           sepal_difference == max(sepal_difference))
-```
-
-But because there's no single record that is _both_ a "setosa" and has the 
-largest difference -- because only one record has the largest difference, and 
-it's a virginica.
-
---
-
-We could try using two filter statements instead: 
-
-```{r}
-iris %>% 
-  filter(Species == "setosa") %>% 
-  mutate(sepal_difference = abs(Sepal.Length - Sepal.Width)) %>% 
-  filter(sepal_difference == max(sepal_difference))
-```
-
-But that seems silly -- and it would take a lot of typing to do this for each 
-species!
-
----
-
-Luckily, `dplyr` provides functions to make this easier! We can use the 
-`group_by` function to _group_ our data frame by a variable.  
-Our `filter` function then will calculate the `max(sepal_difference)` separately for each species, so we'll get results for each species in one go:
-
-```{r}
-iris %>% 
-  mutate(sepal_difference = abs(Sepal.Length - Sepal.Width)) %>% 
-  group_by(Species) %>% 
-  filter(sepal_difference == max(sepal_difference))
-```
-
-<br>
-
-Under the hood, `group_by` is basically splitting our dataframe into three -- 
-one per species -- running our code on each of them, and then combining them 
-back into a single table at the end. Luckily, `group_by` handles all the work 
-for us, so we don't have to think about most of those in-between steps!
-
----
-
-
-
-```{r}
-iris %>% 
-  group_by(Species) %>% 
-  summarise(mean_length = mean(Sepal.Length),
-            median_length = median(Sepal.Length))
+class(c(1, "hello world"))
 ```
 
 ---
 
+### 2: We can use _logical operators_ to determine if a statement is true or false:
 
+```{r}
+4 > 5
+
+10 <= 10
+
+5 == 5
+
+5 != 5
+
+TRUE == 1
+
+FALSE == 0
+```
 
 ---
 
+### 3: Vectors can only store one type of data, but dataframes can store multiple vectors:
 
+```{r}
+data.frame(x = c("one", "two"),
+           y = c(9, 8))
+```
 
 ---
 
-    rename() to select variables based on their names.
+### 4: R provides several methods to _subset_ our dataframes into smaller tables:
 
-    count / tally
+```{r}
+iris[48:52, "Sepal.Width"]
 
-    distinct
-    
-    group_by
-    summarise
+iris[[1, 2]]
+
+head(iris$Species)
+```
