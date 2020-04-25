@@ -15,17 +15,13 @@
   to = "https://www.researchgate.net/profile/Michael_Mahoney13"
 
 [[redirects]]
-  from = "/"
-  to = "https://www.mikemahoney218.com"
-
-[[redirects]]
   from = "/twitter"
   to = "https://www.twitter.com/mikemahoney218"
 
 [[redirects]]
   from = "/cv"
-  to = "https://www.mikemahoney218.com/files/cv.pdf"
+  to = "/cv.pdf"
 
 [[redirects]]
   from = "/resume"
-  to = "https://www.mikemahoney218.com/files/resume.pdf"
+  to = "/resume.pdf"

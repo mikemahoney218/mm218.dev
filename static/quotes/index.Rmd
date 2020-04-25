@@ -1,0 +1,279 @@
+---
+title: Quotes
+output:
+  tufte::tufte_html: default
+---
+
+<hr>
+
+Of course, someone has to write for loops. It doesn't have to be you.
+
+--- [Jenny Bryan: Row Oriented Workflows in R With the Tidyverse](https://speakerdeck.com/jennybc/row-oriented-workflows-in-r-with-the-tidyverse?slide=16)
+
+
+<hr>
+
+An over-simplified and dangerously reductive diagram of a data system might look like this:
+
+    Collection → Computation → Representation
+
+Whenever you look at data — as a spreadsheet or database view or a visualization, you are looking at an artifact of such a system. What this diagram doesn’t capture is the immense branching of choice that happens at each step along the way. As you make each decision — to omit a row of data, or to implement a particular database structure or to use a specific colour palette you are treading down a path through this wild, tall grass of possibility. It will be tempting to look back and see your trail as the only one that you could have taken, but in reality a slightly divergent you who’d made slightly divergent choices might have ended up somewhere altogether different. To think in data systems is to consider all three of these stages at once.
+
+--- [Jer Thorpe: You Say Data, I Say System](https://medium.com/@blprnt/you-say-data-i-say-system-54e84aa7a421)
+
+<hr>
+
+The thing that is most alluring about the Gini coefficient also turns out to be its greatest shortcoming. By collapsing the whole rainbow of the income distribution into a single statistical point of white light, it necessarily conceals much of great interest. That is of course true of any single summary measure... The best measures are those that match our purpose, or pick up on the places where important changes are happening. We should pick and mix with that in mind.
+
+--- [Angus Deaton and Angela Case](https://www.prospectmagazine.co.uk/economics-and-finance/rebottling-the-gini-why-this-headline-measure-of-inequality-misses-everything-that-matters)
+
+<hr>
+
+After describing the perverse interaction between wealth gaps, education, mortality trends and political economy, Case and Deaton note that “You could crunch the Gini coefficient to as many decimal places as you like, and you’d learn next to nothing about what’s really going on here.” Quite so, but surely it is unreasonable to demand of one measure of inequality along one dimension that it shed light on complex social interactions or detect causal relationships.
+
+That would be like urging us to abandon the Centigrade scale as a measure of temperature because it so badly fails to inform us about how climate change plays havoc with rainfall patterns, the incidence of extreme weather events, or the extent of sea level rises.  You could calculate average global temperature increases to as many decimal places in degrees Celsius as you liked, and you would be none the wiser about the diversity of consequences of climate change around the world.
+
+--- [Francisco Ferreira](https://blogs.worldbank.org/developmenttalk/defense-gini-coefficient)
+
+<hr>
+
+Software has been around since the 1940s. Which means that people have been faking their way through meetings about software, and the code that builds it, for generations. Now that software lives in our pockets, runs our cars and homes, and dominates our waking lives, ignorance is no longer acceptable. The world belongs to people who code. Those who don’t understand will be left behind. (Josh Tyrangiel, header)
+
+[...]
+
+A computer is a clock with benefits. They all work the same, doing second-grade math, one step at a time: Tick, take a number and put it in box one. Tick, take another number, put it in box two. Tick, operate (an operation might be addition or subtraction) on those two numbers and put the resulting number in box one. Tick, check if the result is zero, and if it is, go to some other box and follow a new set of instructions.
+
+[...]
+
+It’s a good and healthy exercise to ponder what your computer is doing right now. Maybe you’re reading this on a laptop: What are the steps and layers between what you’re doing and the Lilliputian mechanisms within? When you double-click an icon to open a program such as a word processor, the computer must know where that program is on the disk. It has some sort of accounting process to do that. And then it loads that program into its memory—which means that it loads an enormous to-do list into its memory and starts to step through it. What does that list look like?
+
+Maybe you’re reading this in print. No shame in that. In fact, thank you. The paper is the artifact of digital processes. Remember how we put that “a” on screen? See if you can get from some sleepy writer typing that letter on a keyboard in Brooklyn, N.Y., to the paper under your thumb. What framed that fearful symmetry?
+
+Thinking this way will teach you two things about computers:   
+One, there’s no magic, no matter how much it looks like there is. There’s just work to make things look like magic.  
+And two, it’s crazy in there.
+
+[...]
+
+You can tell how well code is organized from across the room. Or by squinting or zooming out. The shape of code from 20 feet away is incredibly informative. Clean code is idiomatic, as brief as possible, obvious even if it’s not heavily documented. Colloquial and friendly. As was written in Structure and Interpretation of Computer Programs (aka SICP), the seminal textbook of programming taught for years at MIT, “A computer language is not just a way of getting a computer to perform operations -- it is a novel formal medium for expressing ideas about methodology. Thus, programs must be written for people to read, and only incidentally for machines to execute.” A great program is a letter from current you to future you or to the person who inherits your code. A generous humanistic document.
+
+Of course all of this is nice and flowery; it needs to work, too.
+
+--- [Paul Ford: What is Code?](https://www.bloomberg.com/graphics/2015-paul-ford-what-is-code/)
+
+<hr>
+
+The Postulates of Mathematics Were Not on the Stone Tablets that Moses Brought Down from Mt. Sinai. It is necessary to emphasize this. We begin with a vague concept in our minds, then we create various sets of postulates, and gradually we settle down to one particular set. In the rigorous postulational approach, the original concept is now replaced by what the postulates define. This makes further evolution of the concept rather difficult and as a result tends to slow down the evolution of mathematics. It is not that the postulation approach is wrong, only that its arbitrariness should be clearly recognized, and we should be prepared to change postulates when the need becomes apparent.
+
+--- Richard Hamming 
+<hr>
+
+Teachers should prepare the student for the student's future, not for the teacher's past.
+
+[...]
+
+Education is what, when, and why to do things. Training is how to do it.
+
+[...]
+
+In science, if you know what you are doing, you should not be doing it. In engineering, if you do not know what you are doing, you should not be doing it. Of course, you seldom, if ever, see either pure state.
+
+---[Richard Hamming: The Art of Doing Science and Engineering](http://worrydream.com/refs/Hamming-TheArtOfDoingScienceAndEngineering.pdf) 
+<hr>
+
+I note with fear and horror that even in 1980, language designers and users have not learned this lesson [mandatory run-time checking of array bounds]. In any respectable branch of engineering, failure to observe such elementary precautions would have long been against the law.
+
+[...]
+
+I conclude that there are two ways of constructing a software design: One way is to make it so simple that there are obviously no deficiencies, and the other way is to make it so complicated that there are no obvious deficiencies. The first method is far more difficult. It demands the same skill, devotion, insight, and even inspiration as the discovery of the simple physical laws which underlie the complex phenomena of nature. It also requires a willingness to accept objectives which are limited by physical, logical, and technological constraints, and to accept a compromise when conflicting objectives cannot be met. No committee will ever do this until it is too late.
+
+--- [C.A.R. Hoare: The Emperor's Old Clothes](http://worrydream.com/refs/Hoare%20-%20The%20Emperors%20Old%20Clothes.pdf)
+<hr>
+
+
+I like this definition:   A tool addresses human needs by amplifying human capabilities. That is, a tool converts what we can do into what we want to do. A great tool is designed to fit both sides. 
+
+--- [Bret Victor: A Brief Rant on the Future of Interaction Design](http://worrydream.com/#!/ABriefRantOnTheFutureOfInteractionDesign)
+<hr>
+
+Discoverability is often cited as npm’s biggest flaw. Many blog posts -- scratch that, entire websites -- have been created to try and mitigate the difficulty of finding what you need on npm. Everyone has an idea about how to make it easier to find needles in the haystack, but no-one bothers to ask what all this hay is doing here in the first place.
+
+--- [Rich Harris: Small modules: it's not quite that simple](https://medium.com/@Rich_Harris/small-modules-it-s-not-quite-that-simple-3ca532d65de4)
+<hr>
+
+Brave to write it, all by itself, and then brave to show it. It is like opening your ribcage, and letting someone see the little bird you have inside. What if they don’t love the bird? It’s not like you can change it.  I mean.. That’s your bird.
+
+--- [Tycho: Fan Fiction](https://www.penny-arcade.com/news/post/2014/12/12/fan-fiction) 
+<hr>
+
+Look, you have two choices. You can say, "I'm a pessimist, nothing's gonna work, I'm giving up, I'll help ensure that the worst will happen." Or you can grasp onto the opportunities that do exist, the rays of hope that exist, and say, "Well, maybe we can make it a better world." It's not a much of a choice.
+
+--- [Noam Chomskey: Interview](https://www.youtube.com/watch?v=btJfkPBLULg&t=7m7s) 
+<hr>
+
+There's really only one important question worth asking, which is: what is a life well-lived?... That's a question that can't be answered, but one thing we can say, with a lot of certainty, is that a life well-lived is not going to be a life in which every moment is scrutinized.
+
+--- [Frank Lantz: Hearts and Minds](https://www.gdcvault.com/play/1020788/Hearts-and)
+<hr>
+
+I hate abstraction. Here are some examples.
+
+--- [Adam Cadre: Fatal abstraction](http://adamcadre.ac/calendar/11170.html) 
+<hr>
+
+I find that the single thing which inhibits young professionals, new students most severely, is their acceptance of standards that are too low. If I ask a student whether her design is as good as Chartres, she often smiles tolerantly at me as if to say, "Of course not, that isn't what I am trying to do.... I could never do that."
+
+Then, I express my disagreement, and tell her: "That standard must be our standard. If you are going to be a builder, no other standard is worthwhile. That is what I expect of myself in my own buildings, and it is what I expect of my students." Gradually, I show the students that they have a right to ask this of themselves, and must ask this of themselves. Once that level of standard is in their minds, they will be able to figure out, for themselves, how to do better, how to make something that is as profound as that.
+
+--- [Christopher Alexander: Foreward to Patterns of Software](http://www.dreamsongs.com/Files/PatternsOfSoftware.pdf) 
+<hr>
+
+The Stone Age didn't end for lack of stone, and the Oil Age will end long before the world runs out of oil.
+
+--- Sheik Ahmed Zaki Yamani 
+<hr>
+
+[I told the fourth-graders] I was thinking of a number between 1 and 10,000. ... They still cling stubbornly to the idea that the only good answer is a yes answer. This, of course, is the result of miseducation in which "right answers" are the only ones that pay off. They have not learned how to learn from a mistake, or even that learning from mistakes is possible. If they say, "Is the number between 5,000 and 10,000?" and I say yes, they cheer; if I say no, they groan, even though they get exactly the same amount of information in either case. The more anxious ones will, over and over again, ask questions that have already been answered, just for the satisfaction of hearing a yes.
+
+--- John Holt: How Children Fail 
+<hr>
+
+Ian is a game design teacher and a professional skeptic. People call him a “curmudgeon”, but they don’t really understand how much love, how much actual faith, that kind of skepticism takes. On a pretty regular basis one of us will IM the other something like “help” or “fuck” or “people are terrible”.
+
+Only when you fully believe in how wonderful something is supposed to be does every little daily indignity start to feel like some claw of malaise. At least, that’s how I explain Ian to other people.
+
+--- Leigh Alexander: The Unearthing 
+<hr>
+
+Q: So it’s fine to say, everybody should learn a little bit about how to program and this way of thinking because it’s valuable and important. But then maybe that’s just not realistic. Donald Knuth told me that he thinks two percent of the population have brains wired the right way to think about programming.
+
+A: That same logic would lead you to say that one percent of the US's population is wired to understand Mandarin. The reasoning there is equivalent.
+
+--- [Hal Abselson: Interview]
+<hr>
+
+Many professions require some form of programming. Accountants program spreadsheets; musicians program synthesizers; authors program word processors; and web designers program style sheets.
+
+[...]
+
+The typical course on programming teaches a “tinker until it works” approach. When it works, students exclaim “It works!” and move on. Sadly, this phrase is also the shortest lie in computing, and it has cost many people many hours of their lives.
+
+[...]
+
+By “good programming,” we mean an approach to the creation of software that relies on systematic thought, planning, and understanding from the very beginning, at every stage, and for every step. To emphasize the point, we speak of systematic program design and systematically designed programs. Critically, the latter articulates the rationale of the desired functionality. Good programming also satisfies an aesthetic sense of accomplishment; the elegance of a good program is comparable to time-tested poems or the black-and-white photographs of a bygone era. In short, programming differs from good programming like crayon sketches in a diner from oil paintings in a museum.
+No, this book won’t turn anyone into a master painter. But, we would not have spent fifteen years writing this edition if we didn’t believe that  
+_everyone can design programs_  
+and  
+_everyone can experience the satisfaction that comes with creative design._
+
+[...]
+
+When you were a small child, your parents taught you to count and perform simple calculations with your fingers: “1 + 1 is 2”; “1 + 2 is 3”; and so on. Then they would ask “what’s 3 + 2?” and you would count off the fingers of one hand. They programmed, and you computed. And in some way, that’s really all there is to programming and computing.
+Now it is time to switch roles.
+
+
+--- [How to Design Programs](https://htdp.org/2019-02-24/index.html)
+<hr>
+
+You can't sell someone the solution before they've bought the problem.
+
+--- Chip Morningstar: Smart people can rationalize anything
+<hr>
+
+when you don't create things, you become defined by your tastes rather than ability. your tastes only narrow & exclude people. so create
+
+--- why the lucky stiff
+<hr>
+
+When you believe you have a future, you think in terms of generations and years. When you do not, you live not just by the day -- but by the minute.
+
+--- Iris Chang
+<hr>
+
+It seems like most people ask: "How can I throw my life away in the least unhappy way?"
+
+--- Stewart Brand
+<hr>
+
+Q: Are you ever afraid of someone stealing your thunder?
+
+A: I think anybody really good is going to want to do their own thing. Anybody who's not really good, you don't have to worry too much about.
+ 
+--- [Chris Hecker: Interview](https://kotaku.com/weve-got-jonathan-blow-the-witness-braid-and-chris-h-5923134)
+<hr>
+
+Living organisms are shaped by evolution to survive, not necessarily to get a clear picture of the universe. For example, frogs' brains are set up to recognize food as moving objects that are oblong in shape. So if we take a frog's normal food -- flies -- paralyze them with a little chloroform and put them in front of the frog, it will not notice them or try to eat them.
+
+It will starve in front of its food! But if we throw little rectangular pieces of cardboard at the frog it will eat them until it is stuffed! The frog only sees a little of the world we see, but it still thinks it perceives the whole world.
+
+Now, of course, we are not like frogs! Or are we?
+
+--- [Alan Kay: The Center of "Why?"](http://www.vpri.org/pdf/m2004002_center.pdf)
+<hr>
+
+Pick a plane or a cave wall to project the shadow of the Real World onto, and tell a story about the outlines it makes. The trick is to shrug and smile and pick another plane and do it all again to get a completely different shadow, until you find the one most useful for the day. It’s a magic trick for most folks.
+
+--- [Down is just the most common way out](http://vaguery.com/words/down-is-just-the-most-common-way-out)
+<hr>
+
+To an architect, imagination is mostly about the future. To invent the future, one must live in it, which means living (at least partly) in a world that does not yet exist. Just as a driver whizzing along a highway pays more attention to the front window than the rear, the architect steers by looking ahead. This can sometimes make them seem aloof or absent-minded, as if they are someplace else. In fact, they are. For them, the past is a lesson, the present is fleeting; but the future is real. It is infinite and malleable, brimming with possibility.
+
+--- [Danny Hillis: The Power of Conviction](https://www.piumarta.com/pov/points-of-view.pdf)
+<hr>
+
+If the first line of your [R] script is `setwd("C:\Users\jenny\path\that\only\I\have")`, I will come into your lab and SET YOUR COMPUTER ON FIRE.
+
+--- [Jenny Bryan: here, here](https://github.com/jennybc/here_here)
+<hr>
+
+It becomes important in such a climate of opinion to emphasize that books do not store knowledge. They contain symbolic codes that can serve us as external mnemonics for knowledge. Knowledge can exist only in living human minds.
+
+--- [Kieran Egan](The Educated Mind: How Cognitive Tools Shape Our Understanding)
+<hr>
+
+People are much smarter when they can use their full intellect and when they can relate what they are learning to situations or phenomena which are real to them.
+The natural reaction, when someone is having trouble understanding what you are explaining, is to break up the explanation into smaller pieces and explain the pieces one by one. This tends not to work, so you back up even further and fill in even more details.
+
+But human minds do not work like computers: it is harder, not easier, to understand something broken down into all the precise little rules than to grasp it as a whole. It is very hard for a person to read a computer assembly language program and figure out what it is about...
+
+Studying mathematics one rule at a time is like studying a language by first memorizing the vocabulary and the detailed linguistic rules, then building phrases and sentences, and only afterwards learning to read, write, and converse. Native speakers of a language are not aware of the linguistic rules: they assimilate the language by focusing on a higher level, and absorbing the rules and patterns subconsciously. The rules and patterns are much harder for people to learn explicitly than is the language itself.
+
+--- [William Thurston: Mathematical Education](https://arxiv.org/pdf/math/0503081v1.pdf) 
+<hr>
+
+A lot of the stuff going on [in AI] is not very ambitious. In machine learning, one of the big steps that happened in the mid-'80s was to say, "Look, here’s some real data -- can I get my program to predict accurately on parts of the data that I haven’t yet provided to it?" What you see now in machine learning is that people see that as the only task.
+
+--- [Stuart Russell](http://www.theatlantic.com/magazine/archive/2013/11/the-man-who-would-teach-machines-to-think/309529/)
+<hr>
+
+Like most readers, I had functionally consigned [our game] to the furnace. I had let it float away on one of those little lantern boats in a way that brought me closure, if no one else. Insufficient.  
+Fucking insufficient.
+
+You have to get back on the horse. Somehow, and I don't know how this kind of thing starts, we have started to lionize horseback-not-getting-on: these casual, a priori assertions of inevitable failure, which is nothing more than a gauze draped over your own pulsing terror. Every creative act is open war against The Way It Is. What you are saying when you make something is that the universe is not sufficient, and what it really needs is more you. And it does, actually; it does. Go look outside. You can't tell me that we are done making the world.
+
+--- [Tycho: A Matter of Scale](https://www.penny-arcade.com/news/post/2012/04/20) 
+<hr>
+
+Q: At the [NYU] Game Center, we're interested in the role of the university as an alternate place for thinking about games... What in your opinion are some of the big interesting problems that students should be working on?
+
+A: My advice for students is... I question the question. I don't think there are problems that students should be working on. I think students should be making games that are interesting and push the boundaries, and those will generate the problems.
+
+--- Chirs Hecker
+<hr>
+
+A complex system that works is invariably found to have evolved from a simple system that worked. A complex system designed from scratch never works and cannot be patched up to make it work. You have to start over with a working simple system.
+
+--- John Gall: Systemantics
+<hr>
+
+We have this limited bubble of experience. We can only have so many experiences in our lifetime to build models from, and we're abstracting from that data. We've found, through evolution, two ways to get more data, to build more elaborate models of the world. One is to have toy experiences, little counterfeit experiences. The other one is to learn from the experience of others. When somebody tells you a story, you can actually learn from that story, incorporate it into your model of the world to make your model more accurate based upon that data that you got from somebody else. So over time, we have come to call one of these things "play" and the other one "storytelling". These are both fundamentally educational technologies that allow us to build more elaborate models of the world around us, by supplanting our limited experience with other experiences.
+
+--- [Will Wright: Gaming Reality](https://www.youtube.com/watch?v=ZqUkMsYL1Yc)
+<hr>
+
+John [McCarthy]'s world is a world of ideas, a world in which ideas don't belong to anyone, and when an idea is wrong, just the idea - not the person - is wrong. A world in which ideas are like young birds, and we catch them and proudly show them to our friends. The bird's beauty and the hunter's are distinct....
+
+Some people won't show you the birds they've caught until they are sure, certain, positive that they - the birds, or themselves - are gorgeous, or rare, or remarkable. When your mind can separate yourself from your bird, you will share it sooner, and the beauty of the bird will be sooner enjoyed. And what is a bird but for being enjoyed?
+
+--- [Richard Gabriel: The Design of Parallel Programming Languages](http://www.dreamsongs.com/10ideas.html)
+<hr>

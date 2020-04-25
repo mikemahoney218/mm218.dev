@@ -1,0 +1,335 @@
+---
+title: 2013 NYC Flights Dashboard
+author: Mike Mahoney
+params:
+  flights: NA
+  graph_flights_per_hour: NA
+  graph_mean_delay: NA
+  graph_sankey: NA
+  graph_carriers: NA
+output:
+  flexdashboard::flex_dashboard:
+    vertical_layout: fill
+    orientation: rows
+---
+# EWR {data-navmenu="Airport Overviews"}
+
+##
+
+###
+
+```{r warning=FALSE}
+airportcode <- "EWR"
+
+graph_flights_per_hour(airportcode)
+```
+
+###
+```{r warning=FALSE}
+graph_sankey(airportcode)
+```
+
+###
+```{r warning=FALSE}
+graph_carriers(airportcode)
+```
+
+## {.tabset}
+
+### `r month.name[[1]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 1)
+```
+
+
+### `r month.name[[2]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 2)
+```
+
+
+### `r month.name[[3]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 3)
+```
+
+
+### `r month.name[[4]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 4)
+```
+
+
+### `r month.name[[5]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 5)
+```
+
+
+### `r month.name[[6]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 6)
+```
+
+
+### `r month.name[[7]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 7)
+```
+
+
+### `r month.name[[8]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 8)
+```
+
+
+### `r month.name[[9]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 9)
+```
+
+
+### `r month.name[[10]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 10)
+```
+
+
+### `r month.name[[11]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 11)
+```
+
+
+### `r month.name[[12]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 12)
+```
+
+# LGA {data-navmenu="Airport Overviews"}
+
+##
+
+###
+
+```{r warning=FALSE}
+airportcode <- "LGA"
+
+graph_flights_per_hour(airportcode)
+```
+
+###
+```{r warning=FALSE}
+graph_sankey(airportcode)
+```
+
+###
+```{r warning=FALSE}
+graph_carriers(airportcode)
+```
+
+## {.tabset}
+
+### `r month.name[[1]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 1)
+```
+
+
+### `r month.name[[2]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 2)
+```
+
+
+### `r month.name[[3]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 3)
+```
+
+
+### `r month.name[[4]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 4)
+```
+
+
+### `r month.name[[5]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 5)
+```
+
+
+### `r month.name[[6]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 6)
+```
+
+
+### `r month.name[[7]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 7)
+```
+
+
+### `r month.name[[8]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 8)
+```
+
+
+### `r month.name[[9]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 9)
+```
+
+
+### `r month.name[[10]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 10)
+```
+
+
+### `r month.name[[11]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 11)
+```
+
+
+### `r month.name[[12]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 12)
+```
+
+# JFK {data-navmenu="Airport Overviews"}
+
+##
+
+###
+
+```{r warning=FALSE}
+airportcode <- "JFK"
+
+graph_flights_per_hour(airportcode)
+```
+
+###
+```{r warning=FALSE}
+graph_sankey(airportcode)
+```
+
+###
+```{r warning=FALSE}
+graph_carriers(airportcode)
+```
+
+## {.tabset}
+
+### `r month.name[[1]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 1)
+```
+
+
+### `r month.name[[2]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 2)
+```
+
+
+### `r month.name[[3]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 3)
+```
+
+
+### `r month.name[[4]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 4)
+```
+
+
+### `r month.name[[5]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 5)
+```
+
+
+### `r month.name[[6]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 6)
+```
+
+
+### `r month.name[[7]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 7)
+```
+
+
+### `r month.name[[8]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 8)
+```
+
+
+### `r month.name[[9]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 9)
+```
+
+
+### `r month.name[[10]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 10)
+```
+
+
+### `r month.name[[11]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 11)
+```
+
+
+### `r month.name[[12]]`
+
+```{r, fig.width=16, fig.height=3.5, warning=FALSE}
+graph_mean_delay(airportcode, 12)
+```
+

@@ -1,0 +1,14 @@
+{
+  "presets": [
+    [
+      "babel-preset-env",
+      {
+        "useBuiltIns": true,
+        "modules": "commonjs",
+        "targets": {
+          "node": 4
+        }
+      }
+    ]
+  ]
+}

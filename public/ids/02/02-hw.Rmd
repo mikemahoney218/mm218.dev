@@ -1,0 +1,90 @@
+# Homework Two: Introduction to Data
+
+## Part One: Data Types
+
+### Question 1
+
+Why does this code not work?
+
+```{r}
+1 + "a"
+```
+
+ANSWER: 
+
+### Question 2
+
+Change the ? in each of these statements so that the statement returns TRUE:
+
+```{r}
+4 ? 3
+
+5 ? 6
+
+# Use the not-equal operator here
+5 ? 6
+
+# Use the is-equal operator here
+5 ? 5
+
+TRUE ? 1
+
+FALSE ? 0
+
+?(NA)
+```
+
+### Question 3
+
+Why does this code not return a value? How can we get it to do so? Remember you
+can check the help for `sum` by running `?sum`.
+
+```{r}
+sum(c(1:10, NA))
+```
+
+## Part Two: Subsetting
+
+### Question 3
+
+Use all three of the subsetting methods we've gone over to select the `Species`
+column from the `iris` dataset:
+
+```{r}
+
+```
+
+### Question 4
+
+Select the first 6 rows of both the `Species` and `Sepal.Length` column from the 
+`iris` dataset. Only one of our subsetting methods will work for this, but you 
+can specify the columns two different ways -- do it both ways in the chunk below!
+
+```{r}
+
+```
+
+### Question 5
+
+Create a data frame and a list with the same data: a single vector named x, 
+containing the numbers 1 through 10. Save them (using `<-`) in our_data_frame 
+and our_list, respectively.
+
+What's the difference between the output of `head` when called on a list versus
+a data frame?
+
+```{r}
+
+```
+
+ANSWER:
+
+### Question 6
+
+Use our subsetting techniques to pull the number 6 out of `our_list`. Do it 
+two times, once using `$` and once only using `[[]]`.
+
+```{r}
+
+```
+

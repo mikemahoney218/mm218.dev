@@ -1,0 +1,109 @@
+# Homework Three: Data Wrangling
+
+## Part One: Ungrouped Wrangling
+
+### Question 1
+
+We're going to start working with data frames now! In order to do so, load the 
+`dplyr` package with `library` now:
+
+```{r}
+
+```
+
+If the package loaded correctly, you should now have access to the `storms` 
+dataset. Use whichever of the methods we've gone over to explore a dataset to 
+get familiar with it below:
+
+```{r}
+
+```
+
+### Question 2
+
+How many distinct storm names are in the `storms` table? How many years are 
+included?
+
+```{r}
+
+```
+
+ANSWER: ____ names, ____ years
+
+### Question 3
+
+What year had the storm with the highest pressure? What was the storm named?
+
+```{r}
+
+```
+
+ANSWER: 
+
+### Question 4
+
+What day and month combination has the most records? You'll probably want to use
+the `count` function here.
+
+```{r}
+
+```
+
+### Question 5
+
+Create a new column for our `storms` dataframe, named ID, which combines the 
+year, month, day, and name of each storm into a unique ID. To combine the 
+fields, use the `paste` function. What type is the output vector?
+
+```{r}
+
+```
+
+ANSWER:
+
+## Part Two: Grouped Operations
+
+### Question 6
+
+Use our `dplyr` functions to find the storm each year with the highest wind 
+speeds. Your code should return a table of storm name and year, which should be
+46 rows long.
+
+If you need a hint, the only dplyr functions you should need are `group_by`, 
+`filter`, and `distinct`. You'll also need a base R function to find the highest
+wind of each year.
+
+```{r}
+storms %>% 
+  group_by(year) %>% 
+  filter(wind == max(wind)) %>% 
+  distinct(name, year)
+```
+
+### Question 7
+
+Find the average and median wind speed and pressure for each year. You should 
+have 41 rows and five columns when you're done!
+
+```{r}
+
+```
+
+### Question 8
+
+Run the code in the chunk below to see the graph, then use the following 
+chunk to recreate it. Note that we can pipe straight into `ggplot` from dplyr --
+since the first argument to `ggplot` is the data, it works with pipes just like 
+all our `dplyr` functions!
+
+This graph took me eight lines of code to make, including getting the counts of 
+storms by year and status. Note that you'll also need to load ggplot2 using `library`.
+
+```{r}
+knitr::include_graphics("https://www.mm218.dev/ids/03/make_this_graph_1.png")
+```
+
+```{r}
+
+```
+

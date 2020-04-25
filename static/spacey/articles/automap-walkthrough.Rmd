@@ -1,0 +1,138 @@
+---
+title: "A semi-comprehensive `automap` walkthrough"
+output: html_document
+---
+
+This vignette aims to cover the various arguments to `automap`, the main 
+function within the `spacey` package.
+
+This vignette will only discuss functions which aren't comprehensively covered 
+in the [package introduction](https://mikemahoney218.github.io/spacey/articles/introduction-to-spacey.html).
+If you're stuck on saving and loading data or generating a map of the right 
+place at all, check that document out first.
+
+## Map Generation and Sizing
+
+### Image Sizing
+
+There are two arguments to `automap` which control the output size of your image,
+somewhat predictably named `img.width` (for the x dimension) and `img.height` 
+(for the y). Both of these measurements are in pixels and have maximum values of
+8000 (enforced by the API, not just this package).
+
+### Overlay
+
+An overlay is a png image which will be placed over your elevation map, 
+downloaded from the ESRI MapServer API. The following overlays can be accessed:
+
+* "World_Imagery"
+* "NatGeo_World_Map"
+* "USA_Topo_Maps"
+* "World_Physical_Map"
+* "World_Shaded_Relief"
+* "World_Street_Map"
+* "World_Terrain_Base"
+* "World_Topo_Map"
+
+You can see previews of many of these overlays at 
+[this link](http://leaflet-extras.github.io/leaflet-providers/preview/index.html)
+by looking for the maps prefixed with "ESRI". Note that not all ESRI maps on 
+that list are available through the public API used by this package.
+
+The transparency of the overlay layer is controlled via `overlay.alpha`, with a
+default value of 0.75. A value of 1 means the overlay will be fully opaque 
+(looking like Google Maps), while a value of 0 will be fully transparent.
+
+### Elevation Scale
+
+The z-scale (units of your x/y data divided by units of your z data) for USGS 
+data is approximately 9, the default value used by the package. This will result
+in your map's elevations being roughly accurately scaled, which can sometimes 
+make for lame maps. To exaggerate elevation features, try setting `z` to lower 
+values (I've gone as low as 0.0001 for artistic renderings before); 
+alternatively, to flatten your map set `z` to higher values.
+
+### Displaying the Map
+
+By default, `automap` prints your map and then invisibly returns the map itself.
+To suppress the printing, set `print.map = FALSE` in your call to `automap`.
+
+## Map Coloring
+
+This section will make comparsions against a simple map to show the effect each 
+argument has on coloration. This is the map we're using as our default:
+```{r}
+library(spacey)
+automap(
+  44.121268,
+  -73.903734
+)
+```
+
+Shadow intensity can be controlled via the `max.darken` argument. Lower values 
+will result in higher contrast images:
+
+```{r}
+automap(44.121268,
+  -73.903734,
+  max.darken = 0.1
+)
+```
+
+The height of the sun used to draw shadows can be changed via the `sun.altitude`
+function:
+```{r}
+automap(44.121268,
+  -73.903734,
+  sun.altitude = 90
+)
+```
+
+The direction of the sun, meanwhile, can be changed via `sun.angle`. Values here
+represent degree values -- so 0 means the sun is located due North, 90 due East,
+and so on.
+```{r}
+automap(44.121268,
+  -73.903734,
+  sun.angle = 115
+)
+```
+
+Shading colors can be controlled via the `colorscale` argument.
+All individual scales implemented in `rayshader` (at the time of this 
+writing, this meant `imhof1` through `imhof4`, `desert`, `bw`, and `unicorn`) 
+can be provided as values to `colorscale`.  
+Additionally, this package implements three new scales for maps:
+
+```{r}
+automap(44.121268,
+  -73.903734,
+  colorscale = "spacey1"
+)
+```
+
+```{r}
+automap(44.121268,
+  -73.903734,
+  colorscale = "spacey2"
+)
+```
+
+```{r}
+automap(44.121268,
+  -73.903734,
+  colorscale = "spacey3"
+)
+```
+
+I'm taking suggestions for better names for these color schemes (though the 
+numeric ones will be left as aliases) -- suggestions are welcome on 
+[GitHub](https://github.com/mikemahoney218/spacey/issues)!
+
+## 3D Options
+
+I personally find it easiest to render 3D images in interactive sessions, then
+use the interactive viewer to position my map as I want it. I'll then use
+`rayshader::render_snapshot()` to save the image from my interactive viewer to 
+file. Better support for scripted 3D rendering is expected in future package 
+versions.

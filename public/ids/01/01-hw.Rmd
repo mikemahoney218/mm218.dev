@@ -1,0 +1,123 @@
+# Homework One: Plotting & Intro to R
+
+## Part One: Exploring Your Data
+
+We're going to use a new dataset, `mpg`, included with the `ggplot2` package. To
+load the data, we'll start off by loading `ggplot2`.
+
+```{r}
+library(ggplot2)
+```
+
+### Question 1
+
+We can now explore the `mpg` dataset the same way we did for iris. In the code 
+chunk below, use the three functions we used to explore `iris` to find out more 
+about `mpg`.
+
+```{r}
+
+```
+
+### Question 2
+
+When data comes with a package, it will usually be documented. You can read the 
+documentation for a dataset (or a function) by running `?<name>` (just like 
+you run any other line of code -- either Ctrl + Enter or type it into the 
+console directly). 
+
+Try running ?mpg to get more information on our dataset. What does the drv 
+variable describe?
+
+## Part Two: Basic Plotting
+
+### Question 3
+
+Using ggplot2, make a scatterplot of hwy vs cyl.
+
+```{r}
+
+```
+
+### Question 4
+
+What happens if you make a scatterplot of class vs drv? Why is the plot not useful?
+
+```{r}
+
+```
+
+ANSWER: 
+
+### Question 5
+
+What’s gone wrong with this code? Why are the points not blue? Fix it!
+
+```{r}
+ggplot(data = mpg) + 
+  geom_point(aes(x = displ, y = hwy, color = "blue"))
+```
+
+### Question 6
+
+Why do these two graphs look the same?
+
+```{r}
+ggplot(data = mpg, aes(x = displ, y = hwy)) + 
+  geom_point() + 
+  geom_smooth()
+
+ggplot() + 
+  geom_point(data = mpg, aes(x = displ, y = hwy)) + 
+  geom_smooth(data = mpg, aes(x = displ, y = hwy))
+```
+
+ANSWER:
+
+## Part Three: Make this graph!
+
+There are a number of datasets included with the ggplot2 package. We'll start 
+using the `diamonds` data to make a handful of plots. You should take the chance
+to explore it the same way we did iris and mpg!
+
+I made four graphs using this data set, included as make_this_graph numbers 1 - 
+4. You should be able to remake all of them, using the techniques we've gone 
+over and a tiny bit of Googling. 
+
+Run the code in each of these chunks to see the graph, then use the following 
+chunk to recreate it. Note that each graph took me about ten lines of 
+code to make -- if you find yourself writing much more than that, you're 
+probably going down a rabbit hole somewhere.
+
+```{r}
+knitr::include_graphics("https://www.mm218.dev/ids/01/make_this_graph_1.png")
+```
+
+```{r}
+
+```
+
+```{r}
+knitr::include_graphics("https://www.mm218.dev/ids/01/make_this_graph_2.png")
+```
+
+```{r}
+
+```
+
+```{r}
+knitr::include_graphics("https://www.mm218.dev/ids/01/make_this_graph_3.png")
+```
+
+```{r}
+
+```
+
+```{r}
+knitr::include_graphics("https://www.mm218.dev/ids/01/make_this_graph_4.png")
+```
+
+```{r}
+
+```
+

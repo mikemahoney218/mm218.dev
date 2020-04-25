@@ -1,0 +1,47 @@
+language: node_js
+
+node_js:
+  - '8'
+  - '10'
+
+sudo: false
+
+before_install:
+  - curl -o- -L https://yarnpkg.com/install.sh | bash
+  - export PATH="$HOME/.yarn/bin:$PATH"
+
+install:
+  - yarn
+
+cache:
+  yarn: true
+  directories:
+    - 'node_modules'
+
+script:
+  - yarn test
+
+after_success: yarn cover
+
+notifications:
+  email:
+    on_success: never
+    on_failure: never
+
+stages:
+  - test
+  - name: deploy
+    if: type = push AND tag IS present
+
+jobs:
+  include:
+    - stage: deploy
+      node_js: '10'
+      deploy:
+        skip_cleanup: true
+        provider: npm
+        email: $NPM_EMAIL
+        api_key: $NPM_TOKEN
+        on:
+          tags: true
+          branch: master
