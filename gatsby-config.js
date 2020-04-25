@@ -6,7 +6,7 @@ module.exports = {
     title: config.siteTitle,
     author: config.author,
     siteUrl: 'https://mm218.dev',
-    description: "Data science & modern software development. Posts by Mike Mahoney",
+    description: "Mike Mahoney's personal webpage. Maps, data, and the world around us.",
     social: [
       {
         name: 'Github',
