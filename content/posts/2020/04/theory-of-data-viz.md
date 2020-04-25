@@ -3,7 +3,7 @@ title: "Theory of Data Visualizations"
 path: "/2020/04/dataviz-theory"
 tags: ["Data Visualization", "Tutorials"]
 featuredImage: "./theory.png"
-created: '2020-04-20'
+date: '2020-04-20'
 updated: '2020-04-20'
 excerpt: "Part 1 in the data visualization series"
 ---

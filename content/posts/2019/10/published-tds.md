@@ -3,7 +3,7 @@ title: "The Art and Science of Data Visualization published in Towards Data Scie
 path: "/2019/10/tds-published"
 tags: ["Publications", "Data Visualization", "Towards Data Science"]
 featuredImage: "./making.png"
-created: '2019-10-13'
+date: '2019-10-13'
 updated: '2019-10-13'
 excerpt: "A comprehensive guide on how to think about and create brilliant data visualizations."
 ---

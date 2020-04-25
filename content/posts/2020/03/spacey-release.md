@@ -3,7 +3,7 @@ title: "Announcing {spacey}, now on CRAN!"
 path: "/2020/03/spacey-release"
 tags: ["R", "R Packages", "maps", "spacey", "geospatial data"]
 featuredImage: "./spacey.png"
-created: '2019-03-24'
+date: '2019-03-24'
 updated: '2019-03-24'
 excerpt: "USGS data access and rayshader maps, done cheap."
 ---

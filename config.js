@@ -1,8 +1,8 @@
 module.exports = {
   siteTitle: 'Mike Mahoney', // <title>
   author: 'Mike Mahoney',
-  manifestName: 'Resume',
-  manifestShortName: 'Landing', // max 12 characters
+  manifestName: 'Mike Mahoney',
+  manifestShortName: 'Homepage', // max 12 characters
   manifestStartUrl: '/',
   manifestDisplay: 'standalone',
   manifestIcon: 'src/assets/img/website-icon.png',

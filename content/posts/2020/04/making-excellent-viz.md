@@ -3,7 +3,7 @@ title: "making Excellent Visualizations"
 path: "/2020/04/make-good-graphs"
 tags: ["Data Visualization", "Tutorials"]
 featuredImage: "./making.png"
-created: '2020-04-22'
+date: '2020-04-22'
 updated: '2020-04-22'
 excerpt: "Part 3 in the data visualization series"
 ---

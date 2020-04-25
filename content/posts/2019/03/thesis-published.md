@@ -3,7 +3,7 @@ title: "Thesis Now Available in ESF Digital Commons"
 path: "/2019/03/thesis-published"
 tags: ["Publications", "Beaver"]
 featuredImage: "./Wireframes.png"
-created: '2019-03-27'
+date: '2019-03-27'
 updated: '2019-03-27'
 excerpt: "It's a real humdinger."
 ---

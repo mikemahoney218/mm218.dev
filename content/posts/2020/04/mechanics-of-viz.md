@@ -3,7 +3,7 @@ title: "Mechanics of Data Visualizations"
 path: "/2020/04/dataviz-mechanics"
 tags: ["Data Visualization", "Tutorials"]
 featuredImage: "./mechanics.png"
-created: '2020-04-21'
+date: '2020-04-21'
 updated: '2020-04-21'
 excerpt: "Part 2 in the data visualization series"
 ---

@@ -3,7 +3,7 @@ title: "Announcing {heddlr}, now on CRAN!"
 path: "/2020/01/heddlr-release"
 tags: ["R", "R Packages", "R Markdown"]
 featuredImage: "./heddlr-badge.png"
-created: '2019-01-23'
+date: '2019-01-23'
 updated: '2019-01-23'
 excerpt: "Write less boilerplate, get more done."
 ---
