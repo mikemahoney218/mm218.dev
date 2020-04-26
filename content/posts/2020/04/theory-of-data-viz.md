@@ -33,7 +33,7 @@ you with recipes for the future, but rather to teach you what flour is –
 to introduce you to the basic concepts and building blocks of effective
 data visualizations.
 
-## The mantras
+### The mantras
 
 As much as possible, I’ve collapsed those concepts into four mantras
 we’ll return to throughout this course. The mantras are:
@@ -46,7 +46,7 @@ we’ll return to throughout this course. The mantras are:
 Each mantra serves as the theme for a section, and will also be
 interwoven throughout. The theme of this section is, easily enough:
 
-## A good graphic tells a story
+### A good graphic tells a story
 
 When making a graphic, it is important to understand what the graphic is
 for. After all, you usually won’t make a chart that is an exact

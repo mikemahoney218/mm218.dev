@@ -2,26 +2,6 @@ const config = require('./config');
 
 module.exports = {
   pathPrefix: config.pathPrefix,
-  siteMetadata: {
-    title: config.siteTitle,
-    author: config.author,
-    siteUrl: 'https://mm218.dev',
-    description: "Mike Mahoney's personal webpage. Maps, data, and the world around us.",
-    social: [
-      {
-        name: 'Github',
-        url: 'https://github.com/mikemahoney218',
-      },
-      {
-        name: 'Linkedin',
-        url: 'https://linkedin.com/in/mikemahoney218/',
-      },
-      {
-        name: 'Twitter',
-        url: 'https://twitter.com/mikemahoney218',
-      },
-    ]
-  },
   plugins: [
     'gatsby-plugin-react-helmet',
     {
@@ -51,4 +31,24 @@ module.exports = {
       options: { paths: ['ans_key.Rmd'] },
     },
   ],
+  siteMetadata: {
+    title: config.siteTitle,
+    author: config.author,
+    siteUrl: 'https://mm218.dev',
+    description: "Mike Mahoney's personal webpage. Maps, data, and the world around us.",
+    social: [
+      {
+        name: 'Github',
+        url: 'https://github.com/mikemahoney218',
+      },
+      {
+        name: 'Linkedin',
+        url: 'https://linkedin.com/in/mikemahoney218/',
+      },
+      {
+        name: 'Twitter',
+        url: 'https://twitter.com/mikemahoney218',
+      },
+    ]
+  },
 };

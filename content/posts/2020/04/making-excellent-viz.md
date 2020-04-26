@@ -11,7 +11,7 @@ excerpt: "Part 3 in the data visualization series"
 As we move into our final section, it’s time to dwell on our final
 mantra:
 
-## Ink is cheap. Electrons are even cheaper.
+### Ink is cheap. Electrons are even cheaper.
 
 This is a fancy, dogmatic way to say: Make more than one chart. It’s
 rare that your first try is going to produce your best looking output.
@@ -159,7 +159,7 @@ isn’t to say you can never use animation – but its uses are best kept to
 times when your graphic looking cool is more important than it conveying
 information.
 
-## Common Mistakes
+### Common Mistakes
 
 As we wind down this section, I want to touch on a few common mistakes
 that didn’t have a great home in any other section – mostly because we
@@ -211,7 +211,7 @@ tends to reduce the effectiveness of your graphic – this type of
 visualization should be reserved for exploratory graphics and modeling,
 instead.
 
-## Conclusion
+### Conclusion
 
 And that just about wraps up this introduction to the basic concepts of
 data visualizations. Hopefully you’ve picked up some concepts or

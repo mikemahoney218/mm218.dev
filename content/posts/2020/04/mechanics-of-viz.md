@@ -15,7 +15,7 @@ Let’s move from theoretical considerations of graphing to the actual
 building blocks you have at your disposal. As we do so, we’re also going
 to move on to mantra \#2:
 
-## Everything should be made as simple as possible – but no simpler.
+### Everything should be made as simple as possible – but no simpler.
 
 Graphs are inherently a 2D image of our data:
 
@@ -419,7 +419,7 @@ following:
 
 Let’s transition away from aesthetics, and towards our third mantra:
 
-## Use the right tool for the job.
+### Use the right tool for the job.
 
 Think back to our first chart:
 
