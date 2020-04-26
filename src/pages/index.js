@@ -5,6 +5,9 @@ import Layout from '../components/Layout'
 // import { Link } from 'gatsby';
 import Sidebar from '../components/Sidebar'
 import config from '../../config'
+import jobs from '../../jobs'
+import professional_experience from '../../build_funcs'
+import { element } from 'prop-types'
 const IndexPage = () => (
   <Layout>
     <Sidebar />
@@ -67,166 +70,146 @@ const IndexPage = () => (
       >
         <div className='w-100'>
           <h2 className='mb-5'>Experience</h2>
+            
+            {jobs.wayfair_detail.map(item => {
+              const { title, team, when, where, bullets } = item
+              return (
+                <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
+                <div className='resume-content'>
+                <h3 className='mb-0'>{title}</h3>
+                <div className='subheading mb-3'>{team}</div>
+                
+                {bullets.map(elements => {
+                  return(
+                    <li>
+                      {elements}
+                    </li>
+                  )
+                })
+                }
+                </div>
+                <br></br>
+            <div className='resume-date text-md-right'>
+              <span className='text-primary'>{when}</span>
+              <br></br>
+              <span className='text-primary'>{where}</span>
+            </div>
+          </div>
+              )
+            })}
+            <br></br>
 
-          <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
-            <div className='resume-content'>
-              <h3 className='mb-0'>Analyst</h3>
-              <div className='subheading mb-3'>Forecasting & Analytics -- Wayfair, Inc. </div>
-              <p>
-                <li>
-                Develop and launch department's first automated streaming
-                data pipelines, connecting BuildKite, Docker, R, Python, Bash,
-                and T-SQL in order to create always-available real-time
-                dashboards.
-                </li>
-                <li>
-                Implement process improvements including automating long-standing
-                reporting (dramatically increasing reporting speed and accuracy)
-                and introducing Git and related workflows to department.
-                </li>
-                <li>
-                  Fill role as interdepartmental liaison between partner teams
-                  on matters of reporting methodologies, data availability, and
-                  data access.
-                </li>
-                <li>
-                    Serve as department subject-matter expert on technical matters
-                </li>
-              </p>
-            </div>
+            {jobs.stella_lab.map(item => {
+              const { title, team, when, where, bullets } = item
+              return (
+                <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
+                <div className='resume-content'>
+                <h3 className='mb-0'>{title}</h3>
+                <div className='subheading mb-3'>{team}</div>
+                
+                {bullets.map(elements => {
+                  return(
+                    <li>
+                      {elements}
+                    </li>
+                  )
+                })
+                }
+                </div>
+                <br></br>
             <div className='resume-date text-md-right'>
-              <span className='text-primary'>June 2019 - Present</span>
+              <span className='text-primary'>{when}</span>
               <br></br>
-              <span className='text-primary'>Boston, MA</span>
+              <span className='text-primary'>{where}</span>
             </div>
           </div>
+              )
+            })}
+            <br></br>
 
-          <div className='resume-item d-flex flex-column flex-md-row justify-content-between'>
-            <div className='resume-content'>
-              <h3 className='mb-0'>Independent Researcher</h3>
-              <div className='subheading mb-3'>Stella Riparian and Stream Ecology Laboratory</div>
-              <p>
-                <li>
-                Spearheaded design and implementation of research plan,
-                including data collection from almost 200 field sites, over
-                2,000 miles of travel by researchers, data analysis, and
-                statistical modeling to predict beaver impacts in complex
-                natural systems, using R and ESRI GIS technologies.
-                </li>
-                <li>
-                Analyzed complex systems through use of statistical modeling
-                and machine learning algorithms developed in R and Python.
-                </li>
-                <li>
-                Developed data visualizations and detailed reports used to
-                inform policy at the state level.
-                </li>
-              </p>
-            </div>
+            {jobs.yanai_lab.map(item => {
+              const { title, team, when, where, bullets } = item
+              return (
+                <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
+                <div className='resume-content'>
+                <h3 className='mb-0'>{title}</h3>
+                <div className='subheading mb-3'>{team}</div>
+                
+                {bullets.map(elements => {
+                  return(
+                    <li>
+                      {elements}
+                    </li>
+                  )
+                })
+                }
+                </div>
+                <br></br>
             <div className='resume-date text-md-right'>
-              <span className='text-primary'>September 2017 - June 2019</span>
+              <span className='text-primary'>{when}</span>
               <br></br>
-              <span className='text-primary'>Syracuse, NY</span>
+              <span className='text-primary'>{where}</span>
             </div>
           </div>
-          <br></br>
-          <div className='resume-item d-flex flex-column flex-md-row justify-content-between'>
-            <div className='resume-content'>
-              <h3 className='mb-0'>Research Intern</h3>
-              <div className='subheading mb-3'>Yanai Forest Ecosystem Science Laboratory</div>
-              <p>
-                <li>
-                Analyzed quantitative and qualitative data in R, performing
-                hypothesis testing, statistical estimation, and data
-                visualization using non-parametric statistics in role as data
-                analyst.
-                </li>
-                <li>
-                Improved data collection speed significantly by creating and
-                implementing novel image analysis methods using new
-                technologies.
-                </li>
-              </p>
-            </div>
-            <div className='resume-date text-md-right'>
-              <span className='text-primary'>September 2019 - April 2020</span>
-              <br></br>
-              <span className='text-primary'>Boston, MA</span>
-            </div>
-          </div>
-          <br></br>
-          <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
-            <div className='resume-content'>
-              <h3 className='mb-0'>Beaver Impact Assessment Intern</h3>
-              <div className='subheading mb-3'>New York State Department of Environmental Conservation </div>
-              <p>
-                <li>
-                Spearheaded multi-county environmental research effort in
-                collaboration with New York State Department of Environmental
-                Conservation and the State University of New York College of
-                Environmental Science and Forestry.
-                </li>
-                <li>
-                Evaluated field site locations using R and ESRI ArcGIS to
-                select and prioritize areas for data collection.
-                </li>
-                <li>
-                Applied modern statistical techniques and machine learning
-                approaches to analyze data, leading to reports on results for
-                funding agencies, for land managers and practitioners, and
-                for thesis and journal publication (in review at Forest
-                Ecology and Management).
-                </li>
-                <li>
-                Obtained competitve Career Fellowship to fund 13-week field
-                season.
-                </li>
-                <li>
-                Supervised field technician while travelling extensively
-                throughout New York State to gather field data
-                </li>
-              </p>
-            </div>
-            <div className='resume-date text-md-right'>
-              <span className='text-primary'>May 2018 - August 2018</span>
-              <br></br>
-              <span className='text-primary'>Albany, NY</span>
-            </div>
-          </div>
+              )
+            })}
+            <br></br>
 
-          <div className='resume-item d-flex flex-column flex-md-row justify-content-between'>
-            <div className='resume-content'>
-              <h3 className='mb-0'>Data Scientist / Project Manager (Volunteer)</h3>
-              <div className='subheading mb-3'>Code for Boston - Clean Slate Project</div>
-              <p>
-                <li>
-                Volunteer with civic technology group working with Citizens
-                for Juvenile Justice and Greater Boston
-                Legal Services to making it easier for
-                Massachusetts residents to seal or expunge their
-                criminal records.
-                </li>
-                <li>
-                Manage team of 40 volunteers in developing web
-                applications designed to help speed up and explain
-                the process of applying for record sealing.
-                </li>
-                <li>
-                Mine and wrangle complex data sources to enable
-                deeper analyses into typical offender profiles.
-                </li>
-                <li>
-                  Identify most impactful potential changes to law
-                  in order to help partners prioritize advocacy work.
-                </li>
-              </p>
-            </div>
+            {jobs.beaver_intern.map(item => {
+              const { title, team, when, where, bullets } = item
+              return (
+                <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
+                <div className='resume-content'>
+                <h3 className='mb-0'>{title}</h3>
+                <div className='subheading mb-3'>{team}</div>
+                
+                {bullets.map(elements => {
+                  return(
+                    <li>
+                      {elements}
+                    </li>
+                  )
+                })
+                }
+                </div>
+                <br></br>
             <div className='resume-date text-md-right'>
-              <span className='text-primary'>September 2019 - April 2020</span>
+              <span className='text-primary'>{when}</span>
               <br></br>
-              <span className='text-primary'>Boston, MA</span>
+              <span className='text-primary'>{where}</span>
             </div>
           </div>
+              )
+            })}
+            <br></br>
+
+            {jobs.cfb.map(item => {
+              const { title, team, when, where, bullets } = item
+              return (
+                <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
+                <div className='resume-content'>
+                <h3 className='mb-0'>{title}</h3>
+                <div className='subheading mb-3'>{team}</div>
+                
+                {bullets.map(elements => {
+                  return(
+                    <li>
+                      {elements}
+                    </li>
+                  )
+                })
+                }
+                </div>
+                <br></br>
+            <div className='resume-date text-md-right'>
+              <span className='text-primary'>{when}</span>
+              <br></br>
+              <span className='text-primary'>{where}</span>
+            </div>
+          </div>
+              )
+            })}
+            <br></br>
         </div>
       </section>
 
