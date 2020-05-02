@@ -145,3 +145,5 @@ the way, we'll talk about naming things and the joys of the `here` package.
 tidyr: https://kbroman.org/dataorg/ ; https://r4ds.had.co.nz/tidy-data.html
 
 R markdown: https://rmd4sci.njtierney.com/why-rmarkdown.html
+
+https://arxiv.org/pdf/1903.07639.pdf
