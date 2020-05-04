@@ -38,7 +38,7 @@ sudo apt-get install -y adduser libfontconfig1
 # you can find the current grafana release here: https://grafana.com/grafana/download
 wget https://dl.grafana.com/oss/release/grafana_6.7.3_armhf.deb
 sudo dpkg -i grafana_6.7.3_armhf.deb
-sudo systemctl enable --now grafana
+sudo systemctl enable --now grafana-server
 rm grafana_6.7.3_armhf.deb
 ```
 &nbsp; 
@@ -349,7 +349,7 @@ install looked like this:
 ```
 wget https://dl.grafana.com/oss/release/grafana_6.7.3_armhf.deb
 sudo dpkg -i grafana_6.7.3_armhf.deb
-sudo systemctl enable --now grafana
+sudo systemctl enable --now grafana-server
 rm grafana_6.7.3_armhf.deb
 ```
 &nbsp; 
