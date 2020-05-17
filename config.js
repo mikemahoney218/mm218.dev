@@ -6,7 +6,7 @@ module.exports = {
   manifestStartUrl: '/',
   manifestDisplay: 'standalone',
   manifestIcon: 'src/assets/img/website-icon.png',
-//  pathPrefix: `/gatsby-starter-resume/`, // This path is subpath of your hosting https://domain/portfolio
+  pathPrefix: `/resume`, // This path is subpath of your hosting https://domain/portfolio
   firstName: 'Mike ',
   lastName: ' Mahoney',
   // social

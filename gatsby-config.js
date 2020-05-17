@@ -30,6 +30,44 @@ module.exports = {
       resolve: 'gatsby-plugin-exclude',
       options: { paths: ['ans_key.Rmd'] },
     },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/content/portfolio`,
+        name: `portfolio`,
+      },
+    },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/content/assets`,
+        name: `assets`,
+      },
+    },
+    {
+      resolve: `gatsby-transformer-remark`,
+      options: {
+        plugins: [
+          {
+            resolve: `gatsby-remark-images`,
+            options: {
+              maxWidth: 970,
+            },
+          },
+          `gatsby-remark-prismjs`,
+          "@weknow/gatsby-remark-twitter",
+        ],
+      },
+    },
+    `gatsby-transformer-sharp`,
+    `gatsby-plugin-sharp`,
+ //   {
+  //    resolve: `gatsby-plugin-google-analytics`,
+    //  options: {
+        //trackingId: `ADD YOUR TRACKING ID HERE`,
+      //},
+//    },
+    `gatsby-plugin-feed`,
   ],
   siteMetadata: {
     title: config.siteTitle,

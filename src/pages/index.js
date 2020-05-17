@@ -22,7 +22,7 @@ const IndexPage = () => (
             <span className='text-primary'>{config.lastName}</span>
           </h1>
           <div className='subheading mb-5'>
-            {config.address} · {config.phone} ·
+            {config.address} · 
             <a href={`mailto:${config.email}`}>{config.email}</a>
           </div>
           <p className='lead mb-5'>
