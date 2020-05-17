@@ -1,5 +1,5 @@
 ---
-title: "making Excellent Visualizations"
+title: "Making Excellent Visualizations"
 path: "/2020/04/make-good-graphs"
 tags: ["Data Visualization", "Tutorials"]
 featuredImage: "./making.png"
