@@ -1,0 +1,1130 @@
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Mike Mahoney]]></title><description><![CDATA[Mike Mahoney's personal webpage. Maps, data, and the world around us.]]></description><link>https://mm218.dev</link><generator>GatsbyJS</generator><lastBuildDate>Sun, 17 May 2020 23:39:19 GMT</lastBuildDate><item><title><![CDATA[Installing the TIG stack on Raspberry Pi]]></title><description><![CDATA[Setting Up InfluxDB, Telegraf, and Grafana on Raspberry Pi  tl;dr Do the following in a shell you've already auth'd into sudo on:       This…]]></description><link>https://mm218.dev/2020/05/tig-on-pi/</link><guid isPermaLink="false">https://mm218.dev/2020/05/tig-on-pi/</guid><pubDate>Sun, 03 May 2020 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;Setting Up InfluxDB, Telegraf, and Grafana on Raspberry Pi&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&quot;/img/blog/grafana_dash.webp&quot;&gt;&lt;/p&gt;
+&lt;h3&gt;tl;dr&lt;/h3&gt;
+&lt;p&gt;Do the following in a shell you&apos;ve already auth&apos;d into sudo on:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;sudo apt update
+sudo apt upgrade
+
+wget -qO- https://repos.influxdata.com/influxdb.key | sudo apt-key add -
+# change &amp;quot;buster&amp;quot; as appropriate for your distro
+echo &amp;quot;deb https://repos.influxdata.com/debian buster stable&amp;quot; | sudo tee /etc/apt/sources.list.d/influxdb.list
+sudo apt update
+sudo apt install influxdb
+sudo systemctl unmask influxdb
+sudo systemctl enable influxdb
+sudo systemctl start influxdb
+
+# you can find the current telegraf release here: https://portal.influxdata.com/downloads/
+wget https://dl.influxdata.com/telegraf/releases/telegraf-1.14.2_linux_armhf.tar.gz
+tar xf telegraf-1.14.2_linux_armhf.tar.gz
+sudo systemctl enable --now telegraf
+rm telegraf-1.14.2_linux_armhf.tar.gz
+
+sudo apt-get install -y adduser libfontconfig1
+# you can find the current grafana release here: https://grafana.com/grafana/download
+wget https://dl.grafana.com/oss/release/grafana_6.7.3_armhf.deb
+sudo dpkg -i grafana_6.7.3_armhf.deb
+sudo systemctl enable --now grafana-server
+rm grafana_6.7.3_armhf.deb&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;This should cause all three services to start on system boot. You&apos;ll need to
+configure Telegraf to actually write to your local Influx instance at
+&lt;a href=&quot;http://127.0.0.1:8086&quot;&gt;http://127.0.0.1:8086&lt;/a&gt; (there&apos;s a sample config under the &lt;code class=&quot;language-text&quot;&gt;Telegraf&lt;/code&gt; part of the
+post), then set up Grafana to read from Influx (at the same port) via the UI
+at localhost:3000.&lt;/p&gt;
+&lt;hr&gt;&lt;/hr&gt;
+&lt;br&gt;&lt;/br&gt;
+&lt;h3&gt;Setting up the TIG stack on Raspberry Pi&lt;/h3&gt;
+&lt;p&gt;I&apos;m getting a little cabin-fevery as the 2020 quarantine moves into its third
+month. To try and defray some of the extra energy, I&apos;ve been hacking on a Pi I
+set up with a &lt;a href=&quot;https://openvpn.net/&quot;&gt;Pi-hole&lt;/a&gt; and &lt;a href=&quot;https://openvpn.net/&quot;&gt;openvpn&lt;/a&gt;
+server about a month ago. &lt;/p&gt;
+&lt;p&gt;One of the cool things about the Pi-hole is that it gives you a little
+at-a-glance view of how your machine is doing, including CPU load, memory
+utilization, and temperature. This window into system stats made me realize
+that my little box is packing &lt;em&gt;heat&lt;/em&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/blog/pihole_data.webp&quot;&gt;&lt;/p&gt;
+&lt;p&gt;I&apos;m running a Pi 4, which &lt;a href=&quot;https://www.theregister.co.uk/2019/07/22/raspberry_pi_4_too_hot_to_handle/&quot;&gt;is known for generating more heat than it can handle&lt;/a&gt;,
+so temperatures of ~60 C (&lt;a href=&quot;https://www.raspberrypi.org/forums/viewtopic.php?t=39953&quot;&gt;the upper range of &quot;safe&quot;&lt;/a&gt;)
+isn&apos;t too shocking -- but with summer coming and me planning to add some load
+to this machine in the near future, I wanted to set up monitoring to make sure
+my box wasn&apos;t going to melt on me. This also has the side benefit that I&apos;ll
+have a metrics system already in place for anything else I stand up on this
+machine.&lt;/p&gt;
+&lt;p&gt;Enter the TIG stack. TIG -- &lt;strong&gt;T&lt;/strong&gt;elegraf, &lt;strong&gt;I&lt;/strong&gt;nfluxDB, and &lt;strong&gt;G&lt;/strong&gt;rafana -- is
+a suite of open-source solutions for collecting, storing, and visualizing
+time-series data, like the sort you&apos;ll get from repeatedly measuring system
+temperature. &lt;/p&gt;
+&lt;p&gt;This tutorial will walk you through setting up each of these services
+separately. These steps were tested on a Raspberry Pi 4 running Raspbian Buster,
+so other configurations might require some tweaking. &lt;/p&gt;
+&lt;p&gt;All of the code here should be run in a terminal on your Raspberry Pi unless
+I specify it needs to go somewhere else. To make sure you&apos;re not
+going to run into dependency hell, it&apos;s a good idea to run
+&lt;code class=&quot;language-text&quot;&gt;sudo apt update &amp;amp;&amp;amp; sudo apt upgrade&lt;/code&gt; before installing any of the stack.&lt;/p&gt;
+&lt;hr&gt;&lt;/hr&gt;
+&lt;br&gt;&lt;/br&gt;
+&lt;h3&gt;InfluxDB&lt;/h3&gt;
+&lt;p&gt;First up, we need to set up our InfluxDB instance. This database is where
+our Telegraf instance will send metrics and where Grafana will read from, so
+it makes sense to stand it up first!&lt;/p&gt;
+&lt;p&gt;Installing the service is easy enough -- we just need to add Influx&apos;s
+authentication key, add their repository to our trusted sources, and
+then install it via &lt;code class=&quot;language-text&quot;&gt;apt&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;wget -qO- https://repos.influxdata.com/influxdb.key | sudo apt-key add -
+# change &amp;quot;buster&amp;quot; as appropriate for your distro
+echo &amp;quot;deb https://repos.influxdata.com/debian buster stable&amp;quot; | sudo tee /etc/apt/sources.list.d/influxdb.list
+sudo apt update
+sudo apt install influxdb influxdb-client&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;&lt;/p&gt;
+&lt;p&gt;Now we want to actually start the database, and tell our system to start it
+after reboots -- since we&apos;re expecting to always be collecting metrics via
+Telegraf, we need to make sure that we always have a place to write to, as well.
+This is a quick two-liner using &lt;code class=&quot;language-text&quot;&gt;systemctl&lt;/code&gt; -- we first need to &lt;code class=&quot;language-text&quot;&gt;unmask&lt;/code&gt; Influx,
+which will let us add it as a service, then tell our Pi to start the service
+both right now and every time the system restarts via the &lt;code class=&quot;language-text&quot;&gt;enable --now&lt;/code&gt;
+command:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;sudo systemctl unmask influxdb
+sudo systemctl enable --now influxdb&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;After this, you should be able to run &lt;code class=&quot;language-text&quot;&gt;systemctl status influxdb&lt;/code&gt; to see the
+service status -- if everything went according to plan, you should see
+&lt;code class=&quot;language-text&quot;&gt;Active: active (running)&lt;/code&gt; around line 3 of the output.&lt;/p&gt;
+&lt;p&gt;At this point, it&apos;s probably healthy to add authentication to your Influx
+instance if your pi is exposed to external networks. You can set up a basic
+admin account via:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;influx
+CREATE USER admin WITH PASSWORD &amp;#39;&amp;lt;password&amp;gt;&amp;#39; WITH ALL PRIVILEGES&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;You can then force HTTP authentication by adding the following under the HTTP
+header in &lt;code class=&quot;language-text&quot;&gt;/etc/influxdb/influxdb.conf&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;[HTTP]
+auth-enabled = true
+pprof-enabled = true
+pprof-auth-enabled = true
+ping-auth-enabled = true&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;The changes take effect the next time your service starts, which you can
+trigger via &lt;code class=&quot;language-text&quot;&gt;sudo systemctl restart influxdb&lt;/code&gt;.&lt;/p&gt;
+&lt;hr&gt;&lt;/hr&gt;
+&lt;br&gt;&lt;/br&gt;
+&lt;h3&gt;Telegraf&lt;/h3&gt;
+&lt;p&gt;With Influx up and running, it&apos;s time for us to start writing records, which
+means standing up Telegraf!&lt;/p&gt;
+&lt;p&gt;Telegraf is updated pretty frequently, so it&apos;s a good idea to check &lt;a href=&quot;https://portal.influxdata.com/downloads/&quot;&gt;the release page&lt;/a&gt;
+to see what version you should be installing. At the time of writing, the
+current version is 1.14.2, so I ran the following to install Telegraf on my
+machine:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;wget https://dl.influxdata.com/telegraf/releases/telegraf_1.14.2-1_armhf.deb
+sudo dpkg -i telegraf_1.14.2-1_armhf.deb
+rm telegraf_1.14.2-1_armhf.deb&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;We now have Telegraf installed on our machine, but the service won&apos;t do us much
+good before we set up our configuration, located at
+&lt;code class=&quot;language-text&quot;&gt;/etc/telegraf/telegraf.conf&lt;/code&gt;. Telegraf operates by coordinating a bunch of
+&quot;plugins&quot;, which work to collect and write data to and from different sources.
+You can see the full list of plugins &lt;a href=&quot;https://github.com/influxdata/telegraf/tree/master/plugins&quot;&gt;at Telegraf&apos;s GitHub repo&lt;/a&gt;,
+and activate each by copying the configuration from the plugin&apos;s readme into
+your &lt;code class=&quot;language-text&quot;&gt;/etc/telegraf/telegraf.conf&lt;/code&gt; file.&lt;/p&gt;
+&lt;p&gt;I spent far too much time pouring over the various plugins and wound up with
+the following configuration file -- you can use this to overwrite your default
+&lt;code class=&quot;language-text&quot;&gt;telegraph.conf&lt;/code&gt; file and start collecting metrics right away, or you can
+spend the time now to set up your instance to suit your own particular needs.
+Just make sure you edit your &lt;code class=&quot;language-text&quot;&gt;[[outputs.influxdb]]&lt;/code&gt; to include the following:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;[[outputs.influxdb]]
+   ## The full HTTP or UDP URL for your InfluxDB instance.
+   urls = [&amp;quot;http://127.0.0.1:8086&amp;quot;] # required&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;My full configuration looks like this:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;[agent]
+   # Batch size of values that Telegraf sends to output plugins.
+   metric_batch_size = 1000
+   # Default data collection interval for inputs.
+   interval = &amp;quot;30s&amp;quot;
+   # Added degree of randomness in the collection interval.
+   collection_jitter = &amp;quot;5s&amp;quot;
+   # Send output every 5 seconds
+   flush_interval = &amp;quot;5s&amp;quot;
+   # Buffer size for failed writes.
+   metric_buffer_limit = 10000
+   # Run in quiet mode, i.e don&amp;#39;t display anything on the console.
+   quiet = true
+[[inputs.ping]] # # Ping given url(s) and return statistics
+## urls to ping
+urls = [&amp;quot;www.github.com&amp;quot;,&amp;quot;www.amazon.com&amp;quot;,&amp;quot;1.1.1.1&amp;quot;,&amp;quot;www.mm218.dev&amp;quot;]
+## number of pings to send per collection (ping -c )
+count = 3
+## interval, in s, at which to ping. 0 == default (ping -i )
+ping_interval = 15.0
+## per-ping timeout, in s. 0 == no timeout (ping -W )
+timeout = 10.0
+## interface to send ping from (ping -I )
+interface = &amp;quot;wlan0&amp;quot;
+[[inputs.system]]
+[[inputs.influxdb]]
+  ## Works with InfluxDB debug endpoints out of the box,
+  ## but other services can use this format too.
+  ## See the influxdb plugin&amp;#39;s README for more details.
+
+  ## Multiple URLs from which to read InfluxDB-formatted JSON
+  ## Default is &amp;quot;http://localhost:8086/debug/vars&amp;quot;.
+  urls = [
+    &amp;quot;http://localhost:8086/debug/vars&amp;quot;
+  ]
+  ## http request &amp;amp; header timeout
+  timeout = &amp;quot;5s&amp;quot;
+[[inputs.disk]]
+  ## Ignore mount points by filesystem type.
+  ignore_fs = [&amp;quot;tmpfs&amp;quot;, &amp;quot;devtmpfs&amp;quot;, &amp;quot;devfs&amp;quot;, &amp;quot;iso9660&amp;quot;, &amp;quot;overlay&amp;quot;, &amp;quot;aufs&amp;quot;, &amp;quot;squashfs&amp;quot;]
+[[inputs.diskio]]
+[[inputs.internal]]
+  ## If true, collect telegraf memory stats.
+  collect_memstats = true
+[[inputs.mem]]
+[[inputs.processes]]
+# custom temperature script
+# https://github.com/mikemahoney218/pi-admin/blob/master/telegraf-scripts/systemp.sh
+[[inputs.exec]]
+  commands = [&amp;quot;sh /tmp/telegraf-scripts/systemp.sh&amp;quot;]
+  timeout = &amp;quot;5s&amp;quot;
+  data_format = &amp;quot;influx&amp;quot;
+[[outputs.influxdb]]
+   ## The full HTTP or UDP URL for your InfluxDB instance.
+   urls = [&amp;quot;http://127.0.0.1:8086&amp;quot;] # required
+   ## The target database for metrics (telegraf will create it if not exists).
+   database = &amp;quot;pi_logs&amp;quot; # required
+   ## Name of existing retention policy to write to.  Empty string writes to
+   ## the default retention policy.
+   retention_policy = &amp;quot;&amp;quot;
+   ## Write consistency (clusters only), can be: &amp;quot;any&amp;quot;, &amp;quot;one&amp;quot;, &amp;quot;quorum&amp;quot;, &amp;quot;all&amp;quot;
+   write_consistency = &amp;quot;any&amp;quot;
+   ## Write timeout (for the InfluxDB client), formatted as a string.
+   ## If not provided, will default to 5s. 0s means no timeout (not recommended).
+   timeout = &amp;quot;10s&amp;quot;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;In putting all this together, I found out that the Telegraf plugin to measure
+system temperature -- the thing that got me down this rabbit hole in the first
+place -- doesn&apos;t actually work on Raspberry Pi systems. As a workaround, I
+threw together &lt;a href=&quot;https://github.com/mikemahoney218/pi-admin/blob/master/telegraf-scripts/systemp.sh&quot;&gt;a simple one-liner in Bash&lt;/a&gt;:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;echo &amp;quot;systemp temp=`cat /sys/class/thermal/thermal_zone0/temp`&amp;quot;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;I saved that script off to &lt;code class=&quot;language-text&quot;&gt;/tmp/telegraf-scripts/systemp.sh&lt;/code&gt;, then added it to
+my &lt;code class=&quot;language-text&quot;&gt;telegraf.conf&lt;/code&gt; in the brick:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;[[inputs.exec]]
+  commands = [&amp;quot;sh /tmp/telegraf-scripts/systemp.sh&amp;quot;]
+  timeout = &amp;quot;5s&amp;quot;
+  data_format = &amp;quot;influx&amp;quot;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;If you&apos;re not worried about measuring temperature, you don&apos;t need (or want) to
+include that section in your &lt;code class=&quot;language-text&quot;&gt;telegraf.conf&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;If you set up HTTP authentication for your Influx instance, you&apos;re going to
+want to add &lt;code class=&quot;language-text&quot;&gt;username&lt;/code&gt; and &lt;code class=&quot;language-text&quot;&gt;password&lt;/code&gt; fields under the &lt;code class=&quot;language-text&quot;&gt;[[outputs.influxdb]]&lt;/code&gt; &lt;/p&gt;
+&lt;p&gt;With our configuration in place, all that&apos;s left now is to start and enable the
+Telegraf service:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;sudo systemctl enable --now telegraf&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;As before, you should be able to see that the service is running without issue
+by running &lt;code class=&quot;language-text&quot;&gt;systemctl status telegraf&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Now that your service is running, any changes that you make to your
+&lt;code class=&quot;language-text&quot;&gt;telegraf.config&lt;/code&gt; file will only take effect after the service restarts. You
+can always restart the service using &lt;code class=&quot;language-text&quot;&gt;sudo systemctl restart telegraf&lt;/code&gt;, but I
+personally kept forgetting to do so (and then was surprised when my metrics
+weren&apos;t showing up in Influx). To deal with that,
+&lt;a href=&quot;https://github.com/mikemahoney218/pi-admin/tree/master/telegraf-watcher&quot;&gt;I wrote an extremely-micro service that restarts Telegraf for me&lt;/a&gt;.&lt;/p&gt;
+&lt;hr&gt;&lt;/hr&gt;
+&lt;br&gt;&lt;/br&gt;
+&lt;h3&gt;Grafana&lt;/h3&gt;
+&lt;p&gt;We&apos;re finally onto our last service, the G in the TIG stack, Grafana. A quick
+word of warning: &lt;strong&gt;don&apos;t try to&lt;/strong&gt; &lt;code class=&quot;language-text&quot;&gt;sudo apt install grafana&lt;/code&gt;. The main
+repository has an outdated version of Grafana, which will leave you stuck at a
+blank screen when you try to log on for the first time.&lt;/p&gt;
+&lt;p&gt;Instead, we&apos;ll install Grafana via dpkg, like we did with Telegraf. Check for
+the most current version at &lt;a href=&quot;https://grafana.com/grafana/download&quot;&gt;Grafana&apos;s downloads page&lt;/a&gt;.
+At the time of writing, I was installing version 6.7.3, so my commands to
+install looked like this:&lt;/p&gt;
+&lt;div class=&quot;gatsby-highlight&quot; data-language=&quot;text&quot;&gt;&lt;pre class=&quot;language-text&quot;&gt;&lt;code class=&quot;language-text&quot;&gt;wget https://dl.grafana.com/oss/release/grafana_6.7.3_armhf.deb
+sudo dpkg -i grafana_6.7.3_armhf.deb
+sudo systemctl enable --now grafana-server
+rm grafana_6.7.3_armhf.deb&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;  &lt;/p&gt;
+&lt;p&gt;Unlike Influx and Telegraf, Grafana can be managed almost entirely from a UI.
+Boot up &lt;code class=&quot;language-text&quot;&gt;localhost:3000&lt;/code&gt; on your Pi and log in using &lt;code class=&quot;language-text&quot;&gt;admin&lt;/code&gt; for both your
+username and password -- you&apos;ll be prompted to change it once you&apos;re logged in
+for the first time.&lt;/p&gt;
+&lt;p&gt;You&apos;ll then want to add your local Influx instance as a datasource for Grafana.
+Assuming you&apos;ve followed along until now, the URL for your Influx instance is
+&lt;code class=&quot;language-text&quot;&gt;http://localhost:8086&lt;/code&gt;. You&apos;ll also want to add whatever database Telegraf is
+writing to -- in the sample configuration I posted, the database name is
+&lt;code class=&quot;language-text&quot;&gt;pi_logs&lt;/code&gt;, but you can find yours by looking for the &lt;code class=&quot;language-text&quot;&gt;database&lt;/code&gt; field under
+&lt;code class=&quot;language-text&quot;&gt;[[outputs.influxdb]]&lt;/code&gt;. If you added authentication to your Influx instance,
+you&apos;ll also want to turn on &lt;code class=&quot;language-text&quot;&gt;basic auth&lt;/code&gt; and provide your database credentials.&lt;/p&gt;
+&lt;hr&gt;&lt;/hr&gt;
+&lt;br&gt;&lt;/br&gt;
+&lt;h3&gt;Get Graphing&lt;/h3&gt;
+&lt;p&gt;And with that, you should have everything you need to start monitoring your
+Pi -- and, with a little elbow grease, anything your Pi can touch! While
+it certainly feels a little like overkill, I&apos;ve now got state-of-the art
+tracking and system metrics for my Pi, letting me confirm beyond a shadow of
+a doubt that... my Pi is running too hot. With all the time I spent on this,
+maybe I should have just bought a fan.&lt;/p&gt;
+&lt;p&gt;But hey -- would a fan look &lt;em&gt;this&lt;/em&gt; good?&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/blog/full_grafana.webp&quot;&gt;&lt;/p&gt;</content:encoded></item><item><title><![CDATA[A minimalist visualization of Coronavirus rates]]></title><description><![CDATA[I had been getting frustrated with not being able to quickly find coronavirus
+data for my area, and not being able to see recent trends…]]></description><link>https://mm218.dev/2020/04/corona-viz/</link><guid isPermaLink="false">https://mm218.dev/2020/04/corona-viz/</guid><pubDate>Mon, 27 Apr 2020 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;I had been getting frustrated with not being able to quickly find coronavirus
+data for my area, and not being able to see recent trends without framing and
+interpretation. So I grabbed down the John Hopkins CSSE data and made a quick
+Shiny app to visualize case and death rates.
+I&apos;m trying to not contribute to
+the constant noise surrounding the ongoing pandemic, but having a
+way to see these numbers without an overwhelming amount of surrounding
+editorialization has made me feel like I understand the world a bit better.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/blog/covid.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://mm218.shinyapps.io/corona_data_explore/&quot;&gt;The app lives at this link&lt;/a&gt;.
+Thanks to R Studio, who are providing free hosting for coronavirus apps through
+the pandemic.&lt;/p&gt;</content:encoded></item><item><title><![CDATA[making Excellent Visualizations]]></title><description><![CDATA[As we move into our final section, it’s time to dwell on our final
+mantra: Ink is cheap. Electrons are even cheaper. This is a fancy…]]></description><link>https://mm218.dev/2020/04/making-excellent-viz/</link><guid isPermaLink="false">https://mm218.dev/2020/04/making-excellent-viz/</guid><pubDate>Wed, 22 Apr 2020 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;As we move into our final section, it’s time to dwell on our final
+mantra:&lt;/p&gt;
+&lt;h3&gt;Ink is cheap. Electrons are even cheaper.&lt;/h3&gt;
+&lt;p&gt;This is a fancy, dogmatic way to say: Make more than one chart. It’s
+rare that your first try is going to produce your best looking output.
+Play around with your data set, try out different visuals, and keep the
+concepts we’ve talked about in mind. Your graphs will be all the better
+for it. In this section, we’ll talk about solutions to some of the most
+common problems people have with making charts:&lt;/p&gt;
+&lt;h3&gt;Dealing with big data sets&lt;/h3&gt;
+&lt;p&gt;Think back to the diamonds data set we used in the last section. It
+contains data on 54,000 individual diamonds, including the carat and
+sale price for each. If we wanted to compare those two continuous
+variables, we might think a scatter plot would be a good way to do
+so:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MakingExcellentVisualizations_files/figure-gfm/unnamed-chunk-1-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Unfortunately, it seems like 54,000 points is a few too many for this
+plot to do us much good! This is a clear case of what’s called
+&lt;em&gt;overplotting&lt;/em&gt; – we simply have too much data on a single graph.&lt;/p&gt;
+&lt;p&gt;There are three real solutions to this problem. First off, we could
+decide simply that we want to refactor our chart, and instead show how a
+metric – such as average sale price – changes at different carats,
+rather than how our data is
+distributed:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MakingExcellentVisualizations_files/figure-gfm/unnamed-chunk-2-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;There are all sorts of ways we can do this sort of refactoring – if we
+wanted, we could get a very similar graph by binning our data and making
+a bar
+plot:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MakingExcellentVisualizations_files/figure-gfm/unnamed-chunk-3-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Either way, though, we’re not truly showing the same thing as was in the
+original graph – we don’t have any indication of the actual distribution
+of our data set along these axes.&lt;/p&gt;
+&lt;p&gt;The second solution solves this problem much more effectively – make all
+your points
+semi-transparent:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MakingExcellentVisualizations_files/figure-gfm/unnamed-chunk-4-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;By doing this, we’re now able to see areas where our data is much more
+densely distributed, something that was lost in the summary statistics –
+for instance, it appears that low-carat diamonds are much more tighly
+grouped than higher carat ones. We can also see some dark stripes at
+“round-number” values for carat – that indicates to me that our data
+has some integrity issues, if appraisers are more likely to give a stone
+a rounded number.&lt;/p&gt;
+&lt;p&gt;The challenge with this approach comes when we want to map a third
+variable – let’s use cut – in our graphic. We can try to change the
+aesthetics of our graph as
+usual:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MakingExcellentVisualizations_files/figure-gfm/unnamed-chunk-5-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;But unfortunately the sheer number of points drowns out most of the
+variance in color and shape on the graphic. In this case, our best
+option may be to turn to option number three and facet our plots – that
+is, to split our one large plot into several small
+multiples:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MakingExcellentVisualizations_files/figure-gfm/unnamed-chunk-6-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Remember: Ink is cheap. Electrons are even cheaper. Make more than one
+graph.&lt;/p&gt;
+&lt;p&gt;By splitting out our data into several smaller graphics, we’re much
+better able to see how the distribution shifts between our categories.
+In fact, we could use this technique to split our data even further,
+into a matrix of scatter plots showing how different groups are
+distributed:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MakingExcellentVisualizations_files/figure-gfm/unnamed-chunk-7-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;One last, extremely helpful use of faceting is to split apart charts
+with multiple entangled lines:
+&lt;img src=&quot;/MakingExcellentVisualizations_files/figure-gfm/unnamed-chunk-8-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;These charts, commonly referred to as “spaghetti charts”, are usually
+much easier to use when split into small
+multiples:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MakingExcellentVisualizations_files/figure-gfm/unnamed-chunk-9-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Now, one major drawback of facet charts is that they can make
+comparisons much harder – if, in our line chart, it’s more important to
+know that most clarities are similar in price at 2 carats than it is to
+know how the price for each clarity changes with carat, then the first
+chart is likely the more effective option. In those cases, however, it’s
+worth reassessing how many lines you actually need on your graph – if
+you only care about a few clarities, then only include those lines, and
+if you only care about a narrow band of prices or carats, window your
+data so that’s all you show. The goal is to make making comparisons
+easy, with the understanding that some comparisons are more important
+than others.&lt;/p&gt;
+&lt;h3&gt;Dealing with chartjunk&lt;/h3&gt;
+&lt;p&gt;Cast your mind back to the graphic I used as an example of an
+explanatory
+chart:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MakingExcellentVisualizations_files/figure-gfm/unnamed-chunk-10-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;You might have noticed that this chart is differently styled from all
+the others in this course – it doesn’t have the grey background or grid
+lines or anything else.&lt;/p&gt;
+&lt;p&gt;Think back to our second mantra: everything should be made as simple as
+possible, but no simpler. This chart reflects that goal. We’ve lost some
+of the distracting elements – the colored background and grid lines –
+and changed the other elements to make the overall graphic more
+effective. The objective is to have no extraneous element on the graph,
+so that it might be as expressive and effective as possible. This
+usually means using minimal colors, minimal text, and no grid lines.
+(After all, those lines are usually only useful in order to pick out a
+specific value – and if you’re expecting people to need specific values,
+you should give them a table!)&lt;/p&gt;
+&lt;p&gt;Those extraneous elements are known as &lt;em&gt;chartjunk&lt;/em&gt;. You see this a lot
+with graphs made in Excel – they’ll have dark backgrounds, dark lines,
+special shading effects or gradients that don’t encode information, or –
+worst of all – those “3D” bar/line/pie charts, because these things can
+be added with a single click. However, they tend to make your graphics
+less effective as they force the user to spend more time separating data
+from ornamentation. Everything should be made as simple as possible, but
+no simpler; every element of your graphic should increase expressiveness
+or effectiveness. In short: don’t try to pretty up your graph with
+non-useful elements.&lt;/p&gt;
+&lt;p&gt;Another common instance of chartjunk is animation in graphics. While
+animated graphics are exciting and trendy, they tend to reduce the
+effectiveness of your graphics because as humans, when something is
+moving we can’t focus on anything else. &lt;a href=&quot;http://visionlab.harvard.edu/silencing/&quot;&gt;Check out these examples from
+the Harvard Vision Lab&lt;/a&gt; – they
+show just how hard it is to notice changes when animation is added. This
+isn’t to say you can never use animation – but its uses are best kept to
+times when your graphic looking cool is more important than it conveying
+information.&lt;/p&gt;
+&lt;h3&gt;Common Mistakes&lt;/h3&gt;
+&lt;p&gt;As we wind down this section, I want to touch on a few common mistakes
+that didn’t have a great home in any other section – mostly because we
+were too busy talking about &lt;em&gt;good&lt;/em&gt; design principles.&lt;/p&gt;
+&lt;h3&gt;Dual y axes&lt;/h3&gt;
+&lt;p&gt;Chief amongst these mistakes are plots with two y axes, beloved by
+charlatans and financial advisors since days unwritten. Plots with two y
+axes are a great way to force a correlation that doesn’t really exist
+into existence on your chart, through manipulation of your units and
+axes. In almost every case, you should just make two graphs – ink is
+cheap. Electrons are even cheaper.&lt;/p&gt;
+&lt;p&gt;For an extremely entertaining read on this subject, &lt;a href=&quot;https://kieranhealy.org/blog/archives/2016/01/16/two-y-axes/&quot;&gt;check out this
+link&lt;/a&gt;.
+I’ve borrowed Kieran’s code for the below viz – look at how we can
+imply different things, just by changing how we scale our
+axes!&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MakingExcellentVisualizations_files/figure-gfm/unnamed-chunk-11-1.png&quot;&gt;&lt;/p&gt;
+&lt;h3&gt;Overcomplex visualizations&lt;/h3&gt;
+&lt;p&gt;Another common issue in visualizations comes from the analyst getting a
+little too technical with their graphs. For instance, think back to our
+original diamonds scatter plot:
+&lt;img src=&quot;/MakingExcellentVisualizations_files/figure-gfm/unnamed-chunk-12-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Looking at this chart, we can see that carat and price have a positive
+correlation – as one increases, the other does as well. However, it’s
+not a linear relationship; instead, it appears that price increases
+faster as carat increases.&lt;/p&gt;
+&lt;p&gt;The more statistically-minded analyst might already be thinking that we
+could make this relationship linear by log-transforming the axes – and
+they’d be right! We can see a clear linear relationship when we make
+the
+transformation:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MakingExcellentVisualizations_files/figure-gfm/unnamed-chunk-13-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Unfortunately, transforming your visualizations in this way can make
+your graphic hard to understand – in fact, only about &lt;a href=&quot;https://www.nature.com/articles/s41559-018-0610-7?WT.feed_name=subjects_ecology&quot;&gt;60% of
+professional
+scientists&lt;/a&gt;
+can even understand them. As such, transforming your axes like this
+tends to reduce the effectiveness of your graphic – this type of
+visualization should be reserved for exploratory graphics and modeling,
+instead.&lt;/p&gt;
+&lt;h3&gt;Conclusion&lt;/h3&gt;
+&lt;p&gt;And that just about wraps up this introduction to the basic concepts of
+data visualizations. Hopefully you’ve picked up some concepts or
+vocabulary that can help you think about your own visualizations in your
+daily life. I wanted to close out here with a list of resources I’ve
+found helpful in making graphics – I’ll keep adding to this over time:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;When picking colors, I often find myself reaching for one of the
+following
+tools:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://colorbrewer2.org/#type=diverging&amp;#x26;scheme=BrBG&amp;#x26;n=5&quot;&gt;ColorBrewer&lt;/a&gt;
+provided most of the palettes for these graphics&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://colorsupplyyy.com/&quot;&gt;ColorSupply&lt;/a&gt; makes picking custom
+colors
+easier&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html&quot;&gt;Viridis&lt;/a&gt;
+provides beautiful, colorblind-friendly palettes for use (though
+this resource is a little harder to understand)&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;I used the following resources in putting this post together:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;a href=&quot;http://stat405.had.co.nz/&quot;&gt;Hadley Wickham’s Stat 405 Course&lt;/a&gt;,
+particularly the lecture on &lt;a href=&quot;http://stat405.had.co.nz/lectures/20-effective-vis.pdf&quot;&gt;effective
+visualizations&lt;/a&gt;
+(I’ve lifted “perceptual topology should match data toplogy”,
+“make important comparisons easy”, and “visualization is only
+one part of data analysis” directly from his slides)&lt;/li&gt;
+&lt;li&gt;&lt;a href=&quot;https://courses.cs.washington.edu/courses/cse442/17au/lectures/CSE442-VisualEncoding.pdf&quot;&gt;Jeffrey Heer’s CSE 442 lecture on
+visualizations&lt;/a&gt;,
+particularly the definitions for expressiveness and
+effectiveness&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;</content:encoded></item><item><title><![CDATA[Mechanics of Data Visualizations]]></title><description><![CDATA[(Note: this is part two of a three part series on data visualization,
+originally published on Towards Data Science in 2019. Let’s move from…]]></description><link>https://mm218.dev/2020/04/mechanics-of-viz/</link><guid isPermaLink="false">https://mm218.dev/2020/04/mechanics-of-viz/</guid><pubDate>Tue, 21 Apr 2020 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;&lt;em&gt;(Note: this is part two of a three part series on data visualization,&lt;/em&gt;
+&lt;em&gt;originally published on &lt;a href=&quot;https://towardsdatascience.com/the-art-and-science-of-data-visualization-6f9d706d673e&quot;&gt;Towards Data Science in 2019&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Let’s move from theoretical considerations of graphing to the actual
+building blocks you have at your disposal. As we do so, we’re also going
+to move on to mantra #2:&lt;/p&gt;
+&lt;h3&gt;Everything should be made as simple as possible – but no simpler.&lt;/h3&gt;
+&lt;p&gt;Graphs are inherently a 2D image of our data:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-1-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;They have an x and a y scale, and - as in our scatter plot here - the
+position a point falls along each scale tells you how large its values
+are. But this setup only allows us to look at two variables in our data&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;and we’re frequently interested in seeing relationships between more
+than two variables.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So the question becomes: how can we visualize those extra variables? We
+can try adding another position scale:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-2-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;But 3D images are hard to wrap your head around, complicated to produce,
+and not as effective in delivering your message. They do have their uses&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;particularly when you’re able to build real, physical 3D models, and
+not just make 3D shapes on 2D planes - but frequently aren’t worth the
+trouble.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;So what tools do we have in our toolbox? The ones that are generally
+agreed upon (no, really - this is an area of active debate) fall into
+four categories:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Position (like we already have with X and Y)&lt;/li&gt;
+&lt;li&gt;Color&lt;/li&gt;
+&lt;li&gt;Shape&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These are the tools we can use to encode more information into our
+graphics. We’re going to call these &lt;em&gt;aesthetics&lt;/em&gt;, but any number of
+other words could work - some people refer to them as scales, some as
+values. I call them aesthetics because that’s what my software of choice
+calls them - but the word itself comes from the fact that these are the
+things that change how your graph looks.&lt;/p&gt;
+&lt;p&gt;For what it’s worth, we’re using an EPA data set for this unit,
+representing fuel economy data from 1999 and 2008 for 38 popular models
+of car. “Hwy” is highway mileage, “displ” is engine displacement (so
+volume), and “cty” is city mileage. But frankly, our data set doesn’t
+matter right now - most of our discussion here is applicable to any data
+set you’ll pick up.&lt;/p&gt;
+&lt;p&gt;We’re going to go through each of these aesthetics, to talk about how
+you can encode more information in each of your graphics. Along the way,
+remember our mantras:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;A good graphic tells a story&lt;/li&gt;
+&lt;li&gt;Everything should be made as simple as possible - but no simpler&lt;/li&gt;
+&lt;li&gt;Use the right tool for the job&lt;/li&gt;
+&lt;li&gt;Ink is cheap. Electrons are even cheaper&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;We’ll talk about how these are applicable throughout this section.&lt;/p&gt;
+&lt;h3&gt;Position&lt;/h3&gt;
+&lt;p&gt;Let’s start off discussing these aesthetics by finishing up talking
+about position. The distance of values along the x, y, or – in the case
+of our 3D graphic – z axes represents how large a particular variable
+is. People inherently understand that values further out on each axis
+are more extreme - for instance, imagine you came across the following
+graphic (made with simulated data):&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-3-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Which values do you think are higher?&lt;/p&gt;
+&lt;p&gt;Most people innately assume that the bottom-left hand corner represents
+a 0 on both axes, and that the further you get from that corner the
+higher the values are. This – relatively obvious – revelation hints at a
+much more important concept in data visualizations: perceptual topology
+should match data topology. Put another way, that means that values
+which &lt;em&gt;feel&lt;/em&gt; larger in a graph should represent values that &lt;em&gt;are&lt;/em&gt; larger
+in your data. As such, when working with position, higher values should
+be the ones further away from that lower left-hand corner – you should
+let your viewer’s subconscious assumptions do the heavy lifting for you.&lt;/p&gt;
+&lt;p&gt;Applying this advice to categorical data can get a little tricky.
+Imagine that we’re looking at the average highway mileages for
+manufacturers of the cars in our data set:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-4-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;In this case, the position along the x axis just represents a different
+car maker, in alphabetical order. But remember, position in a graph is
+an aesthetic that we can use to encode more information in our graphics.
+And we aren’t doing that here – for instance, we could show the same
+information without using x position at all:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-5-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Try to compare Pontiac and Hyundai on the first graph, versus on this
+second one. If anything, removing our extraneous x aesthetic has made it
+easier to compare manufacturers. This is a big driver behind our second
+mantra – that everything should be made as simple as possible, but no
+simpler. Having extra aesthetics confuses a graph, making it harder to
+understand the story it’s trying to tell.&lt;/p&gt;
+&lt;p&gt;However, when making a graphic, we should always be aiming to make
+important comparisons easy. As such, we should take advantage of our x
+aesthetic by arranging our manufacturers not alphabetically, but rather
+by their average highway mileage:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-6-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;By reordering our graphic, we’re now able to better compare more similar
+manufacturers. It’s now dramatically faster to understand our
+visualization – closer comparisons are easier to make, so placing more
+similar values closer together makes them dramatically easier to grasp.
+Look at Pontiac vs Hyundai now, for instance. Generally speaking, don’t
+put things in alphabetical order - use the order you place things to
+encode additional information.&lt;/p&gt;
+&lt;p&gt;As a quick sidenote, I personally believe that, when working with
+categorical values along the X axis, you should reorder your values so
+the highest value comes first. For some reason, I just find having the
+tallest bar/highest point (or whatever is being used to show value) next
+to the Y axis line is much cleaner looking than the alternative:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-7-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;For what it’s worth, I’m somewhat less dogmatic about this when the
+values are on the Y axis. I personally believe the highest value should
+always be at the top, as humans expect higher values to be further from
+that bottom left corner:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-8-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;However, I’m not as instantly repulsed by the opposite ordering as I am
+with the X axis, likely because the bottom bar/point being the furthest
+looks like a more natural shape, and is still along the X axis line:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-9-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;For this, at least, your mileage may vary. Also, it’s worth pointing out
+how much cleaner the labels on this graph are when they’re on the Y axis&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;flipping your coordinate system, like we’ve done here, is a good way
+to display data when you’ve got an unwieldy number of categories.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3&gt;Color&lt;/h3&gt;
+&lt;p&gt;While we’ve done a good job covering the role position plays in
+communicating information, we’re still stuck on the same question we
+started off with: How can we show a third variable on the graph?&lt;/p&gt;
+&lt;p&gt;One of the most popular ways is to use colors to represent your third
+variable. It might be worth talking through how color can be used with a
+simulated data set. Take for example the following graph:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-10-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;And now let’s add color for our third variable:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-11-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Remember: perceptual topology should match data topology. Which values
+are larger?&lt;/p&gt;
+&lt;p&gt;Most people would say the darker ones. But is it always that simple?
+Let’s change our color scale to compare:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-12-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Sure, some of these colors are darker than others – but I wouldn’t say
+any of them tell me a value is particularly high or low.&lt;/p&gt;
+&lt;p&gt;That’s because humans don’t percieve &lt;em&gt;hue&lt;/em&gt; – the actual shade of a color
+– as an ordered value. The color a point is doesn’t communicate that the
+point has a higher or lower value than any other point on the graph.
+Instead, hue works as an &lt;em&gt;unordered&lt;/em&gt; value, which only tells us which
+points belong to which groupings. In order to tell how high or low a
+point’s value is, we instead have to use &lt;em&gt;luminescence&lt;/em&gt; – or how bright
+or dark the individual point is.&lt;/p&gt;
+&lt;p&gt;There’s one other axis you can move colors along in order to encode
+value – how vibrant a color is, known as &lt;em&gt;chroma&lt;/em&gt;:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-13-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Just keep in mind that &lt;em&gt;luminescence&lt;/em&gt; and &lt;em&gt;chroma&lt;/em&gt; – how light a color
+is and how vibrant it is – are &lt;em&gt;ordered values&lt;/em&gt;, while &lt;em&gt;hue&lt;/em&gt; (or shade
+of color) is &lt;em&gt;unordered&lt;/em&gt; This becomes relevant when dealing with
+categorical data. For instance, moving back to the scatter plot we
+started with:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-14-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;If we wanted to encode a categorical variable in this – for instance,
+the class of vehicle – we could use hue to distinguish the different
+types of cars from one another:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-15-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;In this case, using hue to distinguish our variables clearly makes more
+sense than using either chroma or luminesence:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-16-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;This is a case of knowing what tool to use for the job - chroma and
+luminescence will clearly imply certain variables are closer together
+than is appropriate for categorical data, while hue won’t give your
+audience any helpful information about an ordered variable. Note,
+though, that I’d still discourage using the rainbow to distinguish
+categories in your graphics – the colors of the rainbow aren’t exactly
+unordered values (for instance, red and orange are much more similar
+colors than yellow and blue), and you’ll wind up implying connections
+between your categories that you might not want to suggest. Also, the
+rainbow is just really ugly:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-17-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Speaking of using the right tool for the job, one of the worst things
+people like to do in data visualizations is overuse color. Take for
+instance the following example:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-18-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;In this graph, the variable “class” is being represented by both
+position along the x axis, and by color. By duplicating this effort,
+we’re making our graph harder to understand – encoding the information
+once is enough, and doing it any more times than that is a distraction.
+Remember the second mantra: Everything should be made as simple as
+possible – but no simpler. The best data visualization is one that
+includes all the elements needed to deliver the message, and no more.&lt;/p&gt;
+&lt;p&gt;You can feel free to use color in your graphics, so long as it adds more
+information to the plot - for instance, if it’s encoding a third
+variable:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-19-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;But replicating as we did above is just adding more junk to your chart.&lt;/p&gt;
+&lt;p&gt;There’s one last way you can use color effectively in your plot, and
+that’s to highlight points with certain characteristics:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-20-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Doing so allows the viewer to quickly pick out the most important
+sections of our graph, increasing its effectiveness. Note that I used
+shape instead of color to separate the class of vehicles, by the way –
+combining point highlighting and using color to distinguish categorical
+variables can work, but can also get somewhat chaotic:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-21-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;There’s one other reason color is a tricky aesthetic to get right in
+your graphics: about 5% of the population (10% of men, 1% of women)
+can’t see colors at all. That means you should be careful when using
+it in your visualizations – use colorblind-safe color palettes (google
+“ColorBrewer” or “viridis” for more on these), and pair it with
+another aesthetic whenever possible.&lt;/p&gt;
+&lt;h3&gt;Shape&lt;/h3&gt;
+&lt;p&gt;The easiest aesthetic to pair color with is the next most frequently
+used – shape. This one is much more intuitive than color – to
+demonstrate, let’s go back to our scatter plot:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-22-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;We can now change the shape of each point based on what class of vehicle
+it represents:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-23-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Imagine we were doing the same exercise as we did with color earlier –
+which values are larger?&lt;/p&gt;
+&lt;p&gt;I’ve spoiled the answer already by telling you what the shapes represent
+– none of them are inherently larger than the others. Shape, like hue,
+is an &lt;em&gt;unordered value&lt;/em&gt;.&lt;/p&gt;
+&lt;p&gt;The same basic concepts apply when we change the shape of lines, not
+just points. For instance, if we plot separate trendlines for
+front-wheel, rear-wheel, and four-wheel drive cars, we can use linetype
+to represent each type of vehicle:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-24-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;But even here, no one linetype implies a higher or lower value than the
+others.&lt;/p&gt;
+&lt;p&gt;There are two caveats to be made to this rule, however. For instance, if
+we go back to our original scatter plot and change which shapes we’re
+using:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-25-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;This graph seems to imply more connection between the first three
+classes of car (which are all different types of diamonds) and the next
+three classes (which are all types of triangle), while singling out
+SUVs. In this way, we’re able to use shape to imply connection between
+our groupings - more similar shapes, which differ only in angle or
+texture, imply a closer relationship to one another than to other types
+of shape. This can be a blessing as well as a curse - if you pick, for
+example, a square and a diamond to represent two unrelated groupings,
+your audience might accidentally read more into the relationship than
+you had meant to imply.&lt;/p&gt;
+&lt;p&gt;It’s also worth noting that different shapes can pretty quickly clutter
+up a graph. As a general rule of thumb, using more than 3-4 shapes on a
+graph is a bad idea, and more than 6 means you need to do some thinking
+about what you actually want people to take away.&lt;/p&gt;
+&lt;h3&gt;Size&lt;/h3&gt;
+&lt;p&gt;Our last aesthetic is that of size. Going back to our original scatter
+plot, we could imagine using size like this:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-26-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Size is an inherently &lt;em&gt;ordered value&lt;/em&gt; - large size points imply larger
+values. Specifically, humans perceive larger areas as corresponding to
+larger values - the points which are three times larger in the above
+graph are about three times larger in value, as well.&lt;/p&gt;
+&lt;p&gt;This becomes tricky when size is used incorrectly, either by mistake or
+to distort the data. Sometimes an analyst maps radius to the variable,
+rather than area of the point, resulting in graphs as the below:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-27-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;In this example, the points representing a cty value of 10 don’t look
+anything close to 1/3 as large as the points representing 30. This makes
+the increase seem much steeper upon looking at this chart – so be
+careful when working with size as an aesthetic that your software is
+using the area of points, not radius!&lt;/p&gt;
+&lt;p&gt;It’s also worth noting that unlike color – which can be used to
+distinguish groupings, as well as represent an ordered value – it’s
+generally a bad idea to use size for a categorical variable. For
+instance, if we mapped point size to class of vehicle:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-28-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;We seem to be implying relationships here that don’t actually exist,
+like a minivan and midsize vehicle being basically the same. As a
+result, it’s best to only use size for continuous (or numeric) data.&lt;/p&gt;
+&lt;h3&gt;A Tangent&lt;/h3&gt;
+&lt;p&gt;Now that we’ve gone over these four aesthetics, I want to go on a quick
+tangent. When it comes to how quickly and easily humans perceive each of
+these aesthetics, research has settled on the following order:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Position&lt;/li&gt;
+&lt;li&gt;Size&lt;/li&gt;
+&lt;li&gt;Color (especially chroma and luminescence)&lt;/li&gt;
+&lt;li&gt;Shape&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;And as we’ve discussed repeatedly, the best data visualization is one
+that includes exactly as many elements as it takes to deliver a message,
+and no more. Everything should be made as simple as possible, but no
+simpler.&lt;/p&gt;
+&lt;p&gt;However, we live in a world of humans, where the scientifically most
+effective method is not always the most popular one. And since color is
+inherently more exciting than size as an aesthetic, the practitioner
+often finds themselves using colors to denote values where size would
+have sufficed. And since we know that color should usually be used
+alongside shape in order to be more inclusive in our visualizations,
+size often winds up being the last aesthetic used in a chart. This is
+fine - sometimes we have to optimize for other things than “how quickly
+can someone understand my chart”, such as “how attractive does my chart
+look” or “what does my boss want from me”. But it’s worth noting, in
+case you see contradictory advice in the future - the disagreement comes
+from if your source is teaching the most scientifically sound theory, or
+the most applicable practice.&lt;/p&gt;
+&lt;h3&gt;Summary&lt;/h3&gt;
+&lt;p&gt;We started off this section with our second mantra: that everything
+should be made as simple as possible, but no simpler. The first half of
+that cautions us against overusing aesthetics and against adding too
+much to a graphic, lest we erode its efficency in conveying information:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-29-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;The second half cautions us against not using all the aesthetics it
+takes to tell our story, in case we don’t produce the most expressive
+graphic possible:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-30-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Instead, we should use exactly as many aesthetics as it takes to tell
+our story, carefully choosing each to encode the most information
+possible into our graphics:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-31-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;As for the specific takeaways from this section, I can think of the
+following:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Match perceptual and data topology – if a color or position &lt;em&gt;feels
+like a higher value&lt;/em&gt;, use it to represent data that is a higher
+value&lt;/li&gt;
+&lt;li&gt;Make important comparisons easy – place them near each other, call
+attention to them&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Use aesthetics to encode more information into your graphics&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Use exactly as many aesthetics as you need – no more, no less.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;Don’t place things in alphabetical order&lt;/li&gt;
+&lt;li&gt;Don’t use the rainbow for a color scheme&lt;/li&gt;
+&lt;li&gt;Use ordered aesthetics (like position, chroma, luminescence, and
+size) to show ordered values (like numeric data)&lt;/li&gt;
+&lt;li&gt;Use unordered aesthetics (like hue or shape) to show unordered
+values&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Let’s transition away from aesthetics, and towards our third mantra:&lt;/p&gt;
+&lt;h3&gt;Use the right tool for the job.&lt;/h3&gt;
+&lt;p&gt;Think back to our first chart:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-32-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;As you already know, this is a &lt;em&gt;scatter plot&lt;/em&gt; - also known as a &lt;em&gt;point
+graph&lt;/em&gt;. Now say we added a line of best fit to it:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-33-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;This didn’t stop being a scatter plot once we drew a line on it – but
+the term scatter plot no longer really encompasses everything that’s
+going on here. It’s also obviously not a line chart, as even though
+there’s a line on it, it also has points.&lt;/p&gt;
+&lt;p&gt;Rather than quibble about what type of chart this is, it’s more helpful
+to describe what tools we’ve used to depict our data. We refer to these
+as &lt;em&gt;geoms&lt;/em&gt;, short for &lt;em&gt;geometries&lt;/em&gt; – because when you get really deep
+into things, these are geometric representations of how your data set is
+distributed along the x and y axes of your graph. I don’t want to get
+too far down that road – I just want to explain the vocabulary so that
+we aren’t talking about &lt;em&gt;what type of chart&lt;/em&gt; that is, but rather &lt;em&gt;what
+geoms it uses&lt;/em&gt;. Framing things that way makes it easier to understand
+how things can be combined and reformatted, rather than assuming each
+type of chart can only do one thing.&lt;/p&gt;
+&lt;h3&gt;Two continuous variables&lt;/h3&gt;
+&lt;p&gt;This chart uses two geoms that are really good for graphs that have a
+continuous y and a continuous x - points and lines. This is what people
+refer to most of the time when they say a line graph - a single smooth
+trendline that shows a pattern in the data. However, a line graph can
+also mean a chart where each point is connected in turn:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-34-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;It’s important to be clear about which type of chart you’re expected to
+produce! I always refer to the prior as a trendline, for clarity.&lt;/p&gt;
+&lt;p&gt;These types of charts have enormous value for quick exploratory
+graphics, showing how various combinations of variables interact with
+one another. For instance, many analysts start familiarizing themselves
+with new data sets using correlation matrices (also known as scatter
+plot matrices), which create a grid of scatter plots representing each
+variable:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-35-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;In this format, understanding interactions between your data is quick
+and easy, with certain variable interactions obviously jumping out as
+promising avenues for further exploration.&lt;/p&gt;
+&lt;p&gt;To back up just a little, there’s one major failing of scatter plots
+that I want to highlight before moving on. If you happen to have more
+than one point with the same x and y values, a scatter plot will just
+draw each point over the previous, making it seem like you have less
+data than you actually do. Adding a little bit of random noise - for
+instance, using RAND() in Excel - to your values can help show the
+actual densities of your data, especially when you’re dealing with
+numbers that haven’t been measured as precisely as they could a have
+been.
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-36-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;One last chart that does well with two continuous variables is the area
+chart, which resembles a line chart but fills in the area beneath the
+line:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-37-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Area plots make sense when 0 is a relevant number to your data set –
+that is, a 0 value wouldn’t be particularly unexpected. They’re also
+frequently used when you have multiple groupings and care about their
+total sum:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-38-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;(This new data set is the “diamonds” data set, representing 54,000
+diamonds sizes, qualities, cut, and sale prices. We’ll be going back and
+forth using it and the EPA data set from now on.)&lt;/p&gt;
+&lt;p&gt;Now one drawback of stacked area charts is that it can be very hard to
+estimate how any individual grouping shifts along the x axis, due to the
+cumulative effects of all the groups underneath them. For instance,
+there are actually fewer “fair” diamonds at 0.25 carats than at 1.0 –
+but because “ideal” and “premium” spike so much, your audience might
+draw the wrong conclusions. In situations where the total matters more
+than the groupings, this is alright – but otherwise, it’s worth looking
+at other types of charts as a result.&lt;/p&gt;
+&lt;h3&gt;One continuous variable&lt;/h3&gt;
+&lt;p&gt;If instead you’re looking to see how a single continuous variable is
+distributed throughout your data set, one of the best tools at your
+disposal is the histogram. A histogram shows you how many observations
+in your data set fall into a certain range of a continuous variable, and
+plot that count as a bar plot:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-39-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;One important flag to raise with histograms is that you need to pay
+attention to how your data is being binned. If you haven’t picked the
+right width for your bins, you might risk missing peaks and valleys in
+your data set, and might misunderstand how your data is distributed –
+for instance, look what shifts if we graph 500 bins, instead of the 30
+we used above:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-40-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;An alternative to the histogram is the frequency plot, which uses a line
+chart in the place of bars to represent the frequency of a value in your
+data set:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-41-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Again, however, you have to pay attention to how wide your data bins are
+with these charts – you might accidentally smooth over major patterns in
+your data if you aren’t careful!
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-42-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;One large advantage of the frequency chart over the histogram is how it
+deals with multiple groupings – if your groupings trade dominance at
+different levels of your variable, the frequency graph will make it much
+more obvious how they shift than a histogram will.&lt;/p&gt;
+&lt;p&gt;(Note that I’ve done something weird to the data in order to show how
+the distributions change below.)
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-43-1.png&quot;&gt;&lt;/p&gt;
+&lt;h3&gt;One categorical variable, one continuous&lt;/h3&gt;
+&lt;p&gt;If you want to compare a categorical and continuous variable, you’re
+usually stuck with some form of bar chart:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-44-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;The bar chart is possibly the least exciting type of graph in existence,
+mostly because of how prevalent it is – but that’s because it’s really
+good at what it does. Bar charts are one of the most easily interpreted
+and effective types of visualizations, no matter how exciting they are.&lt;/p&gt;
+&lt;p&gt;However, some people are really intent on ruining that. Take, for
+instance, the stacked bar chart, often used to add a third variable to
+the mix:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-45-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Compare Fair/G to Premium/G. It’s next to impossible to accurately
+compare the boxes – they don’t share a top or a bottom line, so you
+can’t really make a comparison. In these situations, it’s a better
+idea to use a dodged bar chart instead:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-46-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Dodged bar charts are usually a better choice for comparing the actual
+numbers of different groupings. However, this chart does a good job
+showing one of the limitations dodged bar charts come up against – once
+you get past 4 or 5 groupings, making comparisons is tricky. In these
+cases, you’re probably trying to apply the wrong chart for the job, and
+should consider either breaking your chart up into smaller ones –
+remember, ink is cheap, and electrons or cheaper – or replacing your
+bars with a few lines.&lt;/p&gt;
+&lt;p&gt;The one place where stacked bar charts are appropriate, however, is when
+you’re comparing the relative proportions of two different groups in
+each bar. For instance, take the following graph:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-47-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;In this case, making comparisons across groups is trivial, made simple
+by the fact that the groupings all share a common line - at 100% for
+group 1, and at 0% for group 2. This point of reference solves the issue
+we had with more than two groupings – though note we’d still prefer a
+dodged bar chart if the bars didn’t always sum to the same amount.&lt;/p&gt;
+&lt;h4&gt;A Quick Tangent&lt;/h4&gt;
+&lt;p&gt;This is usually where most people will go on a super long rant about pie
+charts and how bad they are. They’re wrong, but in an understandable
+way.&lt;/p&gt;
+&lt;p&gt;People love to hate on pie charts, because they’re almost universally a
+bad chart. However, if it’s important for your viewer to be able to
+quickly figure out what proportion two or more groupings make up of the
+whole, a pie chart is actually the fastest and most effective way to get
+the point across. For instance, compare the following pie and bar
+charts, made with the same data set:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-48-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-49-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;It’s a lot easier to tell that, say, A is smaller than C through F in
+the pie chart than the bar plot, since humans are better at summing
+angles than areas. In these instances, feel free to use a pie chart –
+and to tell anyone giving you flack that I said it was OK.&lt;/p&gt;
+&lt;h3&gt;Two categorical variables&lt;/h3&gt;
+&lt;p&gt;Our last combination is when you’re looking to have a categorical
+variable on both the x and y axis. These are trickier plots to think
+about, as we no longer encode value in position based on how far away a
+point is from the lower left hand corner, but rather have to get
+creative in effectively using position to encode a value. Remember that
+a geom is a geometric representation of how your data set is distributed
+along the x and y axes of your graph. When both of your axes are
+categorical, you have to get creative to show that distribution.&lt;/p&gt;
+&lt;p&gt;One method is to use density, as we would in a scatter plot, to show how
+many datapoints you have falling into each combination of categories
+graphed. You can do this by making a “point cloud” chart, where more
+dense clouds represent more common combinations:
+&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-50-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;Even without a single number on this chart, its message is clear - we
+can tell how our diamonds are distributed with a single glance. A
+similar way to do this is to use a heatmap, where differently colored
+cells represent a range of values:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/MechanicsOfDataViz_files/figure-gfm/unnamed-chunk-51-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;I personally think heatmaps are less effective – partially because by
+using the color aesthetic to encode this value, you can’t use it for
+anything else – but they’re often easier to make with the resources at
+hand.&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Theory of Data Visualizations]]></title><description><![CDATA[(Note: this is part one of a three part series on data visualization,
+originally published on Towards Data Science in 2019. Data…]]></description><link>https://mm218.dev/2020/04/theory-of-data-viz/</link><guid isPermaLink="false">https://mm218.dev/2020/04/theory-of-data-viz/</guid><pubDate>Mon, 20 Apr 2020 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;&lt;em&gt;(Note: this is part one of a three part series on data visualization,&lt;/em&gt;
+&lt;em&gt;originally published on &lt;a href=&quot;https://towardsdatascience.com/the-art-and-science-of-data-visualization-6f9d706d673e&quot;&gt;Towards Data Science in 2019&lt;/a&gt;.&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;Data visualization – our working definition will be “the graphical
+display of data” – is one of those things like driving, cooking, or
+being funny: everyone thinks they’re really great at it, because they’ve
+been doing it for a while, and yet many – if not most – people don’t
+even know where they could start learning how much better they could be
+doing things. For something so essential to so many people’s daily work,
+data visualization is so rarely directly taught, and is usually assumed
+to be something people will pick up with time.&lt;/p&gt;
+&lt;p&gt;However, that isn’t the best approach. Data visualization is a skill
+like any other, and even experienced practitioners could benefit from
+honing their skills in the subject. Hence, this series.&lt;/p&gt;
+&lt;p&gt;This series doesn’t set out to teach you how to make a specific graphic
+in a specific software. I don’t know what softwares might be applicable
+to your needs in the future, or what visualizations you’ll need to
+formulate when, and quite frankly Google exists – so this isn’t a
+cookbook with step-by-step instructions. The goal here is not to provide
+you with recipes for the future, but rather to teach you what flour is –
+to introduce you to the basic concepts and building blocks of effective
+data visualizations.&lt;/p&gt;
+&lt;h3&gt;The mantras&lt;/h3&gt;
+&lt;p&gt;As much as possible, I’ve collapsed those concepts into four mantras
+we’ll return to throughout this course. The mantras are:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;A good graphic tells a story.&lt;/li&gt;
+&lt;li&gt;Everything should be made as simple as possible, but no simpler.&lt;/li&gt;
+&lt;li&gt;Use the right tool for the job.&lt;/li&gt;
+&lt;li&gt;Ink is cheap. Electrons are even cheaper.&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Each mantra serves as the theme for a section, and will also be
+interwoven throughout. The theme of this section is, easily enough:&lt;/p&gt;
+&lt;h3&gt;A good graphic tells a story&lt;/h3&gt;
+&lt;p&gt;When making a graphic, it is important to understand what the graphic is
+for. After all, you usually won’t make a chart that is an exact
+depiction of your data – modern data sets tend to be too big (in terms
+of number of observations) and wide (in terms of number of variables) to
+depict every datapoint on a single graph. Instead, the analyst
+consciously chooses what elements to include in a visualization in order
+to identify patterns and trends in the data in the most effective manner
+possible. In order to make those decisions, it helps a little to think
+both about &lt;em&gt;why&lt;/em&gt; and &lt;em&gt;how&lt;/em&gt; graphics are made.&lt;/p&gt;
+&lt;h3&gt;Why do we tell a story?&lt;/h3&gt;
+&lt;p&gt;As far as the &lt;em&gt;why&lt;/em&gt; question goes, the answer usually comes down to one
+of two larger categories:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;To help identify patterns in a data set, or&lt;/li&gt;
+&lt;li&gt;To explain those patterns to a wider audience&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;These are the rationales behind creating what are known as,
+respectively, &lt;em&gt;exploratory&lt;/em&gt; and &lt;em&gt;explanatory&lt;/em&gt; graphics. Exploratory
+graphics are often very simple pictures of your data, built to identify
+patterns in your data that you might not know exist yet. Take for
+example a simple graphic, showing tree circumference as a function of
+age:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/TheoryOfDataViz_files/figure-gfm/unnamed-chunk-1-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;This visualization isn’t anything too complex – two variables,
+thirty-five observations, not much text – but it already shows us a
+trend that exists in the data. We could use this information, if we were
+so inspired, to start investigating the &lt;em&gt;whys&lt;/em&gt; of why tree growth
+changes with age, now that we’re broadly aware of &lt;em&gt;how&lt;/em&gt; it changes.&lt;/p&gt;
+&lt;p&gt;Explanatory graphs, meanwhile, are all about the &lt;em&gt;whys&lt;/em&gt;. Where an
+exploratory graphic focuses on identifying patterns in the first place,
+an explanatory graphic aims to explain why they happen and – in the best
+examples – what exactly the reader is to do about them. Explanatory
+graphics can exist on their own or in the context of a larger report,
+but their goals are the same: to provide evidence about why a pattern
+exists and provide a call to action. For instance, we can reimagine the
+same tree graph with a few edits in order to explain what patterns we’re
+seeing:&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/TheoryOfDataViz_files/figure-gfm/unnamed-chunk-2-1.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;I want to specifically call out the title here: “Orange tree growth
+tapers by year 4.” A good graphic tells a story, remember. As such,
+whatever title you give your graph should reflect the point of that
+story – titles such as “Tree diameter (cm) versus age (days)” and so on
+add nothing that the user can’t get from the graphic itself. Instead,
+use your title to advance your message whenever it makes sense –
+otherwise, if it doesn’t add any new information, you’re better off
+erasing it altogether.&lt;/p&gt;
+&lt;p&gt;The important takeaway here is not that explanatory graphics are
+necessarily more polished than exploratory ones, or that exploratory
+graphics are only for the analyst – periodic reporting, for instance,
+will often use highly polished exploratory graphics to identify existing
+trends, hoping to spur more intensive analysis that will identify the
+whys. Instead, the message is that knowing the end purpose of your graph
+– whether it should help identify patterns in the first place or explain
+how they got there – can help you decide what elements need to be
+included to tell the story your graphic is designed to address.&lt;/p&gt;
+&lt;h3&gt;How do we tell a story?&lt;/h3&gt;
+&lt;p&gt;The other important consideration when thinking about graph design is
+the actual &lt;em&gt;how&lt;/em&gt; you’ll tell your story, including what design elements
+you’ll use and what data you’ll display. My preferred paradigm when
+deciding between the possible “hows” is to weigh the &lt;em&gt;expressiveness and
+effectiveness&lt;/em&gt; of the resulting graphic – as defined by Jeffrey Heer at
+the University of Washington, that means:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Expressiveness&lt;/strong&gt;: A set of facts is expressible in a visual
+language if the sentences (i.e. the visualizations) in the language
+express all the facts in the set of data, and only the facts in the
+data.  &lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Effectiveness&lt;/strong&gt;: A visualization is more effective than another
+visualization if the information conveyed by one visualization is
+more readily perceived than the information in the other
+visualization.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Or, to simplify:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Tell the truth and nothing but the truth (don’t lie, and don’t lie
+by omission)&lt;/li&gt;
+&lt;li&gt;Use encodings that people decode better (where better = faster
+and/or more accurate)&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Keep this concept in the back of your mind as we move into the mechanics
+of data visualization in our next post – it should be your main
+consideration while deciding which elements you use! We’ll keep
+returning to these ideas of explanatory and exploratory, as well as
+expressiveness and effectiveness, throughout the rest of this article.&lt;/p&gt;</content:encoded></item><item><title><![CDATA[The Art and Science of Data Visualization published in Towards Data Science]]></title><description><![CDATA[I'm in Towards Data Science today, talking about the theory behind what makes a good visualization and how you can use those concepts to…]]></description><link>https://mm218.dev/2019/10/published-tds/</link><guid isPermaLink="false">https://mm218.dev/2019/10/published-tds/</guid><pubDate>Sun, 13 Oct 2019 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;I&apos;m in &lt;a href=&quot;https://towardsdatascience.com/the-art-and-science-of-data-visualization-6f9d706d673e&quot;&gt;Towards Data Science&lt;/a&gt; today, talking about the theory behind what makes a good visualization and how you can use those concepts to improve your own graphics. The guide is written for all experience levels and doesn&apos;t contain a snippet of code, though -- as usual -- you can find the R Markdown documents used to build the article on &lt;a href=&quot;https://mm218.dev/github&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The TDS article can be found &lt;a href=&quot;https://towardsdatascience.com/the-art-and-science-of-data-visualization-6f9d706d673e&quot;&gt;at this link&lt;/a&gt; -- I plan on putting the content on this website, too, once I get the chance.&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Thesis Now Available in ESF Digital Commons]]></title><description><![CDATA[My thesis is now available on the ESF Digital Commons! I'm extremely grateful to Drs. John Drake and Bill Shields for their help in the…]]></description><link>https://mm218.dev/2019/03/thesis-published/</link><guid isPermaLink="false">https://mm218.dev/2019/03/thesis-published/</guid><pubDate>Wed, 27 Mar 2019 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;My thesis is now available on the &lt;a href=&quot;https://digitalcommons.esf.edu/honors/141/&quot;&gt;ESF Digital Commons&lt;/a&gt;! I&apos;m extremely grateful to Drs. John Drake and Bill Shields for their help in the revision and submission process, and of course to Dr. John Stella for the extensive support he provided throughout the project, from conceptualization to publication.&lt;/p&gt;
+&lt;p&gt;In the thesis, we look at the impacts beavers have on the forest community around them as they remove trees for food and building dams. While people had looked at these impacts in other parts of beaver&apos;s range, the Adirondacks are a strange enough ecosystem - being largely protected from anthropogenic disturbances, most of the forest landscape exhibits only one or two age classes - that we weren&apos;t sure how applicable conclusions from these regions would be. What we found was that while the broad conclusions of these studies held true - beavers still operate as central place foragers and create large disturbances in the landscape - the lack of early-successional species throughout the Adirondacks seriously shifted which stems were harvested preferrentially. We also found a lot of variance in the patterns of how individual species were utilized - for instance, beaver harvested almost any size speckled alder they could find, so long as it was close to their dam, but would harvest red maple at any distance, so long as the stem was small.&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/blog/Wireframes.png&quot;&gt;&lt;/p&gt;
+&lt;p&gt;We&apos;re currently working on a journal article version of the thesis, using an expanded dataset and focusing more closely on the patterns in forage selectivity we found, and how they differ from other regions. That should hopefully be in the review process within the next few weeks.&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Announcing {spacey}, now on CRAN!]]></title><description><![CDATA[I've launched a new package to CRAN!  helps you pull elevation and 
+image overlay data from the USGS and ESRI, then helps you turn them into…]]></description><link>https://mm218.dev/2020/03/spacey-release/</link><guid isPermaLink="false">https://mm218.dev/2020/03/spacey-release/</guid><pubDate>Sun, 24 Mar 2019 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;I&apos;ve launched a new package to CRAN! &lt;code class=&quot;language-text&quot;&gt;spacey&lt;/code&gt; helps you pull elevation and
+image overlay data from the USGS and ESRI, then helps you turn them into
+beautiful maps via &lt;a href=&quot;https://www.rayshader.com/&quot;&gt;the fantastic &lt;code class=&quot;language-text&quot;&gt;rayshader&lt;/code&gt; package&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;The package has a &lt;a href=&quot;https://mikemahoney218.github.io/spacey/&quot;&gt;documentation website&lt;/a&gt;
+built with &lt;a href=&quot;https://pkgdown.r-lib.org/&quot;&gt;pkgdown&lt;/a&gt; -- check it out for more
+information!&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Announcing {heddlr}, now on CRAN!]]></title><description><![CDATA[My first package just got published to CRAN today!  is a set of tools 
+that make it easier to write modular R Markdown documents by…]]></description><link>https://mm218.dev/2020/01/heddlr-release/</link><guid isPermaLink="false">https://mm218.dev/2020/01/heddlr-release/</guid><pubDate>Wed, 23 Jan 2019 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;My first package just got published to CRAN today! &lt;code class=&quot;language-text&quot;&gt;heddlr&lt;/code&gt; is a set of tools
+that make it easier to write modular R Markdown documents by decomposing them
+into a set of patterns which can be repeated and combined based on your input
+data, letting you dynamically add and remove sections based on your data. I
+started this package to solve an issue I found myself running into when
+building &lt;a href=&quot;https://rmarkdown.rstudio.com/flexdashboard/&quot;&gt;flexdashboards&lt;/a&gt;, and
+have since found out that there&apos;s all sorts of cool tricks you can do by
+applying this type of functional programming mindset to R Markdown documents.&lt;/p&gt;
+&lt;p&gt;You can find out more on heddlr&apos;s &lt;a href=&quot;https://mikemahoney218.github.io/heddlr/&quot;&gt;documentation website&lt;/a&gt;,
+proudly made in R via &lt;a href=&quot;https://pkgdown.r-lib.org/&quot;&gt;pkgdown&lt;/a&gt;. This first version
+on CRAN is 0.5.0, with 0.1 -&gt; 0.4 previously released on &lt;a href=&quot;https://github.com/mikemahoney218/heddlr&quot;&gt;GitHub&lt;/a&gt;.&lt;/p&gt;</content:encoded></item></channel></rss>
