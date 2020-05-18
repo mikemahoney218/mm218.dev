@@ -45,9 +45,8 @@ const IndexPage = () => (
           in both scientific and business contexts.
           </p>
           <p className='lead mb-5'>
-            I post updates to my projects on <a href="/blog">my blog</a>, as 
-            well as cool visualization and tech things I stumble across in my
-            day-to-day work.
+            I post updates to my projects on <a href="/blog">my blog</a>, and
+            keep a collection of artwork on <a href="/portfolio">a portfolio page.</a>
           </p>
           <div className='social-icons'>
             {config.socialLinks.map(social => {
