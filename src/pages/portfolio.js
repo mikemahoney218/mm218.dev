@@ -51,7 +51,7 @@ const IndexPage = () => (
                     <a target="_blank" href="../img/portfolio/washington.jpg">
                         <picture>
                         <source srcset="../img/portfolio/washington.webp" type="image/webp" />
-                        <img alt="An abstract map of Mt. Katahdin" src="../img/portfolio/washington.jpg" type="image/jpg" />
+                        <img alt="An abstract map of Mt. Katahdin" src="../img/portfolio/washington.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -60,7 +60,7 @@ const IndexPage = () => (
                     <a target="_blank" href="../img/portfolio/katahdin.jpg">
                         <picture>
                             <source srcset="../img/portfolio/katahdin.webp" type="image/webp" />
-                            <img alt="An abstract map of Mt. Katahdin" src="../img/portfolio/katahdin.jpg" type="image/jpg" />
+                            <img alt="An abstract map of Mt. Katahdin" src="../img/portfolio/katahdin.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -69,7 +69,7 @@ const IndexPage = () => (
                     <a target="_blank" href="../img/portfolio/marcy.jpg">
                         <picture>
                             <source srcset="../img/portfolio/marcy.webp" type="image/webp" />
-                            <img alt="An abstract map of Mt. Marcy" src="../img/portfolio/marcy.jpg" type="image/jpg" />
+                            <img alt="An abstract map of Mt. Marcy" src="../img/portfolio/marcy.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -97,7 +97,7 @@ const IndexPage = () => (
                     <a target="_blank" href="../img/portfolio/albany.jpg">
                         <picture>
                             <source srcset="../img/portfolio/albany.webp" type="image/webp" />
-                            <img alt="A monochromatic map of Albany" src="../img/portfolio/albany.jpg" type="image/jpg" />
+                            <img alt="A monochromatic map of Albany" src="../img/portfolio/albany.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -106,7 +106,7 @@ const IndexPage = () => (
                 <a target="_blank" href="../img/portfolio/atlanta.jpg">
                         <picture>
                             <source srcset="../img/portfolio/atlanta.webp" type="image/webp" />
-                            <img alt="A monochromatic map of Atlanta" src="../img/portfolio/atlanta.jpg" type="image/jpg" />
+                            <img alt="A monochromatic map of Atlanta" src="../img/portfolio/atlanta.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -115,7 +115,7 @@ const IndexPage = () => (
                     <a target="_blank" href="../img/portfolio/boston.jpg">
                         <picture>
                             <source srcset="../img/portfolio/boston.webp" type="image/webp" />
-                            <img alt="A monochromatic map of Boston" src="../img/portfolio/boston.jpg" type="image/jpg" />
+                            <img alt="A monochromatic map of Boston" src="../img/portfolio/boston.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -124,7 +124,7 @@ const IndexPage = () => (
                 <a target="_blank" href="../img/portfolio/bozeman.jpg">
                         <picture>
                             <source srcset="../img/portfolio/bozeman.webp" type="image/webp" />
-                            <img alt="A monochromatic map of Bozeman" src="../img/portfolio/bozeman.jpg" type="image/jpg" />
+                            <img alt="A monochromatic map of Bozeman" src="../img/portfolio/bozeman.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -133,7 +133,7 @@ const IndexPage = () => (
                 <a target="_blank" href="../img/portfolio/pittsburgh.jpg">
                         <picture>
                             <source srcset="../img/portfolio/pittsburgh.webp" type="image/webp" />
-                            <img alt="A monochromatic map of Pittsburgh" src="../img/portfolio/pittsburgh.jpg" type="image/jpg" />
+                            <img alt="A monochromatic map of Pittsburgh" src="../img/portfolio/pittsburgh.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -142,7 +142,7 @@ const IndexPage = () => (
                 <a target="_blank" href="../img/portfolio/philadelphia.jpg">
                         <picture>
                             <source srcset="../img/portfolio/philadelphia.webp" type="image/webp" />
-                            <img alt="A monochromatic map of Philadelphia" src="../img/portfolio/philadelphia.jpg" type="image/jpg" />
+                            <img alt="A monochromatic map of Philadelphia" src="../img/portfolio/philadelphia.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -151,7 +151,7 @@ const IndexPage = () => (
                 <a target="_blank" href="../img/portfolio/rochester.jpg">
                         <picture>
                             <source srcset="../img/portfolio/rochester.webp" type="image/webp" />
-                            <img alt="A monochromatic map of Rochester" src="../img/portfolio/rochester.jpg" type="image/jpg" />
+                            <img alt="A monochromatic map of Rochester" src="../img/portfolio/rochester.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -160,7 +160,7 @@ const IndexPage = () => (
                 <a target="_blank" href="../img/portfolio/syracuse.jpg">
                         <picture>
                             <source srcset="../img/portfolio/syracuse.webp" type="image/webp" />
-                            <img alt="A monochromatic map of Syracuse" src="../img/portfolio/syracuse.jpg" type="image/jpg" />
+                            <img alt="A monochromatic map of Syracuse" src="../img/portfolio/syracuse.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -169,7 +169,7 @@ const IndexPage = () => (
                 <a target="_blank" href="../img/portfolio/vegas.jpg">
                         <picture>
                             <source srcset="../img/portfolio/vegas.webp" type="image/webp" />
-                            <img alt="A monochromatic map of Las Vegas" src="../img/portfolio/vegas.jpg" type="image/jpg" />
+                            <img alt="A monochromatic map of Las Vegas" src="../img/portfolio/vegas.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -208,7 +208,7 @@ const IndexPage = () => (
                 <a target="_blank" href="../img/portfolio/arrow_bg.jpg">
                         <picture>
                             <source srcset="../img/portfolio/arrow_bg.webp" type="image/webp" />
-                            <img alt="A geometric pattern in the shape of arrows" src="../img/portfolio/arrow_bg.jpg" type="image/jpg" />
+                            <img alt="A geometric pattern in the shape of arrows" src="../img/portfolio/arrow_bg.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -217,7 +217,7 @@ const IndexPage = () => (
                 <a target="_blank" href="../img/portfolio/cst.jpg">
                         <picture>
                             <source srcset="../img/portfolio/cst.webp" type="image/webp" />
-                            <img alt="A geometric pattern in the shape of squares" src="../img/portfolio/cst.jpg" type="image/jpg" />
+                            <img alt="A geometric pattern in the shape of squares" src="../img/portfolio/cst.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -226,7 +226,7 @@ const IndexPage = () => (
                 <a target="_blank" href="../img/portfolio/tree.jpg">
                         <picture>
                             <source srcset="../img/portfolio/tree.webp" type="image/webp" />
-                            <img alt="A geometric pattern in the shape of a tree" src="../img/portfolio/tree.jpg" type="image/jpg" />
+                            <img alt="A geometric pattern in the shape of a tree" src="../img/portfolio/tree.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -235,7 +235,7 @@ const IndexPage = () => (
                 <a target="_blank" href="../img/portfolio/tree7.jpg">
                         <picture>
                             <source srcset="../img/portfolio/tree7.webp" type="image/webp" />
-                            <img alt="A geometric pattern in the shape of hexagons" src="../img/portfolio/tree7.jpg" type="image/jpg" />
+                            <img alt="A geometric pattern in the shape of hexagons" src="../img/portfolio/tree7.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
@@ -244,7 +244,7 @@ const IndexPage = () => (
                 <a target="_blank" href="../img/portfolio/tree8.jpg">
                         <picture>
                             <source srcset="../img/portfolio/tree8.webp" type="image/webp" />
-                            <img alt="A geometric pattern in the shape of curved lines" src="../img/portfolio/tree8.jpg" type="image/jpg" />
+                            <img alt="A geometric pattern in the shape of curved lines" src="../img/portfolio/tree8.jpg" type="image/jpeg" />
                         </picture>
                     </a>
                 </p>
