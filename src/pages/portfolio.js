@@ -23,6 +23,9 @@ const IndexPage = () => (
           <div className='subheading mb-5'>
             Mike Mahoney · Digital Art ·
             <a href={`mailto:${config.email}`}>{config.email}</a>
+            <p>
+            <a href="/">Back to the main site</a>
+            </p>
           </div>
         </div>
       </section>

@@ -31,7 +31,7 @@ export class Sidebar extends Component {
     const { tabs, isCollapsed } = this.state;
     return (
       <nav
-        className="navbar navbar-expand-lg navbar-dark bg-primary fixed-top"
+        className="navbar navbar-expand-lg navbar-dark bg-primary fixed-top border border-dark"
         id="sideNav"
       >
         <a className="navbar-brand" href="#page-top">
