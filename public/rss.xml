@@ -1,4 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Mike Mahoney]]></title><description><![CDATA[Mike Mahoney's personal webpage. Maps, data, and the world around us.]]></description><link>https://mm218.dev</link><generator>GatsbyJS</generator><lastBuildDate>Fri, 12 Jun 2020 00:50:49 GMT</lastBuildDate><item><title><![CDATA[Installing the TIG stack on Raspberry Pi]]></title><description><![CDATA[Setting Up InfluxDB, Telegraf, and Grafana on Raspberry Pi  tl;dr Do the following in a shell you've already auth'd into sudo on:       This…]]></description><link>https://mm218.dev/2020/05/tig-on-pi/</link><guid isPermaLink="false">https://mm218.dev/2020/05/tig-on-pi/</guid><pubDate>Sun, 03 May 2020 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;Setting Up InfluxDB, Telegraf, and Grafana on Raspberry Pi&lt;/h2&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:atom="http://www.w3.org/2005/Atom" version="2.0"><channel><title><![CDATA[Mike Mahoney]]></title><description><![CDATA[Mike Mahoney's personal webpage. Maps, data, and the world around us.]]></description><link>https://mm218.dev</link><generator>GatsbyJS</generator><lastBuildDate>Sat, 20 Jun 2020 23:37:47 GMT</lastBuildDate><item><title><![CDATA[Make a Retweet Bot in R]]></title><description><![CDATA[A while back, I made a tweetbot that 
+retweets a set of ecology-related hashtags, in order to signal boost ecology 
+content in a similar…]]></description><link>https://mm218.dev/2020/06/retweetbot/</link><guid isPermaLink="false">https://mm218.dev/2020/06/retweetbot/</guid><pubDate>Sat, 20 Jun 2020 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;A while back, I made a &lt;a href=&quot;https://twitter.com/ecology_tweets&quot;&gt;tweetbot&lt;/a&gt; that
+retweets a set of ecology-related hashtags, in order to signal boost ecology
+content in a similar manner to &lt;a href=&quot;https://twitter.com/statstwitbot&quot;&gt;statsbot&lt;/a&gt; or
+&lt;a href=&quot;https://twitter.com/PlotterTweeter&quot;&gt;Plotter Bot&lt;/a&gt;. The code to do this is pretty
+simple -- made almost trivial by the &lt;a href=&quot;https://rtweet.info/&quot;&gt;rtweet&lt;/a&gt; package --
+but I found that environmental hashtags have a pretty low signal-to-noise
+ratio, driven down by various political and industry groups, as well as trolls.&lt;/p&gt;
+&lt;p&gt;I didn&apos;t want to get into the business of content filtering, so instead I started
+looking for other markers that a tweet was -- or wasn&apos;t -- worth promoting, and
+have gotten to what I believe is a respectable place with my filtration. So I&apos;ve
+&lt;a href=&quot;https://github.com/mikemahoney218/retweet_bot/tree/master&quot;&gt;open-sourced the code&lt;/a&gt;
+(without the specific values I use to filter) for anyone else who might be
+interested in setting up their own automated retweet app.&lt;/p&gt;</content:encoded></item><item><title><![CDATA[Installing the TIG stack on Raspberry Pi]]></title><description><![CDATA[Setting Up InfluxDB, Telegraf, and Grafana on Raspberry Pi  tl;dr Do the following in a shell you've already auth'd into sudo on:       This…]]></description><link>https://mm218.dev/2020/05/tig-on-pi/</link><guid isPermaLink="false">https://mm218.dev/2020/05/tig-on-pi/</guid><pubDate>Sun, 03 May 2020 00:00:00 GMT</pubDate><content:encoded>&lt;h2&gt;Setting Up InfluxDB, Telegraf, and Grafana on Raspberry Pi&lt;/h2&gt;
 &lt;p&gt;&lt;img src=&quot;/img/blog/grafana_dash.webp&quot;&gt;&lt;/p&gt;
 &lt;h3&gt;tl;dr&lt;/h3&gt;
 &lt;p&gt;Do the following in a shell you&apos;ve already auth&apos;d into sudo on:&lt;/p&gt;

@@ -28,7 +28,7 @@ module.exports = {
     },
     {
       resolve: 'gatsby-plugin-exclude',
-      options: { paths: ['ans_key.Rmd'] },
+      options: { paths: ['ans_key.Rmd', '/content/posts/2020/06/beaver-foreco.md'] },
     },
     {
       resolve: `gatsby-source-filesystem`,

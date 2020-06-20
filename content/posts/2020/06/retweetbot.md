@@ -1,0 +1,23 @@
+---
+title: "Make a Retweet Bot in R"
+path: "/2020/06/retweet-bot"
+tags: ["R", "Twitter", "ecology_tweets"]
+date: '2020-06-20'
+updated: '2020-06-20'
+excerpt: "Y'know. If you wanna."
+---
+
+A while back, I made a [tweetbot](https://twitter.com/ecology_tweets) that 
+retweets a set of ecology-related hashtags, in order to signal boost ecology 
+content in a similar manner to [statsbot](https://twitter.com/statstwitbot) or
+[Plotter Bot](https://twitter.com/PlotterTweeter). The code to do this is pretty
+simple -- made almost trivial by the [rtweet](https://rtweet.info/) package -- 
+but I found that environmental hashtags have a pretty low signal-to-noise 
+ratio, driven down by various political and industry groups, as well as trolls.
+
+I didn't want to get into the business of content filtering, so instead I started
+looking for other markers that a tweet was -- or wasn't -- worth promoting, and 
+have gotten to what I believe is a respectable place with my filtration. So I've
+[open-sourced the code](https://github.com/mikemahoney218/retweet_bot/tree/master)
+(without the specific values I use to filter) for anyone else who might be 
+interested in setting up their own automated retweet app.
