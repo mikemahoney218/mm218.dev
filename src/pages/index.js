@@ -64,6 +64,102 @@ const IndexPage = () => (
       <hr className='m-0' />
 
       <section
+        className='resume-section p-3 p-lg-5 d-flex align-items-center'
+        id='education'
+      >
+        <div className='w-100'>
+          <h2 className='mb-5'>Education</h2>
+
+          <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
+            <div className='resume-content'>
+              <h3 className='mb-0'>State University of New York College of Environmental Science and Forestry</h3>
+              <div className='subheading mb-3'>Ph.D. in Environmental Science with Area of Study in Coupled Natural and Human Systems</div>
+            </div>
+            <div className='resume-date text-md-right'>
+              <span className='text-primary'>August 2020 - Present</span>
+            </div>
+          </div>
+
+          <br></br>
+
+          <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
+            <div className='resume-content'>
+              <h3 className='mb-0'>State University of New York College of Environmental Science and Forestry</h3>
+              <div className='subheading mb-3'>B.S. <span>magna cum laude </span>  with honors in Forest Ecosystem Science</div>
+              <div>GPA: 3.72</div>
+              <p>Thesis: Beaver Foraging Preferences and Impacts on Forest Structure in New York’s Adirondack Mountains</p> 
+            </div>
+            <div className='resume-date text-md-right'>
+              <span className='text-primary'>August 2015 - December 2018</span>
+            </div>
+          </div>
+
+          <br></br>
+
+        </div>
+      </section>
+
+      <hr className='m-0' />
+
+      <section
+        className='resume-section p-3 p-lg-5 d-flex align-items-center'
+        id='publications'
+      >
+        <div className='w-100'>
+          <h2 className='mb-5'>Publications</h2>
+
+          <h3 className='mb-3'>In Press</h3>
+
+          <br></br>
+
+          <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
+            <div>
+            Stem size selectivity is stronger than species preferences for beaver, a central place forager. <strong>Mahoney, M. J. </strong> and Stella, J. C. 2020. Forest Ecology and Management, In Press.
+            </div>
+            <div className='resume-date text-md-right'>
+              <span className='text-primary'>2020</span>
+            </div>
+          </div>
+
+          <br></br>
+
+        </div>
+
+      </section>
+
+      <hr className='m-0' />
+      <section
+        className='resume-section p-3 p-lg-5 d-flex align-items-center'
+        id='awards'
+      >
+        <div className='w-100'>
+          <h2 className='mb-5'>Awards</h2>
+
+          <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
+            <div className='resume-content'>
+              <p>
+                <span className='text-primary'>December 2018: </span>
+                <span>Robin Hood Oak Award for Academic Excellence</span>
+              </p>
+              <p>
+                <span className='text-primary'>December 2018: </span>
+                <span>Robert M. Hicks Award for Academic Achievement</span>
+              </p>
+              <p>
+                <span className='text-primary'>May 2018: </span>
+                <span>SUNY-ESF Career Fellowship</span>
+              </p>
+              <p>
+                <span className='text-primary'>August 2017: </span>
+                <span>Outstanding Student Award for Accomplishments in Field Ecology and Dendrology</span>
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <section
         className='resume-section p-3 p-lg-5 d-flex justify-content-center'
         id='experience'
       >
@@ -216,30 +312,6 @@ const IndexPage = () => (
 
       <section
         className='resume-section p-3 p-lg-5 d-flex align-items-center'
-        id='education'
-      >
-        <div className='w-100'>
-          <h2 className='mb-5'>Education</h2>
-
-          <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
-            <div className='resume-content'>
-              <h3 className='mb-0'>State University of New York College of Environmental Science and Forestry</h3>
-              <div className='subheading mb-3'>Bachelor of Science</div>
-              <div>Forest Ecosystem Science</div>
-              <p>GPA: 3.72</p>
-            </div>
-            <div className='resume-date text-md-right'>
-              <span className='text-primary'>August 2015 - December 2018</span>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
-      <hr className='m-0' />
-
-      <section
-        className='resume-section p-3 p-lg-5 d-flex align-items-center'
         id='skills'
       >
         <div className='w-100'>
@@ -278,42 +350,15 @@ const IndexPage = () => (
             <li>
               <a href='https://github.com/mikemahoney218/heddlr'>heddlr:</a> Functional programming tools for R Markdown document generation.
             </li>
+            <br></br>
+            <li>
+              <a href='https://twitter.com/ecology_tweets'>@ecology_tweets:</a> A tweetbot to amplify ecology and conservation related content on Twitter.
+            </li>
           </ul>
         </div>
       </section>
 
       <hr className='m-0' />
-
-      <section
-        className='resume-section p-3 p-lg-5 d-flex align-items-center'
-        id='awards'
-      >
-        <div className='w-100'>
-          <h2 className='mb-5'>Awards</h2>
-
-          <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
-            <div className='resume-content'>
-              <p>
-                <span className='text-primary'>December 2018: </span>
-                <span>Robin Hood Oak Award for Academic Excellence</span>
-              </p>
-              <p>
-                <span className='text-primary'>December 2018: </span>
-                <span>Robert M. Hicks Award for Academic Achievement</span>
-              </p>
-              <p>
-                <span className='text-primary'>May 2018: </span>
-                <span>SUNY-ESF Career Fellowship</span>
-              </p>
-              <p>
-                <span className='text-primary'>August 2017: </span>
-                <span>Outstanding Student Award for Accomplishments in Field Ecology and Dendrology</span>
-              </p>
-            </div>
-          </div>
-
-        </div>
-      </section>
 
       <hr className='m-0' />
 

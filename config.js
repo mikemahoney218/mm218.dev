@@ -12,6 +12,11 @@ module.exports = {
   // social
   socialLinks: [
     {
+      icon: 'fab fa-researchgate',
+      name: 'ResearchGate',
+      url: 'https://www.researchgate.net/profile/Michael_Mahoney13',
+      },
+    {
       icon: 'fab fa-github',
       name: 'Github',
       url: 'https://github.com/mikemahoney218',

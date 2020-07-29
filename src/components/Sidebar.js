@@ -11,10 +11,16 @@ export class Sidebar extends Component {
     this.state = {
       tabs: [
         { content: 'About', href: 'about' },
-        { content: 'Professional Experience', href: 'experience' },
         { content: 'Education', href: 'education' },
-        { content: 'Skills', href: 'skills' },
+        { content: 'Publications', href: 'publications' },
         { content: 'Awards', href: 'awards' },
+        { content: 'Conference Activity', href: 'conferences' },
+        { content: 'Teaching Experience', href: 'teaching' },
+        { content: 'Research Experience', href: 'research' },
+        { content: 'Outreach', href: 'community' },
+        { content: 'Professional Experience', href: 'experience' },
+        { content: 'Software', href: 'software' },
+        { content: 'Skills', href: 'skills' },
         //{ content: 'Blog', href: 'blog' },
       ],
       isCollapsed: true,
