@@ -114,7 +114,7 @@ const IndexPage = () => (
 
           <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
             <div>
-            Stem size selectivity is stronger than species preferences for beaver, a central place forager. <strong>Mahoney, M. J. </strong> and Stella, J. C. 2020. Forest Ecology and Management, In Press.
+            Stem size selectivity is stronger than species preferences for beaver, a central place forager. <strong>Mahoney, M. J. </strong> and Stella, J. C. 2020. Forest Ecology and Management, 475, 118331. https://doi.org/10.1016/j.foreco.2020.118331. <a href="https://raw.githubusercontent.com/mikemahoney218/research_repository/master/2020/MahoneyStella2020.pdf">Link to full text.</a>
             </div>
             <div className='resume-date text-md-right'>
               <span className='text-primary'>2020</span>
@@ -128,37 +128,7 @@ const IndexPage = () => (
       </section>
 
       <hr className='m-0' />
-      <section
-        className='resume-section p-3 p-lg-5 d-flex align-items-center'
-        id='awards'
-      >
-        <div className='w-100'>
-          <h2 className='mb-5'>Awards</h2>
-
-          <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
-            <div className='resume-content'>
-              <p>
-                <span className='text-primary'>December 2018: </span>
-                <span>Robin Hood Oak Award for Academic Excellence</span>
-              </p>
-              <p>
-                <span className='text-primary'>December 2018: </span>
-                <span>Robert M. Hicks Award for Academic Achievement</span>
-              </p>
-              <p>
-                <span className='text-primary'>May 2018: </span>
-                <span>SUNY-ESF Career Fellowship</span>
-              </p>
-              <p>
-                <span className='text-primary'>August 2017: </span>
-                <span>Outstanding Student Award for Accomplishments in Field Ecology and Dendrology</span>
-              </p>
-            </div>
-          </div>
-
-        </div>
-      </section>
-
+      
       <section
         className='resume-section p-3 p-lg-5 d-flex justify-content-center'
         id='experience'
@@ -355,6 +325,39 @@ const IndexPage = () => (
               <a href='https://twitter.com/ecology_tweets'>@ecology_tweets:</a> A tweetbot to amplify ecology and conservation related content on Twitter.
             </li>
           </ul>
+        </div>
+      </section>
+
+      <hr className='m-0' />
+
+      <section
+        className='resume-section p-3 p-lg-5 d-flex align-items-center'
+        id='awards'
+      >
+        <div className='w-100'>
+          <h2 className='mb-5'>Awards</h2>
+
+          <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
+            <div className='resume-content'>
+              <p>
+                <span className='text-primary'>December 2018: </span>
+                <span>Robin Hood Oak Award for Academic Excellence</span>
+              </p>
+              <p>
+                <span className='text-primary'>December 2018: </span>
+                <span>Robert M. Hicks Award for Academic Achievement</span>
+              </p>
+              <p>
+                <span className='text-primary'>May 2018: </span>
+                <span>SUNY-ESF Career Fellowship</span>
+              </p>
+              <p>
+                <span className='text-primary'>August 2017: </span>
+                <span>Outstanding Student Award for Accomplishments in Field Ecology and Dendrology</span>
+              </p>
+            </div>
+          </div>
+
         </div>
       </section>
 

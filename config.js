@@ -44,5 +44,5 @@ module.exports = {
   ],
   email: 'mike.mahoney.218@gmail.com',
 //  phone: '000-00000',
-  address: 'Boston, MA',
+  address: 'Syracuse, NY',
 };
