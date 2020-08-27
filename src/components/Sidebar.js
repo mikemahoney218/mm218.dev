@@ -10,18 +10,12 @@ export class Sidebar extends Component {
     super(props);
     this.state = {
       tabs: [
-        { content: 'About', href: '#about' },
-        { content: 'Education', href: '#education' },
-        { content: 'Publications', href: '#publications' },
-//        { content: 'Conference Activity', href: 'conferences' },
-//        { content: 'Teaching Experience', href: 'teaching' },
-//        { content: 'Research Experience', href: 'research' },
-//        { content: 'Outreach', href: 'community' },
-        { content: 'Professional Experience', href: '#experience' },
-//        { content: 'Software', href: 'software' },
-        { content: 'Skills', href: '#skills' },
-        { content: 'Awards', href: '#awards' },
-        //{ content: 'Blog', href: 'blog' },
+        { content: 'About', href: 'about' },
+        { content: 'Education', href: 'education' },
+        { content: 'Publications', href: 'publications' },
+        { content: 'Professional Experience', href: 'experience' },
+        { content: 'Skills', href: 'skills' },
+        { content: 'Awards', href: 'awards' },
       ],
       isCollapsed: true,
     };
@@ -38,7 +32,7 @@ export class Sidebar extends Component {
     const { tabs, isCollapsed } = this.state;
     return (
       <nav
-        className="navbar navbar-expand-lg navbar-dark bg-primary fixed-top"
+        className="navbar navbar-expand-lg navbar-dark bg-primary fixed-top border border-dark"
         id="sideNav"
       >
         <a className="navbar-brand" href="#page-top">
