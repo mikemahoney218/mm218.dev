@@ -28,7 +28,7 @@ const IndexPage = () => (
           I'm a PhD candidate at SUNY-ESF, working with Colin Beier to try and make forest modeling easier to use by reducing the amount of data practicioners need to provide and creating more effective and expressive outputs. This work incorporates ecological modeling and data engineering to try and make cutting-edge models accessible outside of academia.
           </p>
           <p className='lead mb-5'>
-          In the past I've worked as an analyst for Wayfair's Forecasting and Analytics team, an independent researcher with both the Stella Riparian and Stream Ecology and Yanai Forest Ecosystem Science laboratories, and the Beaver Impact Assessment intern for the New York State Department of Environmental Conservation. In all of these roles I've worked to apply data science techniques to large-scale challenges, frequently serving as the statistical and technical expert within my team.
+          In the past I've worked as an analyst for Wayfair's Forecasting and Analytics team, an independent researcher with both the Stella Riparian and Stream Ecology and Yanai Forest Ecosystem Science laboratories, and as the Beaver Impact Assessment intern for the New York State Department of Environmental Conservation. In all of these roles I've worked to apply data science techniques to large-scale challenges, frequently serving as the statistical and technical expert within my team.
           </p>
           <p className='lead mb-5'>
             My past projects have included assessing the landscape-level impacts of ecosystem engineers within New York's Adirondack State Park, as well as investigating the impact of fertilization on beech bark disease within the White Mountains of New Hampshire. I've also written a primer on how to use R for data exploration and analysis in both scientific and business contexts.
@@ -68,12 +68,8 @@ const IndexPage = () => (
               <span className='text-primary'>August 2020 - Present</span>
             </div>
           </div>
-
-          <br></br>
-
           <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
             <div className='resume-content'>
-              <h3 className='mb-0'>State University of New York College of Environmental Science and Forestry</h3>
               <div className='subheading mb-3'>B.S. <span>magna cum laude </span>  with honors in Forest Ecosystem Science</div>
               <div>GPA: 3.72</div>
               <p>Thesis: Beaver Foraging Preferences and Impacts on Forest Structure in New York’s Adirondack Mountains</p> 
@@ -96,8 +92,6 @@ const IndexPage = () => (
       >
         <div className='w-100'>
           <h2 className='mb-5'>Publications</h2>
-
-          <h3 className='mb-3'>In Press</h3>
 
           <br></br>
 
