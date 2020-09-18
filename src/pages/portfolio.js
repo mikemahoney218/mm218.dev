@@ -275,10 +275,9 @@ const IndexPage = () => (
       >
         <div className='w-100'>
           <h2 className='mb-5'>Experimental</h2>
-          <div>
           <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
                 <div className='resume-content'>
-                <h3 className='mb-0'>@fortunes_teller</h3>
+                <h3 className='mb-0'><a href="https://twitter.com/fortunes_teller" className='text-primary'>@fortunes_teller</a></h3>
                 <p>
                 A human-curated AI tweetbot created by training the GPT-2 355M model against 
                 "fortunes" packages from various Linux distros. Began running in May 2020.
@@ -317,8 +316,20 @@ const IndexPage = () => (
                 />
               </div>
           </div>
-          </div>
             <br></br>
+            <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
+                <div className='resume-content'>
+                <h3 className='mb-0'><a href="https://twitter.com/fund_me_please_" className='text-primary'>@fund_me_please_</a></h3>
+                <p>
+                An tweetbot created by training the GPT-2 355M model against ~150 Graduate Research Fellowship Program personal statements, with the outputs representing a surreal fun-house-mirror take on what we think review boards want us to be. Began running in September 2020.
+                </p>
+                </div>
+                <br></br>
+            <div className='resume-date text-md-right'>
+              <a href="https://twitter.com/fund_me_please_" className='text-primary'>See it in action</a>
+              <br></br>
+            </div>
+          </div>
             </div>
       </section>
 
