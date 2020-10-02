@@ -199,6 +199,15 @@ const IndexPage = () => (
         <div className='w-100'>
           <h2 className='mb-5'>Generative Art</h2>
           <div>
+          <div className='subheading mb-3'>Frost on a Windshield</div>
+                <a target="_blank" href="../img/portfolio/frost.jpg">
+                        <picture>
+                            <source srcset="../img/portfolio/frost.webp" type="image/webp" />
+                            <img alt="A Worley-noise pattern edited to be much higher contrast" src="../img/portfolio/frost.jpg" type="image/jpeg" />
+                        </picture>
+                    </a>
+                    <br></br>
+                    <br></br>
           <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
                 <div className='resume-content'>
                 <h3 className='mb-0'><a href='https://mm218.shinyapps.io/have_a_tree/'>Can I Offer You a Tree in this Trying Time?</a></h3>
