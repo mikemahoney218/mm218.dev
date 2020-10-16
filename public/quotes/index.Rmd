@@ -6,6 +6,24 @@ output:
 
 <hr>
 
+The joy in mathematics is often the receding of the pain.
+
+[...]
+
+Bob Morris Sr. asked me when I met what I do.  
+"I study math."  
+"For whom?"  
+
+[...]
+
+It is difficult to get a man to understand something when his salary depends 
+upon his not understanding it. People tend to pick their ideologies by function.
+
+
+--- [Halvar Flake - OffensiveCon 2020 Keynote](https://docs.google.com/presentation/d/1YcBqgccBcdn5-v80OX8NTYdu_-qRmrwfejlEx6eq-4E/edit?usp=sharing)
+
+<hr>
+
 Data analysis is hard, and part of the problem is that few people can explain how to do it. It’s not that there aren’t any people doing data analysis on a regular basis. It’s that the people who are really good at it have yet to enlighten us about the thought process that goes on in their heads.
 
 Imagine you were to ask a songwriter how she writes her songs. There are many tools upon which she can draw. We have a general understanding of how a good song should be structured: how long it should be, how many verses, maybe there’s a verse followed by a chorus, etc. In other words, there’s an abstract framework for songs in general. Similarly, we have music theory that tells us that certain combinations of notes and chords work well together and other combinations don’t sound good. As good as these tools might be, ultimately, knowledge of song structure and music theory alone doesn’t make for a good song. Something else is needed.
