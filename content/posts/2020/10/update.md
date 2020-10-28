@@ -30,12 +30,7 @@ More interesting are the two GPT-2 "AI" tweetbots now running, including [@fortu
 
 I've got a new R package out, the first real "product" from my PhD. {terrainr} wraps the USGS National Map family of APIs to help users download geospatial data for their areas of interest, and provides functionality to turn those files into tiles that can be imported into Unity for 3D landscape visualization:
 
-<a target="_blank" href="/img/blog/terrainr.jpg">
-    <picture>
-        <source srcset="../img/portfolio/terrainr.webp" type="image/webp" />
-        <img alt="A 3D landscape visualization of the area southeast of Mt. Whitney, California, USA." src="../img/portfolio/terrainr.jpg" type="image/jpeg" />
-    </picture>
-</a>
+![A 3D landscape visualization of the area southeast of Mt. Whitney, California, USA.](/img/blog/terrainr.jpg)
 
 I love writing packages with visual outputs. I love writing packages with visual outputs that look like _this_. 
 
