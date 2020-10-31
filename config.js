@@ -12,10 +12,20 @@ module.exports = {
   // social
   socialLinks: [
     {
+      icon: 'fas fa-user-graduate',
+      name: 'Google Scholar',
+      url: 'https://scholar.google.com/citations?user=nvZddqgAAAAJ&hl=en',
+    },
+    {
       icon: 'fab fa-researchgate',
       name: 'ResearchGate',
       url: 'https://www.researchgate.net/profile/Michael_Mahoney13',
       },
+    {
+      icon: 'fab fa-orcid',
+      name: 'ORCID',
+      url: 'https://orcid.org/0000-0003-2402-304X'
+    },
     {
       icon: 'fab fa-github',
       name: 'Github',

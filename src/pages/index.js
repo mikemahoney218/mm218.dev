@@ -25,7 +25,8 @@ const IndexPage = () => (
             <a href={`mailto:${config.email}`}>{config.email}</a>
           </div>
           <p className='lead mb-5'>
-          I'm a PhD candidate at SUNY-ESF, working with Colin Beier to try and make forest modeling easier to use by reducing the amount of data practicioners need to provide and creating more effective and expressive outputs. This work incorporates ecological modeling and data engineering to try and make cutting-edge models accessible outside of academia.
+          I'm a PhD candidate at SUNY-ESF, working with <a href='https://www.esf.edu/faculty/beier/'>Colin Beier</a> and <a href='https://aidanackerman.com/'>Aidan Ackerman</a> 
+          on model interpretability, data visualization, and environmental data science. 
           </p>
           <p className='lead mb-5'>
           In the past I've worked as an analyst for Wayfair's Forecasting and Analytics team, an independent researcher with both the Stella Riparian and Stream Ecology and Yanai Forest Ecosystem Science laboratories, and as the Beaver Impact Assessment intern for the New York State Department of Environmental Conservation. In all of these roles I've worked to apply data science techniques to large-scale challenges, frequently serving as the statistical and technical expert within my team.
