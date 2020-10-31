@@ -6,6 +6,22 @@ output:
 
 <hr>
 
+PHP is an embarrassment, a blight upon my craft. It’s so broken, but so lauded by every empowered amateur who’s yet to learn anything else, as to be maddening. It has paltry few redeeming qualities and I would prefer to forget it exists at all.
+
+[...]
+
+
+Do not tell me that “good developers can write good code in any language”, or bad developers blah blah. That doesn’t mean anything. A good carpenter can drive in a nail with either a rock or a hammer, but how many carpenters do you see bashing stuff with rocks? Part of what makes a good developer is the ability to choose the tools that work best.
+
+[...]
+
+PHP is built to keep chugging along at all costs. When faced with either doing something nonsensical or aborting with an error, it will do something nonsensical. Anything is better than nothing.
+
+
+--- [PHP: A fractal of bad design](https://eev.ee/blog/2012/04/09/php-a-fractal-of-bad-design/)
+
+<hr>
+
 The joy in mathematics is often the receding of the pain.
 
 [...]
