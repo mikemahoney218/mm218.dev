@@ -6,7 +6,6 @@ import Layout from '../components/Layout'
 import Sidebar from '../components/Sidebar'
 import config from '../../config'
 import jobs from '../../jobs'
-import { element } from 'prop-types'
 const IndexPage = () => (
   <Layout>
     <Sidebar />
