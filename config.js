@@ -46,11 +46,6 @@ module.exports = {
       name: 'CV',
       url: '/cv.pdf',
     },
-    {
-      icon: 'far fa-file',
-      name: 'Resume',
-      url: '/resume.pdf',
-    },
   ],
   email: 'mike.mahoney.218@gmail.com',
 //  phone: '000-00000',

@@ -97,7 +97,7 @@ const IndexPage = () => (
 
           <div className='resume-item d-flex flex-column flex-md-row justify-content-between mb-5'>
             <div>
-            Stem size selectivity is stronger than species preferences for beaver, a central place forager. <strong>Mahoney, M. J. </strong> and Stella, J. C. 2020. Forest Ecology and Management, 475, 118331. https://doi.org/10.1016/j.foreco.2020.118331. <a href="https://raw.githubusercontent.com/mikemahoney218/research_repository/master/2020/MahoneyStella2020.pdf">Link to full text.</a>
+            Stem size selectivity is stronger than species preferences for beaver, a central place forager. <strong>Mahoney, M. J. </strong> and Stella, J. C. 2020. Forest Ecology and Management, 475, 118331. https://doi.org/10.1016/j.foreco.2020.118331. <a href="https://doi.org/10.1016/j.foreco.2020.118331">Link to paper.</a>
             </div>
             <div className='resume-date text-md-right'>
               <span className='text-primary'>2020</span>
