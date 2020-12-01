@@ -6,6 +6,14 @@ output:
 
 <hr>
 
+objects: Everything that exists in R is an object.  
+functions: Everything that happens in R is a function call.  
+interfaces: Interfaces to other languages are a part of R.
+
+--- [John Chambers - S, R, and Data Science](https://journal.r-project.org/archive/2020/RJ-2020-028/RJ-2020-028.pdf)
+
+<hr>
+
 PHP is an embarrassment, a blight upon my craft. It’s so broken, but so lauded by every empowered amateur who’s yet to learn anything else, as to be maddening. It has paltry few redeeming qualities and I would prefer to forget it exists at all.
 
 [...]
