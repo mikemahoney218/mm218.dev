@@ -1,0 +1,52 @@
+---
+title: "Mike Mahoney"
+image: "avatar.jpg"
+links:
+  - label: LinkedIn
+    url: "https://linkedin.com/in/mikemahoney218"
+  - label: Twitter
+    url: "https://twitter.com/mikemahoney218"
+  - label: GitHub
+    url: "https://github.com/mikemahoney218"
+  - label: Email
+    url: "mailto:mike.mahoney.218+site@gmail.com"
+  - label: Blog
+    url: "blog.html"
+site: distill::distill_website
+output:
+  postcards::trestles
+---
+ 
+## Bio
+
+I'm a PhD candidate at SUNY-ESF, working with Colin Beier and Aidan Ackerman on 
+model interpretability, data visualization, and environmental data science. My 
+past projects have included assessing the landscape-level impacts of ecosystem 
+engineers within New York's Adirondack State Park, as well as investigating the 
+impact of fertilization on beech bark disease within the White Mountains of New 
+Hampshire. In all of these projects I've worked to apply data science techniques 
+to large-scale challenges, frequently serving as the statistical and technical 
+expert within my team.
+
+<p></p>
+
+## Education
+
+**State University of New York College of Environmental Science and Forestry** | Syracuse, NY
+
+Ph.D. in Environmental Science | August 2020 - Present (Expected 2024)  
+B.S. in Forest Ecosystem Science | August 2015 - December 2018
+
+<p></p>
+
+## Selected Projects
+
+#### Publications
+
+**Stem size selectivity is stronger than species preferences for beaver, a central place forager.**  Mahoney, M. J. and Stella, J. C. 2020. Forest Ecology and Management, 475, 118331. https://doi.org/10.1016/j.foreco.2020.118331. Link to paper.
+
+#### R Packages
+
+**[mvdf](https://github.com/mikemahoney218/heddlr)** | A standardized approach to using R as a frontend for the Blender 3D rendering program | 2020  
+**[terrainr](https://github.com/mikemahoney218/terrainr)** | Retrieve Data from the USGS National Map and Transform it for 3D Landscape Visualizations | 2020  
+**[heddlr](https://github.com/mikemahoney218/heddlr)** | Functional Programming Concepts for R Markdown Documents | 2020

@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:media="http://search.yahoo.com/mrss/" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:distill="https://distill.pub/journal/" version="2.0">
+  <channel>
+    <title>Mike Mahoney</title>
+    <link>https://www.mm218.dev/</link>
+    <atom:link href="https://www.mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
+    <description>Technology and the Environment</description>
+    <generator>Distill</generator>
+    <lastBuildDate>Fri, 16 Oct 2020 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>Some Updates</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2020/10</link>
+      <description>&lt;p&gt;Where Do We Come From? What Are We? Where Are We Going?&lt;/p&gt;
+</description>
+      <category>R</category>
+      <category>Twitter</category>
+      <category>phd</category>
+      <category>terrainr</category>
+      <category>beaver</category>
+      <guid>https://www.mm218.dev/posts/2020/10</guid>
+      <pubDate>Fri, 16 Oct 2020 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Make a Retweet Bot in R</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2020/06</link>
+      <description>&lt;p&gt;Y&amp;#39;know. If you wanna.&lt;/p&gt;
+</description>
+      <guid>https://www.mm218.dev/posts/2020/06</guid>
+      <pubDate>Sat, 20 Jun 2020 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Installing the TIG stack on Raspberry Pi</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2020/05</link>
+      <description>&lt;p&gt;A guide to installing InfluxDB, Telegraf, and Grafana on a Raspberry Pi 4 running Raspbian Buster. Unlike every other guide like this on the internet, this one works.&lt;/p&gt;
+</description>
+      <category>Raspberry Pi</category>
+      <category>Tutorials</category>
+      <category>Data Visualization</category>
+      <category>Monitoring</category>
+      <category>Telegraf</category>
+      <category>InfluxDB</category>
+      <category>Grafana</category>
+      <guid>https://www.mm218.dev/posts/2020/05</guid>
+      <pubDate>Sun, 03 May 2020 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>A minimalist visualization of Coronavirus rates</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2020/04/corona-viz</link>
+      <description>&lt;p&gt;Made with Shiny and R&lt;/p&gt;
+</description>
+      <category>R</category>
+      <guid>https://www.mm218.dev/posts/2020/04/corona-viz</guid>
+      <pubDate>Mon, 27 Apr 2020 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Making Excellent Visualizations</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2020/04/making-excellent-viz</link>
+      <description>&lt;p&gt;Part 3 in the data visualization series&lt;/p&gt;
+</description>
+      <category>Data Visualization</category>
+      <category>Tutorials</category>
+      <guid>https://www.mm218.dev/posts/2020/04/making-excellent-viz</guid>
+      <pubDate>Wed, 22 Apr 2020 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Mechanics of Data Visualizations</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2020/04/mechanics-of-viz</link>
+      <description>&lt;p&gt;Part 2 in the data visualization series&lt;/p&gt;
+</description>
+      <category>Data Visualization</category>
+      <category>Tutorials</category>
+      <guid>https://www.mm218.dev/posts/2020/04/mechanics-of-viz</guid>
+      <pubDate>Tue, 21 Apr 2020 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Theory of Data Visualizations</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2020/04/theory-of-data-viz</link>
+      <description>&lt;p&gt;Part 1 in the data visualization series&lt;/p&gt;
+</description>
+      <category>Data Visualization</category>
+      <category>Tutorials</category>
+      <guid>https://www.mm218.dev/posts/2020/04/theory-of-data-viz</guid>
+      <pubDate>Mon, 20 Apr 2020 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Thesis Now Available in ESF Digital Commons</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2019/03</link>
+      <description>&lt;p&gt;It&amp;#39;s a real humdinger.&lt;/p&gt;
+</description>
+      <category>Publications</category>
+      <category>Beaver</category>
+      <guid>https://www.mm218.dev/posts/2019/03</guid>
+      <pubDate>Wed, 27 Mar 2019 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Announcing {spacey}, now on CRAN!</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2020/03</link>
+      <description>&lt;p&gt;USGS data access and rayshader maps, done cheap.&lt;/p&gt;
+</description>
+      <category>R</category>
+      <category>R Packages</category>
+      <category>maps</category>
+      <category>spacey</category>
+      <category>geospatial data</category>
+      <guid>https://www.mm218.dev/posts/2020/03</guid>
+      <pubDate>Sun, 24 Mar 2019 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Announcing {heddlr}, now on CRAN!</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2020/01</link>
+      <description>&lt;p&gt;Write less boilerplate, get more done.&lt;/p&gt;
+</description>
+      <category>R</category>
+      <category>R Packages</category>
+      <category>R Markdown</category>
+      <guid>https://www.mm218.dev/posts/2020/01</guid>
+      <pubDate>Wed, 23 Jan 2019 00:00:00 +0000</pubDate>
+    </item>
+  </channel>
+</rss>
