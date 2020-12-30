@@ -14,7 +14,10 @@ output:
 
 ## Setting Up InfluxDB, Telegraf, and Grafana on Raspberry Pi
 
-![](grafana_dash.webp)
+```{r echo=FALSE}
+knitr::include_graphics("grafana_dash.webp")
+```
+
 
 ### tl;dr
 

@@ -101,14 +101,20 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <meta property="og:type" content="article"/>
 <meta property="og:description" content="Made with Shiny and R"/>
 <meta property="og:url" content="https://www.mm218.dev/posts/2020/04/corona-viz/"/>
+<meta property="og:image" content="https://www.mm218.dev/posts/2020/04/corona-viz/covid.png"/>
+<meta property="og:image:width" content="942"/>
+<meta property="og:image:height" content="883"/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:site_name" content="Mike Mahoney"/>
 
 <!--  https://dev.twitter.com/cards/types/summary -->
-<meta property="twitter:card" content="summary"/>
+<meta property="twitter:card" content="summary_large_image"/>
 <meta property="twitter:title" content="Mike Mahoney: A minimalist visualization of Coronavirus rates"/>
 <meta property="twitter:description" content="Made with Shiny and R"/>
 <meta property="twitter:url" content="https://www.mm218.dev/posts/2020/04/corona-viz/"/>
+<meta property="twitter:image" content="https://www.mm218.dev/posts/2020/04/corona-viz/covid.png"/>
+<meta property="twitter:image:width" content="942"/>
+<meta property="twitter:image:height" content="883"/>
 
 <!--  https://scholar.google.com/intl/en/scholar/inclusion.html#indexing -->
 <meta name="citation_title" content="Mike Mahoney: A minimalist visualization of Coronavirus rates"/>
@@ -125,7 +131,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["corona-viz_files/anchor-4.2.2/anchor.min.js","corona-viz_files/bowser-1.9.3/bowser.min.js","corona-viz_files/distill-2.2.21/template.v2.js","corona-viz_files/header-attrs-2.6/header-attrs.js","corona-viz_files/jquery-1.11.3/jquery.min.js","corona-viz_files/webcomponents-2.0.0/webcomponents.js","covid.png","making-1-1.png","making-10-1.png","making-11-1.png","making-12-1.png","making-13-1.png","making-2-1.png","making-3-1.png","making-4-1.png","making-5-1.png","making-6-1.png","making-7-1.png","making-8-1.png","making-9-1.png","making-excellent-viz_files/anchor-4.2.2/anchor.min.js","making-excellent-viz_files/bowser-1.9.3/bowser.min.js","making-excellent-viz_files/distill-2.2.21/template.v2.js","making-excellent-viz_files/header-attrs-2.6/header-attrs.js","making-excellent-viz_files/jquery-1.11.3/jquery.min.js","making-excellent-viz_files/webcomponents-2.0.0/webcomponents.js","making-excellent-viz.html","making.png","mechanics-of-viz_files/anchor-4.2.2/anchor.min.js","mechanics-of-viz_files/bowser-1.9.3/bowser.min.js","mechanics-of-viz_files/distill-2.2.21/template.v2.js","mechanics-of-viz_files/header-attrs-2.6/header-attrs.js","mechanics-of-viz_files/jquery-1.11.3/jquery.min.js","mechanics-of-viz_files/webcomponents-2.0.0/webcomponents.js","mechanics-of-viz.html","mechanics.png","theory-of-data-viz_files/anchor-4.2.2/anchor.min.js","theory-of-data-viz_files/bowser-1.9.3/bowser.min.js","theory-of-data-viz_files/distill-2.2.21/template.v2.js","theory-of-data-viz_files/header-attrs-2.6/header-attrs.js","theory-of-data-viz_files/jquery-1.11.3/jquery.min.js","theory-of-data-viz_files/webcomponents-2.0.0/webcomponents.js","theory-of-data-viz.html","theory.png","theory1.png","theory2.png","unnamed-chunk-1-1.png","unnamed-chunk-10-1.png","unnamed-chunk-11-1.png","unnamed-chunk-12-1.png","unnamed-chunk-13-1.png","unnamed-chunk-14-1.png","unnamed-chunk-15-1.png","unnamed-chunk-16-1.png","unnamed-chunk-17-1.png","unnamed-chunk-18-1.png","unnamed-chunk-19-1.png","unnamed-chunk-2-1.png","unnamed-chunk-20-1.png","unnamed-chunk-21-1.png","unnamed-chunk-22-1.png","unnamed-chunk-23-1.png","unnamed-chunk-24-1.png","unnamed-chunk-25-1.png","unnamed-chunk-26-1.png","unnamed-chunk-27-1.png","unnamed-chunk-28-1.png","unnamed-chunk-29-1.png","unnamed-chunk-3-1.png","unnamed-chunk-30-1.png","unnamed-chunk-31-1.png","unnamed-chunk-32-1.png","unnamed-chunk-33-1.png","unnamed-chunk-34-1.png","unnamed-chunk-35-1.png","unnamed-chunk-36-1.png","unnamed-chunk-37-1.png","unnamed-chunk-38-1.png","unnamed-chunk-39-1.png","unnamed-chunk-4-1.png","unnamed-chunk-40-1.png","unnamed-chunk-41-1.png","unnamed-chunk-42-1.png","unnamed-chunk-43-1.png","unnamed-chunk-44-1.png","unnamed-chunk-45-1.png","unnamed-chunk-46-1.png","unnamed-chunk-47-1.png","unnamed-chunk-48-1.png","unnamed-chunk-49-1.png","unnamed-chunk-5-1.png","unnamed-chunk-50-1.png","unnamed-chunk-51-1.png","unnamed-chunk-6-1.png","unnamed-chunk-7-1.png","unnamed-chunk-8-1.png","unnamed-chunk-9-1.png"]}
+  {"type":"character","attributes":{},"value":["corona-viz_files/anchor-4.2.2/anchor.min.js","corona-viz_files/bowser-1.9.3/bowser.min.js","corona-viz_files/distill-2.2.21/template.v2.js","corona-viz_files/header-attrs-2.6/header-attrs.js","corona-viz_files/jquery-1.11.3/jquery.min.js","corona-viz_files/webcomponents-2.0.0/webcomponents.js","covid.png"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
 <meta name="distill:offset" content="../../../.."/>
@@ -2082,7 +2088,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <div class="d-article">
 <p>I had been getting frustrated with not being able to quickly find coronavirus data for my area, and not being able to see recent trends without framing and interpretation. So I grabbed down the John Hopkins CSSE data and made a quick Shiny app to visualize case and death rates. I’m trying to not contribute to the constant noise surrounding the ongoing pandemic, but having a way to see these numbers without an overwhelming amount of surrounding editorialization has made me feel like I understand the world a bit better.</p>
-<p><img src="covid.png" /></p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="covid.png" width="100%" /></p>
+</div>
 <p><a href="https://mm218.shinyapps.io/corona_data_explore/">The app lives at this link</a>. Thanks to R Studio, who are providing free hosting for coronavirus apps through the pandemic.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->

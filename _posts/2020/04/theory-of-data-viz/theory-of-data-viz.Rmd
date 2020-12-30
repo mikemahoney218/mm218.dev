@@ -95,7 +95,9 @@ exists and provide a call to action. For instance, we can reimagine the
 same tree graph with a few edits in order to explain what patterns we’re
 seeing:
 
-![](theory2.png)
+```{r, out.width='100%'}
+knitr::include_graphics("theory2.png")
+```
 
 I want to specifically call out the title here: “Orange tree growth
 tapers by year 4.” A good graphic tells a story, remember. As such,

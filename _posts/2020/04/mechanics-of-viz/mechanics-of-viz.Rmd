@@ -34,7 +34,9 @@ than two variables.
 So the question becomes: how can we visualize those extra variables? We
 can try adding another position scale:
 
-![](unnamed-chunk-2-1.png)
+```{r, out.width='100%'}
+knitr::include_graphics("unnamed-chunk-2-1.png")
+```
 
 But 3D images are hard to wrap your head around, complicated to produce,
 and not as effective in delivering your message. They do have their uses

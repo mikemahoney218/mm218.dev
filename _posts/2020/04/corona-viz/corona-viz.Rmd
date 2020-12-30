@@ -20,7 +20,10 @@ the constant noise surrounding the ongoing pandemic, but having a
 way to see these numbers without an overwhelming amount of surrounding 
 editorialization has made me feel like I understand the world a bit better.
 
-![](covid.png)
+```{r, out.width='100%'}
+knitr::include_graphics("covid.png")
+```
+
 
 [The app lives at this link](https://mm218.shinyapps.io/corona_data_explore/).
 Thanks to R Studio, who are providing free hosting for coronavirus apps through

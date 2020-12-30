@@ -20,6 +20,7 @@
       <category>beaver</category>
       <guid>https://www.mm218.dev/posts/2020/10</guid>
       <pubDate>Fri, 16 Oct 2020 00:00:00 +0000</pubDate>
+      <media:content url="https://www.mm218.dev/posts/2020/10/terrainr.jpg" medium="image" type="image/jpeg"/>
     </item>
     <item>
       <title>Make a Retweet Bot in R</title>
@@ -55,6 +56,7 @@
       <category>R</category>
       <guid>https://www.mm218.dev/posts/2020/04/corona-viz</guid>
       <pubDate>Mon, 27 Apr 2020 00:00:00 +0000</pubDate>
+      <media:content url="https://www.mm218.dev/posts/2020/04/corona-viz/covid.png" medium="image" type="image/png" width="942" height="883"/>
     </item>
     <item>
       <title>Making Excellent Visualizations</title>
@@ -77,6 +79,7 @@
       <category>Tutorials</category>
       <guid>https://www.mm218.dev/posts/2020/04/mechanics-of-viz</guid>
       <pubDate>Tue, 21 Apr 2020 00:00:00 +0000</pubDate>
+      <media:content url="https://www.mm218.dev/posts/2020/04/mechanics-of-viz/unnamed-chunk-2-1.png" medium="image" type="image/png" width="672" height="480"/>
     </item>
     <item>
       <title>Theory of Data Visualizations</title>
@@ -88,6 +91,7 @@
       <category>Tutorials</category>
       <guid>https://www.mm218.dev/posts/2020/04/theory-of-data-viz</guid>
       <pubDate>Mon, 20 Apr 2020 00:00:00 +0000</pubDate>
+      <media:content url="https://www.mm218.dev/posts/2020/04/theory-of-data-viz/theory2.png" medium="image" type="image/png" width="672" height="480"/>
     </item>
     <item>
       <title>Thesis Now Available in ESF Digital Commons</title>
