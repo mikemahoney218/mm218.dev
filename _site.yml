@@ -9,7 +9,7 @@ navbar:
     - text: "Blog"
       href: blog.html
     - icon: fab fa-github
-      href: https://github.com/mikemahoney218/mm  218.dev
+      href: https://github.com/mikemahoney218/mm218.dev
     - icon: fa fa-rss
       href: blog.xml
 repository_url: https://github.com/mikemahoney218/mm218.dev
@@ -22,5 +22,6 @@ collections:
     share: [twitter, facebook, linkedin]
 rss:
   full_content: true
-  categories: ["R"]
+  categories:
+    - R
 base_url: https://www.mm218.dev/
