@@ -111,12 +111,12 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","path","tags","date","updated","description","author","output"]}},"value":[{"type":"character","attributes":{},"value":["Make a Retweet Bot in R"]},{"type":"character","attributes":{},"value":["/2020/06/retweet-bot"]},{"type":"character","attributes":{},"value":["R","Twitter","ecology_tweets"]},{"type":"character","attributes":{},"value":["2020-06-20"]},{"type":"character","attributes":{},"value":["2020-06-20"]},{"type":"character","attributes":{},"value":["Y'know. If you wanna."]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["Mike Mahoney"]}]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","path","categories","date","updated","description","author","output"]}},"value":[{"type":"character","attributes":{},"value":["Make a Retweet Bot in R"]},{"type":"character","attributes":{},"value":["/2020/06/retweet-bot"]},{"type":"character","attributes":{},"value":["R","Twitter","ecology_tweets"]},{"type":"character","attributes":{},"value":["2020-06-20"]},{"type":"character","attributes":{},"value":["2020-06-20"]},{"type":"character","attributes":{},"value":["Y'know. If you wanna."]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["Mike Mahoney"]}]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["retweetbot_files/anchor-4.2.2/anchor.min.js","retweetbot_files/bowser-1.9.3/bowser.min.js","retweetbot_files/distill-2.2.21/template.v2.js","retweetbot_files/header-attrs-2.6/header-attrs.js","retweetbot_files/jquery-1.11.3/jquery.min.js","retweetbot_files/webcomponents-2.0.0/webcomponents.js"]}
+  {"type":"character","attributes":{},"value":["retweetbot_files/anchor-4.2.2/anchor.min.js","retweetbot_files/bowser-1.9.3/bowser.min.js","retweetbot_files/distill-2.2.21/template.v2.js","retweetbot_files/header-attrs-2.6/header-attrs.js","retweetbot_files/jquery-1.11.3/jquery.min.js","retweetbot_files/popper-2.6.0/popper.min.js","retweetbot_files/tippy-6.2.7/tippy-bundle.umd.min.js","retweetbot_files/tippy-6.2.7/tippy-light-border.css","retweetbot_files/tippy-6.2.7/tippy.css","retweetbot_files/tippy-6.2.7/tippy.umd.min.js","retweetbot_files/webcomponents-2.0.0/webcomponents.js"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
@@ -308,6 +308,11 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     text-decoration: underline;
   }
 
+  d-article details {
+    grid-column: text;
+    margin-bottom: 0.8em;
+  }
+
   @media(min-width: 768px) {
 
   d-article pre,
@@ -462,6 +467,17 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
   div.hanging-indent{
     margin-left: 1em; text-indent: -1em;
+  }
+
+  /* Citation hover box */
+
+  .tippy-box[data-theme~=light-border] {
+    background-color: rgba(250, 250, 250, 0.95);
+  }
+
+  .tippy-content > p {
+    margin-bottom: 0;
+    padding: 2px;
   }
 
 
@@ -1129,7 +1145,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       var layout = $(this).attr('data-layout');
 
       // apply layout to markdown level block elements
-      var elements = $(this).children().not('div.sourceCode, pre, script');
+      var elements = $(this).children().not('details, div.sourceCode, pre, script');
       elements.each(function(i, el) {
         var layout_div = $('<div class="' + layout + '"></div>');
         if (layout_div.hasClass('shaded')) {
@@ -1244,6 +1260,20 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       // move appendix-bottom entries to the bottom
       $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
       $('.appendix-bottom').remove();
+
+      // hoverable references
+      $('span.citation[data-cites]').each(function() {
+        var refHtml = $('#ref-' + $(this).attr('data-cites')).html();
+        window.tippy(this, {
+          allowHTML: true,
+          content: refHtml,
+          maxWidth: 500,
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        });
+      });
 
       // clear polling timer
       clearInterval(tid);
@@ -1406,6 +1436,10 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--/radix_placeholder_distill-->
   <script src="retweetbot_files/header-attrs-2.6/header-attrs.js"></script>
   <script src="retweetbot_files/jquery-1.11.3/jquery.min.js"></script>
+  <script src="retweetbot_files/popper-2.6.0/popper.min.js"></script>
+  <link href="retweetbot_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="retweetbot_files/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="retweetbot_files/tippy-6.2.7/tippy.umd.min.js"></script>
   <script src="retweetbot_files/anchor-4.2.2/anchor.min.js"></script>
   <script src="retweetbot_files/bowser-1.9.3/bowser.min.js"></script>
   <script src="retweetbot_files/webcomponents-2.0.0/webcomponents.js"></script>
@@ -1433,6 +1467,11 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <div class="d-title">
 <h1>Make a Retweet Bot in R</h1>
 <!--radix_placeholder_categories-->
+<div class="dt-tags">
+<div class="dt=tag">R</div>
+<div class="dt=tag">Twitter</div>
+<div class="dt=tag">ecology_tweets</div>
+</div>
 <!--/radix_placeholder_categories-->
 <p>Y’know. If you wanna.</p>
 </div>

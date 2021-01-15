@@ -28,6 +28,9 @@
       <link>https://www.mm218.dev/posts/2020/06</link>
       <description>&lt;p&gt;Y&amp;#39;know. If you wanna.&lt;/p&gt;
 </description>
+      <category>R</category>
+      <category>Twitter</category>
+      <category>ecology_tweets</category>
       <guid>https://www.mm218.dev/posts/2020/06</guid>
       <pubDate>Sat, 20 Jun 2020 00:00:00 +0000</pubDate>
     </item>
@@ -94,17 +97,6 @@
       <media:content url="https://www.mm218.dev/posts/2020/04/theory-of-data-viz/theory2.png" medium="image" type="image/png" width="672" height="480"/>
     </item>
     <item>
-      <title>Thesis Now Available in ESF Digital Commons</title>
-      <dc:creator>Mike Mahoney</dc:creator>
-      <link>https://www.mm218.dev/posts/2019/03</link>
-      <description>&lt;p&gt;It&amp;#39;s a real humdinger.&lt;/p&gt;
-</description>
-      <category>Publications</category>
-      <category>Beaver</category>
-      <guid>https://www.mm218.dev/posts/2019/03</guid>
-      <pubDate>Wed, 27 Mar 2019 00:00:00 +0000</pubDate>
-    </item>
-    <item>
       <title>Announcing {spacey}, now on CRAN!</title>
       <dc:creator>Mike Mahoney</dc:creator>
       <link>https://www.mm218.dev/posts/2020/03</link>
@@ -116,7 +108,7 @@
       <category>spacey</category>
       <category>geospatial data</category>
       <guid>https://www.mm218.dev/posts/2020/03</guid>
-      <pubDate>Sun, 24 Mar 2019 00:00:00 +0000</pubDate>
+      <pubDate>Tue, 24 Mar 2020 00:00:00 +0000</pubDate>
     </item>
     <item>
       <title>Announcing {heddlr}, now on CRAN!</title>
@@ -128,7 +120,18 @@
       <category>R Packages</category>
       <category>R Markdown</category>
       <guid>https://www.mm218.dev/posts/2020/01</guid>
-      <pubDate>Wed, 23 Jan 2019 00:00:00 +0000</pubDate>
+      <pubDate>Thu, 23 Jan 2020 00:00:00 +0000</pubDate>
+    </item>
+    <item>
+      <title>Thesis Now Available in ESF Digital Commons</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2019/03</link>
+      <description>&lt;p&gt;It&amp;#39;s a real humdinger.&lt;/p&gt;
+</description>
+      <category>Publications</category>
+      <category>Beaver</category>
+      <guid>https://www.mm218.dev/posts/2019/03</guid>
+      <pubDate>Wed, 27 Mar 2019 00:00:00 +0000</pubDate>
     </item>
   </channel>
 </rss>

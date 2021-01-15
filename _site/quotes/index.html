@@ -293,17 +293,24 @@ if (window.hljs) {
 
 
 <hr>
+<p>The more instructions something has, the worse its design. It’s cheaper to add instructions later than to design something well.</p>
+<p>— <a href="https://designmtw.com/">Scott Berkun: How Design Makes the World</a></p>
+<hr>
+<p>We prove that last digits are approximately uniform for distributions with an absolutely continuous distribution function. From a practical perspective, that result, of course, is only moderately interesting. For that reason, we derive a result for ‘certain’ sums of lattice-variables as well. That justification is provided in terms of stationary distributions.</p>
+<p>— <a href="doi.org/10.1007/s11634-009-0048-5">Stephan Dlugosz and Ulrich Muller-Funk: The value of the last digit: statistical fraud detection with digit analysis</a></p>
+<hr>
 <p>The first of McIlroy’s dicta is often paraphrased as “do one thing and do it well”, which is shortened from “Make each program do one thing well. To do a new job, build afresh rather than complicate old programs by adding new ‘features.’”</p>
 <p>McIlroy’s example of this dictum is:</p>
 <blockquote>
 <p>Surprising to outsiders is the fact that UNIX compilers produce no listings: printing can be done better and more flexibly by a separate program.</p>
 </blockquote>
 <p>[…]</p>
-<p>This isn’t to say there’s no cost to adding options – more options means more maintenance burden, but that’s a cost that maintainers pay to benefit users, which isn’t obviously unreasonable considering the ratio of maintainers to users. This is analogous to Gary Bernhardt’s comment that it’s reasonable to practice a talk fifty times since, if there’s a three hundred person audience, the ratio of time spent watching to the talk to time spent practicing will still only be 1:6. In general, this ratio will be even more extreme with commonly used command line tools.</p>
-<p>[…]</p>
 <p>McIlroy implies that the problem is that people didn’t think hard enough, the old school UNIX mavens would have sat down in the same room and thought longer and harder until they came up with a set of consistent tools that has “unusual simplicity”. But that was never going to scale, the philosophy made the mess we’re in inevitable. It’s not a matter of not thinking longer or harder; it’s a matter of having a philosophy that cannot scale unless you have a relatively small team with a shared cultural understanding, able to to sit down in the same room.</p>
 <p>If anyone can write a tool and the main instruction comes from “the unix philosophy”, people will have different opinions about what “simplicity” or “doing one thing” means, what the right way to do things is, and inconsistency will bloom, resulting in the kind of complexity you get when dealing with a wildly inconsistent language, like PHP. People make fun of PHP and javascript for having all sorts of warts and weird inconsistencies, but as a language and a standard library, any commonly used shell plus the collection of widely used *nix tools taken together is much worse and contains much more accidental complexity due to inconsistency even within a single Linux distro and there’s no other way it could have turned out. If you compare across Linux distros, BSDs, Solaris, AIX, etc., the amount of accidental complexity that users have to hold in their heads when switching systems dwarfs PHP or javascript’s incoherence. The most widely mocked programming languages are paragons of great design by comparison.</p>
 <p>To be clear, I’m not saying that I or anyone else could have done better with the knowledge available in the 70s in terms of making a system that was practically useful at the time that would be elegant today. It’s easy to look back and find issues with the benefit of hindsight. What I disagree with are comments from Unix mavens speaking today; comments like McIlroy’s, which imply that we just forgot or don’t understand the value of simplicity, or Ken Thompson saying that C is as safe a language as any and if we don’t want bugs we should just write bug-free code. These kinds of comments imply that there’s not much to learn from hindsight; in the 70s, we were building systems as effectively as anyone can today; five decades of collective experience, tens of millions of person-years, have taught us nothing; if we just go back to building systems like the original Unix mavens did, all will be well. I respectfully disagree.</p>
+<p>— <a href="https://danluu.com/cli-complexity/">Dan Luu: The growth of command line options, 1979-Present</a></p>
+<hr>
+<p>This isn’t to say there’s no cost to adding options – more options means more maintenance burden, but that’s a cost that maintainers pay to benefit users, which isn’t obviously unreasonable considering the ratio of maintainers to users. This is analogous to Gary Bernhardt’s comment that it’s reasonable to practice a talk fifty times since, if there’s a three hundred person audience, the ratio of time spent watching to the talk to time spent practicing will still only be 1:6. In general, this ratio will be even more extreme with commonly used command line tools.</p>
 <p>— <a href="https://danluu.com/cli-complexity/">Dan Luu: The growth of command line options, 1979-Present</a></p>
 <hr>
 <p>objects: Everything that exists in R is an object.<br />

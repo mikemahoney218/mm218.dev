@@ -91,9 +91,9 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
 
   <!--  https://schema.org/Article -->
-  <meta property="article:published" itemprop="datePublished" content="2019-03-24"/>
-  <meta property="article:created" itemprop="dateCreated" content="2019-03-24"/>
-  <meta property="article:modified" itemprop="dateModified" content="2019-03-24T00:00:00.000-04:00"/>
+  <meta property="article:published" itemprop="datePublished" content="2020-03-24"/>
+  <meta property="article:created" itemprop="dateCreated" content="2020-03-24"/>
+  <meta property="article:modified" itemprop="dateModified" content="2020-03-24T00:00:00.000-04:00"/>
   <meta name="article:author" content="Mike Mahoney"/>
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
@@ -111,12 +111,12 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","categories","date","updated","description","author","output"]}},"value":[{"type":"character","attributes":{},"value":["Announcing {spacey}, now on CRAN!"]},{"type":"character","attributes":{},"value":["R","R Packages","maps","spacey","geospatial data"]},{"type":"character","attributes":{},"value":["2019-03-24"]},{"type":"character","attributes":{},"value":["2019-03-24"]},{"type":"character","attributes":{},"value":["USGS data access and rayshader maps, done cheap."]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Mike Mahoney"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":[]}},"value":[]}]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","categories","date","updated","description","author","output"]}},"value":[{"type":"character","attributes":{},"value":["Announcing {spacey}, now on CRAN!"]},{"type":"character","attributes":{},"value":["R","R Packages","maps","spacey","geospatial data"]},{"type":"character","attributes":{},"value":["2020-03-24"]},{"type":"character","attributes":{},"value":["2020-03-24"]},{"type":"character","attributes":{},"value":["USGS data access and rayshader maps, done cheap."]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Mike Mahoney"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":[]}},"value":[]}]}]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["spacey.png"]}
+  {"type":"character","attributes":{},"value":["spacey-release_files/anchor-4.2.2/anchor.min.js","spacey-release_files/bowser-1.9.3/bowser.min.js","spacey-release_files/distill-2.2.21/template.v2.js","spacey-release_files/header-attrs-2.6/header-attrs.js","spacey-release_files/jquery-1.11.3/jquery.min.js","spacey-release_files/webcomponents-2.0.0/webcomponents.js","spacey.png"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
@@ -308,6 +308,11 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     text-decoration: underline;
   }
 
+  d-article details {
+    grid-column: text;
+    margin-bottom: 0.8em;
+  }
+
   @media(min-width: 768px) {
 
   d-article pre,
@@ -462,6 +467,17 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
   div.hanging-indent{
     margin-left: 1em; text-indent: -1em;
+  }
+
+  /* Citation hover box */
+
+  .tippy-box[data-theme~=light-border] {
+    background-color: rgba(250, 250, 250, 0.95);
+  }
+
+  .tippy-content > p {
+    margin-bottom: 0;
+    padding: 2px;
   }
 
 
@@ -1129,7 +1145,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       var layout = $(this).attr('data-layout');
 
       // apply layout to markdown level block elements
-      var elements = $(this).children().not('div.sourceCode, pre, script');
+      var elements = $(this).children().not('details, div.sourceCode, pre, script');
       elements.each(function(i, el) {
         var layout_div = $('<div class="' + layout + '"></div>');
         if (layout_div.hasClass('shaded')) {
@@ -1244,6 +1260,20 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       // move appendix-bottom entries to the bottom
       $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
       $('.appendix-bottom').remove();
+
+      // hoverable references
+      $('span.citation[data-cites]').each(function() {
+        var refHtml = $('#ref-' + $(this).attr('data-cites')).html();
+        window.tippy(this, {
+          allowHTML: true,
+          content: refHtml,
+          maxWidth: 500,
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        });
+      });
 
       // clear polling timer
       clearInterval(tid);
@@ -1406,6 +1436,10 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--/radix_placeholder_distill-->
   <script src="spacey-release_files/header-attrs-2.6/header-attrs.js"></script>
   <script src="spacey-release_files/jquery-1.11.3/jquery.min.js"></script>
+  <script src="spacey-release_files/popper-2.6.0/popper.min.js"></script>
+  <link href="spacey-release_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="spacey-release_files/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="spacey-release_files/tippy-6.2.7/tippy.umd.min.js"></script>
   <script src="spacey-release_files/anchor-4.2.2/anchor.min.js"></script>
   <script src="spacey-release_files/bowser-1.9.3/bowser.min.js"></script>
   <script src="spacey-release_files/webcomponents-2.0.0/webcomponents.js"></script>
@@ -1421,7 +1455,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Announcing {spacey}, now on CRAN!","description":"USGS data access and rayshader maps, done cheap.","authors":[{"author":"Mike Mahoney","authorURL":{},"affiliation":"&nbsp;","affiliationURL":"#","orcidID":""}],"publishedDate":"2019-03-24T00:00:00.000-04:00","citationText":"Mahoney, 2019"}
+{"title":"Announcing {spacey}, now on CRAN!","description":"USGS data access and rayshader maps, done cheap.","authors":[{"author":"Mike Mahoney","authorURL":{},"affiliation":"&nbsp;","affiliationURL":"#","orcidID":""}],"publishedDate":"2020-03-24T00:00:00.000-04:00","citationText":"Mahoney, 2020"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -1447,7 +1481,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <div class="d-byline">
   Mike Mahoney true 
   
-<br/>2019-03-24
+<br/>2020-03-24
 </div>
 
 <div class="d-article">

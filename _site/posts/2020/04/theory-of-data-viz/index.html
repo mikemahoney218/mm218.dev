@@ -2058,6 +2058,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <!--/radix_placeholder_distill-->
   <script src="../../../../site_libs/header-attrs-2.6/header-attrs.js"></script>
   <script src="../../../../site_libs/jquery-1.11.3/jquery.min.js"></script>
+  <script src="../../../../site_libs/popper-2.6.0/popper.min.js"></script>
+  <link href="../../../../site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="../../../../site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="../../../../site_libs/tippy-6.2.7/tippy.umd.min.js"></script>
   <script src="../../../../site_libs/anchor-4.2.2/anchor.min.js"></script>
   <script src="../../../../site_libs/bowser-1.9.3/bowser.min.js"></script>
   <script src="../../../../site_libs/webcomponents-2.0.0/webcomponents.js"></script>
@@ -2145,6 +2149,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <p>This visualization isn’t anything too complex – two variables, thirty-five observations, not much text – but it already shows us a trend that exists in the data. We could use this information, if we were so inspired, to start investigating the <em>whys</em> of why tree growth changes with age, now that we’re broadly aware of <em>how</em> it changes.</p>
 <p>Explanatory graphs, meanwhile, are all about the <em>whys</em>. Where an exploratory graphic focuses on identifying patterns in the first place, an explanatory graphic aims to explain why they happen and – in the best examples – what exactly the reader is to do about them. Explanatory graphics can exist on their own or in the context of a larger report, but their goals are the same: to provide evidence about why a pattern exists and provide a call to action. For instance, we can reimagine the same tree graph with a few edits in order to explain what patterns we’re seeing:</p>
 <div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/include_graphics.html'>include_graphics</a></span><span class='op'>(</span><span class='st'>"theory2.png"</span><span class='op'>)</span>
+</code></pre>
+</div>
 <p><img src="theory2.png" width="100%" /></p>
 </div>
 <p>I want to specifically call out the title here: “Orange tree growth tapers by year 4.” A good graphic tells a story, remember. As such, whatever title you give your graph should reflect the point of that story – titles such as “Tree diameter (cm) versus age (days)” and so on add nothing that the user can’t get from the graphic itself. Instead, use your title to advance your message whenever it makes sense – otherwise, if it doesn’t add any new information, you’re better off erasing it altogether.</p>

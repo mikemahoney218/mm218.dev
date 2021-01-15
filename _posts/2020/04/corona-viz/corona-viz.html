@@ -307,6 +307,11 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     text-decoration: underline;
   }
 
+  d-article details {
+    grid-column: text;
+    margin-bottom: 0.8em;
+  }
+
   @media(min-width: 768px) {
 
   d-article pre,
@@ -461,6 +466,17 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
   div.hanging-indent{
     margin-left: 1em; text-indent: -1em;
+  }
+
+  /* Citation hover box */
+
+  .tippy-box[data-theme~=light-border] {
+    background-color: rgba(250, 250, 250, 0.95);
+  }
+
+  .tippy-content > p {
+    margin-bottom: 0;
+    padding: 2px;
   }
 
 
@@ -1128,7 +1144,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       var layout = $(this).attr('data-layout');
 
       // apply layout to markdown level block elements
-      var elements = $(this).children().not('div.sourceCode, pre, script');
+      var elements = $(this).children().not('details, div.sourceCode, pre, script');
       elements.each(function(i, el) {
         var layout_div = $('<div class="' + layout + '"></div>');
         if (layout_div.hasClass('shaded')) {
@@ -1243,6 +1259,20 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
       // move appendix-bottom entries to the bottom
       $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
       $('.appendix-bottom').remove();
+
+      // hoverable references
+      $('span.citation[data-cites]').each(function() {
+        var refHtml = $('#ref-' + $(this).attr('data-cites')).html();
+        window.tippy(this, {
+          allowHTML: true,
+          content: refHtml,
+          maxWidth: 500,
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        });
+      });
 
       // clear polling timer
       clearInterval(tid);
@@ -1405,6 +1435,10 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--/radix_placeholder_distill-->
   <script src="corona-viz_files/header-attrs-2.6/header-attrs.js"></script>
   <script src="corona-viz_files/jquery-1.11.3/jquery.min.js"></script>
+  <script src="corona-viz_files/popper-2.6.0/popper.min.js"></script>
+  <link href="corona-viz_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="corona-viz_files/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="corona-viz_files/tippy-6.2.7/tippy.umd.min.js"></script>
   <script src="corona-viz_files/anchor-4.2.2/anchor.min.js"></script>
   <script src="corona-viz_files/bowser-1.9.3/bowser.min.js"></script>
   <script src="corona-viz_files/webcomponents-2.0.0/webcomponents.js"></script>
@@ -1448,6 +1482,10 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <div class="d-article">
 <p>I had been getting frustrated with not being able to quickly find coronavirus data for my area, and not being able to see recent trends without framing and interpretation. So I grabbed down the John Hopkins CSSE data and made a quick Shiny app to visualize case and death rates. I’m trying to not contribute to the constant noise surrounding the ongoing pandemic, but having a way to see these numbers without an overwhelming amount of surrounding editorialization has made me feel like I understand the world a bit better.</p>
 <div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/include_graphics.html'>include_graphics</a></span><span class='op'>(</span><span class='st'>"covid.png"</span><span class='op'>)</span>
+</code></pre>
+</div>
 <p><img src="covid.png" width="100%" /></p>
 </div>
 <p><a href="https://mm218.shinyapps.io/corona_data_explore/">The app lives at this link</a>. Thanks to R Studio, who are providing free hosting for coronavirus apps through the pandemic.</p>

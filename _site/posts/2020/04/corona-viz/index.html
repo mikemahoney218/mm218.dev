@@ -2057,6 +2057,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <!--/radix_placeholder_distill-->
   <script src="../../../../site_libs/header-attrs-2.6/header-attrs.js"></script>
   <script src="../../../../site_libs/jquery-1.11.3/jquery.min.js"></script>
+  <script src="../../../../site_libs/popper-2.6.0/popper.min.js"></script>
+  <link href="../../../../site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="../../../../site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="../../../../site_libs/tippy-6.2.7/tippy.umd.min.js"></script>
   <script src="../../../../site_libs/anchor-4.2.2/anchor.min.js"></script>
   <script src="../../../../site_libs/bowser-1.9.3/bowser.min.js"></script>
   <script src="../../../../site_libs/webcomponents-2.0.0/webcomponents.js"></script>
@@ -2119,6 +2123,10 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="d-article">
 <p>I had been getting frustrated with not being able to quickly find coronavirus data for my area, and not being able to see recent trends without framing and interpretation. So I grabbed down the John Hopkins CSSE data and made a quick Shiny app to visualize case and death rates. I’m trying to not contribute to the constant noise surrounding the ongoing pandemic, but having a way to see these numbers without an overwhelming amount of surrounding editorialization has made me feel like I understand the world a bit better.</p>
 <div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre><code><span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/include_graphics.html'>include_graphics</a></span><span class='op'>(</span><span class='st'>"covid.png"</span><span class='op'>)</span>
+</code></pre>
+</div>
 <p><img src="covid.png" width="100%" /></p>
 </div>
 <p><a href="https://mm218.shinyapps.io/corona_data_explore/">The app lives at this link</a>. Thanks to R Studio, who are providing free hosting for coronavirus apps through the pandemic.</p>
