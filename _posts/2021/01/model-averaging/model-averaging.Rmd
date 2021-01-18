@@ -7,13 +7,12 @@ author:
   - name: Mike Mahoney
     url: {}
     orcid_id: "0000-0003-2402-304X"
-date: 01-04-2021
+date: 01-18-2021
 output:
   distill::distill_article:
     self_contained: false
     toc: true
 bibliography: biblio.bib
-draft: true
 ---
 
 ```{r setup, include=FALSE}

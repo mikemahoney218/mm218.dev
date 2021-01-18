@@ -6,7 +6,19 @@
     <atom:link href="https://www.mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
     <description>Technology and the Environment</description>
     <generator>Distill</generator>
-    <lastBuildDate>Fri, 16 Oct 2020 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 18 Jan 2021 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>Model averaging methods: how and why to build ensemble models</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2021/01/model-averaging</link>
+      <description>&lt;p&gt;Averaging predictions for fun and profit &amp;ndash; and for dealing with the uncertainty of model selection. With examples in R!&lt;/p&gt;
+</description>
+      <category>R</category>
+      <category>Data science</category>
+      <guid>https://www.mm218.dev/posts/2021/01/model-averaging</guid>
+      <pubDate>Mon, 18 Jan 2021 00:00:00 +0000</pubDate>
+      <media:content url="https://www.mm218.dev/posts/2021/01/model-averaging/model_avg.jpg" medium="image" type="image/jpeg"/>
+    </item>
     <item>
       <title>Some Updates</title>
       <dc:creator>Mike Mahoney</dc:creator>
