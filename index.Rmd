@@ -12,6 +12,8 @@ links:
     url: "mailto:mike.mahoney.218+site@gmail.com"
   - label: Blog
     url: "blog.html"
+  - label: CV
+    url: "cv.pdf"
 site: distill::distill_website
 output:
   postcards::trestles
@@ -43,7 +45,7 @@ B.S. in Forest Ecosystem Science | August 2015 - December 2018
 
 #### Publications
 
-**Stem size selectivity is stronger than species preferences for beaver, a central place forager.**  Mahoney, M. J. and Stella, J. C. 2020. Forest Ecology and Management, 475, 118331. https://doi.org/10.1016/j.foreco.2020.118331. Link to paper.
+**Stem size selectivity is stronger than species preferences for beaver, a central place forager.**  Mahoney, M. J. and Stella, J. C. 2020. Forest Ecology and Management, 475, 118331. [https://doi.org/10.1016/j.foreco.2020.118331](https://doi.org/10.1016/j.foreco.2020.118331).
 
 #### R Packages
 
