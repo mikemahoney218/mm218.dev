@@ -62,3 +62,23 @@
   from = "/blog/2020/04/making-excellent-viz"
   to = "/posts/2020/04/making-excellent-viz"
 
+[[redirects]]
+  from = "/heddlr"
+  to = "https://mikemahoney218.github.io/heddlr/"
+
+[[redirects]]
+  from = "/spacey"
+  to = "https://mikemahoney218.github.io/spacey/"
+  
+[[redirects]]
+  from = "/terrainr"
+  to = "https://mikemahoney218.github.io/terrainr/"
+
+[[redirects]]
+  from = "/proceduralnames"
+  to = "https://mikemahoney218.github.io/proceduralnames/"
+  
+[[redirects]]
+  from = "/mvdf"
+  to = "https://mikemahoney218.github.io/mvdf/"
+
