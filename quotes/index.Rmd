@@ -20,7 +20,7 @@ The more instructions something has, the worse its design. It’s cheaper to add
 
 We prove that last digits are approximately uniform for distributions with an absolutely continuous distribution function. From a practical perspective, that result, of course, is only moderately interesting. For that reason, we derive a result for ‘certain’ sums of lattice-variables as well. That justification is provided in terms of stationary distributions.
 
---- [Stephan Dlugosz and Ulrich Muller-Funk: The value of the last digit: statistical fraud detection with digit analysis](doi.org/10.1007/s11634-009-0048-5)
+--- [Stephan Dlugosz and Ulrich Muller-Funk: The value of the last digit: statistical fraud detection with digit analysis](https://doi.org/10.1007/s11634-009-0048-5)
 
 <hr id="LuuThe1">
 
