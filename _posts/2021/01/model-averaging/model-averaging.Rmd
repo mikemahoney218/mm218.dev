@@ -517,7 +517,7 @@ While plenty of complex and computationally expensive approaches to averaging
 exist -- and can greatly improve model performance -- simpler ensemble methods
 can provide the same benefits without necessarily incurring the same costs. 
 
-<hr>
+<br>
 
 <script src="https://utteranc.es/client.js"
         repo="mikemahoney218/mm218.dev"
