@@ -125,7 +125,7 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--radix_placeholder_rmarkdown_metadata-->
 
 <script type="text/json" id="radix-rmarkdown-metadata">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","categories","author","date","output","bibliography","citation_url","canonical_url"]}},"value":[{"type":"character","attributes":{},"value":["Model averaging methods: how and why to build ensemble models"]},{"type":"character","attributes":{},"value":["Averaging predictions for fun and profit -- and for dealing with the uncertainty of model selection. With examples in R!"]},{"type":"character","attributes":{},"value":["R","Data science"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","orcid_id"]}},"value":[{"type":"character","attributes":{},"value":["Mike Mahoney"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":[]}},"value":[]},{"type":"character","attributes":{},"value":["0000-0003-2402-304X"]}]}]},{"type":"character","attributes":{},"value":["01-18-2021"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained","toc"]}},"value":[{"type":"logical","attributes":{},"value":[false]},{"type":"logical","attributes":{},"value":[true]}]}]},{"type":"character","attributes":{},"value":["biblio.bib"]},{"type":"character","attributes":{},"value":["https://www.mm218.dev/posts/2021/01/model-averaging/"]},{"type":"character","attributes":{},"value":["https://www.mm218.dev/posts/2021/01/model-averaging/"]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","categories","author","date","output","bibliography","citation_url","canonical_url"]}},"value":[{"type":"character","attributes":{},"value":["Model averaging methods: how and why to build ensemble models"]},{"type":"character","attributes":{},"value":["Averaging predictions for fun and profit -- and for dealing with the uncertainty of model selection. With examples in R!"]},{"type":"character","attributes":{},"value":["R","Data science"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","orcid_id"]}},"value":[{"type":"character","attributes":{},"value":["Mike Mahoney"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":[]}},"value":[]},{"type":"character","attributes":{},"value":["0000-0003-2402-304X"]}]}]},{"type":"character","attributes":{},"value":["01-18-2021"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained","toc","includes"]}},"value":[{"type":"logical","attributes":{},"value":[false]},{"type":"logical","attributes":{},"value":[true]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["after_body"]}},"value":[{"type":"character","attributes":{},"value":["../../../utterances.html"]}]}]}]},{"type":"character","attributes":{},"value":["biblio.bib"]},{"type":"character","attributes":{},"value":["https://www.mm218.dev/posts/2021/01/model-averaging/"]},{"type":"character","attributes":{},"value":["https://www.mm218.dev/posts/2021/01/model-averaging/"]}]}
 </script>
 <!--/radix_placeholder_rmarkdown_metadata-->
   
@@ -2615,15 +2615,6 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Cool – our model-based ensemble actually performed better than any of the components! While the equal weight and fit-based averages were pretty middle-of-the-road, in other settings these methods can also help to reduce bias in predictions and produce estimates with less variance than any of the component models.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>Model averaging can be a powerful tool for reducing model bias and addressing the implicit uncertainty in attempting to pick the “best” model for a situation. While plenty of complex and computationally expensive approaches to averaging exist – and can greatly improve model performance – simpler ensemble methods can provide the same benefits without necessarily incurring the same costs.</p>
-<p><br></p>
-<script src="https://utteranc.es/client.js"
-        repo="mikemahoney218/mm218.dev"
-        issue-term="url"
-        label="comment"
-        theme="github-light"
-        crossorigin="anonymous"
-        async>
-</script>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-Dormann" class="csl-entry" role="doc-biblioentry">
@@ -2664,6 +2655,17 @@ Wintle, B. A., M. A. McCarthy, C. T. Volinsky, and R. P. Kavanagh. 2003. <span>�
 </div>
 
 
+
+<br>
+
+<script src="https://utteranc.es/client.js"
+        repo="mikemahoney218/mm218.dev"
+        issue-term="url"
+        label="comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
 <!--radix_placeholder_site_after_body-->
 <!--/radix_placeholder_site_after_body-->
 <!--radix_placeholder_appendices-->
