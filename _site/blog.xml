@@ -6,13 +6,24 @@
     <atom:link href="https://www.mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
     <description>Technology and the Environment</description>
     <generator>Distill</generator>
-    <lastBuildDate>Mon, 18 Jan 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Wed, 17 Feb 2021 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>terrainr 0.3.0 is out today</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2021/02/terrainr</link>
+      <description>New version, who this?</description>
+      <category>R</category>
+      <category>Data science</category>
+      <category>terrainr</category>
+      <guid>https://www.mm218.dev/posts/2021/02/terrainr</guid>
+      <pubDate>Wed, 17 Feb 2021 00:00:00 +0000</pubDate>
+      <media:content url="https://www.mm218.dev/posts/2021/02/terrainr/terrainr_files/figure-html5/unnamed-chunk-4-1.png" medium="image" type="image/png" width="1248" height="768"/>
+    </item>
     <item>
       <title>Model averaging methods: how and why to build ensemble models</title>
       <dc:creator>Mike Mahoney</dc:creator>
       <link>https://www.mm218.dev/posts/2021/01/model-averaging</link>
-      <description>&lt;p&gt;Averaging predictions for fun and profit &amp;ndash; and for dealing with the uncertainty of model selection. With examples in R!&lt;/p&gt;
-</description>
+      <description>Averaging predictions for fun and profit -- and for dealing with the uncertainty of model selection. With examples in R!</description>
       <category>R</category>
       <category>Data science</category>
       <guid>https://www.mm218.dev/posts/2021/01/model-averaging</guid>
@@ -23,8 +34,7 @@
       <title>Some Updates</title>
       <dc:creator>Mike Mahoney</dc:creator>
       <link>https://www.mm218.dev/posts/2020/10</link>
-      <description>&lt;p&gt;Where Do We Come From? What Are We? Where Are We Going?&lt;/p&gt;
-</description>
+      <description>Where Do We Come From? What Are We? Where Are We Going?</description>
       <category>R</category>
       <category>Twitter</category>
       <category>phd</category>
@@ -38,8 +48,7 @@
       <title>Make a Retweet Bot in R</title>
       <dc:creator>Mike Mahoney</dc:creator>
       <link>https://www.mm218.dev/posts/2020/06</link>
-      <description>&lt;p&gt;Y&amp;#39;know. If you wanna.&lt;/p&gt;
-</description>
+      <description>Y'know. If you wanna.</description>
       <category>R</category>
       <category>Twitter</category>
       <category>ecology_tweets</category>
@@ -50,8 +59,7 @@
       <title>Installing the TIG stack on Raspberry Pi</title>
       <dc:creator>Mike Mahoney</dc:creator>
       <link>https://www.mm218.dev/posts/2020/05</link>
-      <description>&lt;p&gt;A guide to installing InfluxDB, Telegraf, and Grafana on a Raspberry Pi 4 running Raspbian Buster. Unlike every other guide like this on the internet, this one works.&lt;/p&gt;
-</description>
+      <description>A guide to installing InfluxDB, Telegraf, and Grafana on a Raspberry Pi 4 running Raspbian Buster. Unlike every other guide like this on the internet, this one works.</description>
       <category>Raspberry Pi</category>
       <category>Tutorials</category>
       <category>Data Visualization</category>
@@ -66,8 +74,7 @@
       <title>A minimalist visualization of Coronavirus rates</title>
       <dc:creator>Mike Mahoney</dc:creator>
       <link>https://www.mm218.dev/posts/2020/04/corona-viz</link>
-      <description>&lt;p&gt;Made with Shiny and R&lt;/p&gt;
-</description>
+      <description>Made with Shiny and R</description>
       <category>R</category>
       <guid>https://www.mm218.dev/posts/2020/04/corona-viz</guid>
       <pubDate>Mon, 27 Apr 2020 00:00:00 +0000</pubDate>
@@ -77,8 +84,7 @@
       <title>Making Excellent Visualizations</title>
       <dc:creator>Mike Mahoney</dc:creator>
       <link>https://www.mm218.dev/posts/2020/04/making-excellent-viz</link>
-      <description>&lt;p&gt;Part 3 in the data visualization series&lt;/p&gt;
-</description>
+      <description>Part 3 in the data visualization series</description>
       <category>Data Visualization</category>
       <category>Tutorials</category>
       <guid>https://www.mm218.dev/posts/2020/04/making-excellent-viz</guid>
@@ -88,8 +94,7 @@
       <title>Mechanics of Data Visualizations</title>
       <dc:creator>Mike Mahoney</dc:creator>
       <link>https://www.mm218.dev/posts/2020/04/mechanics-of-viz</link>
-      <description>&lt;p&gt;Part 2 in the data visualization series&lt;/p&gt;
-</description>
+      <description>Part 2 in the data visualization series</description>
       <category>Data Visualization</category>
       <category>Tutorials</category>
       <guid>https://www.mm218.dev/posts/2020/04/mechanics-of-viz</guid>
@@ -100,8 +105,7 @@
       <title>Theory of Data Visualizations</title>
       <dc:creator>Mike Mahoney</dc:creator>
       <link>https://www.mm218.dev/posts/2020/04/theory-of-data-viz</link>
-      <description>&lt;p&gt;Part 1 in the data visualization series&lt;/p&gt;
-</description>
+      <description>Part 1 in the data visualization series</description>
       <category>Data Visualization</category>
       <category>Tutorials</category>
       <guid>https://www.mm218.dev/posts/2020/04/theory-of-data-viz</guid>
@@ -112,8 +116,7 @@
       <title>Announcing {spacey}, now on CRAN!</title>
       <dc:creator>Mike Mahoney</dc:creator>
       <link>https://www.mm218.dev/posts/2020/03</link>
-      <description>&lt;p&gt;USGS data access and rayshader maps, done cheap.&lt;/p&gt;
-</description>
+      <description>USGS data access and rayshader maps, done cheap.</description>
       <category>R</category>
       <category>R Packages</category>
       <category>maps</category>
@@ -126,8 +129,7 @@
       <title>Announcing {heddlr}, now on CRAN!</title>
       <dc:creator>Mike Mahoney</dc:creator>
       <link>https://www.mm218.dev/posts/2020/01</link>
-      <description>&lt;p&gt;Write less boilerplate, get more done.&lt;/p&gt;
-</description>
+      <description>Write less boilerplate, get more done.</description>
       <category>R</category>
       <category>R Packages</category>
       <category>R Markdown</category>
@@ -138,8 +140,7 @@
       <title>Thesis Now Available in ESF Digital Commons</title>
       <dc:creator>Mike Mahoney</dc:creator>
       <link>https://www.mm218.dev/posts/2019/03</link>
-      <description>&lt;p&gt;It&amp;#39;s a real humdinger.&lt;/p&gt;
-</description>
+      <description>It's a real humdinger.</description>
       <category>Publications</category>
       <category>Beaver</category>
       <guid>https://www.mm218.dev/posts/2019/03</guid>

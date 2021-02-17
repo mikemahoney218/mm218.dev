@@ -7,7 +7,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
   <meta name="generator" content="distill" />
-  <link rel="alternate" type="application/rss+xml" href="https://www.mm218.dev/blog.xml" />
 
   <style type="text/css">
   /* Hide doc at startup (prevent jankiness while JS renders/transforms) */
@@ -86,635 +85,39 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
 
   <!--radix_placeholder_meta_tags-->
-  <title>Mike Mahoney</title>
+  <title>terrainr 0.3.0 is out today</title>
+
+  <meta property="description" itemprop="description" content="New version, who this?"/>
 
 
-
+  <!--  https://schema.org/Article -->
+  <meta property="article:published" itemprop="datePublished" content="2021-02-17"/>
+  <meta property="article:created" itemprop="dateCreated" content="2021-02-17"/>
+  <meta name="article:author" content="Mike Mahoney"/>
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="Mike Mahoney"/>
+  <meta property="og:title" content="terrainr 0.3.0 is out today"/>
   <meta property="og:type" content="article"/>
+  <meta property="og:description" content="New version, who this?"/>
   <meta property="og:locale" content="en_US"/>
-  <meta property="og:site_name" content="Mike Mahoney"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="Mike Mahoney"/>
+  <meta property="twitter:title" content="terrainr 0.3.0 is out today"/>
+  <meta property="twitter:description" content="New version, who this?"/>
 
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","listing"]}},"value":[{"type":"character","attributes":{},"value":["Mike Mahoney"]},{"type":"character","attributes":{},"value":["posts"]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","categories","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["terrainr 0.3.0 is out today"]},{"type":"character","attributes":{},"value":["New version, who this?\n"]},{"type":"character","attributes":{},"value":["R","Data science","terrainr"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url","orcid_id"]}},"value":[{"type":"character","attributes":{},"value":["Mike Mahoney"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":[]}},"value":[]},{"type":"character","attributes":{},"value":["0000-0003-2402-304X"]}]}]},{"type":"character","attributes":{},"value":["02-17-2021"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained","toc","includes"]}},"value":[{"type":"logical","attributes":{},"value":[false]},{"type":"logical","attributes":{},"value":[true]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["after_body"]}},"value":[{"type":"character","attributes":{},"value":["../../../utterances.html"]}]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
+  
+  <script type="text/json" id="radix-resource-manifest">
+  {"type":"character","attributes":{},"value":["terrainr_files/figure-html5/unnamed-chunk-4-1.png","terrainr_files/figure-html5/unnamed-chunk-5-1.png","terrainr_files/figure-html5/unnamed-chunk-6-1.png","terrainr_files/figure-html5/unnamed-chunk-7-1.png"]}
+  </script>
   <!--radix_placeholder_navigation_in_header-->
-  <meta name="distill:offset" content=""/>
-
-  <script type="application/javascript">
-
-    window.headroom_prevent_pin = false;
-
-    window.document.addEventListener("DOMContentLoaded", function (event) {
-
-      // initialize headroom for banner
-      var header = $('header').get(0);
-      var headerHeight = header.offsetHeight;
-      var headroom = new Headroom(header, {
-        tolerance: 5,
-        onPin : function() {
-          if (window.headroom_prevent_pin) {
-            window.headroom_prevent_pin = false;
-            headroom.unpin();
-          }
-        }
-      });
-      headroom.init();
-      if(window.location.hash)
-        headroom.unpin();
-      $(header).addClass('headroom--transition');
-
-      // offset scroll location for banner on hash change
-      // (see: https://github.com/WickyNilliams/headroom.js/issues/38)
-      window.addEventListener("hashchange", function(event) {
-        window.scrollTo(0, window.pageYOffset - (headerHeight + 25));
-      });
-
-      // responsive menu
-      $('.distill-site-header').each(function(i, val) {
-        var topnav = $(this);
-        var toggle = topnav.find('.nav-toggle');
-        toggle.on('click', function() {
-          topnav.toggleClass('responsive');
-        });
-      });
-
-      // nav dropdowns
-      $('.nav-dropbtn').click(function(e) {
-        $(this).next('.nav-dropdown-content').toggleClass('nav-dropdown-active');
-        $(this).parent().siblings('.nav-dropdown')
-           .children('.nav-dropdown-content').removeClass('nav-dropdown-active');
-      });
-      $("body").click(function(e){
-        $('.nav-dropdown-content').removeClass('nav-dropdown-active');
-      });
-      $(".nav-dropdown").click(function(e){
-        e.stopPropagation();
-      });
-    });
-  </script>
-
-  <style type="text/css">
-
-  /* Theme (user-documented overrideables for nav appearance) */
-
-  .distill-site-nav {
-    color: rgba(255, 255, 255, 0.8);
-    background-color: #0F2E3D;
-    font-size: 15px;
-    font-weight: 300;
-  }
-
-  .distill-site-nav a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .distill-site-nav a:hover {
-    color: white;
-  }
-
-  @media print {
-    .distill-site-nav {
-      display: none;
-    }
-  }
-
-  .distill-site-header {
-
-  }
-
-  .distill-site-footer {
-
-  }
-
-
-  /* Site Header */
-
-  .distill-site-header {
-    width: 100%;
-    box-sizing: border-box;
-    z-index: 3;
-  }
-
-  .distill-site-header .nav-left {
-    display: inline-block;
-    margin-left: 8px;
-  }
-
-  @media screen and (max-width: 768px) {
-    .distill-site-header .nav-left {
-      margin-left: 0;
-    }
-  }
-
-
-  .distill-site-header .nav-right {
-    float: right;
-    margin-right: 8px;
-  }
-
-  .distill-site-header a,
-  .distill-site-header .title {
-    display: inline-block;
-    text-align: center;
-    padding: 14px 10px 14px 10px;
-  }
-
-  .distill-site-header .title {
-    font-size: 18px;
-    min-width: 150px;
-  }
-
-  .distill-site-header .logo {
-    padding: 0;
-  }
-
-  .distill-site-header .logo img {
-    display: none;
-    max-height: 20px;
-    width: auto;
-    margin-bottom: -4px;
-  }
-
-  .distill-site-header .nav-image img {
-    max-height: 18px;
-    width: auto;
-    display: inline-block;
-    margin-bottom: -3px;
-  }
-
-
-
-  @media screen and (min-width: 1000px) {
-    .distill-site-header .logo img {
-      display: inline-block;
-    }
-    .distill-site-header .nav-left {
-      margin-left: 20px;
-    }
-    .distill-site-header .nav-right {
-      margin-right: 20px;
-    }
-    .distill-site-header .title {
-      padding-left: 12px;
-    }
-  }
-
-
-  .distill-site-header .nav-toggle {
-    display: none;
-  }
-
-  .nav-dropdown {
-    display: inline-block;
-    position: relative;
-  }
-
-  .nav-dropdown .nav-dropbtn {
-    border: none;
-    outline: none;
-    color: rgba(255, 255, 255, 0.8);
-    padding: 16px 10px;
-    background-color: transparent;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    margin: 0;
-    margin-top: 1px;
-    z-index: 2;
-  }
-
-  .nav-dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: white;
-    min-width: 200px;
-    border: 1px solid rgba(0,0,0,0.15);
-    border-radius: 4px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
-    z-index: 1;
-    margin-top: 2px;
-    white-space: nowrap;
-    padding-top: 4px;
-    padding-bottom: 4px;
-  }
-
-  .nav-dropdown-content hr {
-    margin-top: 4px;
-    margin-bottom: 4px;
-    border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  }
-
-  .nav-dropdown-active {
-    display: block;
-  }
-
-  .nav-dropdown-content a, .nav-dropdown-content .nav-dropdown-header {
-    color: black;
-    padding: 6px 24px;
-    text-decoration: none;
-    display: block;
-    text-align: left;
-  }
-
-  .nav-dropdown-content .nav-dropdown-header {
-    display: block;
-    padding: 5px 24px;
-    padding-bottom: 0;
-    text-transform: uppercase;
-    font-size: 14px;
-    color: #999999;
-    white-space: nowrap;
-  }
-
-  .nav-dropdown:hover .nav-dropbtn {
-    color: white;
-  }
-
-  .nav-dropdown-content a:hover {
-    background-color: #ddd;
-    color: black;
-  }
-
-  .nav-right .nav-dropdown-content {
-    margin-left: -45%;
-    right: 0;
-  }
-
-  @media screen and (max-width: 768px) {
-    .distill-site-header a, .distill-site-header .nav-dropdown  {display: none;}
-    .distill-site-header a.nav-toggle {
-      float: right;
-      display: block;
-    }
-    .distill-site-header .title {
-      margin-left: 0;
-    }
-    .distill-site-header .nav-right {
-      margin-right: 0;
-    }
-    .distill-site-header {
-      overflow: hidden;
-    }
-    .nav-right .nav-dropdown-content {
-      margin-left: 0;
-    }
-  }
-
-
-  @media screen and (max-width: 768px) {
-    .distill-site-header.responsive {position: relative; min-height: 500px; }
-    .distill-site-header.responsive a.nav-toggle {
-      position: absolute;
-      right: 0;
-      top: 0;
-    }
-    .distill-site-header.responsive a,
-    .distill-site-header.responsive .nav-dropdown {
-      display: block;
-      text-align: left;
-    }
-    .distill-site-header.responsive .nav-left,
-    .distill-site-header.responsive .nav-right {
-      width: 100%;
-    }
-    .distill-site-header.responsive .nav-dropdown {float: none;}
-    .distill-site-header.responsive .nav-dropdown-content {position: relative;}
-    .distill-site-header.responsive .nav-dropdown .nav-dropbtn {
-      display: block;
-      width: 100%;
-      text-align: left;
-    }
-  }
-
-  /* Site Footer */
-
-  .distill-site-footer {
-    width: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
-    z-index: 3;
-    margin-top: 30px;
-    padding-top: 30px;
-    padding-bottom: 30px;
-    text-align: center;
-  }
-
-  /* Headroom */
-
-  d-title {
-    padding-top: 6rem;
-  }
-
-  @media print {
-    d-title {
-      padding-top: 4rem;
-    }
-  }
-
-  .headroom {
-    z-index: 1000;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-
-  .headroom--transition {
-    transition: all .4s ease-in-out;
-  }
-
-  .headroom--unpinned {
-    top: -100px;
-  }
-
-  .headroom--pinned {
-    top: 0;
-  }
-
-  /* adjust viewport for navbar height */
-  /* helps vertically center bootstrap (non-distill) content */
-  .min-vh-100 {
-    min-height: calc(100vh - 100px) !important;
-  }
-
-  </style>
-
-  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
-  <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
-  <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
-  <script src="site_libs/headroom-0.9.4/headroom.min.js"></script>
-  <script src="site_libs/autocomplete-0.37.1/autocomplete.min.js"></script>
-  <script src="site_libs/fuse-6.4.1/fuse.min.js"></script>
-
-  <script type="application/javascript">
-
-  function getMeta(metaName) {
-    var metas = document.getElementsByTagName('meta');
-    for (let i = 0; i < metas.length; i++) {
-      if (metas[i].getAttribute('name') === metaName) {
-        return metas[i].getAttribute('content');
-      }
-    }
-    return '';
-  }
-
-  function offsetURL(url) {
-    var offset = getMeta('distill:offset');
-    return offset ? offset + '/' + url : url;
-  }
-
-  function createFuseIndex() {
-
-    // create fuse index
-    var options = {
-      keys: [
-        { name: 'title', weight: 20 },
-        { name: 'categories', weight: 15 },
-        { name: 'description', weight: 10 },
-        { name: 'contents', weight: 5 },
-      ],
-      ignoreLocation: true,
-      threshold: 0
-    };
-    var fuse = new window.Fuse([], options);
-
-    // fetch the main search.json
-    return fetch(offsetURL('search.json'))
-      .then(function(response) {
-        if (response.status == 200) {
-          return response.json().then(function(json) {
-            // index main articles
-            json.articles.forEach(function(article) {
-              fuse.add(article);
-            });
-            // download collections and index their articles
-            return Promise.all(json.collections.map(function(collection) {
-              return fetch(offsetURL(collection)).then(function(response) {
-                if (response.status === 200) {
-                  return response.json().then(function(articles) {
-                    articles.forEach(function(article) {
-                      fuse.add(article);
-                    });
-                  })
-                } else {
-                  return Promise.reject(
-                    new Error('Unexpected status from search index request: ' +
-                              response.status)
-                  );
-                }
-              });
-            })).then(function() {
-              return fuse;
-            });
-          });
-
-        } else {
-          return Promise.reject(
-            new Error('Unexpected status from search index request: ' +
-                        response.status)
-          );
-        }
-      });
-  }
-
-  window.document.addEventListener("DOMContentLoaded", function (event) {
-
-    // get search element (bail if we don't have one)
-    var searchEl = window.document.getElementById('distill-search');
-    if (!searchEl)
-      return;
-
-    createFuseIndex()
-      .then(function(fuse) {
-
-        // make search box visible
-        searchEl.classList.remove('hidden');
-
-        // initialize autocomplete
-        var options = {
-          autoselect: true,
-          hint: false,
-          minLength: 2,
-        };
-        window.autocomplete(searchEl, options, [{
-          source: function(query, callback) {
-            const searchOptions = {
-              isCaseSensitive: false,
-              shouldSort: true,
-              minMatchCharLength: 2,
-              limit: 10,
-            };
-            var results = fuse.search(query, searchOptions);
-            callback(results
-              .map(function(result) { return result.item; })
-            );
-          },
-          templates: {
-            suggestion: function(suggestion) {
-              var img = suggestion.preview && Object.keys(suggestion.preview).length > 0
-                ? `<img src="${offsetURL(suggestion.preview)}"</img>`
-                : '';
-              var html = `
-                <div class="search-item">
-                  <h3>${suggestion.title}</h3>
-                  <div class="search-item-description">
-                    ${suggestion.description || ''}
-                  </div>
-                  <div class="search-item-preview">
-                    ${img}
-                  </div>
-                </div>
-              `;
-              return html;
-            }
-          }
-        }]).on('autocomplete:selected', function(event, suggestion) {
-          window.location.href = offsetURL(suggestion.path);
-        });
-        // remove inline display style on autocompleter (we want to
-        // manage responsive display via css)
-        $('.algolia-autocomplete').css("display", "");
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
-
-  });
-
-  </script>
-
-  <style type="text/css">
-
-  .nav-search {
-    font-size: x-small;
-  }
-
-  /* Algolioa Autocomplete */
-
-  .algolia-autocomplete {
-    display: inline-block;
-    margin-left: 10px;
-    vertical-align: sub;
-    background-color: white;
-    color: black;
-    padding: 6px;
-    padding-top: 8px;
-    padding-bottom: 0;
-    border-radius: 6px;
-    border: 1px #0F2E3D solid;
-    width: 180px;
-  }
-
-
-  @media screen and (max-width: 768px) {
-    .distill-site-nav .algolia-autocomplete {
-      display: none;
-      visibility: hidden;
-    }
-    .distill-site-nav.responsive .algolia-autocomplete {
-      display: inline-block;
-      visibility: visible;
-    }
-    .distill-site-nav.responsive .algolia-autocomplete .aa-dropdown-menu {
-      margin-left: 0;
-      width: 400px;
-      max-height: 400px;
-    }
-  }
-
-  .algolia-autocomplete .aa-input, .algolia-autocomplete .aa-hint {
-    width: 90%;
-    outline: none;
-    border: none;
-  }
-
-  .algolia-autocomplete .aa-hint {
-    color: #999;
-  }
-  .algolia-autocomplete .aa-dropdown-menu {
-    width: 550px;
-    max-height: 70vh;
-    overflow-x: visible;
-    overflow-y: scroll;
-    padding: 5px;
-    margin-top: 3px;
-    margin-left: -150px;
-    background-color: #fff;
-    border-radius: 5px;
-    border: 1px solid #999;
-    border-top: none;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion {
-    cursor: pointer;
-    padding: 5px 4px;
-    border-bottom: 1px solid #eee;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion:last-of-type {
-    border-bottom: none;
-    margin-bottom: 2px;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item {
-    overflow: hidden;
-    font-size: 0.8em;
-    line-height: 1.4em;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item h3 {
-    font-size: 1rem;
-    margin-block-start: 0;
-    margin-block-end: 5px;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item-description {
-    display: inline-block;
-    overflow: hidden;
-    height: 2.8em;
-    width: 80%;
-    margin-right: 4%;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item-preview {
-    display: inline-block;
-    width: 15%;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item-preview img {
-    height: 3em;
-    width: auto;
-    display: none;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item-preview img[src] {
-    display: initial;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion.aa-cursor {
-    background-color: #eee;
-  }
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion em {
-    font-weight: bold;
-    font-style: normal;
-  }
-
-  </style>
-
-
   <!--/radix_placeholder_navigation_in_header-->
   <!--radix_placeholder_distill-->
 
@@ -2030,397 +1433,180 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </script>
 
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
-  <script src="site_libs/popper-2.6.0/popper.min.js"></script>
-  <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
-  <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
-  <script src="site_libs/tippy-6.2.7/tippy.umd.min.js"></script>
-  <script src="site_libs/anchor-4.2.2/anchor.min.js"></script>
-  <script src="site_libs/bowser-1.9.3/bowser.min.js"></script>
-  <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
-  <script src="site_libs/distill-2.2.21/template.v2.js"></script>
+  <script src="terrainr_files/header-attrs-2.6/header-attrs.js"></script>
+  <script src="terrainr_files/jquery-1.11.3/jquery.min.js"></script>
+  <script src="terrainr_files/popper-2.6.0/popper.min.js"></script>
+  <link href="terrainr_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="terrainr_files/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="terrainr_files/tippy-6.2.7/tippy.umd.min.js"></script>
+  <script src="terrainr_files/anchor-4.2.2/anchor.min.js"></script>
+  <script src="terrainr_files/bowser-1.9.3/bowser.min.js"></script>
+  <script src="terrainr_files/webcomponents-2.0.0/webcomponents.js"></script>
+  <script src="terrainr_files/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
   <!--/radix_placeholder_site_in_header-->
 
 
 </head>
 
-<body class="layout-listing">
+<body>
 
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Mike Mahoney","authors":[]}
+{"title":"terrainr 0.3.0 is out today","description":"New version, who this?","authors":[{"author":"Mike Mahoney","authorURL":{},"affiliation":"&nbsp;","affiliationURL":"#","orcidID":"0000-0003-2402-304X"}],"publishedDate":"2021-02-17T00:00:00.000-05:00","citationText":"Mahoney, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
 <!--radix_placeholder_navigation_before_body-->
-<header class="header header--fixed" role="banner">
-<nav class="distill-site-nav distill-site-header">
-<div class="nav-left">
-<a href="index.html" class="title">Mike Mahoney</a>
-<input id="distill-search" class="nav-search hidden" type="text" placeholder="Search..."/>
-</div>
-<div class="nav-right">
-<a href="index.html">Home</a>
-<a href="blog.html">Blog</a>
-<a href="https://github.com/mikemahoney218/mm218.dev">
-<i class="fab fa-github" aria-hidden="true"></i>
-</a>
-<a href="blog.xml">
-<i class="fa fa-rss" aria-hidden="true"></i>
-</a>
-<a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
-</div>
-</nav>
-</header>
 <!--/radix_placeholder_navigation_before_body-->
 <!--radix_placeholder_site_before_body-->
 <!--/radix_placeholder_site_before_body-->
-<!--radix_placeholder_article_listing-->
-
-
-<script type="application/javascript">
-
-function init_posts_list() {
-
-  function load_image(img) {
-    var src = $(img).attr('data-src');
-    if (src) {
-      $(img).attr('src', src);
-      $(img).load(function() {
-        img.removeAttribute('data-src');
-      });
-    }
-  }
-
-  function set_posts_visible(posts, visible) {
-    if (visible) {
-
-      // show bottom border by default
-      $(posts).removeClass('post-preview-last');
-
-      // apply limits if need be
-      var max_posts = 25;
-      var apply_limits = $('.posts-container').hasClass('posts-apply-limit');
-      if (apply_limits && posts.length > max_posts) {
-        posts = $(posts).slice(0, max_posts);
-      } else {
-        $('.posts-more a').addClass('hidden');
-      }
-
-      // apply last style
-      $(posts.slice(-1)[0]).addClass('post-preview-last');
-
-      $(posts).removeClass('hidden');
-      $(posts).find('img[data-src]').each(function(i, img) {
-        load_image(img);
-      });
-    } else {
-      $(posts).addClass('hidden');
-    }
-  }
-
-  function apply_hash_filter() {
-
-    // clear active state
-    $('.categories .active').removeClass('active');
-
-    // mark all posts invisible to start
-    set_posts_visible($('.posts-list').children('a'), false);
-
-    // if we have a hash filter
-    if (window.location.hash && window.location.hash.startsWith("#category:")) {
-
-      // mark posts that match the category visible
-      var page_category = window.location.hash.replace(/^#category:/, "");
-      var posts = $('.post-metadata').map(function(idx, script) {
-        var metadata = $.parseJSON($(script).html());
-        var post = null;
-        $.each(metadata.categories, function(idx, category) {
-          category = category.replace(/ /g,"_");
-          if ((page_category || '').toLowerCase() === "articles" || category === page_category) {
-            post = $(script).parent().get();
-            return false;
-          }
-        });
-        return post;
-      });
-      set_posts_visible(posts, true);
-
-      // mark the hash active
-      $('.categories li>a[href="' + window.location.hash + '"]').addClass('active');
-
-      // update the list_caption
-      var list_caption = $('.posts-list-caption');
-      var caption = (page_category || '').toLowerCase() === "articles"
-        ? list_caption.attr('data-caption')
-        : ('Category: ' + page_category.replace(/_/g," "));
-      list_caption.text(caption);
-
-    } else {
-
-      // no hash filter, make all posts visible (subject to max display)
-      set_posts_visible($('.posts-list').children(), true);
-
-      // reset list caption
-      var list_caption = $('.posts-list-caption');
-      list_caption.text(list_caption.attr('data-caption'));
-
-
-    }
-  }
-
-  // more articles
-  function apply_post_limits(apply) {
-    if (apply) {
-      $('.posts-container').addClass('posts-apply-limit');
-      $('.posts-more a').removeClass('hidden');
-    } else {
-      $('.posts-container').removeClass('posts-apply-limit');
-      $('.posts-more a').addClass('hidden');
-    }
-  }
-
-  // click handling for tags
-  $('.dt-tag').click(function(ev) {
-    window.location.hash = '#category:' + $(this).text().replace(/ /g, "_");
-    return false;
-  })
-
-  // hash filter handling
-  apply_hash_filter();
-  $(window).on('hashchange',function() {
-    apply_post_limits(true);
-    apply_hash_filter();
-  });
-
-  // more articles link
-  $('.posts-more a').click(function(e) {
-    e.preventDefault();
-    apply_post_limits(false);
-    apply_hash_filter();
-    return false;
-  });
-
-}
-
-</script>
-
-
-
-<div class="posts-container posts-apply-limit l-page">
-<div class="posts-list">
-<h1 class="posts-list-caption" data-caption="Mike Mahoney">Mike Mahoney</h1>
-<a href="posts/2021/02/terrainr/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R","Data science","terrainr"]}</script>
-<div class="metadata">
-<div class="publishedDate">Feb. 17, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img src="posts/2021/02/terrainr/terrainr_files/figure-html5/unnamed-chunk-4-1.png"/>
-</div>
-<div class="description">
-<h2>terrainr 0.3.0 is out today</h2>
-<p>New version, who this?</p>
-</div>
-</a>
-<a href="posts/2021/01/model-averaging/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R","Data science"]}</script>
-<div class="metadata">
-<div class="publishedDate">Jan. 18, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img src="posts/2021/01/model-averaging/model_avg.jpg"/>
-</div>
-<div class="description">
-<h2>Model averaging methods: how and why to build ensemble models</h2>
-<p>Averaging predictions for fun and profit -- and for dealing with the uncertainty of model selection. With examples in R!</p>
-</div>
-</a>
-<a href="posts/2020/10/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R","Twitter","phd","terrainr","beaver"]}</script>
-<div class="metadata">
-<div class="publishedDate">Oct. 16, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img src="posts/2020/10/terrainr.jpg"/>
-</div>
-<div class="description">
-<h2>Some Updates</h2>
-<p>Where Do We Come From? What Are We? Where Are We Going?</p>
-</div>
-</a>
-<a href="posts/2020/06/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R","Twitter","ecology_tweets"]}</script>
-<div class="metadata">
-<div class="publishedDate">June 20, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Make a Retweet Bot in R</h2>
-<p>Y'know. If you wanna.</p>
-</div>
-</a>
-<a href="posts/2020/05/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["Raspberry Pi","Tutorials","Data Visualization","Monitoring","Telegraf","InfluxDB","Grafana"]}</script>
-<div class="metadata">
-<div class="publishedDate">May 3, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Installing the TIG stack on Raspberry Pi</h2>
-<p>A guide to installing InfluxDB, Telegraf, and Grafana on a Raspberry Pi 4 running Raspbian Buster. Unlike every other guide like this on the internet, this one works.</p>
-</div>
-</a>
-<a href="posts/2020/04/corona-viz/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R"]}</script>
-<div class="metadata">
-<div class="publishedDate">April 27, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2020/04/corona-viz/covid.png"/>
-</div>
-<div class="description">
-<h2>A minimalist visualization of Coronavirus rates</h2>
-<p>Made with Shiny and R</p>
-</div>
-</a>
-<a href="posts/2020/04/making-excellent-viz/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["Data Visualization","Tutorials"]}</script>
-<div class="metadata">
-<div class="publishedDate">April 22, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Making Excellent Visualizations</h2>
-<p>Part 3 in the data visualization series</p>
-</div>
-</a>
-<a href="posts/2020/04/mechanics-of-viz/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["Data Visualization","Tutorials"]}</script>
-<div class="metadata">
-<div class="publishedDate">April 21, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2020/04/mechanics-of-viz/unnamed-chunk-2-1.png"/>
-</div>
-<div class="description">
-<h2>Mechanics of Data Visualizations</h2>
-<p>Part 2 in the data visualization series</p>
-</div>
-</a>
-<a href="posts/2020/04/theory-of-data-viz/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["Data Visualization","Tutorials"]}</script>
-<div class="metadata">
-<div class="publishedDate">April 20, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2020/04/theory-of-data-viz/theory2.png"/>
-</div>
-<div class="description">
-<h2>Theory of Data Visualizations</h2>
-<p>Part 1 in the data visualization series</p>
-</div>
-</a>
-<a href="posts/2020/03/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R","R Packages","maps","spacey","geospatial data"]}</script>
-<div class="metadata">
-<div class="publishedDate">March 24, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Announcing {spacey}, now on CRAN!</h2>
-<p>USGS data access and rayshader maps, done cheap.</p>
-</div>
-</a>
-<a href="posts/2020/01/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R","R Packages","R Markdown"]}</script>
-<div class="metadata">
-<div class="publishedDate">Jan. 23, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Announcing {heddlr}, now on CRAN!</h2>
-<p>Write less boilerplate, get more done.</p>
-</div>
-</a>
-<a href="posts/2019/03/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["Publications","Beaver"]}</script>
-<div class="metadata">
-<div class="publishedDate">March 27, 2019</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Thesis Now Available in ESF Digital Commons</h2>
-<p>It's a real humdinger.</p>
-</div>
-</a>
-</div>
-<div class="posts-more">
-<a href="#">More articles &raquo;</a>
-</div>
-</div>
-<!--/radix_placeholder_article_listing-->
 
 <div class="d-title">
-<h1>Mike Mahoney</h1>
+<h1>terrainr 0.3.0 is out today</h1>
 <!--radix_placeholder_categories-->
+<div class="dt-tags">
+<div class="dt=tag">R</div>
+<div class="dt=tag">Data science</div>
+<div class="dt=tag">terrainr</div>
+</div>
 <!--/radix_placeholder_categories-->
-
+<p><p>New version, who this?</p></p>
 </div>
 
+<div class="d-byline">
+  Mike Mahoney true 
+  
+<br/>02-17-2021
+</div>
 
 <div class="d-article">
-<div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<div class="d-contents d-contents-float">
+<nav class="l-text toc figcaption" id="TOC">
+<h3>Contents</h3>
+<ul>
+<li><a href="#breaking-changes">Breaking Changes</a>
+<ul>
+<li><a href="#object-classes-are-dead-long-live-object-classes">Object Classes Are Dead; Long Live Object Classes</a></li>
+<li><a href="#new-names-who-this">New Names, Who This?</a></li>
+<li><a href="#fewer-utilities-more-useful">Fewer Utilities, More Useful</a></li>
+</ul></li>
+<li><a href="#show-me-what-you-got">Show Me What You Got</a></li>
+<li><a href="#new-docs-who-this">New Docs, Who This?</a></li>
+</ul>
+</nav>
+</div>
+<p><a href="https://mikemahoney218.github.io/terrainr/">terrainr</a> is <a href="https://github.com/ropensci/software-review/issues/416">in review with rOpenSci</a> and the first review just came back! I’ve been working through the comments over the past week or so, and today that work has culminated in the release of terrainr version 0.3.0.</p>
+<p>This is a big release with a handful of breaking changes, so I felt like I should give a brief overview of the biggest user-facing changes.</p>
+<h2 id="breaking-changes">Breaking Changes</h2>
+<h3 id="object-classes-are-dead-long-live-object-classes">Object Classes Are Dead; Long Live Object Classes</h3>
+<p>The single largest change is that <em>terrainr specific classes are no longer exported</em>, and users shouldn’t need to worry about getting data into or out of those formats anymore. Instead, use any <code>sf</code> or <code>Raster</code> object in their place. For instance, workflows that used to look like this:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># Doesn't run:</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://mikemahoney218.github.io/terrainr/'>terrainr</a></span><span class='op'>)</span>
+<span class='va'>simulated_data</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>id <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>100</span>, <span class='fl'>1</span><span class='op'>)</span>,
+                              lat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>44.04905</span>, <span class='fl'>44.17609</span><span class='op'>)</span>, 
+                              lng <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='op'>-</span><span class='fl'>74.01188</span>, <span class='op'>-</span><span class='fl'>73.83493</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>bbox</span> <span class='op'>&lt;-</span> <span class='fu'>get_bbox</span><span class='op'>(</span>lat <span class='op'>=</span> <span class='va'>simulated_data</span><span class='op'>$</span><span class='va'>lat</span>, lng <span class='op'>=</span> <span class='va'>simulated_data</span><span class='op'>$</span><span class='va'>lng</span><span class='op'>)</span> 
+
+<span class='va'>output_tiles</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://mikemahoney218.github.io/terrainr/reference/get_tiles.html'>get_tiles</a></span><span class='op'>(</span>bbox <span class='op'>=</span> <span class='va'>bbox</span>,
+                          services <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"elevation"</span>, <span class='st'>"ortho"</span><span class='op'>)</span>,
+                          resolution <span class='op'>=</span> <span class='fl'>90</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Now look like this:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://mikemahoney218.github.io/terrainr/'>terrainr</a></span><span class='op'>)</span>
+<span class='va'>simulated_data</span> <span class='op'>&lt;-</span>  <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>id <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>1</span>, <span class='fl'>100</span>, <span class='fl'>1</span><span class='op'>)</span>,
+                              lat <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='fl'>44.04905</span>, <span class='fl'>44.17609</span><span class='op'>)</span>, 
+                              lng <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/stats/Uniform.html'>runif</a></span><span class='op'>(</span><span class='fl'>100</span>, <span class='op'>-</span><span class='fl'>74.01188</span>, <span class='op'>-</span><span class='fl'>73.83493</span><span class='op'>)</span><span class='op'>)</span>
+
+<span class='va'>simulated_data</span> <span class='op'>&lt;-</span> <span class='fu'>sf</span><span class='fu'>::</span><span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_as_sf.html'>st_as_sf</a></span><span class='op'>(</span><span class='va'>simulated_data</span>, coords <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lng"</span>, <span class='st'>"lat"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>simulated_data</span> <span class='op'>&lt;-</span> <span class='fu'>sf</span><span class='fu'>::</span><span class='fu'><a href='https://r-spatial.github.io/sf/reference/st_crs.html'>st_set_crs</a></span><span class='op'>(</span><span class='va'>simulated_data</span>, <span class='fl'>4326</span><span class='op'>)</span>
+
+<span class='va'>output_tiles</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://mikemahoney218.github.io/terrainr/reference/get_tiles.html'>get_tiles</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>simulated_data</span>,
+                          services <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"elevation"</span>, <span class='st'>"ortho"</span><span class='op'>)</span>,
+                          resolution <span class='op'>=</span> <span class='fl'>90</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>As part of this change, <code>get_bbox</code>, <code>get_coordinate_bbox</code>, and all class creation and export functions are gone now. Use sf (or Raster*) objects in their place instead.</p>
+<h3 id="new-names-who-this">New Names, Who This?</h3>
+<p><code>get_tiles</code> now uses the <code>services</code> argument to name its output list:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>output_tiles</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>[1] &quot;elevation&quot; &quot;ortho&quot;    </code></pre>
+</div>
+<p>This means that if you request the service <code>elevation</code> you can retrieve your tiles using the name <code>elevation</code>. If you request the same endpoint with multiple names, <code>get_tiles</code> will use whatever name was first in the vector.</p>
+<h3 id="fewer-utilities-more-useful">Fewer Utilities, More Useful</h3>
+<p>Utility functions <code>calc_haversine_distance</code>, <code>convert_distance</code>, <code>point_from_distance</code>, <code>rad_to_deg</code>, and <code>deg_to_rad</code> have been removed (or removed from exports). For unit conversions, check out the <a href="cran.r-project.org/package=units">units</a> package. This shouldn’t impact the main uses of the package, but is still worth flagging.</p>
+<h2 id="show-me-what-you-got">Show Me What You Got</h2>
+<p>terrainr 0.3.0 adds a ggplot2 geom, <code>geom_spatial_rgb</code>, for plotting 3 band RGB rasters:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span><span class='op'>)</span>
+
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'><a href='https://mikemahoney218.github.io/terrainr/reference/geom_spatial_rgb.html'>geom_spatial_rgb</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>output_tiles</span><span class='op'>[[</span><span class='st'>"ortho"</span><span class='op'>]</span><span class='op'>]</span>,
+                   <span class='co'># Required aesthetics r/g/b specify color bands:</span>
+                   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, y <span class='op'>=</span> <span class='va'>y</span>, r <span class='op'>=</span> <span class='va'>red</span>, g <span class='op'>=</span> <span class='va'>green</span>, b <span class='op'>=</span> <span class='va'>blue</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggsf.html'>coord_sf</a></span><span class='op'>(</span>crs <span class='op'>=</span> <span class='fl'>4326</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="terrainr_files/figure-html5/unnamed-chunk-4-1.png" width="624" /></p>
+</div>
+<p>Note that above we just passed the file path to our raster; we can also pass a RasterStack:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>ortho</span> <span class='op'>&lt;-</span> <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/stack.html'>stack</a></span><span class='op'>(</span><span class='va'>output_tiles</span><span class='op'>[[</span><span class='st'>"ortho"</span><span class='op'>]</span><span class='op'>]</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'><a href='https://mikemahoney218.github.io/terrainr/reference/geom_spatial_rgb.html'>geom_spatial_rgb</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>ortho</span>,
+                   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, y <span class='op'>=</span> <span class='va'>y</span>, r <span class='op'>=</span> <span class='va'>red</span>, g <span class='op'>=</span> <span class='va'>green</span>, b <span class='op'>=</span> <span class='va'>blue</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggsf.html'>coord_sf</a></span><span class='op'>(</span>crs <span class='op'>=</span> <span class='fl'>4326</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="terrainr_files/figure-html5/unnamed-chunk-5-1.png" width="624" /></p>
+</div>
+<p>Or a data.frame:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>ortho_df</span> <span class='op'>&lt;-</span> <span class='fu'>raster</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/raster/man/as.data.frame.html'>as.data.frame</a></span><span class='op'>(</span><span class='va'>ortho</span>, xy <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>ortho_df</span><span class='op'>)</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"x"</span>, <span class='st'>"y"</span>, <span class='st'>"red"</span>, <span class='st'>"green"</span>, <span class='st'>"blue"</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'><a href='https://mikemahoney218.github.io/terrainr/reference/geom_spatial_rgb.html'>geom_spatial_rgb</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>ortho</span>,
+                   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, y <span class='op'>=</span> <span class='va'>y</span>, r <span class='op'>=</span> <span class='va'>red</span>, g <span class='op'>=</span> <span class='va'>green</span>, b <span class='op'>=</span> <span class='va'>blue</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggsf.html'>coord_sf</a></span><span class='op'>(</span>crs <span class='op'>=</span> <span class='fl'>4326</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="terrainr_files/figure-html5/unnamed-chunk-6-1.png" width="624" /></p>
+</div>
+<p>Note that each step here gives you a little more control over the output image – for instance, if your raster bands aren’t in RGB order (or you have more than RGBA bands), you’ll need to provide a data.frame to get a true color image.</p>
+<p>You can then use these basemaps like most other ggplot geoms:</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'><a href='https://mikemahoney218.github.io/terrainr/reference/geom_spatial_rgb.html'>geom_spatial_rgb</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>ortho_df</span>,
+                   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>x</span>, y <span class='op'>=</span> <span class='va'>y</span>, r <span class='op'>=</span> <span class='va'>red</span>, g <span class='op'>=</span> <span class='va'>green</span>, b <span class='op'>=</span> <span class='va'>blue</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggsf.html'>geom_sf</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>simulated_data</span><span class='op'>)</span> <span class='op'>+</span> 
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggsf.html'>coord_sf</a></span><span class='op'>(</span>crs <span class='op'>=</span> <span class='fl'>4326</span><span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="terrainr_files/figure-html5/unnamed-chunk-7-1.png" width="624" /></p>
+</div>
+<h2 id="new-docs-who-this">New Docs, Who This?</h2>
+<p>Those are just a few of the changes in 0.3.0; you can find a longer list in the NEWS file.</p>
+<p>One thing not mentioned in the <a href="https://mikemahoney218.github.io/terrainr/news/index.html">NEWS</a> file, though, is that this version of terrainr included a complete rewrite of the documentation. The docs were mostly written while the package was being conceptually developed, and as a result gave a bit too much emphasis to some ideas while completely ignoring others. So I’ve rewritten all of the documentation that lives on the <a href="https://mikemahoney218.github.io/terrainr/">terrainr website</a> – let me know what you think about the new versions (or if you catch anything I’ve missed!).</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
@@ -2429,20 +1615,24 @@ function init_posts_list() {
 </div>
 
 
+
+<br>
+
+<script src="https://utteranc.es/client.js"
+        repo="mikemahoney218/mm218.dev"
+        issue-term="url"
+        label="comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
 <!--radix_placeholder_site_after_body-->
 <!--/radix_placeholder_site_after_body-->
 <!--radix_placeholder_appendices-->
-<div class="appendix-bottom">
-<h3 id="updates-and-corrections">Corrections</h3>
-<p>If you see mistakes or want to suggest changes, please <a href="https://github.com/mikemahoney218/mm218.dev/issues/new">create an issue</a> on the source repository.</p>
-</div>
+<div class="appendix-bottom"></div>
 <!--/radix_placeholder_appendices-->
 <!--radix_placeholder_navigation_after_body-->
-<div class="distill-site-nav distill-site-footer">
-<p>© Copyright 2020 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</p>
-</div>
 <!--/radix_placeholder_navigation_after_body-->
-
 
 </body>
 
