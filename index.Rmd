@@ -49,6 +49,6 @@ B.S. in Forest Ecosystem Science | August 2015 - December 2018
 
 #### R Packages
 
-**[mvdf](https://github.com/mikemahoney218/mvdf)** | A standardized approach to using R as a frontend for the Blender 3D rendering program | 2020  
-**[terrainr](https://github.com/mikemahoney218/terrainr)** | Retrieve Data from the USGS National Map and Transform it for 3D Landscape Visualizations | 2020  
+**[mvdf](https://github.com/mikemahoney218/mvdf)** | A standardized approach to using R as a frontend for the Blender 3D rendering program | 2021  
+**[terrainr](https://github.com/ropensci/terrainr)** | Retrieve Data from the USGS National Map and Transform it for 3D Landscape Visualizations | 2021  
 **[heddlr](https://github.com/mikemahoney218/heddlr)** | Functional Programming Concepts for R Markdown Documents | 2020
