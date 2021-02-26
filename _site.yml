@@ -1,0 +1,12 @@
+name: "."
+title: "Machine Learning for Prediction: Concepts and Applications in R"
+description: |
+  Machine Learning for Prediction: Concepts and Applications in R
+output_dir: "_site"
+navbar:
+  right:
+    - text: "Home"
+      href: index.html
+    - text: "About"
+      href: about.html
+output: distill::distill_article

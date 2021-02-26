@@ -1,0 +1,34 @@
+---
+title: "Machine Learning for Prediction: Concepts and Applications in R"
+description: |
+  Slides, notes, and assignments for FOR TK.
+site: distill::distill_website
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+# Learn more about creating websites with Distill at:
+# https://rstudio.github.io/distill/website.html
+
+```
+
+## Course Title and Instructor
+
+**Title**: FOR TK: Machine Learning for Prediction: Concepts and Applications in R
+**Time and Place**: DAY TIME, LOCATION OR LINK
+
+**Instructor**: Mike Mahoney
+**Email**: mike.mahoney.218@gmail.com
+**Office Hours**: TK
+
+
+## Calendar
+
+| Week | Topic | Packages | Assignment |
+---------------------------------------
+| 1 | Prediction, Estimation, and Attribution | None | Assignment 1 |
+| 2 | Regression | None | Assignment 2 |
+| 3 | Classification | `pROC` | Assignment 3 |
+| 4 | Decision Trees | `rpart` | No Assignment | 
+| 5 | Random Forest | `ranger` | Assignment 4 | 

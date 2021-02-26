@@ -1,0 +1,21 @@
+{
+  "articles": [
+    {
+      "path": "about.html",
+      "title": "About this site",
+      "description": "Some additional details about the website",
+      "author": [],
+      "contents": "\n\n\n\n",
+      "last_modified": "2021-02-25T19:03:29-05:00"
+    },
+    {
+      "path": "index.html",
+      "title": "Machine Learning for Prediction: Concepts and Applications in R",
+      "description": "Slides, notes, and assignments for FOR TK.\n",
+      "author": [],
+      "contents": "\nCourse Title and Instructor\nTitle: FOR TK: Machine Learning for Prediction: Concepts and Applications in R Time and Place: DAY TIME, LOCATION OR LINK\nInstructor: Mike Mahoney Email: mike.mahoney.218@gmail.com Office Hours: TK\nCalendar\n| Week | Topic | Packages | Assignment |\n1 | Prediction, Estimation, and Attribution | None | Assignment 1 |\n2 | Regression | None | Assignment 2 |\n3 | Classification | pROC | Assignment 3 |\n4 | Decision Trees | rpart | No Assignment |\n5 | Random Forest | ranger | Assignment 4 |\n\n\n\n",
+      "last_modified": "2021-02-25T19:14:19-05:00"
+    }
+  ],
+  "collections": []
+}
