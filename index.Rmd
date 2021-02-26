@@ -15,13 +15,47 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Course Title and Instructor
 
-**Title**: FOR TK: Machine Learning for Prediction: Concepts and Applications in R
-**Time and Place**: DAY TIME, LOCATION OR LINK
+**Title**: FOR TK: Machine Learning for Prediction: Concepts and Applications in R  
+**Time and Place**: DAY TIME, LOCATION OR LINK  
 
-**Instructor**: Mike Mahoney
-**Email**: mike.mahoney.218@gmail.com
-**Office Hours**: TK
+**Instructor**: Mike Mahoney  
+**Email**: mike.mahoney.218@gmail.com  
+**Office Hours**: TK  
 
+## Purpose and structure
+
+There exist two cultures in statistical modeling: one looking to explain the 
+world, and the other looking to predict it. While statistics -- with an emphasis 
+on data models, estimation, and hypothesis testing -- has traditionally focused
+on explaining relationships between system inputs and outcomes, the modern world
+has given rise to a new class of algorithms which predict outcomes without any 
+concept of causality or underlying data models at all.
+
+These pure prediction algorithms, broadly referred to as "machine learning 
+algorithms", have been embraced across domains, with massive success and public
+interest to match. But this success comes at the cost of complexity, and 
+implementing these techniques requires different techniques and a different 
+mindset than traditional data model based approaches. 
+
+This course attempts to help with the transition, guiding students through 
+several of the most common machine learning approaches with a focus on 
+application. Each week, students are expected to read a course handout on the 
+concepts and applications of a particular machine learning algorithm. Weekly 
+classes will then focus on clarifying and expanding upon the reading, with 
+weekly assignments designed to give students hands-on experience implementing 
+and tuning these different approaches on both example data and a real-world data 
+set of their choice. Topics include the random forest, gradient boosting 
+machine, and support vector machine algorithms as well as cross validation, loss 
+functions, regularization, and model averaging.
+
+## Prerequisites
+
+Students must have some familiarity with the R language, including defining 
+functions, managing objects, controlling the flow of a program (e.g. if/else 
+statements and for-loops), wrangling data in data frames, fitting linear models 
+(i.e., the `lm` function) and other basic tasks. 
+
+An introductory stats course (APM391 or equivalent) is recommended.
 
 ## Calendar
 
@@ -29,14 +63,38 @@ knitr::opts_chunk$set(echo = FALSE)
 library(dplyr)
 
 tribble(
-  ~ Week, ~ Topic, ~ Packages, ~ Assignment
-)
+  ~ Week, ~ Topic, ~ Packages, ~ Assignment,
+  "1", "Prediction, Estimation, and Attribution", "None", "Assignment 1",
+  "2", "Regression", "None", "Assignment 2",
+  "3", "Classification", "pROC", "Assignment 3",
+  "4", "Decision Trees", "rpart", "None",
+  "5", "Random Forests", "ranger", "Assignment 4",
+  "6", "Hyperparameters and Model Tuning", "ranger, purrr", "Assignment 5",
+  "7", "Gradient Boosting Machines", "gbm", "Assignment 6",
+  "8", "Stochastic GBMs", "lightGBM", "Assignment 7",
+  "9", "Loss Functions and Regularization", "lightGBM", "Assignment 8",
+  "10", "Support Vector Machines", "kernlab", "Assignment 9",
+  "11", "Implementing SVMs", "kernlab", "Assignment 10",
+  "12", "Model Averaging", "None", "Assignment 11",
+  "13", "Final Topics", "None", "None"
+) %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
 ```
 
-| Week | Topic | Packages | Assignment |
----------------------------------------
-| 1 | Prediction, Estimation, and Attribution | None | Assignment 1 |
-| 2 | Regression | None | Assignment 2 |
-| 3 | Classification | `pROC` | Assignment 3 |
-| 4 | Decision Trees | `rpart` | No Assignment | 
-| 5 | Random Forest | `ranger` | Assignment 4 | 
+## Textbooks
+
+This class draws heavily from materials presented in the following two books. 
+Both books are freely available online and you do not need to purchase a 
+physical copy of either book to succeed in this class; there are no assigned 
+readings from these books.
+
+1. Bradley Boehmke and Brandon Greenwell. (2020). Hands on Machine Learning with R. CRC Press. Available online at https://bradleyboehmke.github.io/HOML/ .
+2. Bradley Efron and Trevor Hastie. (2016). Computer Age Statistical Inference. Cambridge University Press. Available online at https://web.stanford.edu/~hastie/CASI_files/PDF/casi.pdf .
+
+## Material Requirements
+
+This course focuses on learning through doing, and as such requires students 
+have access to a computer they are able to install software packages on. All
+other materials and texts are available for free online.
+

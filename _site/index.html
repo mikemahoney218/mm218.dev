@@ -2033,6 +2033,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
   <!--/radix_placeholder_distill-->
   <script src="site_libs/header-attrs-2.6/header-attrs.js"></script>
+  <script src="site_libs/kePrint-0.0.1/kePrint.js"></script>
+  <link href="site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
   <script src="site_libs/popper-2.6.0/popper.min.js"></script>
   <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
   <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
@@ -2064,7 +2066,16 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </div>
 <div class="nav-right">
 <a href="index.html">Home</a>
-<a href="about.html">About</a>
+<div class="nav-dropdown">
+<button class="nav-dropbtn">
+Slides
+ 
+<span class="down-arrow">&#x25BE;</span>
+</button>
+<div class="nav-dropdown-content">
+<a href="week_1_slides.html">Week 1</a>
+</div>
+</div>
 <a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
 </div>
 </nav>
@@ -2083,15 +2094,231 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
 <div class="d-article">
 <h2 id="course-title-and-instructor">Course Title and Instructor</h2>
-<p><strong>Title</strong>: FOR TK: Machine Learning for Prediction: Concepts and Applications in R <strong>Time and Place</strong>: DAY TIME, LOCATION OR LINK</p>
-<p><strong>Instructor</strong>: Mike Mahoney <strong>Email</strong>: <a href="mailto:mike.mahoney.218@gmail.com" class="email">mike.mahoney.218@gmail.com</a> <strong>Office Hours</strong>: TK</p>
+<p><strong>Title</strong>: FOR TK: Machine Learning for Prediction: Concepts and Applications in R<br />
+<strong>Time and Place</strong>: DAY TIME, LOCATION OR LINK</p>
+<p><strong>Instructor</strong>: Mike Mahoney<br />
+<strong>Email</strong>: <a href="mailto:mike.mahoney.218@gmail.com" class="email">mike.mahoney.218@gmail.com</a><br />
+<strong>Office Hours</strong>: TK</p>
+<h2 id="purpose-and-structure">Purpose and structure</h2>
+<p>There exist two cultures in statistical modeling: one looking to explain the world, and the other looking to predict it. While statistics – with an emphasis on data models, estimation, and hypothesis testing – has traditionally focused on explaining relationships between system inputs and outcomes, the modern world has given rise to a new class of algorithms which predict outcomes without any concept of causality or underlying data models at all.</p>
+<p>These pure prediction algorithms, broadly referred to as “machine learning algorithms”, have been embraced across domains, with massive success and public interest to match. But this success comes at the cost of complexity, and implementing these techniques requires different techniques and a different mindset than traditional data model based approaches.</p>
+<p>This course attempts to help with the transition, guiding students through several of the most common machine learning approaches with a focus on application. Each week, students are expected to read a course handout on the concepts and applications of a particular machine learning algorithm. Weekly classes will then focus on clarifying and expanding upon the reading, with weekly assignments designed to give students hands-on experience implementing and tuning these different approaches on both example data and a real-world data set of their choice. Topics include the random forest, gradient boosting machine, and support vector machine algorithms as well as cross validation, loss functions, regularization, and model averaging.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<p>Students must have some familiarity with the R language, including defining functions, managing objects, controlling the flow of a program (e.g. if/else statements and for-loops), wrangling data in data frames, fitting linear models (i.e., the <code>lm</code> function) and other basic tasks.</p>
+<p>An introductory stats course (APM391 or equivalent) is recommended.</p>
 <h2 id="calendar">Calendar</h2>
-<h2 id="week-topic-packages-assignment">| Week | Topic | Packages | Assignment |</h2>
-<div class="line-block">1 | Prediction, Estimation, and Attribution | None | Assignment 1 |<br />
-2 | Regression | None | Assignment 2 |<br />
-3 | Classification | <code>pROC</code> | Assignment 3 |<br />
-4 | Decision Trees | <code>rpart</code> | No Assignment |<br />
-5 | Random Forest | <code>ranger</code> | Assignment 4 |</div>
+<div class="layout-chunk" data-layout="l-body">
+<table class="table table-striped table-hover" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Week
+</th>
+<th style="text-align:left;">
+Topic
+</th>
+<th style="text-align:left;">
+Packages
+</th>
+<th style="text-align:left;">
+Assignment
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+1
+</td>
+<td style="text-align:left;">
+Prediction, Estimation, and Attribution
+</td>
+<td style="text-align:left;">
+None
+</td>
+<td style="text-align:left;">
+Assignment 1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2
+</td>
+<td style="text-align:left;">
+Regression
+</td>
+<td style="text-align:left;">
+None
+</td>
+<td style="text-align:left;">
+Assignment 2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+3
+</td>
+<td style="text-align:left;">
+Classification
+</td>
+<td style="text-align:left;">
+pROC
+</td>
+<td style="text-align:left;">
+Assignment 3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+4
+</td>
+<td style="text-align:left;">
+Decision Trees
+</td>
+<td style="text-align:left;">
+rpart
+</td>
+<td style="text-align:left;">
+None
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+5
+</td>
+<td style="text-align:left;">
+Random Forests
+</td>
+<td style="text-align:left;">
+ranger
+</td>
+<td style="text-align:left;">
+Assignment 4
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+6
+</td>
+<td style="text-align:left;">
+Hyperparameters and Model Tuning
+</td>
+<td style="text-align:left;">
+ranger, purrr
+</td>
+<td style="text-align:left;">
+Assignment 5
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+7
+</td>
+<td style="text-align:left;">
+Gradient Boosting Machines
+</td>
+<td style="text-align:left;">
+gbm
+</td>
+<td style="text-align:left;">
+Assignment 6
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+8
+</td>
+<td style="text-align:left;">
+Stochastic GBMs
+</td>
+<td style="text-align:left;">
+lightGBM
+</td>
+<td style="text-align:left;">
+Assignment 7
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+9
+</td>
+<td style="text-align:left;">
+Loss Functions and Regularization
+</td>
+<td style="text-align:left;">
+lightGBM
+</td>
+<td style="text-align:left;">
+Assignment 8
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+10
+</td>
+<td style="text-align:left;">
+Support Vector Machines
+</td>
+<td style="text-align:left;">
+kernlab
+</td>
+<td style="text-align:left;">
+Assignment 9
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+11
+</td>
+<td style="text-align:left;">
+Implementing SVMs
+</td>
+<td style="text-align:left;">
+kernlab
+</td>
+<td style="text-align:left;">
+Assignment 10
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+12
+</td>
+<td style="text-align:left;">
+Model Averaging
+</td>
+<td style="text-align:left;">
+None
+</td>
+<td style="text-align:left;">
+Assignment 11
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+13
+</td>
+<td style="text-align:left;">
+Final Topics
+</td>
+<td style="text-align:left;">
+None
+</td>
+<td style="text-align:left;">
+None
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="textbooks">Textbooks</h2>
+<p>This class draws heavily from materials presented in the following two books. Both books are freely available online and you do not need to purchase a physical copy of either book to succeed in this class; there are no assigned readings from these books.</p>
+<ol type="1">
+<li>Bradley Boehmke and Brandon Greenwell. (2020). Hands on Machine Learning with R. CRC Press. Available online at <a href="https://bradleyboehmke.github.io/HOML/" class="uri">https://bradleyboehmke.github.io/HOML/</a> .</li>
+<li>Bradley Efron and Trevor Hastie. (2016). Computer Age Statistical Inference. Cambridge University Press. Available online at <a href="https://web.stanford.edu/~hastie/CASI_files/PDF/casi.pdf" class="uri">https://web.stanford.edu/~hastie/CASI_files/PDF/casi.pdf</a> .</li>
+</ol>
+<h2 id="material-requirements">Material Requirements</h2>
+<p>This course focuses on learning through doing, and as such requires students have access to a computer they are able to install software packages on. All other materials and texts are available for free online.</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
