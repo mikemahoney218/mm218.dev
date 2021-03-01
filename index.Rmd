@@ -21,8 +21,8 @@ output:
  
 ## Bio
 
-I'm a PhD candidate at SUNY-ESF, working with Colin Beier and Aidan Ackerman on 
-model interpretability, data visualization, and environmental data science. My 
+I'm a PhD candidate at SUNY-ESF, working with Colin Beier and Aidan Ackerman on
+predictive modeling and visualization with a focus on natural systems. My 
 past projects have included assessing the landscape-level impacts of ecosystem 
 engineers within New York's Adirondack State Park, as well as investigating the 
 impact of fertilization on beech bark disease within the White Mountains of New 
