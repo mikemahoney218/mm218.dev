@@ -82,3 +82,6 @@
   from = "/mvdf"
   to = "https://mikemahoney218.github.io/mvdf/"
 
+[[redirects]]
+  from = "/workshop"
+  to = "https://docs.google.com/spreadsheets/d/12LyjTZ6VDlt2TyG2h8LIqeUk23hk4CWBnLIZK9RCuN0/edit?usp=sharing"
