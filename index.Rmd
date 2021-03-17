@@ -47,31 +47,6 @@ assignment performance; there are no quizzes or exams and no attendance or
 participation requirements. Each assignment is worth an equal number of points 
 (approximately 9% of the final grade).
 
-## Schedule
-
-```{r}
-library(dplyr)
-
-tribble(
-  ~ Week, ~ Topic, ~ Packages, ~ "Homework Assigned",
-  "1", "Prediction, Estimation, and Attribution", "None", "Assignment 1",
-  "2", "Regression", "None", "Assignment 2",
-  "3", "Classification", "pROC", "Assignment 3",
-  "4", "Decision Trees", "rpart", "None",
-  "5", "Random Forests", "ranger", "Assignment 4",
-  "6", "Hyperparameters and Model Tuning", "ranger, purrr", "Assignment 5",
-  "7", "Gradient Boosting Machines", "gbm", "Assignment 6",
-  "8", "Stochastic GBMs", "lightGBM", "Assignment 7",
-  "9", "Loss Functions and Regularization", "lightGBM", "Assignment 8",
-  "10", "Support Vector Machines", "kernlab", "Assignment 9",
-  "11", "Implementing SVMs", "kernlab", "Assignment 10",
-  "12", "Model Averaging", "None", "Assignment 11",
-  "13", "Final Topics", "None", "None"
-) %>% 
-  kableExtra::kable() %>% 
-  kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
-```
-
 ## Textbooks and Materials
 
 This class draws heavily from materials presented in the following two books. 

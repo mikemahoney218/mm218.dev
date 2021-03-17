@@ -5,8 +5,10 @@ description: |
 output_dir: "_site"
 navbar:
   right:
-    - text: "Home"
+    - text: "Syllabus"
       href: index.html
+    - text: "Schedule"
+      href: schedule.html
 #    - text: "Slides"
 #      menu:
 #        - text: "Week 1"
