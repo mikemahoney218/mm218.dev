@@ -28,9 +28,9 @@ knitr::opts_chunk$set(echo = FALSE)
 Prediction has taken over the world. Whether it's predicting how species will
 adapt to a changing climate, which plant cultivars will hold their own against
 non-native diseases, or what pair of pants a customer is most likely to buy, 
-prediction -- and algorithms built to predict -- have come to dominate how we 
-work and live in an incredibly short span of time. These predictive methods
-have additionally seen their popularity skyrocket throughout the sciences in 
+prediction -- and the algorithms built to predict -- have come to dominate how 
+we work and live in an incredibly short span of time. These predictive methods
+have seen their popularity skyrocket throughout the sciences in 
 recent years, as it becomes increasingly important to not just understand how 
 systems work but to communicate how they might respond to human activity moving 
 forward.
@@ -39,19 +39,30 @@ The algorithms developed to enable all this prediction -- referred to as
 "pure prediction algorithms" or, more loosely, "machine learning" -- have seen
 massive success across domains. But this success comes at the cost of 
 complexity, and implementing these techniques requires new tools and a different 
-mindset than traditional statistical modeling as most professionals learn it.
+mindset than traditional statistical modeling as taught to most professionals.
 
 This course attempts to help bridge that gap, guiding students through 
-several of the most common machine learning approaches with a focus on 
-application. Each week, students are expected to read a course handout on the 
+several of the most common machine learning approaches at a conceptual level 
+with a focus on applications in R. Each week, students are expected to read a 
+course handout on the 
 concepts and applications of a particular machine learning algorithm. Weekly 
 classes (one-hour mix of lecture and discussion) will then focus on clarifying 
 and expanding upon the reading, with 
 weekly assignments designed to give students hands-on experience implementing 
 and tuning these different approaches on both example data and a real-world data 
 set of their choice. Topics include the random forest and gradient boosting 
-machine algorithms as well as cross validation, loss functions, and
-regularization.
+machine algorithms as well as cross validation and loss functions.
+
+## Learning Objectives
+
+By the end of this course, students will be able to:
+
++ Implement common supervised learning algorithms in R to make predictions 
+  against well-formed data sets.
++ Use accepted hyperparameter tuning approaches to improve model fits across 
+  multiple algorithms.
++ Explain how to assess predictive models, both throughout the iteration process
+  and as a final product.
 
 ## Prerequisites
 
@@ -61,13 +72,6 @@ statements and for-loops), wrangling data in data frames, fitting linear models
 (i.e., the `lm` function) and other basic tasks. 
 
 An introductory stats course (APM391 or equivalent) is recommended.
-
-## Grading
-
-Most weeks, students will be given a hands-on programming assignment due the 
-following class (for a total of 11 assignments). Grades are based solely on 
-assignment performance; there are no quizzes or exams and no attendance or 
-participation requirements. Each assignment is worth an equal number of points.
 
 ## Textbooks and Materials
 
@@ -81,6 +85,13 @@ readings from these books.
 
 Students will need to have access to a computer they are able to install R 
 packages on.
+
+## Grading
+
+Most weeks, students will be given a hands-on programming assignment due the 
+following class (for a total of 11 assignments). Grades are based solely on 
+assignment performance; there are no quizzes or exams and no attendance or 
+participation requirements. Each assignment is worth an equal number of points.
 
 ## Attendance Policy
 
