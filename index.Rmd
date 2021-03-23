@@ -23,7 +23,7 @@ knitr::opts_chunk$set(echo = FALSE)
 **Office Hours**: TK  
 
 
-## Purpose and structure
+## Course Description
 
 Prediction has taken over the world. Whether it's predicting how species will
 adapt to a changing climate, which plant cultivars will hold their own against
@@ -43,15 +43,20 @@ mindset than traditional statistical modeling as taught to most professionals.
 
 This course attempts to help bridge that gap, guiding students through 
 several of the most common machine learning approaches at a conceptual level 
-with a focus on applications in R. Each week, students are expected to read a 
-course handout on the 
-concepts and applications of a particular machine learning algorithm. Weekly 
-classes (one-hour mix of lecture and discussion) will then focus on clarifying 
-and expanding upon the reading, with 
-weekly assignments designed to give students hands-on experience implementing 
-and tuning these different approaches on both example data and a real-world data 
-set of their choice. Topics include the random forest and gradient boosting 
-machine algorithms as well as cross validation and loss functions.
+with a focus on applications in R. Topics include the random forest and gradient 
+boosting machine algorithms as well as cross validation and loss functions.
+
+## Course Structure
+
+Each week students are expected to read a handout on the concepts and 
+applications of a particular machine learning algorithm. Weekly assignments are
+then designed to walk students through applying these concepts to real 
+prediction problems, easing students into writing their own machine learning 
+code.
+
+Weekly classes are a one-hour mix of lecture and discussion, designed to support
+and expand upon the concepts of that week's assignment and allow students to 
+clarify their understanding of the topics at hand.
 
 ## Learning Objectives
 
@@ -89,15 +94,8 @@ packages on.
 ## Grading
 
 Most weeks, students will be given a hands-on programming assignment due the 
-following class (for a total of 11 assignments). Grades are based solely on 
-assignment performance; there are no quizzes or exams and no attendance or 
-participation requirements. Each assignment is worth an equal number of points.
-
-## Attendance Policy
-
-Attendance is not mandatory for this course. Grades will be assigned based on 
-weekly assignments alone; attendance and participation are not incorporated into
-grades.
+following class. Grades are based solely on 
+assignment performance. Each assignment is worth an equal number of points.
 
 ## Students with Learning and Physical Disabilities
 
