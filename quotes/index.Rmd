@@ -4,6 +4,24 @@ output:
   tufte::tufte_html: default
 ---
 
+<hr id='BromanQuotes'>
+
+File organization and naming are powerful weapons against chaos. (Jenny Bryan)
+
+Your closest collaborator is you six months ago, but you don't reply to emails. (Mark Holder)
+
+I will let the data speak for itself when it cleans itself. (Allison Reichel)
+
+Working with data is not about rules to follow but about decisions to make. (Naupaka Zimmerman)
+
+I'm not worried about being scooped, I'm worried about being ignored. (Magnus Nordborg)
+
+Teach stats as you would cake baking: make a few before you delve into the theory of leavening agents. (Jenny Bryan)
+
+The opposite of “open” isn’t “closed”. The opposite of “open” is “broken”. (John Wilbanks)
+
+--- [Collected by Karl Broman](https://github.com/kbroman/datasciquotes)
+
 <hr id="EfronThis">
 
 This was not meant to be an “emperor has no clothes” kind of story, rather “the 
