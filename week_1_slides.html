@@ -4,9 +4,9 @@
     <title>MLCA Week 1:</title>
     <meta charset="utf-8" />
     <meta name="author" content="Mike Mahoney" />
-    <meta name="date" content="2021-02-26" />
+    <meta name="date" content="2021-03-30" />
     <script src="libs/header-attrs/header-attrs.js"></script>
-    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"ee5e5524d6bb4ea1ba4272488d2d9e45","expires":1}</script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"xcde59eef1834b49956f54eef08195d6","expires":1}</script>
     <script src="libs/himalaya/himalaya.js"></script>
     <script src="libs/js-cookie/js.cookie.js"></script>
     <link href="libs/editable/editable.css" rel="stylesheet" />
@@ -30,7 +30,7 @@ class: center, middle, inverse, title-slide
 # MLCA Week 1:
 ## What Are We Doing Here?
 ### Mike Mahoney
-### 2021-02-26
+### 2021-03-30
 
 ---
 
@@ -50,18 +50,37 @@ class: center, middle, inverse, title-slide
 
 
 
-
-class: center, middle
-
-# Housekeeping
-
----
 
 class: center, middle
 
 # Syllabus
 
-Link to course website goes here.
+All content for this class lives on the course website: 
+[https://mlca.mm218.dev/](https://mlca.mm218.dev/)
+
+This includes the syllabus, schedule, course handouts, and weekly
+assignments.
+
+---
+class: middle
+
+Each week you should expect:
+
+* A course handout (these slides) which you should read through before that 
+  week's class.
+* A one-hour class period for discussing and answering any questions you have
+  about the topic of the week.
+* A short application-focused R assignment, due the following class.
+  
+&lt;br /&gt;
+  
+There is no assignment due this week; Assignment 1 (described at the end of this
+handout) is due by the start of class 2.
+
+&lt;br /&gt;
+
+Each assignment is worth the same number of points. Course grades are based 
+solely on assignments.
 
 ---
 
@@ -216,7 +235,7 @@ variables can't explain.
 &lt;br /&gt;
 
 At the simplest level, a model is an explicit hypothesis about how some 
-combination of variables relate to another variable. 
+combination of variables relate to an outcome of interest. 
 
 &lt;br /&gt;
 
@@ -340,7 +359,40 @@ summary(smaller_plants_model)
 
 ---
 
-We can use that model to tell us what value of growth we might expect at every
+This is attribution in action.
+
+We could use this model (built on experimental data) to claim that sunlight 
+_causes_ plant growth based on its p value and effect size.
+
+
+```r
+summary(smaller_plants_model)
+```
+
+```
+## 
+## Call:
+## lm(formula = growth ~ sunlight, data = plants)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -8.5411 -2.0369 -0.3238  2.3366  9.1080 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.88495    0.67145   1.318     0.19    
+## sunlight     0.93415    0.04699  19.879   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3.563 on 118 degrees of freedom
+## Multiple R-squared:  0.7701,	Adjusted R-squared:  0.7681 
+## F-statistic: 395.2 on 1 and 118 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+
+We can use that model to tell us what value of growth we could expect at every
 single value of sunlight there could ever be. If we graphed that relationship, 
 we'd get a line like this:
 
@@ -351,7 +403,7 @@ ggplot(plants, aes(sunlight, growth)) +
   theme(axis.text = element_blank())
 ```
 
-![](week_1_slides_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+![](week_1_slides_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -367,7 +419,7 @@ ggplot(plants, aes(sunlight, growth)) +
   theme(axis.text = element_blank())
 ```
 
-![](week_1_slides_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+![](week_1_slides_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
 ---
 
 This process -- of trying to model the true relationship between variables from
@@ -384,24 +436,24 @@ ggplot(plants, aes(sunlight, growth)) +
   theme(axis.text = element_blank())
 ```
 
-![](week_1_slides_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+![](week_1_slides_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
 
 ---
 class: middle
 
 Estimation and attribution are two sides of the same coin: 
 
-* estimation aims to determine the true relationships between a group of input 
-  variables and some output, while
-  
-* attribution aims to determine which of those relationships matter. 
+* estimation aims to determine how some outcome varies over the different levels
+  of some input variables, while
+* attribution aims to determine which of those variables are causing the 
+  variation (and which are only correlated).
 
 &lt;br /&gt;
 
-This course is about prediction, which is a very different coin. 
+This course is about prediction, which is a different coin. 
 
-If estimation and attribution are different sides of a quarter, prediction is on 
-the euro.
+If estimation and attribution are different sides of a penny, prediction is 
+maybe a dime.
 
 ---
 class: center middle
@@ -411,9 +463,10 @@ class: center middle
 ---
 class: middle
 
-At the simplest level, prediction is about trying to guess an unknown value 
-`\(Y\)` given some number of known `\(X\)` values -- in our example, trying to guess 
-`\(growth\)` based on `\(sunlight\)` alone.
+At the simplest level, prediction is about trying to guess a _specific_ value 
+`\(Y\)` given some number of known values `\((X)\)` -- in our example, trying to guess 
+unknown `\(\operatorname{growth}\)` values based on measured 
+`\(\operatorname{sunlight}\)`.
 
 &lt;br /&gt; 
 
@@ -427,7 +480,8 @@ the lowest rate of errors out of all the models you're considering.
 
 ---
 
-You can do prediction with models designed for other purposes. 
+Let's talk a little about what that means. For instance, you can do prediction 
+with models designed for other purposes. 
 
 For instance, we can predict plant growth using our simple linear model:
 
@@ -441,14 +495,14 @@ ggplot(plants, aes(sunlight, growth)) +
   theme(axis.text = element_blank())
 ```
 
-![](week_1_slides_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+![](week_1_slides_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
 ---
 
 Our predictions fall right along that line of best fit. 
 
-In the world of the linear model, "predicting" is the same thing as estimation 
--- the question the model wants to answer is "how does my outcome vary with my 
-inputs?"
+In the world of the linear model, "predicting" is the same thing as estimation.
+We're estimating how our response varies with our predictors -- here, we're
+saying it increases linearly.
 
 
 ```r
@@ -460,12 +514,12 @@ ggplot(plants, aes(sunlight, growth)) +
   theme(axis.text = element_blank())
 ```
 
-![](week_1_slides_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+![](week_1_slides_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
 
 ---
 
-Of course, the actual question we're asking is "what's the value of the 
-outcome?"
+But with prediction, the question we're asking is "what's the value of 
+`\(\operatorname{growth}\)`?"
 
 In an ideal world, our predictions would look like this:
 
@@ -477,9 +531,9 @@ ggplot(plants, aes(sunlight, growth)) +
   theme(axis.text = element_blank())
 ```
 
-![](week_1_slides_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+![](week_1_slides_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
 
-Knowing the underlying relationship between our variables isn't helpful when 
+Knowing the underlying relationship between our variables isn't the goal when 
 we're assessing predictions. The only thing that matters is accuracy.
 
 ---
@@ -493,8 +547,7 @@ the root mean square error, expressed in algebra as:
 
 &lt;br /&gt;
 
-Or in words as "the square root of the mean of the squared errors (predicted 
-values minus actual values)", or in code as:
+Or in words as "the square root of the mean of the squared errors", or in code as:
 
 
 ```r
@@ -539,31 +592,38 @@ while they walk like traditional statistics and quack like traditional
 statistics, they work in a different way than the majority of statistics used in 
 environmental science. 
 
-Pure prediction algorithms do not care about statistical significance. 
-
-They don't expect parsimony; in fact, getting rid of weakly-correlated variables 
-will often make your predictions worse. 
-
-And, most importantly, they don't pretend to search for any long-term, provable, 
-scientific truth. 
-
----
-class: middle
-
-By relying upon weak correlations and almost completely ignoring estimation and 
+By making use of weak correlations and almost completely ignoring estimation and 
 attribution, these methods are able to optimize entirely for predictive 
 accuracy. 
-
-&lt;br /&gt;
 
 The end result is more powerful models and more accurate predictions than we've 
 ever been able to make before. 
 
-&lt;br /&gt;
 
-But their power is not without limits, and trying to apply traditional thinking 
+---
+class: middle
+
+But this power is not without limits, and trying to apply traditional thinking 
 -- about estimation, attribution, parsimony or significance -- is risky business 
 at best.
+
+&lt;br /&gt;
+
+Pure prediction algorithms do not care about statistical significance. 
+
+&lt;br /&gt;
+
+They don't expect parsimony; in fact, getting rid of weakly-correlated variables 
+will often make your predictions worse. 
+
+&lt;br /&gt;
+
+And, most importantly, they don't pretend to search for any long-term, provable, 
+scientific truth. 
+
+&lt;br /&gt;
+
+We'll spend the rest of the semester talking about what exactly that means.
 
 ---
 .bg-washed-green.b--dark-green.ba.bw2.br3.shadow-5.ph4.mt5[
@@ -584,6 +644,8 @@ Regression methods have come a long and big way since the time of Gauss.
 class: middle center title-slide
 
 # Assignment 1
+
+(Due week 2)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
