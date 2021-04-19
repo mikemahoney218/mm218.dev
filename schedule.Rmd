@@ -1,7 +1,7 @@
 ---
 title: "Schedule"
 description: |
-  Schedule of topics for FOR TK.
+  Schedule of topics for FOR 796: Machine Learning for Prediction: Concepts and Applications in R
 site: distill::distill_website
 ---
 
@@ -9,7 +9,7 @@ site: distill::distill_website
 library(dplyr)
 
 tribble(
-  ~ Week, ~ Topic, ~ Packages, ~ "Homework Assigned",
+  ~ Week, ~ Topic, ~ Packages, ~ "Homework Assigned", 
   "1", "Prediction, Estimation, and Attribution", "None", "Assignment 1",
   "2", "Regression", "None", "Assignment 2",
   "3", "Classification", "pROC", "Assignment 3",
@@ -25,3 +25,41 @@ tribble(
   kableExtra::kable() %>% 
   kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
 ```
+
+# Readings
+
+Unless specified in the weekly handouts, these are not required, but may help
+in understanding a week's topics. "CASI" refers to 
+["Computer Age Statistical Inference"](https://web.stanford.edu/~hastie/CASI_files/PDF/casi.pdf)
+while "HOML" refers to 
+["Hands-on Machine Learning with R"](https://bradleyboehmke.github.io/HOML)
+
+## Week 1
+
+### Prediction, Estimation, and Attribution
+
+CASI 1.0-1.1, 8.4 (just the first two pages), and Epilogue.
+
+Leo Breiman. (2001) Statistical Modeling: The Two Cultures Statist. Sci. 16(3) 199 - 231,  https://doi.org/10.1214/ss/1009213726 
+
+Bradley Efron. (2020) Prediction, Estimation, and Attribution, Journal of the American Statistical Association, 115(530), 636-655, https://doi.org/10.1080/01621459.2020.1762613 
+
+Galit Shmueli. (2010) To Explain or to Predict?. Statistical Science 25(3) 289-310, https://doi.org/10.1214/10-STS330 
+ 
+## Week 2
+
+### Regression and linear regression
+
+HOML 1.1, 4
+
+### Hold-out and validation sets
+
+HOML 2.2
+
+CASI 12.2 (first page only)
+
+## Week 3
+
+### Cross Validation
+
+CASI 12
