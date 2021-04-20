@@ -4,6 +4,17 @@ output:
   tufte::tufte_html: default
 ---
 
+Pay attention to unexpected data that has no natural constituency, and to lack 
+of data that are in high demand.
+
+--- [Whitney R. Robinson: More on meta-epistemology: an epidemiologist’s perspective](https://www.theinsight.org/p/how-one-epidemiologist-decided-whether)
+
+<hr id="SackettHalf">
+
+Half of what you’ll learn in medical school will be shown to be either dead wrong or out of date within five years of your graduation; the trouble is that nobody can tell you which half–so the most important thing to learn is how to learn on your own.
+
+--- [David Sackett](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC300793/) (playing off [a common phrase](https://staff.washington.edu/gray/misc/which-half.html))
+
 <hr id='BromanQuotes'>
 
 File organization and naming are powerful weapons against chaos. (Jenny Bryan)

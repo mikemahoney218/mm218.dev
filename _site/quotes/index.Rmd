@@ -4,6 +4,35 @@ output:
   tufte::tufte_html: default
 ---
 
+Pay attention to unexpected data that has no natural constituency, and to lack 
+of data that are in high demand.
+
+--- [Whitney R. Robinson: More on meta-epistemology: an epidemiologist’s perspective](https://www.theinsight.org/p/how-one-epidemiologist-decided-whether)
+
+<hr id="SackettHalf">
+
+Half of what you’ll learn in medical school will be shown to be either dead wrong or out of date within five years of your graduation; the trouble is that nobody can tell you which half–so the most important thing to learn is how to learn on your own.
+
+--- [David Sackett](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC300793/) (playing off [a common phrase](https://staff.washington.edu/gray/misc/which-half.html))
+
+<hr id='BromanQuotes'>
+
+File organization and naming are powerful weapons against chaos. (Jenny Bryan)
+
+Your closest collaborator is you six months ago, but you don't reply to emails. (Mark Holder)
+
+I will let the data speak for itself when it cleans itself. (Allison Reichel)
+
+Working with data is not about rules to follow but about decisions to make. (Naupaka Zimmerman)
+
+I'm not worried about being scooped, I'm worried about being ignored. (Magnus Nordborg)
+
+Teach stats as you would cake baking: make a few before you delve into the theory of leavening agents. (Jenny Bryan)
+
+The opposite of “open” isn’t “closed”. The opposite of “open” is “broken”. (John Wilbanks)
+
+--- [Collected by Karl Broman](https://github.com/kbroman/datasciquotes)
+
 <hr id="EfronThis">
 
 This was not meant to be an “emperor has no clothes” kind of story, rather “the 
