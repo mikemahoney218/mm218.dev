@@ -1,5 +1,22 @@
 [
   {
+    "path": "posts/2021-04-22-terrainr-version-040-is-now-on-cran/",
+    "title": "What's new in terrainr 0.4.0?",
+    "description": "The new CRAN release of terrainr improves consistency, CRS logic, and \nfixes some bugs.",
+    "author": [
+      {
+        "name": "Mike Mahoney",
+        "url": {}
+      }
+    ],
+    "date": "2021-04-22",
+    "categories": [],
+    "contents": "\nterrainr version 0.4.0 is now on CRAN! This version is a relatively minor update that shouldn’t impact most workflows, but makes some changes to improve the logic and consistency of the package. The rest of this post runs through the changes you can expect if you update.packages() any time soon!\nWhat’s a terrainr?\nterrainr is an R package for the retrieval and visualization of spatial data. It provides functions to download elevation data and basemap tiles for points within the United States (using public domain data from the USGS National Map), visualize them in R via ggplot2, and process them for 3D visualization using the Unity 3D engine. You can see the GitHub repo here!\nmerge_rasters can handle tiles with different numbers of bands\nThe old implementation of merge_rasters was very bulky, read all your map tiles into memory at once, and was a bit of a mess to maintain thanks to the large number of paths you could theoretically take through the code. The commit (suggested via rOpenSci review!) replacing it with gdalwarp via sf is probably the single best code improvement I’ve made to this repo. Unfortunately, the old method could also handle merging rasters with differing numbers of bands, while the simple gdalwarp fix couldn’t.\nSo the old implementation is back as an internal method while I look for a better solution to this problem. merge_rasters will now attempt to use gdalwarp to merge your input files and then fall back to (a massively simplified version of) the older version if gdalwarp fails.\nAs for why you’d want to automatically merge rasters with different numbers of bands, well…\nget_tiles doesn’t auto-download transparency values for NAIP\nNAIP orthophotography provides fantastic continuous 1-meter images for the continental United States. When downloading these photos with the argument transparency = true, which used to be the default, most photos don’t have any transparent pixels to talk about and as such are returned and saved as 3 band rasters (RGB images). Some photos, however, do have such pixels and are returned with a 4th alpha band. This causes problems with gdalwarp as well as image editing software, and the majority of the time users are not better served by these pixels being transparent.\nAs a result, this version changes the default transparency argument for get_tiles and hit_national_map_api to false when downloading NAIP images (no other data source is impacted). This is one of the reasons this version gets a 0.x.0 number – while it should be a small change, the same inputs to functions no longer returns the same outputs (though I doubt people would notice), so I’m counting this as a breaking change.\nThere’s a slightly more impactful breaking change worth noting though:\nFunctions pay attention to the provided CRS\nThis header is actually about two distinct changes.\nFirst, another new behavior with get_tiles is that rather than assuming the provided data and downloaded image should both be using the WGS84 CRS (EPSG 4326), get_tiles will now infer the EPSG CRS from any provided sf or Raster object. If the numeric code is missing, this function will still assume 4326.\nSimilarly, rather than specifying target_crs in vector_to_overlay, this function will now return an overlay projected to match reference_raster’s CRS. Missing CRS are handled slightly differently here – if the error_crs argument is NULL, this function will warn; if FALSE it will assume 4326, and if TRUE it will interrupt the function with an error.\nThose are the major changes to this iteration! On top of these there are some minor changes to the package internals, slowly removing dead code paths and simplifying things behind the scenes. If you have any problems (bugs or missing features) with the package, feel free to open an issue!\n\n\n\n",
+    "preview": {},
+    "last_modified": "2021-04-23T08:02:55-04:00",
+    "input_file": {}
+  },
+  {
     "path": "posts/2021/02/terrainr/",
     "title": "terrainr 0.3.0 is out today",
     "description": "New version, who this?",
