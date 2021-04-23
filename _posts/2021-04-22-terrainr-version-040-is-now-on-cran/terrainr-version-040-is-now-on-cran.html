@@ -110,12 +110,12 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["What's new in terrainr 0.4.0?"]},{"type":"character","attributes":{},"value":["The new CRAN release of terrainr improves consistency, CRS logic, and \nfixes some bugs.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Mike Mahoney"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":[]}},"value":[]}]}]},{"type":"character","attributes":{},"value":["2021-04-22"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["What's new in terrainr 0.4.0?"]},{"type":"character","attributes":{},"value":["The new CRAN release of terrainr improves consistency, CRS logic, and \nfixes some bugs.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Mike Mahoney"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":[]}},"value":[]}]}]},{"type":"character","attributes":{},"value":["2021-04-22"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained","toc","includes"]}},"value":[{"type":"logical","attributes":{},"value":[false]},{"type":"logical","attributes":{},"value":[true]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["after_body"]}},"value":[{"type":"character","attributes":{},"value":["../utterances.html"]}]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"NULL"}
+  {"type":"character","attributes":{},"value":["terrainr-version-040-is-now-on-cran_files/anchor-4.2.2/anchor.min.js","terrainr-version-040-is-now-on-cran_files/bowser-1.9.3/bowser.min.js","terrainr-version-040-is-now-on-cran_files/distill-2.2.21/template.v2.js","terrainr-version-040-is-now-on-cran_files/header-attrs-2.7/header-attrs.js","terrainr-version-040-is-now-on-cran_files/jquery-1.11.3/jquery.min.js","terrainr-version-040-is-now-on-cran_files/popper-2.6.0/popper.min.js","terrainr-version-040-is-now-on-cran_files/tippy-6.2.7/tippy-bundle.umd.min.js","terrainr-version-040-is-now-on-cran_files/tippy-6.2.7/tippy-light-border.css","terrainr-version-040-is-now-on-cran_files/tippy-6.2.7/tippy.css","terrainr-version-040-is-now-on-cran_files/tippy-6.2.7/tippy.umd.min.js","terrainr-version-040-is-now-on-cran_files/webcomponents-2.0.0/webcomponents.js"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
   <!--/radix_placeholder_navigation_in_header-->
@@ -1477,6 +1477,17 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </div>
 
 <div class="d-article">
+<div class="d-contents d-contents-float">
+<nav class="l-text toc figcaption" id="TOC">
+<h3>Contents</h3>
+<ul>
+<li><a href="#whats-a-terrainr">What’s a terrainr?</a></li>
+<li><a href="#merge_rasters-can-handle-tiles-with-different-numbers-of-bands"><code>merge_rasters</code> can handle tiles with different numbers of bands</a></li>
+<li><a href="#get_tiles-doesnt-auto-download-transparency-values-for-naip"><code>get_tiles</code> doesn’t auto-download transparency values for NAIP</a></li>
+<li><a href="#functions-pay-attention-to-the-provided-crs">Functions pay attention to the provided CRS</a></li>
+</ul>
+</nav>
+</div>
 <p>terrainr version 0.4.0 is now on CRAN! This version is a relatively minor update that shouldn’t impact most workflows, but makes some changes to improve the logic and consistency of the package. The rest of this post runs through the changes you can expect if you <code>update.packages()</code> any time soon!</p>
 <h2 id="whats-a-terrainr">What’s a terrainr?</h2>
 <p><a href="https://docs.ropensci.org/terrainr/">terrainr</a> is an R package for the retrieval and visualization of spatial data. It provides functions to download elevation data and basemap tiles for points within the United States (using public domain data from the USGS National Map), visualize them in R via ggplot2, and process them for 3D visualization using the Unity 3D engine. You can see <a href="https://docs.ropensci.org/terrainr/">the GitHub repo here!</a></p>
@@ -1502,6 +1513,17 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </div>
 
 
+
+<br>
+
+<script src="https://utteranc.es/client.js"
+        repo="mikemahoney218/mm218.dev"
+        issue-term="url"
+        label="comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
 <!--radix_placeholder_site_after_body-->
 <!--/radix_placeholder_site_after_body-->
 <!--radix_placeholder_appendices-->

@@ -10,6 +10,9 @@ date: 2021-04-22
 output:
   distill::distill_article:
     self_contained: false
+    toc: true
+    includes: 
+      after_body: "../utterances.html"
 ---
 
 
