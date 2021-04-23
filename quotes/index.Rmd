@@ -501,7 +501,7 @@ If the first line of your [R] script is `setwd("C:\Users\jenny\path\that\only\I\
 
 It becomes important in such a climate of opinion to emphasize that books do not store knowledge. They contain symbolic codes that can serve us as external mnemonics for knowledge. Knowledge can exist only in living human minds.
 
---- [Kieran Egan](The Educated Mind: How Cognitive Tools Shape Our Understanding)
+--- Kieran Egan: The Educated Mind: How Cognitive Tools Shape Our Understanding
 
 <hr id="ThurstonMathematical">
 
