@@ -7,8 +7,8 @@ navbar:
   right:
     - text: "Syllabus"
       href: index.html
-    - text: "Schedule"
-      href: schedule.html
+#    - text: "Schedule"
+#      href: schedule.html
 #    - text: "Slides"
 #      menu:
 #        - text: "Week 1"

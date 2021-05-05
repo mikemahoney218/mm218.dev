@@ -16,11 +16,10 @@ knitr::opts_chunk$set(echo = FALSE)
 ## Course Title and Instructor
 
 **Title**: FOR 796: Machine Learning for Prediction: Concepts and Applications in R  
-**Time and Place**: TBA
+**Time and Place**: Wednesday 2:15-3:10, Bray 300
 
 **Instructor**: Mike Mahoney  
 **Email**: mike.mahoney.218@gmail.com  
-**Office Hours**: TBA  
 
 
 ## Course Description
@@ -76,7 +75,7 @@ functions, managing objects, controlling the flow of a program (e.g. if/else
 statements and for-loops), wrangling data in data frames, fitting linear models 
 (i.e., the `lm` function) and other basic tasks. 
 
-An introductory stats course (APM391 or equivalent) is recommended.
+An introductory stats course is recommended.
 
 ## Textbooks and Materials
 
