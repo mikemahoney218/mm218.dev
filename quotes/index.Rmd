@@ -4,6 +4,37 @@ output:
   tufte::tufte_html: default
 ---
 
+<hr id = "EfronRejoinder">
+
+An extra year of experience has not changed my belief in a disconnect between 
+traditional statistical regression methods and the pure prediction algorithms. 
+Section 8 of the paper, featuring Table 5, makes the case directly in terms of 
+six criteria. Five of the six emerged more or less unscathed from the discussion. 
+Criteria 2, long-time scientific truth versus possibly short-term prediction 
+accuracy, was doubted by FHT and received vigorous push-back from Yu/Barter:
+
+> ...but in our experience the “truth” that traditional regression methods supposedly represent is rarely justified or validated...
+
+This is a hard-line Breimanian point of view. That "rarely" is over the top. The 
+truism that begins “all models are wrong” ends with “but some are useful.” 
+Traditional models tend to err on the side of over-simplicity (not enough 
+interactions, etc.) but still manage to capture at least some aspect of the 
+underlying mechanism. “Eternal truth” is a little too much to ask for, but in 
+the Neonate example we did wind up believing that respiratory strength had 
+something lasting to do with the babies’ survival.
+
+[...]
+
+The fathers of statistical theory — Pearson, Fisher, Neyman, Hotelling, Wald —
+forgot to provide us with a comprehensive theory of optimal prediction. We will 
+have to count on the current generation of young statisticians to fill the gap 
+and put prediction on a principled foundation.
+
+--- [Bradley Efron: Rejoinder to Prediction, Estimation, and Attribution](https://www.tandfonline.com/doi/full/10.1080/01621459.2020.1762453?src=recsys)
+
+
+<hr id = "TrattWhat">
+
 It's important to be realistic: most people don't care about program performance most of the time. Modern computers are so fast that most programs run fast enough even with very slow language implementations. In that sense, I agree with Daniel's premise: optimising compilers are often unimportant. But “often” is often unsatisfying, as it is here. Users find themselves transitioning from not caring at all about performance to suddenly really caring, often in the space of a single day.
 
 This, to me, is where optimising compilers come into their own: they mean that even fewer people need care about program performance. And I don't mean that they get us from, say, 98 to 99 people out of 100 not needing to care: it's probably more like going from 80 to 99 people out of 100 not needing to care. This is, I suspect, more significant than it seems: it means that many people can go through an entire career without worrying about performance. Martin Berger reminded me of A N Whitehead’s wonderful line that “civilization advances by extending the number of important operations which we can perform without thinking about them” and this seems a classic example of that at work.
