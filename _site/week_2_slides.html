@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>MLCA Week 2:</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Mahoney" />
+    <meta name="date" content="2021-05-06" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"xf202e5024364114b866958fd8fb4eec","expires":1}</script>
+    <script src="libs/himalaya/himalaya.js"></script>
+    <script src="libs/js-cookie/js.cookie.js"></script>
+    <link href="libs/editable/editable.css" rel="stylesheet" />
+    <script src="libs/editable/editable.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/mark.js/mark.min.js"></script>
+    <link href="libs/xaringanExtra-search/search.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-search/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":true,"autoSearch":true}) })</script>
+    <link href="libs/tachyons/tachyons.min.css" rel="stylesheet" />
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# MLCA Week 2:
+## Regression, Linear Regression, and Statistics
+### Mike Mahoney
+### 2021-05-06
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: center, middle
+
+# Regression
+
+---
+
+# This class focuses on a set of algorithms known as **supervised learning**.
+
+&lt;br /&gt;
+
+These are models that have been trained on data with known outcomes -- so 
+there's some idea of the "true" values our model "should" be predicting.
+
+&lt;br /&gt;
+
+This is in contrast to **unsupervised learning**, where we don't know the "true" 
+outcome we're trying to model.
+
+---
+
+# Supervised learning is what most people think of when they think of modeling.
+
+&lt;br /&gt;
+
+You might imagine building models to predict...
+
+* the likelihood a species occurs at sites across the landscape;  
+&lt;br /&gt;
+* which species will go extinct within the next five, ten, fifteen years;  
+&lt;br /&gt;
+* how much biomass is stored in forests across a region;  
+&lt;br /&gt;
+* patterns in annual temperatures into the future.
+
+&lt;br /&gt;
+
+These are all examples of supervised learning problems.
+
+---
+
+# When we use models to predict numeric outcomes, we are using a **regression model**.
+
+&lt;br /&gt;
+
+This is in contrast to a **classification model**, which we'll discuss more 
+next week.
+
+&lt;br /&gt;
+
+Most of the algorithms we discuss can be used for both regression and 
+classification, with minor tweaks.
+
+---
+
+Let's walk through a simple regression example.
+
+For most of this class, we'll make use of the Ames Iowa Housing Data provided
+by the `AmesHousing` package to demonstrate regression problems. Install 
+`AmesHousing` if you haven't already:
+
+
+```r
+install.packages("AmesHousing")
+```
+
+Then create a cleaned version of the data by using the 
+`AmesHousing::make_ames()` function:
+
+
+```r
+ames &lt;- AmesHousing::make_ames()
+```
+
+If all goes well, your data frame should have dimensions like this:
+
+
+```r
+nrow(ames)
+```
+
+```
+## [1] 2930
+```
+
+```r
+ncol(ames)
+```
+
+```
+## [1] 81
+```
+
+---
+
+This data frame contains information on a number of homes that were sold in 
+Ames, Iowa from 2006 to 2010. Our regression models will mostly focus on 
+predicting the sale price of homes (the `Sale_Price` column) as a function of
+the other variables in the data set.
+
+Luckily for us, a good number of the variables in this data frame are associated
+with the sale price. For instance, we could plot the relationship between the
+year a house was built and its sale price:
+
+
+```r
+library(ggplot2)
+
+ggplot(ames, aes(Year_Built, Sale_Price)) + 
+  geom_point()
+```
+
+![](week_2_slides_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+---
+
+It looks like, generally speaking, house prices are higher for more recently
+constructed homes. 
+
+Suppose we're interested in the average relationship between these variables -- 
+how many dollars each additional year newer is worth. We might imagine drawing a
+line straight down the middle of all those points, which would look like this:
+
+
+```r
+ggplot(ames, aes(Year_Built, Sale_Price)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", color = "red")
+```
+
+![](week_2_slides_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+---
+
+This is a linear regression. To be specific, this is an **ordinary least squares**
+regression, which minimizes the squared error -- that is, the (squared) distance 
+from the line to all of the points, at the same time.
+
+
+```r
+ggplot(ames, aes(Year_Built, Sale_Price)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", color = "red")
+```
+
+![](week_2_slides_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+---
+
+Things get a little more complex if we include additional variables in the mix.
+
+For instance, let's say we wanted to include the ground floor living area 
+(`Gr_Liv_Area`) in our model. 
+
+We can plot the relationship between these variables in 3D. This plot is a bit
+uglier than before, but we can still see that more living area results in higher 
+sale prices:
+
+![](week_2_slides_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+---
+class: middle
+
+If we fit a linear model to both these variables, we're doing something known as
+**multiple linear regression**. 
+
+Instead of fitting a 1D line to all of our 
+points, we're instead going to fit a 2D plane -- again trying to minimize the 
+(squared) distance between our plane and all of the points:
+
+.pull-left[
+![](week_2_slides_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+
+]
+
+.pull-right[
+
+![](week_2_slides_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+]
+
+As we keep adding more variables, we can imagine that this pattern keeps 
+happening -- our linear model will try and find the plane that minimizes errors
+in every dimension at once.
+
+Rather than come up with different names for each dimension (like line and 
+plane), these planes are generally referred to as **hyperplanes** or, more 
+broadly, **surfaces**.
+
+---
+class: middle
+
+Linear models require a few things from your data set in order to function 
+properly. Among these assumptions, the most important are:
+
+* Linearity: For linear regression to produce accurate predictions, your outcome
+  (the variable being modeled, in our example sale price) must be linearly 
+  associated with each of your predictor variables.
+* Normality: The sample means of your outcome must be normally distributed for
+  linear regression to produce a good fit. 
+* Multicollinearity: Your predictor variables must be independent from each other; 
+  they should not be correlated with one another.
+  
+For the purposes of this course, it's enough to just broadly know what these 
+assumptions are; we're only using linear models as a baseline to compare newer
+machine learning methods against. 
+
+If you're interested in these assumptions and what to do if your data violates 
+them, I'd recommend APM 630 - Regression Methods.
+
+---
+class: middle
+
+To fit a linear model in R, we can use the `lm` function:
+
+
+```r
+ames_one &lt;- lm(Sale_Price ~ Year_Built + Gr_Liv_Area, ames)
+ames_one
+```
+
+```
+## 
+## Call:
+## lm(formula = Sale_Price ~ Year_Built + Gr_Liv_Area, data = ames)
+## 
+## Coefficients:
+## (Intercept)   Year_Built  Gr_Liv_Area  
+##  -2.106e+06    1.087e+03    9.597e+01
+```
+
+---
+
+If you've used linear models in R before, you're likely familiar with using 
+`summary` to view how a model performed:
+
+
+```r
+summary(ames_one)
+```
+
+```
+## 
+## Call:
+## lm(formula = Sale_Price ~ Year_Built + Gr_Liv_Area, data = ames)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -458172  -26758   -2236   18514  306986 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -2.106e+06  5.734e+04  -36.74   &lt;2e-16 ***
+## Year_Built   1.087e+03  2.938e+01   37.01   &lt;2e-16 ***
+## Gr_Liv_Area  9.597e+01  1.758e+00   54.60   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 46660 on 2927 degrees of freedom
+## Multiple R-squared:  0.6591,	Adjusted R-squared:  0.6588 
+## F-statistic:  2829 on 2 and 2927 DF,  p-value: &lt; 2.2e-16
+```
+
+This command gives us information on model `\(R^2\)` values, useful for estimation,
+and p-values for the model and individual variables, useful for attribution. But
+as we discussed last week, we don't care about goodness-of-fit or
+significance for prediction models; we care about **accuracy**.
+
+---
+
+To measure how accurate our model's predictions are, we first have to make 
+predictions:
+
+
+```r
+# Making a new data frame, to not mess up our original:
+ames_copy &lt;- ames
+# Make our predictions:
+ames_copy$predicted &lt;- predict(ames_one, ames)
+```
+
+We can then visualize how well our model predicts by plotting our predictions against
+actual values:
+
+
+```r
+ggplot(ames_copy, aes(predicted, Sale_Price)) + 
+  geom_point(alpha = 0.4)
+```
+
+![](week_2_slides_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+
+---
+
+By looking at the plot, we can get a sense of how our model performs -- we 
+under-predict across the board, and get worse as the homes get more expensive. 
+But if we want to be able to compare our accuracy to other models, we need to 
+quantify our overall error.
+
+&lt;br /&gt;
+
+One way to quantify error is to use RMSE, as we talked about last week:
+
+`$$\operatorname{RMSE} = \sqrt{(\frac{1}{n})\sum_{i=1}^{n}(\hat{y} - y_{i})^{2}}$$`
+
+&lt;br /&gt;
+
+In code, we can write this as:
+
+
+```r
+sqrt(mean((ames_copy$predicted - ames_copy$Sale_Price)^2))
+```
+
+```
+## [1] 46636.73
+```
+
+&lt;br /&gt;
+
+RMSE measures error in the same units as the variable being predicted -- in this
+case, it tells us that our model has a root mean squared error of $46,636.73.
+
+---
+
+RMSE is an example of what's known in machine learning as a **loss function** 
+(or sometimes a "cost function"). Loss functions measure the "cost" associated 
+with an event -- in this case, how much a model should be penalized for each 
+error. We (and our algorithms) are always trying to minimize some loss value.
+
+RMSE is the most popular loss function for regression problems, but it's not the
+only option. Another common option is mean absolute error:
+
+`$$\operatorname{MAE} = (\frac{1}{n})\sum_{i=1}^{n}\left | \hat{y} - y_{i} \right |$$`
+
+Or in code:
+
+
+```r
+mean(abs((ames_copy$predicted - ames_copy$Sale_Price)))
+```
+
+```
+## [1] 31615.67
+```
+
+This loss function is a little more immediately interpretable: our model 
+mis-predicts sale prices by an average of $31,615.67.
+
+As a sidenote: MAE is occasionally used as an acronym for _median_ absolute 
+error. In this course, we'll always use MAE for _mean_ absolute error, but it's 
+always a good idea to double-check if someone uses the acronym without 
+specifying.
+
+---
+class: middle
+
+So if MAE is more easily interpreted than RMSE, why is RMSE more popular? 
+
+It has to do with how individual errors are weighted. Because RMSE takes the 
+mean of the _squared_ errors, it penalizes larger errors much more than MAE.
+
+For instance, here's a graph of the "cost" (on the y axis) of a prediction 
+error of various magnitudes (on the x):
+
+![](week_2_slides_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
+---
+class: middle
+
+Improving a prediction by a certain amount will reduce MAE evenly, no matter 
+which prediction improved -- it's just as beneficial for an error of $10,000 to 
+become $0 as for an error of $100,000 to become $90,000. 
+
+&lt;br /&gt;
+
+For RMSE, improvements to the most-wrong predictions are weighted more heavily, 
+so that bringing the $100,000 error down to $90,000 is viewed as more of
+an improvement than bringing the $10,000 down to $0.
+
+&lt;br /&gt;
+
+At the end of the day, we can only optimize for one of these values -- the model
+with the lowest RMSE may not have the lowest MAE as well. 
+
+&lt;br /&gt;
+
+RMSE tends to be the better loss function for how we actually build, compare, and select
+predictive models; we want to penalize our more extreme errors more heavily, so
+that hopefully each individual prediction is close enough to true to be useful.
+But in some situations, where a small error is truly equally as undesirable as a 
+large one, it makes sense to use MAE instead.
+
+---
+
+So we'll keep using RMSE for our models today. We can use this loss function to
+easily compare models -- for instance, how well does our "year built and square 
+footage" model compare to models built only on one of those variables?
+
+
+```r
+library(dplyr)
+(model_performance &lt;- ames %&gt;% 
+  mutate(
+    predictions_full = predict(
+      lm(Sale_Price ~ Year_Built + Gr_Liv_Area, ames),
+      .),
+    predictions_year = predict(
+      lm(Sale_Price ~ Year_Built, ames), 
+      .),
+    predictions_area = predict(
+      lm(Sale_Price ~ Gr_Liv_Area, ames), 
+      .)
+    ) %&gt;% 
+  summarise(
+    # This calculates RMSE "across" columns 
+    # whose names start with "predictions"
+    across(
+      starts_with("predictions"), 
+      ~ sqrt(mean((. - Sale_Price)^2)))
+    ))
+```
+
+```
+## # A tibble: 1 x 3
+##   predictions_full predictions_year predictions_area
+##              &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1           46637.           66259.           56505.
+```
+
+---
+class: middle
+
+
+```r
+model_performance
+```
+
+```
+## # A tibble: 1 x 3
+##   predictions_full predictions_year predictions_area
+##              &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1           46637.           66259.           56505.
+```
+
+&lt;br /&gt;
+
+RMSE collapses all the differences in how our models make predictions down to a
+single, easily compared value: our full model (RMSE $46,636) performs much 
+better than either of its component models (RMSE $66,259 and $56,504).
+
+&lt;br /&gt;
+
+This method for assessing model performance is a pretty standard workflow for a
+lot of estimation and attribution problems: get some data, fit a model on it, 
+report how well your model describes the data.
+
+---
+class: middle
+
+With prediction models, however, we aren't particularly interested in how well 
+our model predicts the data it's been fit on, since "fitting a model" implies 
+the algorithm has created a model that's as accurate at predicting each 
+observation as possible. Instead, we want to know how well our model will do at
+predicting data where we don't (or can't) know what the "right" answer will be.
+
+&lt;br /&gt;
+
+But it's hard to calculate RMSE (or any loss function) when we don't know the 
+right answer! Instead, what we can do is remove some data from the set we train
+our model on, and use our model predictions on that "removed" data to compare 
+our models.
+
+&lt;br /&gt;
+
+This is called the _hold-out_ or _simple validation_ method of assessing model 
+performance. We'll call the data we use to train the model our "training" set, 
+and the data we use to evaluate performance our "test" set -- though you might
+see "hold-out set" used in more formal situations.
+
+---
+
+Commonly about 20% of the data will be reserved for a "test" set, with the model
+fit to the other 80%. With that said, the amounts used can vary wildly -- in 
+industry, with models trained on trillions of records, it's not uncommon to see 
+10% or even 1% test sets, while some academics go so far as to use 50/50 splits.
+
+&lt;br /&gt;
+
+Generally speaking, your goal is to have enough of your data in training to have
+your model fully capture patterns in the data, while enough of your data is in 
+training to fully capture the variation in the data (since if all the values are 
+similar, you won't have any idea how the model performs on more extreme 
+observations). 
+
+&lt;br /&gt;
+
+If you don't have any reasons for concern about these goals 
+(which we'll talk about next week), an 80/20 or 70/30 training/testing split is
+probably appropriate.
+
+&lt;br /&gt;
+
+Mechanically, we can split our data into testing and training sets like this:
+
+
+```r
+# Always set a seed before doing anything with randomization!
+set.seed(123)
+row_idx &lt;- sample(seq_len(nrow(ames)), nrow(ames))
+training &lt;- ames[row_idx &lt; nrow(ames) * 0.8, ]
+testing &lt;- ames[row_idx &gt;= nrow(ames) * 0.8, ]
+```
+
+---
+
+We can then use the same code as before to compare our model performance, using 
+models fit on the training set and evaluated on the test set:
+
+
+```r
+testing %&gt;% 
+  mutate(
+    predictions_full = predict(
+      lm(Sale_Price ~ Year_Built + Gr_Liv_Area, training), 
+      .),
+    predictions_year = predict(
+      lm(Sale_Price ~ Year_Built, training), 
+      .),
+    predictions_area = predict(
+      lm(Sale_Price ~ Gr_Liv_Area, training), 
+      .)
+    ) %&gt;% 
+  summarise(
+    across(starts_with("predictions"), ~ sqrt(mean((. - Sale_Price)^2)))
+    )
+```
+
+```
+## # A tibble: 1 x 3
+##   predictions_full predictions_year predictions_area
+##              &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+## 1           47203.           62774.           55628.
+```
+
+Our full model performs a bit worse on the hold-out set than it did when we were
+evaluating using training data, which is to be expected -- it wasn't 
+specifically fit to these values, so it makes sense it performs worse. Our 
+component models, however, actually perform slightly _better_ on the new data; 
+it's probable they just got lucky with what data wound up in the test set.
+
+---
+class: middle
+
+This method of model assessment makes two core assumptions it's good to mention
+up-front: 
+
+1. Your training data should resemble your test data (any data processing done 
+   to one set should be done to both), and
+2. Your test data should resemble the real-world data you care about predicting
+   accurately.
+   
+The first assumption is nice and mechanical -- if you scale your variables so 
+they're all between 0 and 1 in the training data, you need to do the same thing
+in the test data. The second is much harder and requires you to think about how
+your model will be used and ensuring your data is representative. 
+
+In other fields, violating this assumption has resulted in facial recognition 
+algorithms not recognizing women
+[(link)](http://proceedings.mlr.press/v81/buolamwini18a/buolamwini18a.pdf)
+and self-driving cars not identifying dark-skinned pedestrians
+[(link)](https://www.vox.com/future-perfect/2019/3/5/18251924/self-driving-car-racial-bias-study-autonomous-vehicle-dark-skin), 
+due to the relative over-representation of white men in the most commonly used
+image data sets. 
+
+Depending on your area of study, it might be difficult to have
+such glaring blindspots -- but evaluating models based on data which doesn't 
+properly represent the spatial extent of the area you'll be predicting, or the 
+diversity of land cover types, or any other relevant variable may still leave
+you with far too positive a picture of your model's performance.
+
+---
+class: middle
+
+There's one other assumption in using holdout sets to assess your model: the 
+test data should be completely unknown to both the model and the modeler. 
+
+We want our model to be predicting data that wasn't used to build it -- that 
+means don't train models on test data, but it also means that you can't evaluate 
+your models against test data, use that information to make changes to the models 
+you're evaluating, and then evaluate the new models against the same test data.
+Given enough time, that's just an inefficient way of fitting your model to the
+combined data.
+
+One way around this is to make a third set of data, called a **validation set**,
+to evaluate models against while you're still in the process of making tweaks.
+Frequently this set is the same size as the test set, so that (for instance) 
+the model is trained on 60% of the data, 20% of the data is used to compare 
+models and make changes, and the last 20% of the data is used to calculate 
+final accuracy metrics. 
+
+This week's assignment will walk through this process in a bit more detail. For
+now, we're just going to keep using our test and train sets.
+
+---
+class: middle
+
+So our full model is still the best of the bunch. Let's go ahead and keep 
+expanding on it. Can we get any improvement by including what type of foundation 
+each home uses?
+
+
+```r
+ames_two &lt;- lm(Sale_Price ~ Year_Built + Gr_Liv_Area + Foundation, training)
+
+testing %&gt;% 
+  mutate(predictions_full = predict(ames_two, .)) %&gt;% 
+  summarise(predictions_full = sqrt(mean((predictions_full - Sale_Price)^2)))
+```
+
+```
+## # A tibble: 1 x 1
+##   predictions_full
+##              &lt;dbl&gt;
+## 1           46227.
+```
+
+Looks like the answer is yes, slightly. It's worth noting that `Foundation` is
+the first non-numeric variable we've used -- let's spend a little time talking
+about how models use non-numeric variables.
+
+---
+
+The short answer is that, behind the scenes, `lm` has turned our single column
+into a handful of temporary variables. We can see this in the 
+output when we run `summary(ames_two)` -- the `Foundation` variables don't exist
+in our data frame:
+
+
+```r
+summary(ames_two)
+```
+
+```
+## 
+## Call:
+## lm(formula = Sale_Price ~ Year_Built + Gr_Liv_Area + Foundation, 
+##     data = training)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -387154  -27464   -1776   18620  301244 
+## 
+## Coefficients:
+##                    Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)      -2.042e+06  9.298e+04 -21.965  &lt; 2e-16 ***
+## Year_Built        1.059e+03  4.841e+01  21.871  &lt; 2e-16 ***
+## Gr_Liv_Area       9.581e+01  2.015e+00  47.551  &lt; 2e-16 ***
+## FoundationCBlock -1.313e+04  3.729e+03  -3.523 0.000435 ***
+## FoundationPConc  -6.176e+02  4.700e+03  -0.131 0.895461    
+## FoundationSlab   -5.332e+04  8.155e+03  -6.538 7.62e-11 ***
+## FoundationStone  -4.446e+02  1.897e+04  -0.023 0.981305    
+## FoundationWood   -4.160e+04  2.338e+04  -1.779 0.075372 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 45870 on 2335 degrees of freedom
+## Multiple R-squared:  0.6831,	Adjusted R-squared:  0.6821 
+## F-statistic:   719 on 7 and 2335 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+class: middle
+
+Those variables are effectively **binary** variables (sometimes referred to as 
+**booleans**): columns with a values of
+either 0 or 1, where 0 corresponds to `FALSE` and 1 to `TRUE`.
+
+&lt;br /&gt;
+
+So in this example, a house with a stone foundation would have a 1 in the 
+`FoundationStone` column and 0s everywhere else.
+
+&lt;br /&gt;
+
+We need to do this because our models don't actually know how to process text 
+data; we need to convert it into some numeric representation before we can use
+that information to help us make predictions. This is worth emphasizing: every
+model we talk about in this course is only capable of dealing with numeric data,
+and we need to make all of our data numeric to use them. 
+
+&lt;br /&gt;
+
+Sometimes this conversion is done for us (like when we used `lm`), sometimes we 
+need to do it for ourselves.
+
+---
+
+When we need to convert categorical data (like foundation types) into binary
+variables, we call this transformation **one-hot encoding** a variable. We can
+do this pretty easily using `pivot_wider` from the `tidyr` package:
+
+
+```r
+library(tidyr)
+
+one_hot_training &lt;- training %&gt;% 
+  mutate(value = 1) %&gt;% # Create a dummy value column
+  pivot_wider(
+     # "Turn each value of Foundation into a variable"
+    names_from = Foundation,
+    # Optional -- column name prefix to match lm
+    names_prefix = "Foundation", 
+    # "Fill the new variables with our dummy value"
+    values_from = value, 
+    # Will fill in all the other Foundation fields with 0s
+    values_fill = 0 
+    ) %&gt;% 
+  # Optional -- only keep the columns we care about
+  select(Sale_Price, Year_Built, Gr_Liv_Area, starts_with("Foundation"))
+
+head(one_hot_training, n = 2)
+```
+
+```
+## # A tibble: 2 x 9
+##   Sale_Price Year_Built Gr_Liv_Area FoundationCBlock FoundationPConc
+##        &lt;int&gt;      &lt;int&gt;       &lt;int&gt;            &lt;dbl&gt;           &lt;dbl&gt;
+## 1     172000       1958        1329                1               0
+## 2     244000       1968        2110                1               0
+## # … with 4 more variables: FoundationWood &lt;dbl&gt;, FoundationBrkTil &lt;dbl&gt;,
+## #   FoundationSlab &lt;dbl&gt;, FoundationStone &lt;dbl&gt;
+```
+
+---
+
+Some models (including linear models) don't deal well with one-hot encoded data, 
+however, since your binary variables will be perfectly collinear with one 
+another. `lm` deals with this by setting one of the variables to `NA`:
+
+
+```r
+lm(Sale_Price ~., data = one_hot_training) %&gt;% 
+  summary()
+```
+
+```
+## 
+## Call:
+## lm(formula = Sale_Price ~ ., data = one_hot_training)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -387154  -27464   -1776   18620  301244 
+## 
+## Coefficients: (1 not defined because of singularities)
+##                    Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)      -2.043e+06  9.434e+04 -21.653  &lt; 2e-16 ***
+## Year_Built        1.059e+03  4.841e+01  21.871  &lt; 2e-16 ***
+## Gr_Liv_Area       9.581e+01  2.015e+00  47.551  &lt; 2e-16 ***
+## FoundationCBlock -1.269e+04  1.896e+04  -0.669  0.50330    
+## FoundationPConc  -1.730e+02  1.918e+04  -0.009  0.99280    
+## FoundationWood   -4.115e+04  2.988e+04  -1.377  0.16852    
+## FoundationBrkTil  4.446e+02  1.897e+04   0.023  0.98130    
+## FoundationSlab   -5.287e+04  2.029e+04  -2.606  0.00922 ** 
+## FoundationStone          NA         NA      NA       NA    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 45870 on 2335 degrees of freedom
+## Multiple R-squared:  0.6831,	Adjusted R-squared:  0.6821 
+## F-statistic:   719 on 7 and 2335 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+
+If we want more control over this process, we can exclude one of the variables
+ourselves. This is known as creating a **dummy variable**:
+
+
+```r
+one_hot_training %&gt;% 
+  select(-FoundationBrkTil) %&gt;% 
+  lm(Sale_Price ~., data = .) %&gt;% 
+  summary()
+```
+
+```
+## 
+## Call:
+## lm(formula = Sale_Price ~ ., data = .)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -387154  -27464   -1776   18620  301244 
+## 
+## Coefficients:
+##                    Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)      -2.042e+06  9.298e+04 -21.965  &lt; 2e-16 ***
+## Year_Built        1.059e+03  4.841e+01  21.871  &lt; 2e-16 ***
+## Gr_Liv_Area       9.581e+01  2.015e+00  47.551  &lt; 2e-16 ***
+## FoundationCBlock -1.313e+04  3.729e+03  -3.523 0.000435 ***
+## FoundationPConc  -6.176e+02  4.700e+03  -0.131 0.895461    
+## FoundationWood   -4.160e+04  2.338e+04  -1.779 0.075372 .  
+## FoundationSlab   -5.332e+04  8.155e+03  -6.538 7.62e-11 ***
+## FoundationStone  -4.446e+02  1.897e+04  -0.023 0.981305    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 45870 on 2335 degrees of freedom
+## Multiple R-squared:  0.6831,	Adjusted R-squared:  0.6821 
+## F-statistic:   719 on 7 and 2335 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+
+This is what `lm` actually does under the hood -- notice how our output now 
+matches the original `ames_two` model exactly.
+
+
+```r
+one_hot_training %&gt;% 
+  select(-FoundationBrkTil) %&gt;% 
+  lm(Sale_Price ~., data = .) %&gt;% 
+  summary()
+```
+
+```
+## 
+## Call:
+## lm(formula = Sale_Price ~ ., data = .)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -387154  -27464   -1776   18620  301244 
+## 
+## Coefficients:
+##                    Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)      -2.042e+06  9.298e+04 -21.965  &lt; 2e-16 ***
+## Year_Built        1.059e+03  4.841e+01  21.871  &lt; 2e-16 ***
+## Gr_Liv_Area       9.581e+01  2.015e+00  47.551  &lt; 2e-16 ***
+## FoundationCBlock -1.313e+04  3.729e+03  -3.523 0.000435 ***
+## FoundationPConc  -6.176e+02  4.700e+03  -0.131 0.895461    
+## FoundationWood   -4.160e+04  2.338e+04  -1.779 0.075372 .  
+## FoundationSlab   -5.332e+04  8.155e+03  -6.538 7.62e-11 ***
+## FoundationStone  -4.446e+02  1.897e+04  -0.023 0.981305    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 45870 on 2335 degrees of freedom
+## Multiple R-squared:  0.6831,	Adjusted R-squared:  0.6821 
+## F-statistic:   719 on 7 and 2335 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+class: middle
+
+Two pieces of trivia that might be helpful in remembering these encoding methods:
+
+&lt;br /&gt;
+
+* One-hot encoding is so called because one and only one of the new variables is
+  a 1, or "hot". The opposite method (which works equivalently) is to have one 
+  and only one variable equal to 0, which is known as "one-cold encoding".
+
+&lt;br /&gt;
+
+* Dummy variables are "dummies" because the model is relying on some information
+  that doesn't exist as a variable on its own, but is a combination of the other
+  variables -- for instance, by removing the BrkTil variable, we've effectively 
+  told our models that houses which are 0 for every other type of foundation are
+  actually their own BrkTil group.
+  
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
