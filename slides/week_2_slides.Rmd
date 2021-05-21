@@ -1,0 +1,762 @@
+---
+title: "MLCA Week 2:"
+subtitle: "Regression, Linear Regression, and Statistics"  
+author: 
+  - "Mike Mahoney"
+date: '`r Sys.Date()`'
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(ggplot2)
+library(dplyr)
+knitr::opts_chunk$set(fig.showtext = TRUE)
+```
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+style_mono_light(base_color = "#23395b")
+theme_set(theme_xaringan())
+```
+
+```{r xaringan-editable, echo=FALSE}
+xaringanExtra::use_editable(expires = 1)
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+```{r xaringanExtra-search, echo=FALSE}
+xaringanExtra::use_search(show_icon = TRUE)
+```
+
+```{r xaringan-tachyons, echo=FALSE}
+xaringanExtra::use_tachyons()
+```
+
+```{r xaringan-extra-styles, echo = FALSE}
+xaringanExtra::use_extra_styles(
+  hover_code_line = TRUE,         #<<
+  mute_unhighlighted_code = TRUE  #<<
+)
+```
+
+```{r xaringan-tile-view, echo=FALSE}
+xaringanExtra::use_tile_view()
+```
+
+class: center, middle
+
+# Regression
+
+---
+
+# This class focuses on a set of algorithms known as **supervised learning**.
+
+<br />
+
+These are models that have been trained on data with known outcomes -- so 
+there's some idea of the "true" values our model "should" be predicting.
+
+<br />
+
+This is in contrast to **unsupervised learning**, where we don't know the "true" 
+outcome we're trying to model.
+
+---
+
+# Supervised learning is what most people think of when they think of modeling.
+
+<br />
+
+You might imagine building models to predict...
+
+* the likelihood a species occurs at sites across the landscape;  
+<br />
+* which species will go extinct within the next five, ten, fifteen years;  
+<br />
+* how much biomass is stored in forests across a region;  
+<br />
+* patterns in annual temperatures into the future.
+
+<br />
+
+These are all examples of supervised learning problems.
+
+---
+
+# When we use models to predict numeric outcomes, we are using a **regression model**.
+
+<br />
+
+This is in contrast to a **classification model**, which we'll discuss more 
+next week.
+
+<br />
+
+Most of the algorithms we discuss can be used for both regression and 
+classification, with minor tweaks.
+
+---
+
+Let's walk through a simple regression example.
+
+For most of this class, we'll make use of the Ames Iowa Housing Data provided
+by the `AmesHousing` package to demonstrate regression problems. Install 
+`AmesHousing` if you haven't already:
+
+```{r eval=FALSE}
+install.packages("AmesHousing")
+```
+
+Then create a cleaned version of the data by using the 
+`AmesHousing::make_ames()` function:
+
+```{r}
+ames <- AmesHousing::make_ames()
+```
+
+If all goes well, your data frame should have dimensions like this:
+
+```{r}
+nrow(ames)
+ncol(ames)
+```
+
+---
+
+This data frame contains information on a number of homes that were sold in 
+Ames, Iowa from 2006 to 2010. Our regression models will mostly focus on 
+predicting the sale price of homes (the `Sale_Price` column) as a function of
+the other variables in the data set.
+
+Luckily for us, a good number of the variables in this data frame are associated
+with the sale price. For instance, we could plot the relationship between the
+year a house was built and its sale price:
+
+```{r, fig.height=4, fig.width=10, message=FALSE}
+library(ggplot2)
+
+ggplot(ames, aes(Year_Built, Sale_Price)) + 
+  geom_point()
+```
+
+---
+
+It looks like, generally speaking, house prices are higher for more recently
+constructed homes. 
+
+Suppose we're interested in the average relationship between these variables -- 
+how many dollars each additional year newer is worth. We might imagine drawing a
+line straight down the middle of all those points, which would look like this:
+
+```{r, fig.height=4, fig.width=10, message=FALSE}
+ggplot(ames, aes(Year_Built, Sale_Price)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", color = "red")
+```
+
+---
+
+This is a linear regression. To be specific, this is an **ordinary least squares**
+regression, which minimizes the squared error -- that is, the (squared) distance 
+from the line to all of the points, at the same time.
+
+```{r, fig.height=4, fig.width=10, message=FALSE}
+ggplot(ames, aes(Year_Built, Sale_Price)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", color = "red")
+```
+
+---
+
+Things get a little more complex if we include additional variables in the mix.
+
+For instance, let's say we wanted to include the ground floor living area 
+(`Gr_Liv_Area`) in our model. 
+
+We can plot the relationship between these variables in 3D. This plot is a bit
+uglier than before, but we can still see that more living area results in higher 
+sale prices:
+
+```{r, fig.height=4, fig.width=10, message=FALSE, echo = FALSE}
+library(lattice)
+lattice::cloud(
+  Sale_Price ~ Year_Built + Gr_Liv_Area, 
+  ames,
+  screen = list(z = 50, x = -60),
+  par.settings = list(axis.line = list(col = 0)),
+  zlab = list(rot = 90),
+  alpha = 0.2,
+  scales = list(arrows = TRUE, col = "black")
+)
+```
+
+---
+class: middle
+
+If we fit a linear model to both these variables, we're doing something known as
+**multiple linear regression**. 
+
+Instead of fitting a 1D line to all of our 
+points, we're instead going to fit a 2D plane -- again trying to minimize the 
+(squared) distance between our plane and all of the points:
+
+.pull-left[
+```{r, fig.height=4, fig.width=10, message=FALSE, echo = FALSE}
+expand.grid(
+  Year_Built = seq(min(ames$Year_Built), max(ames$Year_Built), length.out = 10),
+  Gr_Liv_Area = seq(min(ames$Gr_Liv_Area), max(ames$Gr_Liv_Area), length.out =  10)
+) %>% 
+  mutate(Sale_Price = predict(lm(Sale_Price ~ Year_Built + Gr_Liv_Area, ames), .)) %>% 
+  wireframe(
+    Sale_Price ~ Year_Built + Gr_Liv_Area, ., 
+    drape = TRUE, colorkey = FALSE,
+    col.regions = colorRampPalette(c("#08306b", "#f7fbff"))(100),
+    zlab = list(rot = 90),
+    par.settings = list(axis.line = list(col = 0)),
+    scales = list(arrows = TRUE, col = "black")
+    )
+```
+
+]
+
+.pull-right[
+
+```{r, fig.height=4, fig.width=10, message=FALSE, echo = FALSE}
+expand.grid(
+  Year_Built = seq(min(ames$Year_Built), max(ames$Year_Built), length.out = 100),
+  Gr_Liv_Area = seq(min(ames$Gr_Liv_Area), max(ames$Gr_Liv_Area), length.out = 100)
+) %>% 
+  mutate(Sale_Price = predict(lm(Sale_Price ~ Year_Built + Gr_Liv_Area, ames), .)) %>% 
+  ggplot(aes(Year_Built, Gr_Liv_Area, fill = Sale_Price)) + 
+  geom_raster()
+```
+
+]
+
+As we keep adding more variables, we can imagine that this pattern keeps 
+happening -- our linear model will try and find the shape that minimizes errors
+in every dimension at once.
+
+Rather than come up with different names for this shape in each dimension (like 
+line and plane), these planes are generally referred to as **hyperplanes** or, 
+more broadly, **surfaces**.
+
+---
+class: middle
+
+Linear models require a few things from your data set in order to function 
+properly. Among these assumptions, the most important are:
+
+* Linearity: For linear regression to produce accurate predictions, your outcome
+  (the variable being modeled, in our example sale price) must be linearly 
+  associated with each of your predictor variables.
+* Normality: The sample means of your outcome must be normally distributed for
+  linear regression to produce a good fit. 
+* Multicollinearity: Your predictor variables must be independent from each other; 
+  they should not be correlated with one another.
+  
+For the purposes of this course, it's enough to just broadly know what these 
+assumptions are; we're only using linear models as a baseline to compare newer
+machine learning methods against. 
+
+If you're interested in these assumptions and what to do if your data violates 
+them, I'd recommend APM 630 - Regression Methods.
+
+---
+class: middle
+
+To fit a linear model in R, we can use the `lm` function:
+
+```{r}
+ames_one <- lm(Sale_Price ~ Year_Built + Gr_Liv_Area, ames)
+ames_one
+```
+
+---
+
+If you've used linear models in R before, you're likely familiar with using 
+`summary` to view how a model performed:
+
+```{r}
+summary(ames_one)
+```
+
+This command gives us information on model $R^2$ values, useful for estimation,
+and p-values for the model and individual variables, useful for attribution. But
+as we discussed last week, we don't care about goodness-of-fit or
+significance for prediction models; we care about **accuracy**.
+
+---
+
+Measuring how accurate our model's predictions are requires us to first make
+predictions:
+
+```{r}
+# Making a new data frame, to not mess up our original:
+ames_copy <- ames
+# Make our predictions:
+ames_copy$predicted <- predict(ames_one, ames)
+```
+
+We can then visualize how well our model predicts by plotting our predictions against
+actual values:
+
+```{r, fig.height=4, fig.width=10}
+ggplot(ames_copy, aes(predicted, Sale_Price)) + 
+  geom_point(alpha = 0.4)
+```
+
+---
+
+By looking at the plot, we can get a sense of how our model performs -- we 
+under-predict across the board, and get worse as the homes get more expensive. 
+But if we want to be able to compare our accuracy to other models, we need to 
+quantify our overall error.
+
+<br />
+
+One way to quantify error is to use RMSE, as we talked about last week:
+
+$$\operatorname{RMSE} = \sqrt{(\frac{1}{n})\sum_{i=1}^{n}(\hat{y} - y_{i})^{2}}$$
+
+<br />
+
+In code, we can write this as:
+
+```{r}
+sqrt(mean((ames_copy$predicted - ames_copy$Sale_Price)^2))
+```
+
+<br />
+
+RMSE measures error in the same units as the variable being predicted -- in this
+case, it tells us that our model has a root mean squared error of $46,636.73.
+
+---
+
+RMSE is an example of what's known in machine learning as a **loss function** 
+(or sometimes a "cost function"). Loss functions measure the "cost" associated 
+with an event -- in this case, how much a model should be penalized for each 
+error. We (and our algorithms) are always trying to minimize some loss value.
+
+RMSE is the most popular loss function for regression problems, but it's not the
+only option. Another common option is mean absolute error:
+
+$$\operatorname{MAE} = (\frac{1}{n})\sum_{i=1}^{n}\left | \hat{y} - y_{i} \right |$$
+
+Or in code:
+
+```{r}
+mean(abs((ames_copy$predicted - ames_copy$Sale_Price)))
+```
+
+This loss function is more immediately interpretable than RMSE: our model 
+mispredicts sale prices by an average of $31,615.67.
+
+As a sidenote: MAE is occasionally used as an acronym for _median_ absolute 
+error. In this course, we'll always use MAE for _mean_ absolute error, which is 
+by far the more common meaning, but it's always a good idea to double-check if 
+someone uses the acronym without specifying.
+
+---
+class: middle
+
+So if MAE is more easily interpreted than RMSE, why is RMSE more popular for 
+prediction? 
+
+It has to do with how individual errors are weighted. Because RMSE takes the 
+mean of the _squared_ errors, it penalizes larger errors much more than MAE.
+
+For instance, here's a graph of the "cost" (on the y axis) of a prediction 
+error of various magnitudes (on the x):
+
+```{r, echo = FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=5}
+library(dplyr)
+library(tidyr)
+tibble(
+  x = seq(-4, 4, 0.01),
+  RMSE = x^2,
+  MAE = abs(x)
+) %>% 
+  pivot_longer(-x) %>% 
+  ggplot(aes(x, value)) + 
+  geom_line() + 
+  facet_wrap(~ name) + 
+  labs(x = "Prediction error", y = "Contributed loss")
+```
+
+---
+class: middle
+
+Improving a prediction by a certain amount will reduce MAE evenly, no matter 
+which prediction improved -- it's just as beneficial for an error of $10,000 to 
+become $0 as for an error of $100,000 to become $90,000. 
+
+<br />
+
+For RMSE, improvements to the most-wrong predictions are weighted more heavily, 
+so that bringing the $100,000 error down to $90,000 is viewed as more of
+an improvement than bringing the $10,000 down to $0.
+
+<br />
+
+At the end of the day, we can only optimize for one of these values -- the model
+with the lowest RMSE may not have the lowest MAE as well. 
+
+<br />
+
+RMSE tends to be the better loss function for how we actually build, compare, and select
+predictive models; we want to penalize our more extreme errors more heavily, so
+that hopefully each individual prediction is close enough to true to be useful.
+But in some situations, where a small error is truly just as undesirable as a 
+large one, it makes sense to use MAE instead.
+
+---
+
+So we'll keep using RMSE for our models today. We can use this loss function to
+easily compare models -- for instance, how well does our "year built and square 
+footage" model compare to models built only on one of those variables?
+
+```{r}
+library(dplyr)
+(model_performance <- ames %>% 
+  mutate(
+    predictions_full = predict(
+      lm(Sale_Price ~ Year_Built + Gr_Liv_Area, ames),
+      .),
+    predictions_year = predict(
+      lm(Sale_Price ~ Year_Built, ames), 
+      .),
+    predictions_area = predict(
+      lm(Sale_Price ~ Gr_Liv_Area, ames), 
+      .)
+    ) %>% 
+  summarise(
+    # This calculates RMSE "across" columns 
+    # whose names start with "predictions"
+    across(
+      starts_with("predictions"), 
+      ~ sqrt(mean((. - Sale_Price)^2)))
+    ))
+```
+
+---
+class: middle
+
+```{r}
+model_performance
+```
+
+<br />
+
+RMSE collapses all the differences in how our models make predictions down to a
+single, easily compared value: our full model (RMSE $46,636) performs much 
+better than either of its component models (RMSE $66,259 and $56,504).
+
+<br />
+
+This method for assessing model performance is a pretty standard workflow for a
+lot of estimation and attribution problems: get some data, fit a model on it, 
+report how well your model describes the data.
+
+---
+class: middle
+
+With prediction models, however, we aren't particularly interested in how well 
+our model predicts the data it's been fit on, since our model has already been 
+able to minimize its error on all of the data points we used to create it. 
+
+<br />
+
+Instead, we want to know how well our model will do at
+predicting data where we don't (or can't) know what the "right" answer will be.
+
+<br />
+
+But it's hard to calculate RMSE (or any loss function) when we don't know the 
+right answer! Instead, what we can do is remove some data from the set we "train"
+our model with, and use our model predictions on that "removed" data to compare 
+our models.
+
+<br />
+
+This is called the **hold-out** or **simple validation** method of assessing model 
+performance. We'll call the data we use to train the model our "training" set, 
+and the data we use to evaluate performance our "test" set -- though you might
+see "hold-out set" used in more formal settings
+
+---
+
+Commonly about 20% of the data will be reserved for a "test" set, with the model
+fit to the other 80%. With that said, the amounts used can vary wildly -- in 
+industry, with models trained on trillions of records, it's not uncommon to see 
+10% or even 1% test sets, while some academics go so far as to use 50/50 splits.
+
+<br />
+
+Generally speaking, your goal is to have enough of your data in training to have
+your model fully capture patterns in the data, while enough of your data is in 
+training to fully capture the variation in the data (since if all the values are 
+similar, you won't have any idea how the model performs on more extreme 
+observations). 
+
+<br />
+
+If you don't have any reasons for concern about these goals 
+(which we'll talk about next week), an 80/20 or 70/30 training/testing split is
+probably appropriate.
+
+<br />
+
+Mechanically, we can split our data into testing and training sets like this:
+
+```{r}
+# Always set a seed before doing anything with randomization!
+set.seed(123)
+row_idx <- sample(seq_len(nrow(ames)), nrow(ames))
+training <- ames[row_idx < nrow(ames) * 0.8, ]
+testing <- ames[row_idx >= nrow(ames) * 0.8, ]
+```
+
+---
+
+We can then use the same code as before to compare our model performance, using 
+models fit on the training set and evaluated on the test set:
+
+```{r}
+testing %>% 
+  mutate(
+    predictions_full = predict(
+      lm(Sale_Price ~ Year_Built + Gr_Liv_Area, training), 
+      .),
+    predictions_year = predict(
+      lm(Sale_Price ~ Year_Built, training), 
+      .),
+    predictions_area = predict(
+      lm(Sale_Price ~ Gr_Liv_Area, training), 
+      .)
+    ) %>% 
+  summarise(
+    across(starts_with("predictions"), ~ sqrt(mean((. - Sale_Price)^2)))
+    )
+```
+
+Our full model performs a bit worse on the hold-out set than it did when we were
+evaluating using training data, which is to be expected -- it wasn't 
+specifically fit to these values, so it makes sense it performs worse. Our 
+component models, however, actually perform slightly _better_ on the new data!
+
+---
+class: middle
+
+This method of model assessment makes two core assumptions it's good to mention
+up-front: 
+
+1. Your training data should resemble your test data (any data processing done 
+   to one set should be done to both), and
+2. Your test data should resemble the real-world data you care about predicting
+   accurately.
+   
+The first assumption is nice and mechanical -- if you scale your variables so 
+they're all between 0 and 1 in the training data, you need to do the same thing
+in the test data. The second is much harder and requires you to think about how
+your model will be used, then ensuring your data is representative. 
+
+In other fields, breaking this assumption has resulted in facial recognition 
+algorithms not recognizing women
+[(link)](http://proceedings.mlr.press/v81/buolamwini18a/buolamwini18a.pdf)
+and self-driving cars not identifying dark-skinned pedestrians
+[(link)](https://www.vox.com/future-perfect/2019/3/5/18251924/self-driving-car-racial-bias-study-autonomous-vehicle-dark-skin), 
+due to the over-representation of white men in the most commonly used
+image data sets. 
+
+Depending on your area of study, it might be difficult to have
+such glaring blindspots -- but evaluating models based on data which doesn't 
+properly represent the spatial extent of the area you'll be predicting, or the 
+diversity of land cover types, or any other relevant variable may still leave
+you with far too positive a picture of your model's performance.
+
+---
+class: middle
+
+There's one other assumption in using holdout sets to assess your model: the 
+test data should be completely unknown to both the model and the modeler. 
+
+We want our model to be predicting data that wasn't used to build it -- that 
+means don't train models on test data, but it also means that you can't evaluate 
+your models against test data, use that information to make changes to the models 
+you're evaluating, and then evaluate the new models against the same test data.
+Given enough time, that's just an inefficient way of fitting your model to the
+combined data set, using your manual changes as a substitute for algorithmic 
+fitting.
+
+One way around this is to make a third set of data, called a **validation set**,
+to evaluate models against while you're still in the process of making tweaks.
+Frequently this set is the same size as the test set, so that (for instance) 
+the model is trained on 60% of the data, 20% of the data is used to compare 
+models and make changes, and the last 20% of the data is used to calculate 
+final accuracy metrics. 
+
+This week's assignment will walk through this process in a bit more detail. For
+now, we're just going to keep using our test and train sets.
+
+---
+class: middle
+
+So our full model is still the best of the bunch. Let's go ahead and keep 
+expanding on it. Can we get any improvement by including what type of foundation 
+each home uses?
+
+```{r}
+ames_two <- lm(Sale_Price ~ Year_Built + Gr_Liv_Area + Foundation, training)
+
+testing %>% 
+  mutate(predictions_full = predict(ames_two, .)) %>% 
+  summarise(predictions_full = sqrt(mean((predictions_full - Sale_Price)^2)))
+```
+
+Looks like the answer is yes, slightly. It's worth noting that `Foundation` is
+the first non-numeric variable we've used -- let's spend a little time talking
+about how models use non-numeric variables.
+
+---
+
+The short answer is that, behind the scenes, `lm` has turned our single column
+into a handful of temporary variables. We can see this in the 
+output when we run `summary(ames_two)` -- the `Foundation` variables don't exist
+in our data frame:
+
+```{r}
+summary(ames_two)
+```
+
+---
+class: middle
+
+Those variables are effectively **binary** variables (sometimes referred to as 
+**booleans**): columns with a values of
+either 0 or 1, where 0 corresponds to `FALSE` and 1 to `TRUE`.
+
+<br />
+
+So in this example, a house with a stone foundation would have a 1 in the 
+`FoundationStone` column and 0s everywhere else.
+
+<br />
+
+We need to do this because our models don't actually know how to process text 
+data; we need to convert it into some numeric representation before we can use
+that information to help us make predictions. This is worth emphasizing: every
+model we talk about in this course is only capable of dealing with numeric data,
+and we need to make all of our data numeric to use them. 
+
+<br />
+
+Sometimes this conversion is done for us (like when we used `lm`), sometimes we 
+need to do it for ourselves.
+
+---
+
+When we need to convert categorical data (like foundation types) into binary
+variables, we call this transformation **one-hot encoding** a variable. We can
+do this pretty easily using `pivot_wider` from the `tidyr` package:
+
+```{r}
+library(tidyr)
+
+one_hot_training <- training %>% 
+  mutate(value = 1) %>% # Create a dummy value column
+  pivot_wider(
+     # "Turn each value of Foundation into a variable"
+    names_from = Foundation,
+    # Optional -- column name prefix to match lm
+    names_prefix = "Foundation", 
+    # "Fill the new variables with our dummy value"
+    values_from = value, 
+    # Will fill in all the other Foundation fields with 0s
+    values_fill = 0 
+    ) %>% 
+  # Optional -- only keep the columns we care about
+  select(starts_with("Foundation"), Sale_Price, Year_Built, Gr_Liv_Area)
+head(one_hot_training, n = 2)
+```
+
+---
+
+Some models (including linear models) don't deal well with one-hot encoded data, 
+however, since your binary variables will be perfectly collinear with one 
+another. `lm` deals with this by setting one of the variables to `NA`:
+
+```{r}
+lm(Sale_Price ~., data = one_hot_training) %>% 
+  summary()
+```
+
+---
+
+If we want more control over this process, we can exclude one of the variables
+ourselves. This is known as creating a **dummy variable**:
+
+```{r}
+one_hot_training %>% 
+  select(-FoundationBrkTil) %>% 
+  lm(Sale_Price ~., data = .) %>% 
+  summary()
+```
+
+---
+
+This is what `lm` actually does under the hood -- notice how our output now 
+matches the original `ames_two` model exactly.
+
+```{r}
+one_hot_training %>% 
+  select(-FoundationBrkTil) %>% 
+  lm(Sale_Price ~., data = .) %>% 
+  summary()
+```
+
+---
+class: middle
+
+Two pieces of trivia that might be helpful in remembering these encoding methods:
+
+<br />
+
+* One-hot encoding is so called because one and only one of the new variables is
+  a 1, or "hot". The opposite method (which works just as well) is to have one 
+  and only one variable equal to 0, which is known as "one-cold encoding".
+
+<br />
+
+* Dummy variables are "dummies" because the model is relying on some information
+  that doesn't exist as a variable on its own, but is a combination of the other
+  variables -- for instance, by removing the BrkTil variable, we've effectively 
+  told our models that houses which are 0 for every other type of foundation are
+  actually their own BrkTil group.
+  
+---
+class: middle
+
+These methods -- hold-out set validation and categorical variable encoding -- 
+will show up frequently throughout this course, even as we move towards pure 
+prediction algorithms and leave linear regression behind.
+
+---
+class: middle center title-slide
+
+## Assignment 2
+
+(Due week 3)
+
+  

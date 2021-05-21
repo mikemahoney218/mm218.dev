@@ -40,11 +40,11 @@ while "HOML" refers to
 
 CASI 1.0-1.1, 8.4 (just the first two pages), and Epilogue.
 
-Leo Breiman. (2001) Statistical Modeling: The Two Cultures Statist. Sci. 16(3) 199 - 231,  https://doi.org/10.1214/ss/1009213726 
+Breiman, Leo. 2001. Statistical Modeling: The Two Cultures Statist. Sci. 16(3) 199 - 231,  https://doi.org/10.1214/ss/1009213726 
 
-Bradley Efron. (2020) Prediction, Estimation, and Attribution, Journal of the American Statistical Association, 115(530), 636-655, https://doi.org/10.1080/01621459.2020.1762613 
+Efron, Bradley. 2020. Prediction, Estimation, and Attribution, Journal of the American Statistical Association, 115(530), 636-655, https://doi.org/10.1080/01621459.2020.1762613 
 
-Galit Shmueli. (2010) To Explain or to Predict?. Statistical Science 25(3) 289-310, https://doi.org/10.1214/10-STS330 
+Shmueli, Galit. 2010. To Explain or to Predict?. Statistical Science 25(3) 289-310, https://doi.org/10.1214/10-STS330 
  
 ## Week 2
 
@@ -63,3 +63,10 @@ CASI 12.2 (first page only)
 ### Cross Validation
 
 CASI 12
+
+## Week 13
+
+Mitchell, Margaret, Simone Wu, Andrew Zaldivar, Parker Barnes, Lucy Vasserman, 
+Ben Hutchinson, Elena Spitzer, Inioluwa Deborah Raji, and Timnit Gebru. 2019. 
+Model cards for model reporting." In Proceedings of the conference on fairness, 
+accountability, and transparency, pp. 220-229. 2019. https://arxiv.org/abs/1810.03993

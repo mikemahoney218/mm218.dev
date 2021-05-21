@@ -12,5 +12,13 @@ navbar:
 #    - text: "Slides"
 #      menu:
 #        - text: "Week 1"
-#          href: week_1_slides.html
+#          href: slides/week_1_slides.html
+#        - text: "Week 2"
+#          href: slides/week_2_slides.html
+#        - text: "Week 3"
+#          href: slides/week_3_slides.html
+#    - text: "Assignments"
+#      menu:
+#        - text: "Week 1"
+#          href: assignments/week_1_assignment.html
 output: distill::distill_article
