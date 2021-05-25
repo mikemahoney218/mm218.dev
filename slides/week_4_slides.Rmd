@@ -1,19 +1,194 @@
 ---
-title: "week_4_slides"
-output: html_document
+title: "MLCA Week 4:"
+subtitle: "Imbalanced Classification"  
+author: 
+  - "Mike Mahoney"
+date: '`r Sys.Date()`'
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
 ---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(ggplot2)
+library(dplyr)
+knitr::opts_chunk$set(fig.showtext = TRUE)
+```
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+style_mono_light(base_color = "#23395b")
+theme_set(theme_xaringan())
+```
+
+```{r xaringan-editable, echo=FALSE}
+xaringanExtra::use_editable(expires = 1)
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+```{r xaringanExtra-search, echo=FALSE}
+xaringanExtra::use_search(show_icon = TRUE)
+```
+
+```{r xaringan-tachyons, echo=FALSE}
+xaringanExtra::use_tachyons()
+```
+
+```{r xaringan-extra-styles, echo = FALSE}
+xaringanExtra::use_extra_styles(
+  hover_code_line = TRUE,         #<<
+  mute_unhighlighted_code = TRUE  #<<
+)
+```
+
+```{r xaringan-tile-view, echo=FALSE}
+xaringanExtra::use_tile_view()
+```
+
+class: center, middle
+
+# Classification, Continued
 
 ---
 class: middle
 
-So sensitivity and specificity, alongside ROC curves and AUC, give us a way to 
-get beyond overall accuracy, so that we aren't fooled by our ~90% accurate model
-that predicts 0 positives.
+Last week we started talking about classification using logistic regression, 
+using a very simple model to predict employee attrition as a function of age.
+
+That simple model had ~89% overall accuracy -- not because it was highly 
+predictive, but simply because ~89% of employees didn't quit, so our model could
+score high by assuming no one ever left.
+
+We're going to talk this week about ways to deal with that problem.
+
+---
+class: middle
+
+Let's start by loading packages and recreating our dataframes:
+
+```{r, message=FALSE}
+library(modeldata)
+library(caret)
+library(pROC)
+```
 
 <br />
 
-That said, we could only get that accuracy because there were so few positives --
-employees who quit -- in our data set in the first place! 
+First, we'll load the `attrition` data and clean it, using the same code as last
+week:
+
+```{r}
+data(attrition)
+attrition_cleaned <- attrition |> 
+  mutate(across(where(is.factor), as.character)) |>
+  mutate(Attrition = recode(Attrition, "Yes" = 1, "No" = 0))
+```
+
+<br />
+
+And then recreate our training and testing splits using the same code as before:
+
+```{r}
+set.seed(123)
+row_idx <- sample(seq_len(nrow(attrition_cleaned)), nrow(attrition_cleaned))
+training <- attrition_cleaned[row_idx < nrow(attrition_cleaned) * 0.8, ]
+testing <- attrition_cleaned[row_idx >= nrow(attrition_cleaned) * 0.8, ]
+```
+
+---
+class: middle
+
+Last week we focused on an extremely simple model, with only Age as a 
+predictor. 
+
+<br />
+
+This week, let's go ahead and use all the predictors in the data 
+frame instead:
+
+```{r}
+attrition_model <- glm(Attrition ~ ., 
+                       attrition_cleaned, 
+                       family = "binomial")
+```
+
+<br />
+
+And let's use a probability threshold of 0.5 to classify our predictions:
+
+```{r}
+testing$prediction <- predict(attrition_model, 
+                              testing, 
+                              type = "response")
+
+testing$prediction <- round(testing$prediction)
+```
+
+---
+
+We can use these predictions to calculate a new confusion matrix:
+
+```{r}
+attrition_confusion <- confusionMatrix(
+  factor(testing$prediction),
+  factor(testing$Attrition),
+  positive = "1"
+)
+attrition_confusion
+```
+
+---
+
+As well as to take a look at our ROC curve and AUC:
+
+```{r message=FALSE}
+attrition_roc <- roc(
+  testing$Attrition,
+  predict(attrition_model, testing, type = "response")
+)
+```
+
+.center[
+```{r fig.width=4, fig.height=4}
+plot(attrition_roc)
+```
+]
+
+```{r}
+auc(attrition_roc)
+```
+
+---
+class: middle
+
+Even though our overall accuracy has barely changed -- 91% versus 89% -- we can
+tell from our sensitivity and AUC values that this model is much, much better at
+predicting which employees will quit. Meanwhile, our high specificity suggests 
+we haven't gotten _that_ much worse at predicting which employees will stay.
+
+<br />
+
+But we're still doing _much_ better at predicting employees who will stay than
+those who leave -- our sensitivity is about 45%, while our specificity is at 96%.
+
+<br />
+
+Why does our new model, with so many more predictors to draw from, still mostly
+ignore "positive" cases?
+
+---
+class: middle
+
+The answer is that there just aren't enough "positive" cases in our training 
+data:
 
 ```{r}
 table(training$Attrition)
@@ -22,9 +197,8 @@ table(training$Attrition)
 <br />
 
 Our data set has almost 5 times more "No" values for attrition than "Yes", so 
-models which are super accurate on
-"No" and not very accurate on "Yes" can be just as "accurate" overall as a model
-trying its best on both classes.
+models which are super accurate on "No" and not very accurate on "Yes" can be 
+just as "accurate" overall as a model trying its best on both classes.
 
 <br />
 
@@ -32,43 +206,56 @@ We call this an example of **imbalanced classes**, and this problem an example
 of **imbalanced classification**. 
 
 ---
+class: middle
 
 We have a handful of ways of dealing with imbalanced classes. One that we've 
 already talked about is to change our probability threshold using our ROC curve.
 
+<br />
+
 Another is to _weight_ our observations when we're fitting our model. We want
 our model to care about "Yes" just as much as "No", even though there are almost
-5 times as many "No" values to predict. Weights let us tell our model that every
-"Yes" is "worth" 5 times as much as each "No", so that in total both classes are
-"worth" the same amount to the model.
+5 times as many "No" values to predict. 
+
+<br />
+
+In this situation, we can provide weights to our model to signal that every 
+"Yes" should be "worth" 5 times as much as each "No", so that in total both 
+classes are "worth" the same amount to the model.
+
+---
+class: middle
 
 To put this into practice, we'd first want to create a "weight" column in our 
 training data set. We'll set the weights of "No" values to 1 and "Yes" to 5, to
 try and balance our classes:
 
 ```{r}
-training <- training |> 
-  mutate(weight = ifelse(Attrition, 5, 1))
+training_weights <- ifelse(training$Attrition, 5, 1)
 
-training  |>
+training |> 
+  mutate(weight = training_weights) |> 
   select(Age, Attrition, weight) |> 
-  head(2)
+  head()
 ```
 
 ---
+class: middle
 
 We then need to provide this new "weight" column to the "weights" argument of
 `glm`:
 
 ```{r}
 weighted_model <- glm(
-  Attrition ~ Age, 
+  Attrition ~ ., 
   training,
-  weights = weight, 
+  weights = training_weights, 
   family = "binomial")
 ```
 
-Then we make our predictions as we did originally -- calculate the probability 
+<br />
+
+Then we make our predictions as we did originally: calculate the probability 
 of each employee quitting, then use a probability threshold of 0.5 to classify
 employees into "Yes" and "No" groups:
 
@@ -89,8 +276,129 @@ confusionMatrix(factor(testing$prediction),
 
 ---
 
-One other way we might deal with imbalanced classes is to **resample** our data,
-so that we have approximately equal numbers of each class in our training data.
+And take a look at our ROC curve and AUC:
+
+```{r message=FALSE}
+weighted_roc <- roc(
+  testing$Attrition,
+  predict(weighted_model, testing, type = "response")
+)
+```
+
+.center[
+```{r fig.width=4, fig.height=4}
+plot(weighted_roc)
+```
+]
+
+```{r}
+auc(weighted_roc)
+```
+
+---
+class: middle
+
+So, to summarize, our weighted model has dramatically higher sensitivity than 
+our original, at the cost of lower specificity and AUC. 
+
+<br /> 
+
+As we discussed last week, whether or not this is a _good_ thing strongly 
+depends upon your goals for the model and what trade-offs you're willing to make.
+
+
+<br /> 
+
+If you're happy to accept a more sensitive model at the cost of specificity -- 
+to detect more positives overall even if it means you have more false 
+positives -- then this is definitely an improvement. 
+
+<br />
+
+It might even make sense to weight the positives slightly more -- to 
+intentionally imbalance your classes!
+
+---
+
+A second way we might deal with imbalanced classes is to **resample** our data.
+
+To talk about resampling, it might make sense for us to talk first about 
+sampling itself. Let's say we're interested in the heights of men across the USA.
+
+The heights for every man in the country might look something like this:
+
+```{r fig.width=10, fig.height=4, message=FALSE, warning=FALSE}
+heights <- rnorm(1e5, mean = 68, sd = 4)
+
+qplot(heights)
+```
+
+---
+
+But of course, it's rather expensive to measure every person in the country.
+
+Instead of doing that, most of the time we work with **samples** from our larger
+population. Ideally, our samples are chosen entirely at random, and each person
+is measured at most one time.
+
+If we only measure a few people, then our sample won't look anything like the 
+population:
+
+```{r fig.width=10, fig.height=4, message=FALSE, warning=FALSE}
+sampled_heights <- sample(heights, 10)
+
+qplot(sampled_heights)
+```
+---
+
+But as we take more and more measurements, over time our measurements will start
+looking a lot more like the entire population:
+
+```{r fig.width=10, fig.height=4, message=FALSE, warning=FALSE}
+sampled_heights <- sample(heights, 1e4)
+
+qplot(sampled_heights)
+```
+
+---
+
+What if we took a sample that's larger than the population?
+
+Well, we'd need to break our rule that each person can only be measured once. 
+We'd need to start taking measurements _with replacement_. We're still sampling
+at random, so any given person might be sampled once, more than once, or not at
+all.
+
+If we do that, our super-sized sample looks pretty much exactly like the
+population:
+
+```{r fig.width=10, fig.height=4, message=FALSE, warning=FALSE}
+sampled_heights <- sample(heights, 1e6, replace = TRUE)
+
+qplot(sampled_heights)
+```
+
+---
+class: middle
+
+This is the basic idea behind resampling methods. By taking samples with 
+replacement from our sample, we can increase our effective sample size while 
+still resembling the larger population, all without needing to go and collect
+new data.
+
+<br />
+
+Of course, this method depends on our original sample being sufficiently 
+representative of the population; if that wasn't true, however, you also wouldn't
+be able to fit good models _without_ resampling.
+
+<br />
+
+But we can use this approach to increase the number of "Yes" observations we have
+in our data set, in order to balance our classes and make better predictions.
+
+---
+class: middle 
 
 To do that, we'd first split our training data into positive and negative pieces:
 
@@ -102,48 +410,62 @@ negative_training <- training[training$Attrition == 0, ]
 Then we'd want to randomly select rows from our positive sample until we had the
 same number of positive observations as negatives.
 
-So long as we sample with replacement (so a row can be "selected" multiple times
-in a row), this won't harm our model; we'll talk more about this procedure 
-(called "**bootstrapping**") in two weeks.
-
-We can bootstrap our positive sample to have five times the samples like this:
+We can resample our positive sample to have five times the number of 
+observations like this:
 
 ```{r}
 n_pos <- nrow(positive_training)
 
-bootstrapped_positives <- sample(1:n_pos, 
+resampled_positives <- sample(1:n_pos, 
                                  size = 5 * n_pos, 
                                  replace = TRUE)
-bootstrapped_positives <- positive_training[bootstrapped_positives, ]
+
+resampled_positives <- positive_training[resampled_positives, ]
 ```
 
 ---
 
-Then we can combine our bootstrapped positive sample with the original negative 
-sample to get a new, evenly balanced data set:
+Then we can combine our resampled positive dataframe with the original negative 
+dataframe to get a new, evenly balanced data set:
 
 ```{r}
-bootstrapped_training <- rbind(
+resampled_training <- rbind(
   negative_training,
-  bootstrapped_positives
+  resampled_positives
 )
 ```
 
-Just like before, we'll go ahead and fit a new model on the bootstrapped data:
+We can confirm that our classes are now balanced:
 
 ```{r}
-bootstrap_model <- glm(
-  Attrition ~ Age, 
-  bootstrapped_training,
+table(resampled_training$Attrition)
+```
+
+<br />
+
+If anything, we've actually slightly too many "yes" cases to this data set!
+
+Now let's go ahead and fit a new model on the resampled data:
+
+```{r}
+resampled_model <- glm(
+  Attrition ~ ., 
+  resampled_training,
   family = "binomial")
 ```
 
-Then we make our predictions as we did originally -- calculate the probability 
+---
+class: middle
+
+Then we make our predictions as we did originally: calculate the probability 
 of each employee quitting, then use a probability threshold of 0.5 to classify
 employees into "Yes" and "No" groups:
 
 ```{r}
-testing$prediction <- predict(bootstrap_model, testing, type = "response")
+testing$prediction <- predict(resampled_model, 
+                              testing, 
+                              type = "response")
+
 testing$prediction <- round(testing$prediction)
 ```
 
@@ -159,7 +481,44 @@ confusionMatrix(factor(testing$prediction),
 
 ---
 
-Each of these approaches results in different probabilities being predicted:
+And take a look at our ROC curve and AUC:
+
+```{r message=FALSE}
+resampled_roc <- roc(
+  testing$Attrition,
+  predict(resampled_model, testing, type = "response")
+)
+```
+
+.center[
+```{r fig.width=4, fig.height=4}
+plot(resampled_roc)
+```
+]
+
+```{r}
+auc(resampled_roc)
+```
+
+---
+class: middle
+
+Overall, this model is pretty similar in accuracy and AUC to the weighted 
+version. 
+
+That's not just coincidence; both of these methods were aiming at effectively 
+increasing the importance of "Yes" values to the model by 500%, so it makes sense
+for two methods with the same goals to have similar outcomes.
+
+When you're able to specify weights, that's often a better way to adjust for 
+imbalanced classes than resampling; your intent is a lot more obvious and you
+avoid the pitfalls associated with pseudoreplicating your data. But often, model
+implementations won't provide obvious ways to weight your classes, requiring you
+to take matters into your own hands.
+
+---
+
+Note also the difference in the probabilities predicted by these methods:
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=2.5}
 qplot(predict(attrition_model, testing, type = "response"))
@@ -170,21 +529,19 @@ qplot(predict(weighted_model, testing, type = "response"))
 ```
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=2.5}
-qplot(predict(bootstrap_model, testing, type = "response"))
+qplot(predict(resampled_model, testing, type = "response"))
 ```
 
 ---
+class: middle
 
-None of these adjustments -- using a different probability threshold, weighting
-our model, or bootstrapping our sample -- can make this a _good_ model. Age just
-isn't that predictive of attrition; we'd need to add other variables to get 
-better results.
-
-But all of these approaches can be used even with more complex models to try and
+These approaches can be used even with more complex models to try and
 deal with imbalanced classes. While new methods are being proposed every day --
 imbalanced classification problems are one of the most fundamental unsolved 
 problems in prediction -- these three should be generally applicable to any 
 real-world classification problem you have to work with.
+
+<br />
 
 One final note: I want to highlight that both weighting and bootstrapping used
 the class abundances from the _training set_. You should not be setting weights
@@ -192,6 +549,8 @@ based on the prevalence of classes in the test set; as mentioned last week, the
 test data should be completely unknown to both the model and the modeler. That
 means you shouldn't even _know_ what the class abundances are in the test set,
 if you can avoid it. 
+
+<br />
 
 That's it for this week. Next week we leave the world of traditional statistics
 and start in with our first pure prediction algorithm: the decision tree.
