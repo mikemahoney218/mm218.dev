@@ -13,13 +13,14 @@ tribble(
   "1", "Prediction, Estimation, and Attribution", "None", "Assignment 1",
   "2", "Regression", "None", "Assignment 2",
   "3", "Classification", "pROC", "Assignment 3",
-  "4", "Decision Trees", "rpart", "None",
-  "5", "Random Forests", "ranger", "Assignment 4",
-  "6", "Hyperparameters and Model Tuning", "ranger, purrr", "Assignment 5",
-  "7", "Gradient Boosting Machines", "gbm", "Assignment 6",
-  "8", "Stochastic GBMs", "lightGBM", "Assignment 7",
-  "9", "Loss Functions and Regularization", "lightGBM", "Assignment 8",
-  "10-13", "Additional Topics (as time allows)", "TBA", "Assignment 9-10"
+  "4", "Classification, continued", "", "Assignment 4",
+  "5", "Decision Trees", "rpart", "None",
+  "6", "Random Forests", "ranger", "Assignment 5",
+  "7", "Hyperparameters and Model Tuning", "ranger, purrr", "Assignment 6",
+  "8", "Gradient Boosting Machines", "gbm", "Assignment 7",
+  "9", "Stochastic GBMs", "lightGBM", "Assignment 8",
+  "10", "Loss Functions and Regularization", "lightGBM", "Assignment 9",
+  "11-13", "Additional Topics (as time allows)", "TBA", "Assignment 10"
 
 ) %>% 
   kableExtra::kable() %>% 

@@ -20,5 +20,5 @@ navbar:
 #    - text: "Assignments"
 #      menu:
 #        - text: "Week 1"
-#          href: assignments/week_1_assignment.html
+#          href: assignments/week_1_assignment.Rmd
 output: distill::distill_article

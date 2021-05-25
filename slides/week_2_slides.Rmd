@@ -513,8 +513,8 @@ observations).
 <br />
 
 If you don't have any reasons for concern about these goals 
-(which we'll talk about next week), an 80/20 or 70/30 training/testing split is
-probably appropriate.
+(which we'll talk about during week 4), an 80/20 or 70/30 training/testing split 
+is probably appropriate.
 
 <br />
 
