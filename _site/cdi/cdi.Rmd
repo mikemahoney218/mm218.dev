@@ -332,7 +332,7 @@ Use the dataframe below to pull new starting coordinates and recreate the map in
 
 ```{r}
 # dataframe of cool places in the US
-places <- structure(list(ï..name = c("half dome", "moki dugway", "badwater basin", 
+places <- structure(list(name = c("half dome", "moki dugway", "badwater basin", 
 "mount whitney", "monument valley navajo tribal park", "devil's lake", 
 "cadillac mountain", "mcafee knob", "sleeping bear dunes ", "grand canyon", 
 "miguel's pizza at red river gorge", "between cumberland and blue ridge mountains", 
@@ -351,8 +351,11 @@ places <- structure(list(ï..name = c("half dome", "moki dugway", "badwater basi
     -106.987778)), class = "data.frame", row.names = c(NA, -22L
 ))
 
-# randomly pick one row from the dataframe
+# randomly pick one row from the dataframe above
 site <- places[sample(nrow(places), 1), ]
+
+# Or set your own by changing the values below and uncommenting
+# site <- data.frame(ï..name = "skywalk @ grand canyon", lat = 36.011827, lng = -113.810931) 
 
 # convert to sf object and assign coordinate reference system 
 site_sf <- st_as_sf(site, coords = c("lng","lat"), crs = 4326)
@@ -360,7 +363,44 @@ site_sf <- st_as_sf(site, coords = c("lng","lat"), crs = 4326)
 # buffer around point
 site_bbox <- set_bbox_side_length(site_sf, 10, "km")
 
-# keep going!
+# keep going! Using code from previous steps, make the rest of the map.
+
+# Create site name for use as filenames:
+site_fn <- gsub(" ", "_", gsub("[[:punct:]]", "", site$name))
+
+# Download the appropriate data for your site from The National Map
+with_progress(
+  site_tiles <- get_tiles(site_bbox, 
+                          output_prefix = sprintf("%s_5m", site_fn),
+                          services = c("elevation", "contours"),
+                          resolution = 5)
+)
+
+# COnvert to a raster stack
+elevation <- raster(site_tiles$elevation)
+contours <- stack(site_tiles$contours)
+contour_stack <- stack(elevation, contours)
+contour_df <- as.data.frame(contour_stack, xy = TRUE)
+names(contour_df) <- c("x", "y", "z", "r", "g", "b", "a") # longitude, latitude, elevation, red, green, blue, alpha
+
+# Remove zero elevations
+contour_lines <- contour_df[contour_df$a != 0, ]
+
+## plot it!
+ggplot(data = contour_lines)+
+  geom_raster(mapping = aes(x, y, fill = z))+
+  theme_void()+
+  theme(plot.background = element_rect(fill="black"),
+        plot.title = element_text(color="white"),
+        legend.position = "none")+
+  coord_sf(crs = 4326)+
+  # Change the color palette used by editing the `palette` argument below!!
+  scale_fill_scico(palette="imola", direction = 1)+
+  ggtitle(paste(site$name, site$lat, site$lng))
+
+# If you want to save a higher resolution version (it makes the lines a little sharper)
+# Run this after printing your plot:
+# ggsave(sprintf("whimsical_topomap_terrainr_%s.png", site_fn), width=5, height=8)
 ```
 
 

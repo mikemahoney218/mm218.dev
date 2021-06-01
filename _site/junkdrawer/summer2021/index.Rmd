@@ -7,9 +7,6 @@ output: distill::distill_article
 
 ### LiDAR-Year AGB
 
-+ Boosted ensemble
-+ Potentially, methods note on ensembling methods (in which case I'd want to include a bagged ensemble as well)
-+ Add in the missing 30ish plots
 + Otherwise, unless we have more observations or are willing to compute more predictors, I think this is pretty well set
 
 ### Historic AGB
@@ -47,3 +44,9 @@ output: distill::distill_article
 ## Personal
 
 + No plans yet but going to try to disappear into the woods for a week if I can swing it
+
+## Completed
+
+### LiDAR-Year AGB
+
++ Add in the missing 30ish plots
