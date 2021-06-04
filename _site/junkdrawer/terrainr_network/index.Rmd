@@ -1,0 +1,31 @@
+---
+title: "terrainr function network visualization"
+output: html_document
+---
+
+```{r, out.width='100%'}
+library(visNetwork)
+library(magrittr)
+
+package <- "terrainr"
+map <- pkgapi::map_package(paste0("~/codebase/", package))
+internal_calls <- map$calls[map$calls$to %in% glue::glue("{map$name}::{map$defs$name}"),]
+
+internal_calls <- internal_calls %>%
+  dplyr::mutate(to = gsub(paste0(package, "\\:\\:"), "", to))
+
+nodes <- tibble::tibble(id = map$defs$name,
+                        title = map$defs$file,
+                        label = map$defs$name,
+                        shape = dplyr::if_else(map$defs$exported,
+                                               "triangle",
+                                               "square"))
+
+edges <- internal_calls[, c("from", "to")]
+
+
+visNetwork(nodes, edges, height = "500px") %>%
+  visLayout(randomSeed = 42) %>%
+  visNodes(size = 10)
+```
+
