@@ -6,7 +6,15 @@
     <atom:link href="https://www.mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
     <description>Technology and the Environment</description>
     <generator>Distill</generator>
-    <lastBuildDate>Thu, 22 Apr 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Sat, 12 Jun 2021 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>Virtual Environments talk at useR! 2021</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2021-06-12-virtual-environments-talk-at-user-2021</link>
+      <description>With slides and a rough outline available on GitHub.</description>
+      <guid>https://www.mm218.dev/posts/2021-06-12-virtual-environments-talk-at-user-2021</guid>
+      <pubDate>Sat, 12 Jun 2021 00:00:00 +0000</pubDate>
+    </item>
     <item>
       <title>What's new in terrainr 0.4.0?</title>
       <dc:creator>Mike Mahoney</dc:creator>
