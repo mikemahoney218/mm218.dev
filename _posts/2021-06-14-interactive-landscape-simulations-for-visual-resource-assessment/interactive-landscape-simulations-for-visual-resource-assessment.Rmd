@@ -1,0 +1,33 @@
+---
+title: "Interactive landscape simulations for visual resource assessment"
+description: |
+  New preprint for the 2021 Visual Resources Stewardship Conference.
+author:
+  - name: Mike Mahoney
+    url: {}
+date: 06-14-2021
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+I'll be speaking at the 
+[2021 Visual Resources Stewardship Conference](https://sites.google.com/usu.edu/vrsconf03/), 
+presenting a paper ("Interactive landscape simulations for visual resource assessment", 
+with Colin Beier and Aidan Ackerman) talking about how the use of game engines 
+for spatial visualization can help in visual resource assessment projects.
+
+```{r, fig.cap='Everything the light touches can see & be seen by the red dot. Users can interactively walk around the landscape to see for themselves if the viewshed algorithm gets things exactly right.'}
+knitr::include_graphics("closer.jpg")
+```
+
+
+This was a really fun project, forcing me to push these visualizations in a new 
+direction. The conference itself is in October, and I've posted a preprint of 
+the paper [at this link](https://www.mm218.dev/papers/vrs_2021.pdf).
+

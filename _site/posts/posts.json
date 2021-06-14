@@ -1,5 +1,22 @@
 [
   {
+    "path": "posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/",
+    "title": "Interactive landscape simulations for visual resource assessment",
+    "description": "New preprint for the 2021 Visual Resources Stewardship Conference.",
+    "author": [
+      {
+        "name": "Mike Mahoney",
+        "url": {}
+      }
+    ],
+    "date": "2021-06-14",
+    "categories": [],
+    "contents": "\nI’ll be speaking at the 2021 Visual Resources Stewardship Conference, presenting a paper (“Interactive landscape simulations for visual resource assessment”, with Colin Beier and Aidan Ackerman) talking about how the use of game engines for spatial visualization can help in visual resource assessment projects.\n\n\n\nFigure 1: Everything the light touches can see & be seen by the red dot. Users can interactively walk around the landscape to see for themselves if the viewshed algorithm gets things exactly right.\n\n\n\nThis was a really fun project, forcing me to push these visualizations in a new direction. The conference itself is in October, and I’ve posted a preprint of the paper at this link.\n\n\n\n",
+    "preview": "posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/closer.jpg",
+    "last_modified": "2021-06-14T10:27:11-04:00",
+    "input_file": {}
+  },
+  {
     "path": "posts/2021-06-12-virtual-environments-talk-at-user-2021/",
     "title": "Virtual Environments talk at useR! 2021",
     "description": "With slides and a rough outline available on GitHub.",

@@ -6,7 +6,16 @@
     <atom:link href="https://www.mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
     <description>Technology and the Environment</description>
     <generator>Distill</generator>
-    <lastBuildDate>Sat, 12 Jun 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 14 Jun 2021 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>Interactive landscape simulations for visual resource assessment</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment</link>
+      <description>New preprint for the 2021 Visual Resources Stewardship Conference.</description>
+      <guid>https://www.mm218.dev/posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment</guid>
+      <pubDate>Mon, 14 Jun 2021 00:00:00 +0000</pubDate>
+      <media:content url="https://www.mm218.dev/posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/closer.jpg" medium="image" type="image/jpeg"/>
+    </item>
     <item>
       <title>Virtual Environments talk at useR! 2021</title>
       <dc:creator>Mike Mahoney</dc:creator>
