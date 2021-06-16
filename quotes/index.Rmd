@@ -4,6 +4,13 @@ output:
   tufte::tufte_html: default
 ---
 
+<hr id = 'Ecclesiastes'>
+
+For in much wisdom is much grief: and he that increaseth knowledge increaseth 
+sorrow.
+
+--- Ecclesiastes 1:18
+
 <hr id = "EfronRejoinder">
 
 An extra year of experience has not changed my belief in a disconnect between 
