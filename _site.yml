@@ -6,6 +6,8 @@ navbar:
   right:
     - text: "Home"
       href: index.html
+    - text: "Papers"
+      href: papers
     - text: "Blog"
       href: blog.html
     - icon: fab fa-github
