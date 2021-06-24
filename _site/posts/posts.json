@@ -11,9 +11,9 @@
     ],
     "date": "2021-06-14",
     "categories": [],
-    "contents": "\nI’ll be speaking at the 2021 Visual Resources Stewardship Conference, presenting a paper (“Interactive landscape simulations for visual resource assessment”, with Colin Beier and Aidan Ackerman) talking about how the use of game engines for spatial visualization can help in visual resource assessment projects.\n\n\n\nFigure 1: Everything the light touches can see & be seen by the red dot. Users can interactively walk around the landscape to see for themselves if the viewshed algorithm gets things exactly right.\n\n\n\nThis was a really fun project, forcing me to push these visualizations in a new direction. The conference itself is in October, and I’ve posted a preprint of the paper at this link.\n\n\n\n",
+    "contents": "\nI’ll be speaking at the 2021 Visual Resources Stewardship Conference, presenting a paper (“Interactive landscape simulations for visual resource assessment”, with Colin Beier and Aidan Ackerman) talking about how the use of game engines for spatial visualization can help in visual resource assessment projects.\n\n\n\nFigure 1: Everything the light touches can see & be seen by the red dot. Users can interactively walk around the landscape to see for themselves if the viewshed algorithm gets things exactly right.\n\n\n\nThis was a really fun project, forcing me to push these visualizations in a new direction. The conference itself is in October, and I’ve posted a preprint of the paper at this link.\n[Update - 2021-06-24] And the code and manuscript used for this paper are now on Github at this link.\n\n\n\n",
     "preview": "posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/closer.jpg",
-    "last_modified": "2021-06-14T10:27:11-04:00",
+    "last_modified": "2021-06-24T14:24:39-04:00",
     "input_file": {}
   },
   {

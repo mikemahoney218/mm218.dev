@@ -6,6 +6,7 @@ author:
   - name: Mike Mahoney
     url: {}
 date: 06-14-2021
+updated: 06-24-2021
 output:
   distill::distill_article:
     self_contained: false
@@ -31,3 +32,5 @@ This was a really fun project, forcing me to push these visualizations in a new
 direction. The conference itself is in October, and I've posted a preprint of 
 the paper [at this link](https://www.mm218.dev/papers/vrs_2021.pdf).
 
+[Update - 2021-06-24] And the code and manuscript used for this paper are now on
+[Github at this link](https://github.com/mikemahoney218/vrs2021).
