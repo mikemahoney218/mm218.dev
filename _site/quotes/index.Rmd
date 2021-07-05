@@ -4,10 +4,101 @@ output:
   tufte::tufte_html: default
 ---
 
+<hr id = "BoykisLock">
+
+On-prem is a lock-in. Cloud is a lock-in. Every single language you program in is a type of lock-in. Python is easy to get started with, but soon you run into packaging issues and are optimizing the garbage collector. Scala is great, but everyone winds up migrating away from it. And on and on.
+
+Every piece of code written in a given language or framework is a step away from any other language, and five more minutes you’ll have to spend migrating it to something else. That’s fine. You just have to decide what you’re willing to be locked into.
+
+--- [Vicki Boykis: Commit to your lock-in](https://veekaybee.github.io/2019/02/10/lockin/)
+
+<hr id = "GoreDigital">
+
+I believe we need a ‘Digital Earth’. A multi-resolution, three-dimensional 
+representation of the planet, into which we can embed vast quantities of 
+georeferenced data. 
+
+[...]
+
+Imagine, for example, a young child going to a Digital Earth exhibit at a local 
+museum. After donning a head-mounted display, she sees Earth as it appears from 
+space. Using a data glove, she zooms in, using higher and higher levels of 
+resolution, to see continents, then regions, countries, cities, and finally 
+individual houses, trees, and other natural and man-made objects. Having found 
+an area of the planet she is interested in exploring, she takes the equivalent 
+of a ‘magic carpet ride’ through a 3-D visualization of the terrain. Of course, 
+terrain is only one of the many kinds of data with which she can interact.
+
+[...]
+
+She is able to request information on land cover, distribution of plant and 
+animal species, real-time weather, roads, political boundaries, and population.
+
+
+--- Al Gore: The Digital Earth: Understanding our Planet in the 21st Century, 1998
+
+<hr id = "FisherConsult">
+
+To consult the statistician after an experiment is ﬁnished is often merely to ask him to conduct a post mortem examination. He can perhaps say what the experiment died of.
+
+--- R.A. Fisher
+
+<hr id = "Hiawatha">
+
+Hiawatha, mighty hunter,  
+He could shoot ten arrows upward,  
+Shoot them with such strength and swiftness  
+That the last had left the bow-string  
+Ere the first to earth descended.  
+- This was commonly regarded  
+As a feat of skill and cunning.  
+Several sarcastic spirits  
+Pointed out to him, however,  
+That it might be much more useful  
+If he sometimes hit the target.  
+"Why not shoot a little straighter  
+And employ a smaller sample?"  
+Hiawatha, who at college  
+Majored in applied statistics,  
+Consequently felt entitled  
+To instruct his fellow man  
+In any subject whatsoever  
+
+[...]
+
+Hiawatha, in a temper,  
+Quoted parts of R. A. Fisher,  
+Quoted Yates and quoted Finney,  
+Quoted reams of Oscar Kempthorne,  
+Quoted Anderson and Bancroft  
+(practically in extenso)  
+Trying to impress upon them  
+That what actually mattered  
+Was to estimate the error.  
+- Several of them admitted:  
+"Such a thing might have its uses;  
+Still," they said, "he would do better  
+If he shot a little straighter."  
+
+[...]
+
+- In a corner of the forest  
+Sits alone my Hiawatha  
+Permanently cogitating  
+On the normal law of errors.  
+Wondering in idle moments  
+If perhaps increased precision  
+Might perhaps be sometimes better  
+Even at the cost of bias,  
+If one could thereby now and then  
+Register upon a target.
+
 <hr id = 'Ecclesiastes'>
 
 For in much wisdom is much grief: and he that increaseth knowledge increaseth 
 sorrow.
+
+--- [. E. Mientka, "Professor Leo Moser - Reflections of a Visit"](http://www.math.utah.edu/~cherk/hiawatha.html)
 
 --- Ecclesiastes 1:18
 
