@@ -4,9 +4,9 @@
     <title>MLCA Week 4:</title>
     <meta charset="utf-8" />
     <meta name="author" content="Mike Mahoney" />
-    <meta name="date" content="2021-05-25" />
+    <meta name="date" content="2021-06-22" />
     <script src="libs/header-attrs/header-attrs.js"></script>
-    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"x6d7c5d425c1496daa90d4d864a080d1","expires":1}</script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"c6bf74c8443a41178712de521332d852","expires":1}</script>
     <script src="libs/himalaya/himalaya.js"></script>
     <script src="libs/js-cookie/js.cookie.js"></script>
     <link href="libs/editable/editable.css" rel="stylesheet" />
@@ -30,7 +30,7 @@ class: center, middle, inverse, title-slide
 # MLCA Week 4:
 ## Imbalanced Classification
 ### Mike Mahoney
-### 2021-05-25
+### 2021-06-22
 
 ---
 
@@ -245,13 +245,13 @@ table(training$Attrition)
 
 &lt;br /&gt;
 
-Our data set has almost 5 times more "No" values for attrition than "Yes", so 
-models which are super accurate on "No" and not very accurate on "Yes" can be 
-just as "accurate" overall as a model trying its best on both classes.
+Our data set has almost 5 times more "No" values (0s) for attrition than "Yes"es 
+(1s), so models which are super accurate on "No" and not very accurate on "Yes" 
+can be just as accurate overall as a model trying its best on both classes.
 
 &lt;br /&gt;
 
-We call this an example of **imbalanced classes**, and this problem an example 
+Our data has **imbalanced classes**, and this problem is an example 
 of **imbalanced classification**. 
 
 ---
@@ -503,7 +503,7 @@ new data.
 &lt;br /&gt;
 
 Of course, this method depends on our original sample being sufficiently 
-representative of the population; if that wasn't true, however, you also wouldn't
+representative of the population. If that wasn't true, though, you also wouldn't
 be able to fit good models _without_ resampling.
 
 &lt;br /&gt;
@@ -567,7 +567,7 @@ table(resampled_training$Attrition)
 
 &lt;br /&gt;
 
-If anything, we've actually slightly too many "yes" cases to this data set!
+If anything, we've actually added slightly too many "yes" cases to this data set!
 
 Now let's go ahead and fit a new model on the resampled data:
 
@@ -677,14 +677,14 @@ increasing the importance of "Yes" values to the model by 500%, so it makes sens
 for two methods with the same goals to have similar outcomes.
 
 When you're able to specify weights, that's often a better way to adjust for 
-imbalanced classes than resampling; your intent is a lot more obvious and you
-avoid the pitfalls associated with pseudoreplicating your data. But often, model
+imbalanced classes than resampling; it makes your intent more obvious and is 
+computationally more efficient. But often, model
 implementations won't provide obvious ways to weight your classes, requiring you
 to take matters into your own hands.
 
 ---
 
-Note also the difference in the probabilities predicted by these methods:
+Note also these methods produce slightly different probabilities:
 
 ![](week_4_slides_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
 
@@ -696,24 +696,44 @@ Note also the difference in the probabilities predicted by these methods:
 class: middle
 
 These approaches can be used even with more complex models to try and
-deal with imbalanced classes. While new methods are being proposed every day --
+deal with imbalanced classes. 
+
+&lt;br /&gt;
+
+While new methods are being proposed every day --
 imbalanced classification problems are one of the most fundamental unsolved 
 problems in prediction -- these three should be generally applicable to any 
 real-world classification problem you have to work with.
 
-&lt;br /&gt;
+---
+class: middle
 
 One final note: I want to highlight that both weighting and bootstrapping used
-the class abundances from the _training set_. You should not be setting weights
-based on the prevalence of classes in the test set; as mentioned last week, the 
-test data should be completely unknown to both the model and the modeler. That
-means you shouldn't even _know_ what the class abundances are in the test set,
-if you can avoid it. 
+the class abundances from the _training set_. 
+
+&lt;br /&gt;
+
+You should not be setting weights based on the prevalence of classes in the test 
+set; as we mentioned week 2, the test data should be completely unknown to both 
+the model and the modeler. 
+
+&lt;br /&gt;
+
+That means you shouldn't even _know_ what the class abundances are in the test 
+set, if you can avoid it. 
 
 &lt;br /&gt;
 
 That's it for this week. Next week we leave the world of traditional statistics
 and start in with our first pure prediction algorithm: the decision tree.
+
+---
+class: middle center title-slide
+
+## Assignment 4
+
+(Due week 5)
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

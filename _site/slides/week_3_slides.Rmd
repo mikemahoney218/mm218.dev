@@ -64,11 +64,12 @@ class: middle
 
 For instance, we might want to predict:
 
-* Whether or not an individual has a specific disease
-* Which tree stems a beaver is going to harvest
-* If a species will be present at a given site
+* Whether or not an individual has a specific disease,
+* Which tree stems a beaver is going to harvest, or
+* If a species will be present at a given site.
 
 ---
+class: middle
 
 # We can predict categorical outcomes like these using classification models.
 
@@ -96,22 +97,21 @@ third option.
 <br />
 
 We're focusing on this because it's easier, and because the methods we talk 
-about today can't really handle more than two categories. 
+about today can't _really_ handle more than two categories. 
 
 <br />
 
 But of course, there 
 are plenty of times you have more than 2 categories (known as 
 **multiclass problems**) -- we'll talk about methods that can handle those 
-starting next week.
+starting week 5.
 
 ---
 
 So let's walk through a classification example.
 
 First things first, let's load our data. We'll be using the `attrition` data set
-from the `modeldata` package. Our first step is to install `modeldata` if we 
-haven't already:
+from the `modeldata` package. Our first step is to install `modeldata` if needed:
 
 ```{r eval = FALSE}
 install.packages("modeldata")
@@ -123,7 +123,7 @@ We then need to load the package using `library`:
 library(modeldata)
 ```
 
-And last but not least, we can load the data into our R session using the `data`
+And finally, we load the data into our R session using the `data`
 function:
 
 ```{r}
@@ -138,14 +138,19 @@ nrow(attrition)
 ```
 
 ---
+class: middle
 
 This data set contains information about 1,470 employees in the IBM Watson 
 Analytics lab -- what their job is, how much they made, whether they traveled, 
 and, most importantly, whether or not they still work for IBM. 
 
+<br /> 
+
 That last variable is stored in the `Attrition` column, where `Yes` means the
 employee left IBM and `No` means they're still there. This is what we're going 
 to focus on predicting today.
+
+<br /> 
 
 We could try to model attrition as a function of an employee's age:
 
@@ -153,24 +158,15 @@ We could try to model attrition as a function of an employee's age:
 attrition_model <- lm(Attrition ~ Age, attrition)
 ```
 
+<br /> 
+
 But we get two warnings!
 
 ---
+class: middle
 
-Our warnings both mention `factors`, so let's check if any of the variables in 
-the data frame are factors:
-
-```{r}
-any(
-  lapply(attrition, class) == "factor"
-)
-```
-
-(`lapply`, if you haven't seen it before, just runs `class` against every column
-of our data frame).
-
-Looks like we have a whole bunch of factors! Let's convert them to characters 
-and try again:
+Our warnings both mention `factors`, so let's try just converting every factor
+column in our dataframe to characters:
 
 ```{r}
 attrition_cleaned <- attrition |>
@@ -182,8 +178,9 @@ try(attrition_model <- lm(Attrition ~ Age, attrition_cleaned))
 Alright, this time we got an error! Progress!
 
 ---
+class: middle
 
-The problem here is that our `Attrition` column -- the outcome/response/dependent
+The problem here is that our `Attrition` column -- our outcome/response/dependent
 variable -- is stored as a character, while `lm` is expecting a number. We 
 should go ahead and create a dummy variable to replace it! 
 
@@ -204,7 +201,7 @@ No warnings, no errors, we've got ourselves a model!
 
 ---
 
-But what does this model actually mean? Let's look at it on a graph:
+But what are we actually modeling? Let's look at it on a graph:
 
 ```{r, message=FALSE, warning=FALSE, fig.width=10, fig.height=5}
 ggplot(attrition_cleaned, aes(Age, Attrition)) + 
@@ -217,14 +214,18 @@ This is not exactly an intuitive graph to look at.
 ---
 
 If you recall, we recoded our Attrition variable so that "Yes" (employees who quit)
-were transformed to "1", and "No" was transformed to "0".
+were transformed to "1", and "No" was transformed to "0". So the dots at the top
+are employees who quit at a given age, and the dots at the bottom are employees
+who stayed on.
 
 So this graph suggests that employees who quit were generally pretty young -- 
 look at how the points at 1 thin out towards the older ages -- while employees
-who stayed were maybe a bit older. The slope of our model seems to agree -- the
+who stayed were maybe a bit older. 
+
+The slope of our model seems to agree -- the
 line gets closer to 0 (that is, "not quitting") as employees get older.
 
-```{r, message=FALSE, warning=FALSE, fig.width=10, fig.height=5}
+```{r, message=FALSE, warning=FALSE, fig.width=10, fig.height=4}
 ggplot(attrition_cleaned, aes(Age, Attrition)) + 
   geom_jitter(height = 0) + 
   geom_smooth(method = "lm", formula = "y ~ x")
@@ -232,13 +233,14 @@ ggplot(attrition_cleaned, aes(Age, Attrition)) +
 
 ---
 
-We can see this same relationship in the outputs of `summary` -- Age has a 
-negative coefficient ("estimate"), which means that as Age goes up, the 
-predicted value for Attrition goes down (by 0.006411).
+We can see this same relationship in the outputs of `summary`: 
 
 ```{r}
 summary(attrition_model)
 ```
+
+Age has a negative coefficient ("estimate"), which means that as Age goes up, the 
+predicted value for Attrition goes down (by 0.006411).
 
 But what does it mean for Attrition to go down by 0.006411? What does the actual
 number being predicted by `lm` mean?
@@ -266,15 +268,90 @@ I want to stress this here, because this is a common mistake (particularly in
 economics): a linear model built to predict a binary variable does not give you 
 probabilities for that binary variable.
 
-This makes linear models really poor choices for classification problems.
+<br />
+
+This makes linear models really poor choices for classification problems. 
+
+<br />
 
 So what should we do instead?
+
+<br />
 
 Rather than using linear classifiers, it's a better idea to use what are known 
 as **logistic models** for classification problems. 
 
+---
+class: middle
+
+Logistic models are a transformation of linear models which actually predict 
+probability. This transformation creates a characteristic prediction surface --
+for example, here's a linear model and logistic model both fit to the same 
+(dummy) data:
+
+
+.pull-left[
+
+```{r echo = FALSE, warning=FALSE, message=FALSE, fig.height=4}
+bodysize=rnorm(20,30,2)
+bodysize=sort(bodysize)
+survive=c(0,0,0,0,0,1,0,1,0,0,1,1,0,1,1,1,0,1,1,1)
+dat=as.data.frame(cbind(bodysize,survive))
+
+ggplot(dat, aes(bodysize, survive)) + 
+  geom_point() + 
+  geom_smooth(method = "lm", formula = "y ~ x", se = FALSE) + 
+  labs(x = "", y = "", subtitle = "Example linear model") + 
+  theme(axis.text.x = element_blank())
+```
+
+]
+
+.pull-right[
+
+```{r echo = FALSE, warning=FALSE, message=FALSE, fig.height=4}
+ggplot(dat, aes(bodysize, survive)) + 
+  geom_point() + 
+  stat_smooth(method="glm", method.args = list(family="binomial"), se=FALSE) + 
+  labs(x = "", y = "", subtitle = "Logistic model on the same data") + 
+  theme(axis.text.x = element_blank())
+```
+
+]
+
+You'll notice two important differences between the graphs. First off, because
+logistic regression is predicting probabilities, it's bounded between 0 and 1.
+
+Secondly, the rate of change in probabilities is _not standard_ for logistic 
+regression. Unlike with linear models, an increase in X of 1 doesn't always 
+result in a standard increase of Y.
+
+This makes interpreting coefficients very complicated; while we
+won't get into it in this course, I recommend [the resource at this link](https://stats.idre.ucla.edu/other/mult-pkg/faq/general/faq-how-do-i-interpret-odds-ratios-in-logistic-regression/)
+if you are interested in learning more.
+
+---
+class: middle
+
+As a transformed linear model, logistic regression requires the same assumptions
+about your data as linear regression. To repeat from last week:
+
+* Linearity: Your outcome (the variable being modeled, in our example sale price) 
+  must be linearly associated with each of your predictor variables.
+* Normality: The sample means of your outcome must be normally distributed for
+  linear regression to produce a good fit. 
+* Multicollinearity: Your predictor variables must be independent from each other; 
+  they should not be correlated with one another.
+
+---
+class: middle
+
+Let's go ahead and walk through using logistic regressions in R.
+
+<br />
+
 Before we get started, we should probably go ahead and create separate test and 
-train data sets now:
+train data sets now, using the same code from last week:
 
 ```{r}
 set.seed(123)
@@ -283,24 +360,22 @@ training <- attrition_cleaned[row_idx < nrow(attrition_cleaned) * 0.8, ]
 testing <- attrition_cleaned[row_idx >= nrow(attrition_cleaned) * 0.8, ]
 ```
 
----
+Logistic models, as a transformation of the standard linear model, are part of
+a group known as the generalized linear models. 
 
-Now that we've got our training data ready, we can go ahead and fit a logistic
-model. Just like before, we'll try to predict Attrition as a function of Age.
-This time, though, we'll use the `glm` function instead of `lm`. To fit a 
-logistic model, we also need to make sure to set `family = "binomial"`:
+<br />
+
+As a result, rather than use the
+`lm` function, we'll need to use `glm` to fit our model. To specify _which_ glm
+we want to fit, we also need to pass the argument `family = "binomial"`:
 
 ```{r}
 attrition_model <- glm(Attrition ~ Age, training, family = "binomial")
-summary(attrition_model)
 ```
 
 ---
 
-Our output looks a little bit different this time!
-
-Gone are the $R^2$ and model p-values we got from `lm`, and in their place are 
-measures of deviance and AIC. 
+Just as with linear models, we can investigate our model using `summary`:
 
 ```{r}
 summary(attrition_model)
@@ -338,8 +413,9 @@ employee quitting:
 testing$prediction <- predict(attrition_model, testing, type = "response")
 ```
 
-We then need to convert those probabilities into predictions somehow! Probably
-the easiest method is to just trust in the probabilities -- if an employee has
+Now we need to convert those probabilities into predictions.
+
+The easiest method is to trust the probabilities -- if an employee has
 an over 50% chance of quitting, we'll say they quit, and if their chance is 
 under 50% we'll say they didn't. 
 
@@ -359,10 +435,16 @@ sum(testing$prediction == testing$Attrition) / length(testing$Attrition)
 89% accuracy! We did _great_!
 
 ---
+class: middle
 
-You might already see the issue with this way of assessing accuracy. Our 
-histogram of probabilities topped out at about 0.3 -- there wasn't a single 
+You might already see the issue with this way of assessing accuracy. 
+
+<br />
+
+Our histogram of probabilities topped out at about 0.3 -- there wasn't a single 
 employee our model gave more than a 30ish percent chance of quitting.
+
+<br />
 
 We can show this by replacing our predictions in the accuracy calculation with
 0 -- effectively, assuming no employee would ever quit our fantastic company:
@@ -371,13 +453,18 @@ We can show this by replacing our predictions in the accuracy calculation with
 sum(0 == testing$Attrition) / length(testing$Attrition)
 ```
 
-You don't actually need a data scientist for that result.
+That makes our accuracy much less impressive!
 
 ---
 class: middle
 
-So we can see that we need more than just overall accuracy to judge our models 
-by! Let's look at a few other metrics.
+So we can see that we need more than just overall accuracy to judge our models.
+
+<br />
+
+Let's look at a few other metrics.
+
+<br />
 
 The `caret` package provides tools for assessing our model. Let's go ahead and
 install it now:
@@ -395,19 +482,20 @@ library(caret)
 
 ---
 
-The only `caret` function we'll use today is `confusionMatrix`. To use it, we'll
-provide both our predicted values and actual values as arguments.
+The only `caret` function we'll use today is `confusionMatrix`. This function
+calculates a lot of accuracy metrics for our model; we'll spend the next few
+slides walking through it.
 
-Note that we need to convert our predictions into factors (via `factor`). In 
-this case, we also need to specify the factor levels (0 and 1); if we didn't 
-specify, our predictions would only have one level (0) because we didn't predict
-any 1s!
+This function takes three main arguments. The first argument should be our 
+predicted classes, and the second our "true" class values; we need to convert
+both of these to factors for the function to work.
 
-We're also going to specify which of our values should be considered the 
-"positive". You should think about this term in the same way as if you were 
-getting a medical test -- a "positive" result means that you have the thing the
-test was for; it's generally the thing you're specifically looking for. You'll
-sometimes hear this phrased as "hit" instead.
+Finally, we also need a value indicating which of our classes is the "positive" 
+result. 
+
+Generally we call the rarer class the "positive" -- think of it like in 
+medicine, where a "positive test result" means the test found a disease. We 
+also sometimes call these "hits".
 
 Because we're looking to figure out which employees will quit, we'll call 
 "Yes" values (which we've coded as 1) "positive" here:
@@ -415,8 +503,8 @@ Because we're looking to figure out which employees will quit, we'll call
 ```{r}
 attrition_confusion <- confusionMatrix(
   # Predictions go first, "true" values second:
-  factor(testing$prediction, levels = 0:1),
-  factor(testing$Attrition, levels = 0:1),
+  data = factor(testing$prediction, levels = 0:1),
+  reference = factor(testing$Attrition, levels = 0:1),
   # Specify what level is your "hit" or "positive" value
   positive = "1"
   )
@@ -431,6 +519,11 @@ attrition_confusion
 ```
 
 ---
+class: middle 
+
+We'll go through a few of the most important parts of the output now.
+
+<br />
 
 Starting at the top, we have a table called a **confusion matrix** (where the
 function gets its name)!
@@ -439,8 +532,10 @@ function gets its name)!
 attrition_confusion$table
 ```
 
-The rows represent what our model _predicted_ (either 0 or 1), while the columns
-represent what it _should_ have guessed. 
+The rows in this table represent what our model _predicted_ (either 0 or 1), 
+while the columns represent what it _should_ have guessed. 
+
+<br />
 
 Since we've called our 1s our "positives", we can see that we predicted:
 
@@ -451,6 +546,7 @@ Since we've called our 1s our "positives", we can see that we predicted:
 
 
 ---
+class: middle
 
 Up next, we have a whole slew of accuracy metrics:
 
@@ -459,29 +555,38 @@ round(attrition_confusion$overall, 4)
 ```
 
 You can see "Accuracy" here represents our overall accuracy (across both classes).
-We also have a 95% confidence interval ("AccuracyLower" and "AccuracyHigher"),
-and the accuracy we'd get just by guessing the more common class for all of our
-predictions ("AccuracyNull" -- here the same as our overall accuracy). Better
-models will have a larger "Accuracy" - "AccuracyNull".
 
-Also in this list is Cohen's Kappa ("Kappa"), which is another way to judge model
-performance -- Kappa values range from -1 to 1, and higher (more positive) 
-numbers are better. We won't talk about it any more because it's pretty quickly
-falling out of favor -- but it pops up in enough places that it feels worthy of
-calling out.
+<br />
+
+Also listed is the accuracy we'd get just by guessing the more common class for all of our
+predictions ("AccuracyNull" -- here the same as our overall accuracy). 
+
+<br />
+
+Better models will have a larger "Accuracy" - "AccuracyNull".
 
 ---
+class: middle
 
 The next section has a lot of things worth talking about:
 
 ```{r}
 round(attrition_confusion$byClass, 3)
 ```
+
+<br />
+
 The first two interesting values are the **positive and negative predictive values**
-(Pos/Neg Pred Value). These represent the probabilities that a positive or 
-negative prediction is a _true_ positive or negative prediction.
+(Pos/Neg Pred Value). 
+
+<br />
+
+These represent the probabilities that a positive or 
+negative prediction is a _true_ positive or negative prediction -- so 88.8% of 
+the negatives we predict are _true_ negatives, for instance.
 
 ---
+class: middle
 
 We calculate these by dividing our "true" values in the confusion matrix by the
 sum of their rows:
@@ -494,58 +599,98 @@ attrition_confusion$table
 For example, to calculate our negative predictive power, we'd divide true 
 negatives by the total number of predicted negatives:
 
+<br />
+
 $$\frac{262 \operatorname{true negatives}}{262 \operatorname{true negatives} + 33\operatorname{false negatives}} = \frac{262 \operatorname{true negatives}}{295 \operatorname{negatives}} = 0.888 $$
+
+<br />
 
 Since we don't have any positive predictions, we can't actually tell how 
 accurate our positive predictions are -- 0 / (0 + 0) is undefined. 
 
 ---
+class: middle 
 
 Similar to predictive value are the concepts of **sensitivity** and 
-**specificity**. While our predictive values tell us how likely a given _prediction_
-is to be correct, sensitivity and specificity tell us how likely a given observation
+**specificity**. 
+
+While our predictive values tell us how likely a given _prediction_ is to be 
+correct, sensitivity and specificity tell us how likely a given observation
 is to be correctly predicted.
 
-To be specific, **specificity** tells us what proportion of positives will be 
-correctly classified as positive (the "true positive rate"), while 
-**sensitivity** tells us what proportion of negatives will be classified as 
-negative (the "true negative rate"). 
+To be specific, specificity tells us what proportion of negatives will be 
+classified as negative (the "true negative rate"). 
+
+Sensitivity, meanwhile, tells us what proportion of positives will be 
+correctly classified as positive (the "true positive rate").
 
 ```{r}
 round(attrition_confusion$byClass, 3)
 ```
 
 ---
+class: middle
 
-Instead of adding up rows, we're adding up columns instead:
+To calculate these, we add up the _columns_ of our confusion matrix rather than
+the rows.
 
 ```{r}
 attrition_confusion$table
 ```
 
+<br />
+
+To calculate sensitivity, we want to divide our number of true positives 
+(predicted 1, reference 1) by the total number of positives in the data set 
+(reference 1)
+
+<br />
 
 Our sensitivity calculation is therefore:
 
-$$\frac{0 \operatorname{true positives}}{0 \operatorname{true positives} + 33 \operatorname{false negatives}} = \frac{0 \operatorname{true positives}}{33\operatorname{things that should have been positive}} = 0$$
+$$\frac{0 \operatorname{true positives}}{0 \operatorname{true positives} + 33 \operatorname{false negatives}} = \\ \frac{0 \operatorname{true positives}}{33\operatorname{things that should have been positive}} = 0$$
+---
 
-While our specificity is:
+Specificity is similar, but instead we're dividing our number of true negatives
+(predicted 0, reference 0) by the total number of negatives (reference 0).
 
-$$\frac{262 \operatorname{true negatives}}{262 \operatorname{true negatives} + 0 \operatorname{false positives}} = \frac{262 \operatorname{true negatives}}{262\operatorname{things that should have been negative}} = 1$$
+```{r}
+attrition_confusion$table
+```
 
-Both of these values go from 0 to 1; here we've got the worst possible 
+<br />
+
+That makes our specificity equation:
+
+$$\frac{262 \operatorname{true negatives}}{262 \operatorname{true negatives} + 0 \operatorname{false positives}} = \\ \frac{262 \operatorname{true negatives}}{262\operatorname{things that should have been negative}} = 1$$
+
+<br />
+
+Both of these values go from 0 to 1; our model has the worst possible 
 sensitivity and best possible specificity.
 
 ---
+class: middle
 
-You might imagine that sensitivity and specificity are naturally opposed -- if
-you set a probability threshold so that you class everything as a negative (like 
-we've done here, using a probability threshold of 50%), you'll get maximum
-specificity (no false positives). Similarly, if you set a threshold that classes
-everything as positive (for instance, a threshold of $\geq$ 0) you could get
-maximum sensitivity.
+Sensitivity and specificity are naturally opposed. 
+
+<br />
+
+For instance, if you set a probability threshold so that you class everything as 
+a negative (like we've done here, using a probability threshold of 50%), you'll 
+get maximum specificity (no false positives).
+
+<br />
+
+Similarly, if you set a threshold that classes everything as positive (for 
+instance, a threshold of $\geq$ 0) you could get maximum sensitivity.
+
+<br />
 
 We can imagine that using different probability thresholds would give us 
 different sensitivity and specificity values somewhere between the two extremes.
+
+---
 
 To look at this closer, we're going to use another new package called `pROC`. 
 Install it now if you haven't before:
@@ -561,16 +706,26 @@ library(pROC)
 ```
 
 ---
+class: middle
 
-`pROC` helps us calculate what are known as ROC curves for our classification 
-models. ROC stands for "Receiver Operating Characteristic", which is a legacy
+`pROC` helps us calculate what are known as ROC curves for our models. 
+
+<br />
+
+ROC stands for "Receiver Operating Characteristic", which is a legacy
 name from when they were invented to analyze radar during World War II. Everyone
 just calls them ROC curves, but you'll sometimes see the full name in papers.
 
+<br />
+
 ROC curves let us see how using different thresholds for our model would impact
-sensitivity and specificity. First, we need to create a `roc` object with the
-`roc` function -- this function takes our "true" classes (Attrition in the data 
-frame) and our predicted probabilities as arguments:
+sensitivity and specificity. To see this in action, we need to create a 
+`roc` object with the `roc` function. 
+
+<br />
+
+This function takes our "true" classes (Attrition in the data frame) and our 
+predicted probabilities as arguments:
 
 ```{r}
 attrition_roc <- roc(
@@ -584,12 +739,15 @@ attrition_roc <- roc(
 We can then use `plot` to see how our model trades off between sensitivity and 
 specificity:
 
+.center[
 ```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
 plot(attrition_roc)
 ```
+]
 
-Each point on the black line represents another probability threshold we could 
-use, and the associated sensitivity and specificity.
+Each point on the black line the sensitivity and specificity associated with a
+different probability threshold -- so while we used a cutoff of 0.5 earlier, 
+we could use other values to get different values of specificity and sensitivity.
 
 ---
 
@@ -611,21 +769,28 @@ plot(attrition_roc)
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
 ggplot(coords(attrition_roc), aes(1 - specificity, sensitivity)) + 
   geom_line() + 
-  labs(x = "False negative rate (1 - specificity)")
+  labs(x = "False positive rate")
 ```
 ]
 
 ---
+class: middle
 
 So what do we do with this information?
 
-Well, it depends. We could use this to figure out what probability threshold to
-use. Since the top left corner represents 100% accuracy, we might want to pick
-whatever threshold gets us the closest to that point:
+Well, it depends. 
 
+We could use this to figure out what probability threshold to use. Since the top left corner represents 100% accuracy, we might want to pick whatever threshold gets us the 
+closest to that point:
+
+.center[
 ```{r, message=FALSE, warning=FALSE, fig.width=4, fig.height=4}
 plot(attrition_roc)
 ```
+]
+
+---
+class: middle
 
 We can use the `coords` function from pROC to find the "best" threshold this
 way:
@@ -633,6 +798,8 @@ way:
 ```{r}
 coords(attrition_roc, "best")
 ```
+
+<br />
 
 Note that we'd normally do this using the _validation_ set, not the test set --
 I'm skipping the intermediate step here to make these notes a little shorter.
@@ -651,66 +818,94 @@ confusionMatrix(factor(testing$prediction),
 ```
 
 ---
+class: middle
 
 Our overall accuracy got a good bit worse, but we're now doing a _better_ job of
 predicting positive values! So is that the threshold we should use?
 
+<br />
+
 Maybe. There's no rule for what an acceptable false positive/false negative rate
 "should" be; it depends on your application. 
 
-You might imagine that medical 
-tests are pretty comfortable with false positives (at which point they'll test 
-the patient again) if it means fewer false negatives. Conversely, if you're 
-trying to predict where a species lives to prioritize 
+<br />
+
+You might imagine that medical tests are pretty comfortable with false positives 
+(at which point they'll test the patient again) if it means fewer false negatives. 
+
+<br />
+
+Conversely, if you're trying to predict where a species lives to prioritize 
 field work, you might be willing to have more false negatives to ensure that you 
 aren't wasting a bunch of time driving out to false positive sites.
 
+---
+
 This is where ROC curves really shine -- they give you a sense of what levels of
 sensitivity and specificity you can get at the same time with your current 
-model. If you've looked at the graph and decided what levels of false positives
+model. 
+
+If you've looked at the graph and decided what levels of false positives
 and false negatives are acceptable for your current application, you can get all
 the thresholds plotted on the ROC curve using `coords`:
 
 ```{r}
-head(coords(attrition_roc), 2)
+coords(attrition_roc)
 ```
 
 ---
+class: middle
 
 There's one other useful thing we can get from our ROC curve:
 
+.center[
 ```{r, message=FALSE, warning=FALSE, fig.width=4, fig.height=4}
 plot(attrition_roc)
 ```
+]
 
 That grey line cutting the graph in half is the ROC curve for a completely 
 random model -- that is, a model that's no better than random guessing.
 
 Our model ROC curve shows us how much better our model is than randomly guessing
-at _each_ combination of sensitivity and specificity. If we want very high 
-sensitivity (almost all true positives), for instance, this model isn't much
-better than just guessing.
+at _each_ combination of sensitivity and specificity. 
+
+If we want very high sensitivity (almost all true positives), for instance, this 
+model isn't much better than just guessing.
 
 ---
 
-We can use that relationship to calculate another accuracy metric -- the 
-**area under the curve (AUC)** for our model. This metric is exactly what it 
-sounds like -- it's the proportion of the graph located under our model ROC
-curve:
+We can use this to calculate another accuracy metric -- the 
+**area under the curve (AUC)** for our model. 
 
-```{r, message=FALSE, warning=FALSE, fig.width=4, fig.height=4}
+This metric is exactly what it sounds like -- it's the proportion of the graph 
+located under our model ROC curve:
+
+.center[
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
 plot(attrition_roc, auc.polygon = TRUE)
 ```
+]
+
+---
 
 Since the random model cuts the graph exactly in half, we'd expect the random 
 model would have an AUC of 0.5. If the entire graph was under our curve, we'd
-have an AUC of 1.0. So the closer our AUC is to 1, the closer to "perfect" our
-model; the further our AUC is from 0.5, the better our model is than the 
-random model.
+have an AUC of 1.0. 
+
+So the closer our AUC is to 1, the closer to "perfect" our model; the further 
+our AUC is from 0.5, the better our model is than the random model.
+
+.center[
+```{r, message=FALSE, warning=FALSE, fig.width=5, fig.height=5}
+plot(attrition_roc, auc.polygon = TRUE)
+```
+]
 
 ---
+class: middle
 
-We can use the `auc` function to get the actual AUC for our model:
+We can use the `auc` function to get the actual AUC value for our model:
 
 ```{r}
 auc(attrition_roc)
@@ -726,194 +921,8 @@ The most common rule-of-thumb for AUC says:
 
 In general, we can assume that higher numbers are always better.
 
-So we'd call this model pretty poor at predicting attrition -- which shouldn't
-be a surprise!
-
----
-
-So sensitivity and specificity, alongside ROC curves and AUC, give us a way to 
-get beyond overall accuracy, so that we aren't fooled by our ~90% accurate model
-that predicts 0 positives.
-
-That said, we could only get that accuracy because there were so few positives --
-employees who quit -- in our data set in the first place! 
-
-```{r}
-table(training$Attrition)
-```
-
-Our data set has almost 5 times more "No" values for attrition than "Yes", so 
-models which are super accurate on
-"No" and not very accurate on "Yes" can be just as "accurate" overall as a model
-trying its best on both classes.
-
-We call this an example of **imbalanced classes**, and this problem an example 
-of **imbalanced classification**. 
-
----
-
-We have a handful of ways of dealing with imbalanced classes. One that we've 
-already talked about is to change our probability threshold using our ROC curve.
-
-Another is to _weight_ our observations when we're fitting our model. We want
-our model to care about "Yes" just as much as "No", even though there are almost
-5 times as many "No" values to predict. Weights let us tell our model that every
-"Yes" is "worth" 5 times as much as each "No", so that in total both classes are
-"worth" the same amount to the model.
-
-To put this into practice, we'd first want to create a "weight" column in our 
-training data set. We'll set the weights of "No" values to 1 and "Yes" to 5, to
-try and balance our classes:
-
-```{r}
-training <- training |> 
-  mutate(weight = ifelse(Attrition, 5, 1))
-
-training  |>
-  select(Age, Attrition, weight) |> 
-  head(2)
-```
-
----
-
-We then need to provide this new "weight" column to the "weights" argument of
-`glm`:
-
-```{r}
-weighted_model <- glm(
-  Attrition ~ Age, 
-  training,
-  weights = weight, 
-  family = "binomial")
-```
-
-Then we make our predictions as we did originally -- calculate the probability 
-of each employee quitting, then use a probability threshold of 0.5 to classify
-employees into "Yes" and "No" groups:
-
-```{r}
-testing$prediction <- predict(weighted_model, testing, type = "response")
-testing$prediction <- round(testing$prediction)
-```
-
-Let's take a look at our confusion matrix...
-
----
-
-```{r}
-confusionMatrix(factor(testing$prediction), 
-                factor(testing$Attrition), 
-                positive = "1")
-```
-
----
-
-One other way we might deal with imbalanced classes is to **resample** our data,
-so that we have approximately equal numbers of each class in our training data.
-
-To do that, we'd first split our training data into positive and negative pieces:
-
-```{r}
-positive_training <- training[training$Attrition == 1, ]
-negative_training <- training[training$Attrition == 0, ]
-```
-
-Then we'd want to randomly select rows from our positive sample until we had the
-same number of positive observations as negatives.
-
-So long as we sample with replacement (so a row can be "selected" multiple times
-in a row), this won't harm our model; we'll talk more about this procedure 
-(called "**bootstrapping**") in two weeks.
-
-We can bootstrap our positive sample to have five times the samples like this:
-
-```{r}
-n_pos <- nrow(positive_training)
-
-bootstrapped_positives <- sample(1:n_pos, 
-                                 size = 5 * n_pos, 
-                                 replace = TRUE)
-bootstrapped_positives <- positive_training[bootstrapped_positives, ]
-```
-
----
-
-Then we can combine our bootstrapped positive sample with the original negative 
-sample to get a new, evenly balanced data set:
-
-```{r}
-bootstrapped_training <- rbind(
-  negative_training,
-  bootstrapped_positives
-)
-```
-
-Just like before, we'll go ahead and fit a new model on the bootstrapped data:
-
-```{r}
-bootstrap_model <- glm(
-  Attrition ~ Age, 
-  bootstrapped_training,
-  family = "binomial")
-```
-
-Then we make our predictions as we did originally -- calculate the probability 
-of each employee quitting, then use a probability threshold of 0.5 to classify
-employees into "Yes" and "No" groups:
-
-```{r}
-testing$prediction <- predict(bootstrap_model, testing, type = "response")
-testing$prediction <- round(testing$prediction)
-```
-
-Let's take a look at our confusion matrix...
-
----
-
-```{r}
-confusionMatrix(factor(testing$prediction), 
-                factor(testing$Attrition), 
-                positive = "1")
-```
-
----
-
-Each of these approaches results in different probabilities being predicted:
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=2.5}
-qplot(predict(attrition_model, testing, type = "response"))
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=2.5}
-qplot(predict(weighted_model, testing, type = "response"))
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=2.5}
-qplot(predict(bootstrap_model, testing, type = "response"))
-```
-
----
-
-None of these adjustments -- using a different probability threshold, weighting
-our model, or bootstrapping our sample -- can make this a _good_ model. Age just
-isn't that predictive of attrition; we'd need to add other variables to get 
-better results.
-
-But all of these approaches can be used even with more complex models to try and
-deal with imbalanced classes. While new methods are being proposed every day --
-imbalanced classification problems are one of the most fundamental unsolved 
-problems in prediction -- these three should be generally applicable to any 
-real-world classification problem you have to work with.
-
-One final note: I want to highlight that both weighting and bootstrapping used
-the class abundances from the _training set_. You should not be setting weights
-based on the prevalence of classes in the test set; as mentioned last week, the 
-test data should be completely unknown to both the model and the modeler. That
-means you shouldn't even _know_ what the class abundances are in the test set,
-if you can avoid it. 
-
-That's it for this week. Next week we leave the world of traditional statistics
-and start in with our first pure prediction algorithm: the decision tree.
+So we'd call this model pretty poor at predicting attrition -- which we knew 
+already.
 
 ---
 class: middle center title-slide
@@ -921,115 +930,3 @@ class: middle center title-slide
 ## Assignment 3
 
 (Due week 4)
-
----
-class: middle center title-slide
-
-# Clippings
-
----
-
-These last few slides have things that didn't quite fit into this handout and 
-are probably _just_ outside the scope of what we can cover in a 1-credit course.
-
-I'm including them here for completeness; you can skip them entirely and still 
-be perfectly fine for the rest of this course.
-
----
-
-# Categorical loss functions
-
-We talked about a large number of accuracy metrics earlier, from accuracy to 
-predictive value to sensitivity and specificity. These are all loss functions,
-just like RMSE or MAE -- numeric metrics of model performance that you can 
-choose to optimize.
-
-But these metrics are different from RMSE in an important way. Most regression
-models minimize RMSE by default; the actual formula of the algorithm is written
-to minimize the metric you're paying attention to.
-
-Classification algorithms don't minimize any of the values we discussed. Instead,
-they try to minimize what's known as *log loss* or *binary cross-entropy loss*
-(the terms are equivalent for our purposes). This loss penalizes models based on
-their _confidence_ in predictions, while all of our metrics look at the 
-predictions themselves.
-
-We won't go too far into the details here, but log loss penalizes low 
-probabilities for correct predictions (and high probabilities for wrong 
-predictions) much more heavily. This makes sense -- a wrong prediction the model
-was 100% confident in _should be_ penalized more than wrong predictions the 
-model was only 51% behind -- but is hard for humans to interpret, so we 
-generally stick with our other metrics for reporting our models.
-
----
-
-These are graphs of how much loss is added for different probabilities
-of predictions (remembering that here lower values are better) -- you can see 
-how much "confident but wrong" predictions get penalized!
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=3.5}
-data.frame(
-  x = seq(0.0001, 1, 0.0001),
-  y = -log(seq(0.0001, 1, 0.0001))
-) |> 
-  ggplot(aes(x, y)) + 
-  geom_line() + 
-  labs(x = "predicted probability of 1",
-       y = "log loss") + 
-  labs(subtitle = "Log Loss When Correct Answer = 1")
-```
-
-```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=3.5}
-data.frame(
-  x = seq(0.0001, 1, 0.0001),
-  y = -log(1 - seq(0.0001, 1, 0.0001))
-) |> 
-  ggplot(aes(x, y)) + 
-  geom_line() + 
-  labs(x = "predicted probability of 1",
-       y = "log loss") + 
-  labs(subtitle = "Log Loss When Correct Answer = 0")
-```
-
----
-
-# AUC Cut-points
-
-Our discussion of AUC included a list of thresholds, to classify models from 
-"poor" to "outstanding"
-
-These thresholds come from [Applied Logistic Regression](https://www.wiley.com/en-us/Applied+Logistic+Regression%2C+3rd+Edition-p-9780470582473) by David Hosmer, Stanley Lemeshow, and Rodney Sturdivant. Frustratingly, 
-they are not particularly well explained in that text; instead, they're given as
-magic numbers to guide interpretation. 
-
-These thresholds are very commonly used in the literature, often citing back to
-this textbook for explanation. If it appears that the thresholds just appear 
-from nowhere in this handout, that's because that's how they appear to me in the
-literature. 
-
----
-
-# AIC
-
-While we don't touch on it here because of our focus on accuracy metrics, I want
-to mention that AIC is also a pretty good way to assess and compare models. 
-AIC -- which stands for Akaike Information Criterion -- is a way of estimating 
-prediction accuracy; in effect, it represents the amount of "information" 
-(defined in a very specific, very mathy way) wasted by a given model. 
-
-Models with lower AIC waste less information and are therefore better predictors;
-if one model has an AIC that's at least 4 or more below another's, we say the 
-first model is "better". Models with AIC within 4 of each other are assumed to 
-be equivalent.
-
-The tricky thing is that you can't compare AIC between different types of model 
--- so for instance we could use AIC to compare multiple logistic models, but not
-to compare logistic models against the decision trees we'll talk about next week.
-Also, AIC is a unitless value, so the actual AIC of a model doesn't give you any
-information; you only really care about how a model's AIC compares to all your 
-other models.
-
-That said, AIC is still extremely common for comparing predictive models, 
-especially in academia (BIC is more common for estimation models, and accuracy 
-is more common in industry). If you need more information about the use of AIC,
-I highly recommend Burnham and Anderson's 2004 article: [at this link](https://doi.org/10.1177%2F0049124104268644).
