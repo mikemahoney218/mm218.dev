@@ -4,6 +4,29 @@ output:
   tufte::tufte_html: default
 ---
 
+<hr id = "UweThinking">
+
+RAM is cheap and thinking hurts.
+
+--- [Uwe Ligges: R-Help](https://stat.ethz.ch/pipermail/r-help/2007-June/134955.html)
+
+<hr id = "SilverBullet">
+
+Software people are not alone in facing complexity. Physics deals with terribly 
+complex objects even at the “fundamental” particle level. The physicist labors
+on, however, in a firm faith that there are unifying principles to be found, 
+whether in quarks or in unified field theories. Einstein repeatedly argued that 
+there must be simplified explanations of nature, because God is not capricious 
+or arbitrary. 
+
+No such faith comforts the software engineer. Much of the complexity he must 
+master is arbitrary complexity, forced without rhyme or reason by the many human 
+institutions and systems to which his interfaces must confirm. These differ from 
+interface to interface, and from time to time, not because of necessity but only 
+because they were designed by different people, rather than by God. 
+
+--- [Frederick P. Brooks, Jr.: No Silver Bullet —- Essence and Accident in Software Engineering](http://worrydream.com/refs/Brooks-NoSilverBullet.pdf)
+
 <hr id = "BoykisLock">
 
 On-prem is a lock-in. Cloud is a lock-in. Every single language you program in is a type of lock-in. Python is easy to get started with, but soon you run into packaging issues and are optimizing the garbage collector. Scala is great, but everyone winds up migrating away from it. And on and on.

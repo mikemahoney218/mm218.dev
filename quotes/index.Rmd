@@ -4,6 +4,12 @@ output:
   tufte::tufte_html: default
 ---
 
+<hr id = "UweThinking">
+
+RAM is cheap and thinking hurts.
+
+--- [Uwe Ligges: R-Help](https://stat.ethz.ch/pipermail/r-help/2007-June/134955.html)
+
 <hr id = "SilverBullet">
 
 Software people are not alone in facing complexity. Physics deals with terribly 
