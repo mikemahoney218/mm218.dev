@@ -4,9 +4,9 @@
     <title>MLCA Week 1:</title>
     <meta charset="utf-8" />
     <meta name="author" content="Mike Mahoney" />
-    <meta name="date" content="2021-05-25" />
+    <meta name="date" content="2021-08-03" />
     <script src="libs/header-attrs/header-attrs.js"></script>
-    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"x78800774ecb4ed0acd41a40e6036f80","expires":1}</script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"bc777c6fcd714b00aafdedf716fd1f1b","expires":1}</script>
     <script src="libs/himalaya/himalaya.js"></script>
     <script src="libs/js-cookie/js.cookie.js"></script>
     <link href="libs/editable/editable.css" rel="stylesheet" />
@@ -30,7 +30,7 @@ class: center, middle, inverse, title-slide
 # MLCA Week 1:
 ## What Are We Doing Here?
 ### Mike Mahoney
-### 2021-05-25
+### 2021-08-03
 
 ---
 
@@ -70,17 +70,32 @@ Each week you should expect:
   week's class.
 * A one-hour class period for discussing and answering any questions you have
   about the topic of the week.
-* A short application-focused R assignment, due the following class.
+* A short application-focused R worksheet
   
 &lt;br /&gt;
   
-There is no assignment due this week; Assignment 1 (described at the end of this
-handout) is due by the start of class 2.
+The worksheets are completely optional, you do not ever need to hand them in.
+If you do want feedback or have questions about any worksheet, feel free to
+send me an email or come to office hours.
+
+
+---
+class: middle
+
+The only graded assignment in this class is the final assignment, where you'll
+apply these techniques to a data set of your own choosing (potentially, but 
+not necessarily, from your research).
 
 &lt;br /&gt;
 
-Each assignment is worth the same number of points. Course grades are based 
-solely on assignments.
+We'll spend the last three weeks of the course focused on the assignment -- 
+two weeks for troubleshooting and working on the project, and then the final 
+week will be dedicated to presenting results. The assignment will be graded 
+based on how well you apply the concepts from the course to your problem. 
+
+&lt;br /&gt;
+
+More information on the assignment can be found on the course website.
 
 ---
 class: middle
@@ -91,13 +106,12 @@ Two other notes about the notes, before we get started.
 
 First, I highly recommend you type the code in these notes into R yourself, to 
 get more experience running models and make sure you're familiar with the 
-content. The assignments will assume you're already familiar with all the code
-used in the handout. 
+content. 
 
 &lt;br /&gt;
 
-Second, these notes have a few features added to try and make them more useful 
-than just a standard powerpoint deck. The two I want to highlight is that you 
+Second, these notes have a few features added to try and make them easier to 
+use and navigate. The two I want to highlight is that you 
 can press `o` to see all the slides at a glance, and `h` to see a list of other
 keyboard shortcuts.
 
@@ -211,7 +225,60 @@ head(plants)
 ]
 ]
 
---
+(Click the headers to see the different tables &amp; graphs.)
+
+---
+
+# You collect data.
+
+It looks like this:
+
+
+```r
+set.seed(123)
+
+plants &lt;- data.frame(sunlight = rep(1:24, 5), 
+                     growth = rep(1:24, 5) + rnorm(24 * 5, 0, 4),
+                     noise = runif(24 * 5))
+```
+
+.panelset[
+.panel[.panel-name[Table]
+
+
+```r
+head(plants)
+```
+
+```
+##   sunlight    growth     noise
+## 1        1 -1.241903 0.5468262
+## 2        2  1.079290 0.6623176
+## 3        3  9.234833 0.1716985
+## 4        4  4.282034 0.6330554
+## 5        5  5.517151 0.3118697
+## 6        6 12.860260 0.7245543
+```
+]
+
+.panel[.panel-name[Growth ~ Sunlight]
+
+![](week_1_slides_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+
+]
+
+.panel[.panel-name[Growth ~ Noise]
+
+![](week_1_slides_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+]
+
+.panel[.panel-name[Noise ~ Sunlight]
+
+![](week_1_slides_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+
+]
+]
 
 Just by looking at the data, you can already tell that plants grow faster when
 they get more sun, and noise doesn't seem to be related at all!
@@ -312,6 +379,41 @@ summary(plants_model)
 
 ---
 
+Here, our story seems pretty obvious. Sunlight is highly significant, has a 
+pretty large estimate, and has a small standard error.
+
+We might use this model, built on experimental data, to claim that sunlight 
+_causes_ plant growth.
+
+
+```r
+summary(plants_model)
+```
+
+```
+## 
+## Call:
+## lm(formula = growth ~ sunlight + noise, data = plants)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -8.5490 -2.0789 -0.2725  2.3269  9.0540 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)   0.9792     0.8579   1.141    0.256    
+## sunlight      0.9343     0.0472  19.796   &lt;2e-16 ***
+## noise        -0.1953     1.0984  -0.178    0.859    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 3.578 on 117 degrees of freedom
+## Multiple R-squared:  0.7701,	Adjusted R-squared:  0.7662 
+## F-statistic:   196 on 2 and 117 DF,  p-value: &lt; 2.2e-16
+```
+
+---
+
 When we're looking to associate a cause with its effect, we're doing 
 **attribution**. 
 
@@ -347,80 +449,9 @@ summary(plants_model)
 
 ---
 
-So we look at our results and determine that noise has absolutely nothing to do
-with plant growth, and we decide to take it out. We refit our model:
-
-
-```r
-smaller_plants_model &lt;- lm(growth ~ sunlight, plants)
-```
-
-And now it looks like this:
-
-
-```r
-summary(smaller_plants_model)
-```
-
-```
-## 
-## Call:
-## lm(formula = growth ~ sunlight, data = plants)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -8.5411 -2.0369 -0.3238  2.3366  9.1080 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  0.88495    0.67145   1.318     0.19    
-## sunlight     0.93415    0.04699  19.879   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 3.563 on 118 degrees of freedom
-## Multiple R-squared:  0.7701,	Adjusted R-squared:  0.7681 
-## F-statistic: 395.2 on 1 and 118 DF,  p-value: &lt; 2.2e-16
-```
-
----
-
-This is attribution in action.
-
-We could use this model (built on experimental data) to claim that sunlight 
-_causes_ plant growth based on its p value and effect size.
-
-
-```r
-summary(smaller_plants_model)
-```
-
-```
-## 
-## Call:
-## lm(formula = growth ~ sunlight, data = plants)
-## 
-## Residuals:
-##     Min      1Q  Median      3Q     Max 
-## -8.5411 -2.0369 -0.3238  2.3366  9.1080 
-## 
-## Coefficients:
-##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  0.88495    0.67145   1.318     0.19    
-## sunlight     0.93415    0.04699  19.879   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-## 
-## Residual standard error: 3.563 on 118 degrees of freedom
-## Multiple R-squared:  0.7701,	Adjusted R-squared:  0.7681 
-## F-statistic: 395.2 on 1 and 118 DF,  p-value: &lt; 2.2e-16
-```
-
----
-
-We can use that model to tell us what value of growth we could expect at every
-single value of sunlight there could ever be. If we graphed that relationship, 
-we'd get a line like this:
+We might also use a model to tell us what value of growth we could expect at 
+every single value of sunlight there could ever be. If we graphed that 
+relationship, we'd get a line like this:
 
 
 ```r
@@ -429,7 +460,7 @@ ggplot(plants, aes(sunlight, growth)) +
   theme(axis.text = element_blank())
 ```
 
-![](week_1_slides_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+![](week_1_slides_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -445,11 +476,12 @@ ggplot(plants, aes(sunlight, growth)) +
   theme(axis.text = element_blank())
 ```
 
-![](week_1_slides_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+![](week_1_slides_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
 ---
 
 This process -- of trying to model the true relationship between variables from
-the noisy relationships we can measure in the real world -- is called **estimation**.
+real world data -- is called **estimation**.
 
 Estimation tries to maximize the goodness-of-fit of the model, most commonly 
 using `\(R^2\)`. Parsimony tends to be important here, too.
@@ -462,7 +494,7 @@ ggplot(plants, aes(sunlight, growth)) +
   theme(axis.text = element_blank())
 ```
 
-![](week_1_slides_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+![](week_1_slides_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
 
 ---
 class: middle
@@ -479,10 +511,8 @@ Estimation and attribution are two sides of the same coin:
 
 &lt;br /&gt;
 
-This course is about prediction, which is a different coin. 
-
-If estimation and attribution are different sides of a penny, prediction is 
-maybe a dime.
+In this course, we're going to focus on prediction. 
+Prediction is an entirely different coin. 
 
 ---
 class: center middle
@@ -493,7 +523,7 @@ class: center middle
 class: middle
 
 At the simplest level, prediction is about trying to guess a _specific_ value 
-`\(Y\)` given some number of known values `\((X)\)` -- in our example, trying to guess 
+`\((Y)\)` given some number of known values `\((X)\)` -- in our example, trying to guess 
 unknown `\(\operatorname{growth}\)` values based on measured 
 `\(\operatorname{sunlight}\)`.
 
@@ -516,7 +546,7 @@ For instance, we can predict plant growth using our simple linear model:
 
 
 ```r
-plants$pred &lt;- predict(smaller_plants_model, plants)
+plants$pred &lt;- predict(plants_model, plants)
 
 ggplot(plants, aes(sunlight, growth)) + 
   geom_point() + 
@@ -524,7 +554,8 @@ ggplot(plants, aes(sunlight, growth)) +
   theme(axis.text = element_blank())
 ```
 
-![](week_1_slides_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+![](week_1_slides_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
+
 ---
 
 Our predictions fall right along that line of best fit. 
@@ -535,7 +566,7 @@ saying it increases linearly.
 
 
 ```r
-plants$pred &lt;- predict(smaller_plants_model, plants)
+plants$pred &lt;- predict(plants_model, plants)
 
 ggplot(plants, aes(sunlight, growth)) + 
   geom_point() + 
@@ -543,7 +574,7 @@ ggplot(plants, aes(sunlight, growth)) +
   theme(axis.text = element_blank())
 ```
 
-![](week_1_slides_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+![](week_1_slides_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -560,15 +591,35 @@ ggplot(plants, aes(sunlight, growth)) +
   theme(axis.text = element_blank())
 ```
 
-![](week_1_slides_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+![](week_1_slides_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
 
 Knowing the underlying relationship between our variables isn't the goal when 
 we're assessing predictions. The only thing that matters is accuracy.
 
 ---
 
-We can assess accuracy in a few different ways -- one of the most common being
-the root mean square error, expressed in algebra as:
+We can't measure the accuracy of predictive models using all the same tools we 
+use for estimation and attribution.
+
+&lt;br /&gt;
+
+Importantly, we aren't going to use p-values to assess our model fits. 
+Model p-values represent the probability that your model is equivalent to a 
+model fit using no predictors; the p-values for each individual coefficient 
+represent the probability that the coefficient's true value is 0. But 
+models and coefficients can improve predictions even if non-significant.
+
+&lt;br /&gt;
+
+Similarly, we won't use `\(R^2\)` to assess machine learning models. `\(R^2\)` tells you
+the linear correlation between your predictions and the measured value, but 
+not how _close_ your predictions were.
+
+---
+
+Instead, we need to use metrics which tell us how close our predictions were to
+being right. One of the most common metrics for this is 
+the root mean square error, written as:
 
 &lt;br /&gt;
 
@@ -576,7 +627,8 @@ the root mean square error, expressed in algebra as:
 
 &lt;br /&gt;
 
-Or in words as "the square root of the mean of the squared errors", or in code as:
+We write this out in English as 
+"the square root of the mean of the squared errors", or in code as:
 
 
 ```r
@@ -584,19 +636,21 @@ sqrt(mean((plants$pred - plants$growth)^2))
 ```
 
 ```
-## [1] 3.533489
+## [1] 3.533012
 ```
 
 &lt;br /&gt;
 
 Our linear model has an RMSE of about 3.5, measured in the same units as our 
-made-up "growth" measurement. If all your predictions are exactly correct, your
-RMSE is 0.
+made-up "growth" measurement. 
+
+If all your predictions are exactly correct, your
+RMSE is 0, so smaller values are "better".
 
 ---
 class: middle
 
-The title of this course is Machine Learning for Prediction: Concepts and Applications in R.
+This course is about machine learning methods.
 
 &lt;br /&gt;
 
@@ -628,31 +682,33 @@ accuracy.
 The end result is more powerful models and more accurate predictions than we've 
 ever been able to make before. 
 
-
 ---
 class: middle
 
-But this power is not without limits, and trying to apply traditional thinking 
--- about estimation, attribution, parsimony or significance -- is risky business 
-at best.
+But these models are often used by people who are used to traditional 
+statistics, and try to apply traditional methods to these algorithms without
+realizing why the concepts don't exactly map.
 
 &lt;br /&gt;
 
-Pure prediction algorithms do not care about statistical significance. 
+We won't be talking at all this semester about significance tests for models or
+their coefficients.
 
 &lt;br /&gt;
 
-They don't expect parsimony; in fact, getting rid of weakly-correlated variables 
-will often make your predictions worse. 
+We won't be trying to make parsimonious models. In fact, getting rid of 
+weakly-correlated variables will often make predictions worse. 
 
 &lt;br /&gt;
 
-And, most importantly, they don't pretend to search for any long-term, provable, 
-scientific truth. 
+And we won't be searching for long-term, provable scientific truth. We won't be
+talking about causality, or making inferences from which of our coefficients are
+the most important.
 
 &lt;br /&gt;
 
-We'll spend the rest of the semester talking about what exactly that means.
+We're optimizing for accuracy, and we'll spend the rest of the semester talking 
+about how to get it.
 
 ---
 .bg-washed-green.b--dark-green.ba.bw2.br3.shadow-5.ph4.mt5[
@@ -670,11 +726,20 @@ Regression methods have come a long and big way since the time of Gauss.
 ]
 
 ---
-class: middle center title-slide
+class: title middle
 
-# Assignment 1
+# References
 
-(Due week 2)
+---
+
+This week's content draws heavily from three papers (each title is a link):
+
+* [Prediction, Estimation, Attribution](https://www.tandfonline.com/doi/full/10.1080/01621459.2020.1762613)
+* [Statistical Modeling: The Two Cultures](https://projecteuclid.org/journals/statistical-science/volume-16/issue-3/Statistical-Modeling--The-Two-Cultures-with-comments-and-a/10.1214/ss/1009213726.full)
+* [To Explain or to Predict?](https://www.stat.berkeley.edu/~aldous/157/Papers/shmueli.pdf)
+
+Pieces are also pulled from [Computer Age Statistical Inference](https://web.stanford.edu/~hastie/CASI_files/PDF/casi.pdf),
+specifically sections 1.0, 1.1, 8.4, and Epilogue.
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

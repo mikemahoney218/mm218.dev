@@ -4,9 +4,9 @@
     <title>MLCA Week 2:</title>
     <meta charset="utf-8" />
     <meta name="author" content="Mike Mahoney" />
-    <meta name="date" content="2021-05-25" />
+    <meta name="date" content="2021-08-03" />
     <script src="libs/header-attrs/header-attrs.js"></script>
-    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"ab94b89962da4bae8049576223530fd8","expires":1}</script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"x74d57b7f8de4eadb043cf11c6bda9c5","expires":1}</script>
     <script src="libs/himalaya/himalaya.js"></script>
     <script src="libs/js-cookie/js.cookie.js"></script>
     <link href="libs/editable/editable.css" rel="stylesheet" />
@@ -30,7 +30,7 @@ class: center, middle, inverse, title-slide
 # MLCA Week 2:
 ## Regression, Linear Regression, and Statistics
 ### Mike Mahoney
-### 2021-05-25
+### 2021-08-03
 
 ---
 
@@ -107,8 +107,9 @@ classification, with minor tweaks.
 Let's walk through a simple regression example.
 
 For most of this class, we'll make use of the Ames Iowa Housing Data provided
-by the `AmesHousing` package to demonstrate regression problems. Install 
-`AmesHousing` if you haven't already:
+by the `AmesHousing` package to demonstrate regression problems. 
+
+Let's install `AmesHousing` now:
 
 
 ```r
@@ -183,7 +184,9 @@ ggplot(ames, aes(Year_Built, Sale_Price)) +
 
 ---
 
-This is a linear regression. To be specific, this is an **ordinary least squares**
+This is a linear regression. 
+
+To be specific, this is an **ordinary least squares**
 regression, which minimizes the squared error -- that is, the (squared) distance 
 from the line to all of the points, at the same time.
 
@@ -198,7 +201,9 @@ ggplot(ames, aes(Year_Built, Sale_Price)) +
 
 ---
 
-Things get a little more complex if we include additional variables in the mix.
+So we can imagine a single-variable linear model as just drawing a 1D line 
+through the middle of our data. But things get a little more complex if we 
+want to include additional variables, too.
 
 For instance, let's say we wanted to include the ground floor living area 
 (`Gr_Liv_Area`) in our model. 
@@ -247,8 +252,10 @@ properly. Among these assumptions, the most important are:
 * Linearity: For linear regression to produce accurate predictions, your outcome
   (the variable being modeled, in our example sale price) must be linearly 
   associated with each of your predictor variables.
+  
 * Normality: The sample means of your outcome must be normally distributed for
   linear regression to produce a good fit. 
+  
 * Multicollinearity: Your predictor variables must be independent from each other; 
   they should not be correlated with one another.
   
@@ -474,7 +481,7 @@ library(dplyr)
 ```
 
 ```
-## # A tibble: 1 x 3
+## # A tibble: 1 × 3
 ##   predictions_full predictions_year predictions_area
 ##              &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
 ## 1           46637.           66259.           56505.
@@ -489,7 +496,7 @@ model_performance
 ```
 
 ```
-## # A tibble: 1 x 3
+## # A tibble: 1 × 3
 ##   predictions_full predictions_year predictions_area
 ##              &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
 ## 1           46637.           66259.           56505.
@@ -531,7 +538,7 @@ our models.
 This is called the **hold-out** or **simple validation** method of assessing model 
 performance. We'll call the data we use to train the model our "training" set, 
 and the data we use to evaluate performance our "test" set -- though you might
-see "hold-out set" used in more formal settings
+see "hold-out set" used in more formal settings.
 
 ---
 
@@ -570,7 +577,7 @@ testing &lt;- ames[row_idx &gt;= nrow(ames) * 0.8, ]
 ---
 
 We can then use the same code as before to compare our model performance, using 
-models fit on the training set and evaluated on the test set:
+models fit on the training set and evaluated against the test set:
 
 
 ```r
@@ -592,7 +599,7 @@ testing %&gt;%
 ```
 
 ```
-## # A tibble: 1 x 3
+## # A tibble: 1 × 3
 ##   predictions_full predictions_year predictions_area
 ##              &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
 ## 1           47203.           62774.           55628.
@@ -625,7 +632,7 @@ algorithms not recognizing women
 and self-driving cars not identifying dark-skinned pedestrians
 [(link)](https://www.vox.com/future-perfect/2019/3/5/18251924/self-driving-car-racial-bias-study-autonomous-vehicle-dark-skin), 
 due to the over-representation of white men in the most commonly used
-image data sets. 
+training image data sets. 
 
 Depending on your area of study, it might be difficult to have
 such glaring blindspots -- but evaluating models based on data which doesn't 
@@ -674,13 +681,15 @@ testing %&gt;%
 ```
 
 ```
-## # A tibble: 1 x 1
+## # A tibble: 1 × 1
 ##   predictions_full
 ##              &lt;dbl&gt;
 ## 1           46227.
 ```
 
-Looks like the answer is yes, slightly. It's worth noting that `Foundation` is
+Looks like the answer is yes, slightly. 
+
+It's worth noting that `Foundation` is
 the first non-numeric variable we've used -- let's spend a little time talking
 about how models use non-numeric variables.
 
@@ -727,7 +736,7 @@ summary(ames_two)
 ---
 class: middle
 
-Those variables are effectively **binary** variables (sometimes referred to as 
+Those variables are effectively **binary** variables (also referred to as 
 **booleans**): columns with a values of
 either 0 or 1, where 0 corresponds to `FALSE` and 1 to `TRUE`.
 
@@ -760,14 +769,14 @@ do this pretty easily using `pivot_wider` from the `tidyr` package:
 library(tidyr)
 
 one_hot_training &lt;- training %&gt;% 
-  mutate(value = 1) %&gt;% # Create a dummy value column
+  mutate(dummy_value = 1) %&gt;% # Create a dummy value column
   pivot_wider(
      # "Turn each value of Foundation into a variable"
     names_from = Foundation,
-    # Optional -- column name prefix to match lm
+    # Optional -- add the column name prefix lm uses
     names_prefix = "Foundation", 
     # "Fill the new variables with our dummy value"
-    values_from = value, 
+    values_from = dummy_value, 
     # Will fill in all the other Foundation fields with 0s
     values_fill = 0 
     ) %&gt;% 
@@ -777,7 +786,7 @@ head(one_hot_training, n = 2)
 ```
 
 ```
-## # A tibble: 2 x 9
+## # A tibble: 2 × 9
 ##   FoundationCBlock FoundationPConc FoundationWood FoundationBrkTil
 ##              &lt;dbl&gt;           &lt;dbl&gt;          &lt;dbl&gt;            &lt;dbl&gt;
 ## 1                1               0              0                0
@@ -924,22 +933,26 @@ Two pieces of trivia that might be helpful in remembering these encoding methods
   variables -- for instance, by removing the BrkTil variable, we've effectively 
   told our models that houses which are 0 for every other type of foundation are
   actually their own BrkTil group.
-  
----
-class: middle
 
+&lt;br /&gt;
+  
 These methods -- hold-out set validation and categorical variable encoding -- 
 will show up frequently throughout this course, even as we move towards pure 
 prediction algorithms and leave linear regression behind.
 
 ---
-class: middle center title-slide
+class: middle center title
 
-## Assignment 2
+# References
 
-(Due week 3)
+---
 
-  
+This week we're using a lot of material from 
+[Hands-On Machine Learning with R (link)](https://bradleyboehmke.github.io/HOML/).
+Specifically, we're using Chapter 1 (background and Ames housing data),
+2 (hold-out sets, loss) and 4 (linear regression).
+
+
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

@@ -1,0 +1,573 @@
+---
+title: "MLCA Week 6:"
+subtitle: "Random Forests"  
+author: 
+  - "Mike Mahoney"
+date: '`r Sys.Date()`'
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(ggplot2)
+library(dplyr)
+knitr::opts_chunk$set(fig.showtext = TRUE)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+style_mono_light(base_color = "#23395b")
+theme_set(theme_xaringan())
+```
+
+```{r xaringan-editable, echo=FALSE}
+xaringanExtra::use_editable(expires = 1)
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+```{r xaringanExtra-search, echo=FALSE}
+xaringanExtra::use_search(show_icon = TRUE)
+```
+
+```{r xaringan-tachyons, echo=FALSE}
+xaringanExtra::use_tachyons()
+```
+
+```{r xaringan-extra-styles, echo = FALSE}
+xaringanExtra::use_extra_styles(
+  hover_code_line = TRUE,         #<<
+  mute_unhighlighted_code = TRUE  #<<
+)
+```
+
+```{r xaringan-tile-view, echo=FALSE}
+xaringanExtra::use_tile_view()
+```
+
+class: center, middle
+
+# Random Forests
+
+---
+class: middle
+
+Last week, we talked about how decision trees tend to overfit, producing high
+variance models which might change a lot if they were fit to a different 
+training set. 
+
+If we could find a way to reduce that variance, we might be able to make our
+model altogether more accurate. If our prediction surface had less sharp
+edges, we might be able to capture more of the actual structure of our data.
+
+And so researchers had an idea: what if we fit decision trees to _many_ training
+sets, then aggregate the predictions? Each individual decision tree will still 
+be high-variance, but maybe the
+average of their predictions will smooth out some of the hard thresholds.
+
+---
+class: middle
+
+The first problem with this plan, of course, is that now we need more than one 
+training set. 
+
+We could split our original training set into smaller pieces, and fit separate
+models to each of those. However, decision trees perform better on relatively
+large data sets, meaning we want to be careful about breaking our training
+data into too many pieces. 
+
+Instead, if we want to fit decision trees to many training sets, it's usually
+better to resample our data to create those sets (just like we did in Week 4).
+
+---
+class: middle
+
+Most often, we'll resample our training data to create new training sets of the
+same size (the same number of observations/rows) as the original training data.
+When we do this _with replacement_ (so that each observation can be sampled more
+than once), we call it **bootstrapping**, and each subsample a 
+**bootstrap sample**.
+
+![](https://bradleyboehmke.github.io/HOML/images/bootstrap-scheme.png)
+
+(Image from [Hands-On Machine Learning with R](https://bradleyboehmke.github.io/HOML/process.html#bootstrapping))
+
+---
+class: middle
+
+Let's go ahead and make some bootstrap samples for our Ames housing data.
+First off, let's make the Ames data frame and split it into training and testing
+sets:
+
+```{r}
+set.seed(123)
+
+ames <- AmesHousing::make_ames()
+row_idx <- sample(seq_len(nrow(ames)), nrow(ames))
+training <- ames[row_idx < nrow(ames) * 0.8, ]
+testing <- ames[row_idx >= nrow(ames) * 0.8, ]
+```
+
+We can then use the `sample` function to create a bootstrap sample from our 
+training data like so:
+
+```{r}
+single_bootstrap <- training[sample(1:nrow(training), 
+                                    size = nrow(training), 
+                                    replace = TRUE), ]
+```
+
+---
+
+We can combine this with `lapply` to quickly make a list of as many bootstrap
+samples as we want -- here I'll wind up with 100 separate replicates as 
+a list in `ames_bootstraps`:
+
+```{r}
+ames_bootstraps <- lapply(
+  1:100,
+  \(x) training[sample(1:nrow(training), 
+                       size = nrow(training), 
+                       replace = TRUE), ]
+)
+```
+
+Note that `lapply` is running our code once for each value from 1 to 100, but
+we aren't using that value anywhere -- our resampling code takes no input values.
+
+Also, I should mention that normally you'd use the 
+[`boot` package](https://cran.r-project.org/package=boot) to take bootstrap 
+samples, rather than writing this yourself via lapply. The manual method makes 
+more sense for the demonstration today, but is less efficient than running 
+through `boot`.
+
+---
+class: middle
+
+So now we have our 100 separate bootstraps of our training data. We can use
+`lapply` again to fit a separate decision tree to each of those samples:
+
+```{r, echo=FALSE}
+library(rpart)
+```
+
+```{r, cache=TRUE}
+library(rpart)
+ames_trees <- lapply(
+  ames_bootstraps,
+  \(x) rpart(Sale_Price ~ ., x)
+)
+```
+
+This time around we're actually using that "x" as an input value to pass 
+different training data to each function.
+
+---
+
+And just like that, we have 100 decision trees! If we wanted, we could use 
+`rpart.plot` to visualize our trees -- we'd quickly notice that each tree uses
+different variables, has a different number of leaf nodes, and otherwise 
+produces different predictions.
+
+```{r, eval = FALSE}
+rpart.plot::rpart.plot(ames_trees[[1]])
+```
+
+```{r, echo = FALSE}
+knitr::include_graphics("week_6_imgs/first_tree.jpeg")
+```
+
+---
+
+We now have our 100 decision trees, and need to use them to make predictions.
+We can use a short loop to create 100 new columns in our data frame, each with 
+the predictions from a different tree:
+
+```{r}
+tree_testing <- testing
+for (i in seq_along(ames_trees)) {
+  tree_testing[[paste0("tree_", i)]] <- predict(
+    ames_trees[[i]],
+    testing
+  )
+}
+```
+
+But 100 different predictions isn't super useful to us -- we need to combine
+these to produce a single prediction. A surprisingly effective way to do that
+aggregation is to simply take the mean of your individual tree predictions, 
+which we can do with `rowMeans`:
+
+```{r}
+library(dplyr)
+
+tree_testing <- tree_testing |> 
+  mutate(tree_aggregate = rowMeans(across(starts_with("tree_"))))
+```
+
+---
+
+Let's go ahead and boil those predictions down into RMSEs. First, we'll use the
+`summarize` function to calculate the RMSE of each decision tree's predictions
+(the columns that "start with" `tree_`):
+
+```{r}
+tree_rmse <- tree_testing |> 
+  summarize(
+    across(
+      starts_with("tree_"),
+      ~ sqrt(mean((.x - tree_testing$Sale_Price)^2))
+           )
+  )
+```
+
+---
+
+Then we'll use the `pivot_longer` function to take our super-wide table and make
+it "long", so our RMSE values are stored in a single column. We'll also sort the
+table by RMSE so that our most-successful models are on top:
+
+```{r}
+library(tidyr)
+tree_rmse <- tree_rmse |> 
+  pivot_longer(everything(), values_to = "RMSE") |> 
+  arrange(RMSE)
+```
+
+(If you haven't seen `pivot_longer` before, I recommend section 12.3 of
+[R for Data Science](https://r4ds.had.co.nz/tidy-data.html#pivoting)).
+
+And finally, let's look at the first few rows of RMSE:
+
+```{r}
+head(tree_rmse, 3)
+```
+
+Our aggregated model (the mean of all other tree predictions) is dramatically 
+better than the trees its made of!
+
+---
+
+This method that we just walked through is called **bootstrap aggregation**,
+or **bagging** for short. 
+
+It can be done with any model and works just as well for classification as regression
+(though classifiers often aggregate using the _most common_ predicted class 
+instead of the mean predicted probability).
+
+At its core, bagging improves predictions by reducing the variance of the model,
+just as we discussed last week. Look for instance at the predictions of our 
+bagged model (red points) compared to the component models (blue) -- our 
+aggregated model has much less "spread" in its predictions than the decision 
+trees, with similar sale prices getting generally similar predictions.
+
+```{r, echo = FALSE, height = 3, width = 10}
+library(ggplot2)
+tree_testing |> 
+  select(Sale_Price, starts_with("tree_")) |> 
+  pivot_longer(c(-Sale_Price, -tree_aggregate)) |> 
+  ggplot(aes(value, Sale_Price)) + 
+  geom_point(alpha = 0.3) + 
+  geom_point(aes(x = tree_aggregate), color = "red") + 
+  geom_abline(slope = 1, intercept = 0) + 
+  theme(legend.position = "none",
+        plot.subtitle = element_text(size = 16)) + 
+  labs(x = "Predicted Price", y = "Actual Price", 
+       subtitle = "Blue points represent predictions from single trees,\nred from the aggregated model\n")
+
+```
+
+---
+
+It's worth comparing the results from our bagged model to what we'd get from 
+just a single decision tree:
+
+```{r}
+single_tree <- rpart(Sale_Price ~ ., training)
+sqrt(mean((predict(single_tree, training) - training$Sale_Price)^2))
+```
+
+```{r}
+head(tree_rmse, 1)
+```
+
+So our aggregated model is a pretty large improvement over the single decision
+tree approach. Note that this isn't necessarily because our component decision
+trees -- the ones we've aggregated into our final model -- are better fits; a 
+lot of the individual trees are actually much _worse_ predictors than our
+regular tree:
+
+```{r}
+tail(tree_rmse, 3)
+```
+
+The theory here is similar to the idea that, if you have a bunch of people guess
+how many jelly beans are in a jar, the average of everyone's guesses is probably
+going to be a lot closer than any individual guess. 
+
+In this sort of situation, having higher variance in your guesses is helpful to 
+improve predictions -- you don't necessarily need any given person person to be 
+an incredible guesser, but you're hoping that someone else in the crowd is 
+guessing just as badly in the opposite direction so that all the predictions 
+average out to the "truth".
+
+---
+
+Which begs the question: can we add even _more_ variance to our component trees?
+
+Right now we have 100 decision trees, each fit using different training data and 
+the same predictors. What if we started using different _predictors_ for each,
+as well?
+
+Let's try it and find out! First, we'll get a vector of all our predictors:
+
+```{r}
+ames_names <- setdiff(names(ames), "Sale_Price")
+```
+
+And then we can fit our trees using almost exactly the same code as we used for 
+bagging. The only difference is that we'll subset our training data to use a 
+random 40% of variables each time:
+
+```{r, cache=TRUE}
+random_variable_trees <- lapply(
+  ames_bootstraps,
+  \(x) {
+    # Select a random 40% of variables (and Sale_Price)
+    x <- x[
+      c(sample(ames_names, size = length(ames_names) * 0.4), 
+        "Sale_Price")
+      ]
+    rpart(Sale_Price ~ ., x)
+  }
+)
+```
+
+---
+
+We can use almost exactly the same code as earlier to find our RMSE:
+
+```{r}
+tree_testing <- testing
+for (i in seq_along(random_variable_trees)) {
+  tree_testing[[paste0("tree_", i)]] <- predict(
+    random_variable_trees[[i]],
+    testing
+  )
+}
+
+tree_testing <- tree_testing |> 
+  mutate(tree_aggregate = rowMeans(across(starts_with("tree_"))))
+tree_rmse <- tree_testing |> 
+  summarize(
+    across(
+      starts_with("tree_"),
+      ~ sqrt(mean((.x - tree_testing$Sale_Price)^2))
+           )
+  )
+
+tree_rmse <- tree_rmse |> 
+  pivot_longer(everything(), values_to = "RMSE") |> 
+  arrange(RMSE)
+
+head(tree_rmse, 3)
+```
+
+So we've _dramatically_ improved on our bagged model, just by fitting each tree
+to a different random subset of our predictors. Increasing the variance of our
+trees results in better aggregated predictions.
+
+---
+
+But can we go further? 
+
+What if instead of fitting each _tree_ to a different set of variables, we chose
+a random group of variables for each _split_? This way each tree could still 
+potentially include every variable, but we'd still force the trees to be very
+different by restricting their choices when splitting.
+
+This technique is what we call the **random forest**. Originally introduced in a
+seminal 2001 paper by Leo Breiman ([link](https://link.springer.com/article/10.1023/A:1010933404324)),
+the random forest is one of the first true machine learning methods and is still
+in common use today.
+
+We're going to use the `ranger` package to make random forests in this course.
+Go ahead and install it now, then load it:
+
+```{r, eval=FALSE}
+install.packages("ranger")
+library(ranger)
+```
+
+```{r, echo = FALSE}
+library(ranger)
+```
+
+We can then use the `ranger` function to fit our random forests, using the 
+same syntax as with `lm`:
+
+```{r}
+ames_rf <- ranger(Sale_Price ~ ., training)
+```
+
+---
+
+That single `ranger` call will create 500 decision trees fit to bootstrap 
+samples, using random variable subsets for each split, incredibly quickly.
+We can then use `predict` to get our predictions for the test set -- but note 
+that we need to wrap this function in the `predictions` function from `ranger`
+to get the actual numeric predictions:
+
+```{r}
+rf_predictions <- predictions(predict(ames_rf, testing))
+```
+
+We can then use those predictions to calculate our RMSE:
+
+```{r}
+sqrt(mean((rf_predictions - tree_testing$Sale_Price)^2))
+```
+
+Immediately out-of-the-box, the random forest _dramatically_ out-performs our
+best bagged tree model, to say nothing of our simple decision trees and linear
+regressions we've used in the past.
+
+---
+
+But just like with decision trees, random forests have **hyperparameters** --
+values which can be very important in influencing our predictions; unlike 
+coefficients but can't be automatically determined when fitting your model to 
+the training data.
+
+For instance, we can use the `min.node.size` hyperparameter to control how
+deep we want each of our trees to grow -- just like `minbucket` in rpart, 
+this value sets how many observations each leaf node needs to have, controlling
+how deep our trees can get.
+
+For instance, we might notice an improvement in accuracy if we set our min node
+size to 1 -- so letting each decision tree grow as deep as needed to classify
+every single observation:
+
+```{r}
+min_node <- ranger(Sale_Price ~ ., 
+                     training, 
+                     min.node.size = 1)
+
+rf_predictions <- predictions(predict(min_node, testing))
+sqrt(mean((rf_predictions - tree_testing$Sale_Price)^2))
+```
+
+
+---
+
+There are a few other hyperparameters which can have sizable impacts on our 
+random forests, namely:
+
++ `mtry`: How many variables should be considered at each split?
++ `num.trees`: How many decision trees should be grown?
++ `sample.fraction`: What percent of observations should be sampled for each 
+tree? If set to 1 and `replace` is set to TRUE, the random forest will use 
+bagged trees like we walked through earlier, but it's often advantageous to mess
+with the sampling.
++ `replace`: Sample observations with replacement? 
++ `splitrule`: What equation should be used to choose variables for each split?
+We'll talk more about this one next week.
+
+Choosing smart values for these hyperparameters can give us pretty notable 
+improvements over the default model:
+
+```{r}
+new_params <- ranger(Sale_Price ~ ., 
+                     training, 
+                     num.trees = 800, 
+                     mtry = 20, 
+                     min.node.size = 1, 
+                     replace = FALSE, 
+                     sample.fraction = 1, 
+                     splitrule = "variance")
+
+rf_predictions <- predictions(predict(new_params, testing))
+sqrt(mean((rf_predictions - tree_testing$Sale_Price)^2))
+```
+
+---
+
+So... how do we pick smart values for hyperparameters?
+
+Short answer: trial and error.
+
+For the long answer: We'll pick that up next week.
+
+---
+
+One last note for this week. While we've focused entirely on regression today, 
+all of the techniques we've gone over can be easily applied to classification
+problems as well. To aggregate our trees, we can either average our class 
+probabilities across each tree, or just take the most common class predicted by
+the individual trees.
+
+As a quick example, let's load in our `attrition` data and make train/test 
+splits:
+
+```{r}
+library(modeldata)
+data(attrition)
+row_idx <- sample(seq_len(nrow(attrition)), nrow(attrition))
+training <- attrition[row_idx < nrow(attrition) * 0.8, ]
+testing <- attrition[row_idx >= nrow(attrition) * 0.8, ]
+```
+
+To fit a random forest classifier, we can use exactly the same syntax as with
+regression:
+
+```{r}
+rf_classifier <- ranger(Attrition ~ ., data = training)
+```
+
+Everything we've talked about with classification in the past -- sensitivity and
+specificity, dealing with imbalanced classes, and so on -- still applies when
+dealing with random forests. 
+
+I've included the confusion matrix for this classifier on the next page, so 
+we can see fit statistics for this model. Note in particular how non-sensitive
+our model is -- it does a _really_ bad job at predicting people who DO quit.
+By default, `ranger` random forests don't provide class probabilities, so we'd 
+need to either provide weights or resample our data to balance our accuracy.
+
+---
+
+```{r}
+caret::confusionMatrix(
+  predictions(predict(rf_classifier, testing)), 
+  testing$Attrition, 
+  positive = "Yes")
+```
+
+
+---
+class: middle title
+
+# References
+
+---
+
+As usual, titles are links:
+
++ [Hands-on Machine Learning](https://bradleyboehmke.github.io/HOML/bagging.html) provides a lot of the content for this week; specifically chapter 10 (bagging), 11 (random forests), and section 2.4 (the bootstrap)
++ [https://web.stanford.edu/~hastie/CASI_files/PDF/casi.pdf]()
+
+This week also uses a few seminal papers which are worth knowing about:
+
++ [Bootstrap Methods for Standard Errors, Confidence Intervals, and Other Measures of Statistical Accuracy](https://projecteuclid.org/journals/statistical-science/volume-1/issue-1/Bootstrap-Methods-for-Standard-Errors-Confidence-Intervals-and-Other-Measures/10.1214/ss/1177013815.full) covers the essentials of the bootstrap 
++ [Random decision forests](https://ieeexplore.ieee.org/document/598994) introduced random variable selection for decision trees. Note that this is _not_ random forests as we think of them today, but
+rather the "use random features per-tree" method we walked through.
++ [Random Forests](https://link.springer.com/article/10.1023/A:1010933404324), the paper that introduced the random forest as it's used today (this one is worth reading)

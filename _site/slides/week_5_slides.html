@@ -4,9 +4,9 @@
     <title>MLCA Week 5:</title>
     <meta charset="utf-8" />
     <meta name="author" content="Mike Mahoney" />
-    <meta name="date" content="2021-05-25" />
+    <meta name="date" content="2021-08-03" />
     <script src="libs/header-attrs/header-attrs.js"></script>
-    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"xccd24e3907946309f6f71a71c8fbf4e","expires":1}</script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"bb31535159964c3ab284187f1ab72aff","expires":1}</script>
     <script src="libs/himalaya/himalaya.js"></script>
     <script src="libs/js-cookie/js.cookie.js"></script>
     <link href="libs/editable/editable.css" rel="stylesheet" />
@@ -30,7 +30,7 @@ class: center, middle, inverse, title-slide
 # MLCA Week 5:
 ## Decision Trees
 ### Mike Mahoney
-### 2021-05-25
+### 2021-08-03
 
 ---
 
@@ -52,38 +52,138 @@ class: center, middle, inverse, title-slide
 
 class: center, middle
 
-# Classification, Continued
+# Decision Trees
 
 ---
 class: middle
 
-Last week we started talking about classification using logistic regression, 
-using a very simple model to predict employee attrition as a function of age.
+So far, we've focused almost entirely on traditional parametric regression 
+models. These models require normally distributed residuals, linear associations 
+between your predictors and outcome, and independent, non-correlated predictors.
 
-That simple model had ~89% overall accuracy -- not because it was highly 
-predictive, but simply because ~89% of employees didn't quit, so our model could
-score high by assuming no one ever left.
+&lt;br /&gt;
 
-We're going to talk this week about ways to deal with that problem.
+The problem with these methods is that those assumptions are almost always 
+broken. 
+
+&lt;br /&gt;
+
+Especially in the natural sciences, everything is related to everything else.
+We almost never have completely independent predictors for our models. 
+
+&lt;br /&gt;
+
+Instead,
+our predictors tend to be related to each other and our outcome in complex, 
+non-linear ways, as processes catalyze each other and grow exponentially or
+saturate and slow down over time.
 
 ---
 class: middle
 
-Let's start by loading packages and recreating our dataframes:
+Today we're going to talk about our first truly machine learning algorithm, the 
+decision tree, which was specifically designed to help social scientists deal 
+with a nonlinear world. 
+
+&lt;br /&gt;
+
+It's worth taking a second to note the timeline we're walking through. Linear 
+regression was first proposed in 1805; the first logistic regression was 
+performed in 1838.
+
+&lt;br /&gt;
+
+Decision trees were introduced for the first time in 1960; the method we'll be
+using today was published in 1974, and it's the oldest machine learning method
+we'll cover in this course. 
+
+&lt;br /&gt;
+
+These tools are new, and we're still discovering
+how to use them properly.
+
+---
+class: middle
+
+The last thing I want to point out before we start actually building trees is 
+that decision trees are almost never actually the best choice for a problem. 
+
+&lt;br /&gt;
+
+If you're looking for a highly explainable non-linear model, you might choose 
+general additive models instead; to maximize predictive accuracy you'll probably 
+want to use random forests or gradient boosting machines (which we'll cover in
+the next few weeks).
+
+&lt;br /&gt;
+
+But decision trees underpin those more advanced ML techniques, so we need to 
+discuss them here. However, there's no worksheet for this week's topic;
+it doesn't make sense to practice coding decision trees, as it's rare to 
+actually use them in the real world.
+
+---
+
+With all that said, let's get started!
+
+We'll be using the `rpart` package today, alongside the `rpart.plot` package for
+visualization:
+
+
+```r
+install.packages("rpart")
+install.packages("rpart.plot")
+```
+
+
+```r
+library(rpart)
+library(rpart.plot)
+```
+
+We'll also keep using the same old attrition data:
 
 
 ```r
 library(modeldata)
-library(caret)
-library(pROC)
-library(rpart)
-library(rpart.plot)
 data(attrition)
 ```
 
-&lt;br /&gt;
+And will use `caret` and `pROC` for assessing our models:
 
-And then recreate our training and testing splits using the same code as before:
+
+```r
+library(caret)
+```
+
+```
+## Loading required package: lattice
+```
+
+```r
+library(pROC)
+```
+
+```
+## Type 'citation("pROC")' for a citation.
+```
+
+```
+## 
+## Attaching package: 'pROC'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     cov, smooth, var
+```
+
+---
+class: middle
+
+We're also going to recreate our training and testing splits using the same code 
+as before:
 
 
 ```r
@@ -93,16 +193,649 @@ training &lt;- attrition[row_idx &lt; nrow(attrition) * 0.8, ]
 testing &lt;- attrition[row_idx &gt;= nrow(attrition) * 0.8, ]
 ```
 
+&lt;br /&gt;
+
+To create a decision tree, we can use the `rpart` function from the `rpart` 
+package. The syntax is almost exactly like `lm` -- we just need to provide a 
+formula and our data:
+
+
+```r
+decision_tree &lt;- rpart(Attrition ~ ., data = training)
+```
+
+We can then create a confusion matrix for our classifications just as we did 
+with logistic regressions. I've printed this out on the next slide.
+
 ---
 
 
 ```r
-rpart(Attrition ~ OverTime + TotalWorkingYears, data = attrition) |&gt; 
+confusionMatrix(predict(decision_tree, training, type = "class"), 
+                training$Attrition, 
+                positive = "Yes")
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction  No Yes
+##        No  955 122
+##        Yes  16  82
+##                                           
+##                Accuracy : 0.8826          
+##                  95% CI : (0.8628, 0.9004)
+##     No Information Rate : 0.8264          
+##     P-Value [Acc &gt; NIR] : 6.203e-08       
+##                                           
+##                   Kappa : 0.485           
+##                                           
+##  Mcnemar's Test P-Value : &lt; 2.2e-16       
+##                                           
+##             Sensitivity : 0.40196         
+##             Specificity : 0.98352         
+##          Pos Pred Value : 0.83673         
+##          Neg Pred Value : 0.88672         
+##              Prevalence : 0.17362         
+##          Detection Rate : 0.06979         
+##    Detection Prevalence : 0.08340         
+##       Balanced Accuracy : 0.69274         
+##                                           
+##        'Positive' Class : Yes             
+## 
+```
+
+---
+
+So, we have a decision tree and we've used it to make predictions.
+
+But... what _is_ it? We can get some ideas of what we're working with by 
+visualizing it. We'll use the `rpart.plot` function to display our actual model:
+
+
+```r
+rpart(Attrition ~ ., data = training) |&gt; 
   rpart.plot(type = 4)
 ```
 
-![](week_5_slides_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+&lt;img src="week_4_imgs/rpartplot.png" width="2160" /&gt;
 
+---
+
+You can think of a decision tree as being effectively a flow chart, which your
+data follows until the model has decided how to classify it.
+
+&lt;img src="week_4_imgs/rpartplot.png" width="2160" /&gt;
+
+---
+
+Each of these boxes is called a **node**. We start reading this chart at the very
+top of the diagram, at what's called the **root node**. 
+
+&lt;img src="week_4_imgs/rpartplot_root.png" width="2160" /&gt;
+
+---
+
+Because only 17% of our employees in the training data quit (labeled "No"), we 
+can see that `rpart` assigns this node "No". Below the label, we can see the 
+probability of a data point in this node being a "No" (17%) and the percentage 
+of our data that has to go through this node to be classified (100%).
+
+&lt;img src="week_4_imgs/rpartplot_root.png" width="2160" /&gt;
+
+---
+
+If we want to be more accurate than that, we need to start moving down this flow
+chart. We'll start off with our first split (sometimes called **branches**), 
+which asks each of our observations if their TotalWorkingYears is &gt;= 2.
+
+&lt;img src="week_4_imgs/rpartplot_root.png" width="2160" /&gt;
+
+---
+
+If an employee has been working for more than 2 years, they go down the left 
+path (15% probability of quitting, 94% of employees). If an employee has less 
+than 2 years, they go down the right (55% probability, 6% of employees).
+
+&lt;img src="week_4_imgs/rpartplot_splits.png" width="2160" /&gt;
+
+---
+
+And so the employees go down the tree until they land into the buckets -- 
+called **leaf nodes** -- at the bottom of the chart. These are our final 
+classifications; employees in the blue bins will be classed as "No" and 
+employees in the green bins as "Yes".
+
+&lt;img src="week_4_imgs/rpartplot_leaves.png" width="2160" /&gt;
+
+---
+
+And that's a decision tree -- a flow chart with a bunch of yes/no questions. 
+
+Your data starts at the root node, moves down through the **internal nodes** 
+based on the yes/no questions at each branch, and ends in a leaf node at
+the bottom of the tree.
+
+&lt;img src="week_4_imgs/rpartplot_leaves.png" width="2160" /&gt;
+
+---
+
+There's a few really interesting features of this algorithm. First off, our 
+observations can take different _length_ paths down the decision tree. 
+
+Almost 70% of employees will go through this decision tree in two splits, either 
+on the far left or right. 1% will take seven steps.
+
+&lt;img src="week_4_imgs/rpartplot_diffsplits.png" width="2160" /&gt;
+
+---
+
+Similarly, not all variables are used to classify every observation. A lot of 
+our variables used in this tree are only used to sort 5% or less of the data. 
+
+&lt;img src="week_4_imgs/rpartplot_rarevars.png" width="2160" /&gt;
+
+---
+
+The entire tree only uses 10 variables, even though in our formula we 
+said to use all 30 predictors in our data frame.
+
+And yet, at the same time, our tree uses the variable "TotalWorkingYears" to
+create two separate splits.
+
+&lt;img src="week_4_imgs/rpartplot_doubled.png" width="2160" /&gt;
+
+---
+class: middle
+
+Decision trees are really interesting because they'll only use variables that 
+actually help them make better predictions. 
+
+If using more variables in split rules won't improve accuracy, then the 
+tree won't use those variables.
+
+&lt;br /&gt;
+
+At the same time, decision trees will always use the variable which helps them
+improve predictive accuracy the most. 
+
+If a variable is the best choice for 
+multiple positions in the tree, it can be used multiple times.
+
+&lt;br /&gt;
+
+Which leads us to two questions: how do decision trees know which variables to 
+use? And how do they know when to stop splitting?
+
+---
+
+To answer the first question, let's think about a tree with only one split.
+
+
+```r
+rpart(Attrition ~ TotalWorkingYears, data = training) |&gt; 
+  rpart.plot(type = 4)
+```
+
+
+&lt;img src="week_4_imgs/twy.png" width="2160" /&gt;
+
+---
+
+Because each of our leaf nodes has more than one class in it (they both have 
+"Yes" and "No" values), we refer to them as being **impure**.
+
+Our decision tree will select the variable at each split that creates the most
+pure nodes -- or, put another way, the variable which reduces impurity the most.
+
+&lt;img src="week_4_imgs/twy.png" width="2160" /&gt;
+
+---
+class: middle
+
+In order to do that, we need to quantify impurity somehow. The most popular 
+method is to calculate the **Gini impurity** values of each node. 
+
+For a given node, the Gini impurity `\(G\)` is equal to:
+
+`$$G = 1 - \left(\operatorname{Probability of yes}\right)^{2} - \left(\operatorname{Probability of no}\right)^{2}$$`
+
+&lt;br /&gt;
+
+Conceptually, we can see that pure nodes -- where the node has a 100% chance of
+being "Yes" or a 100% chance of being "No" -- will have a `\(G\)` of 0, since 
+`\(1 - 1^2\)` is 0. 
+
+&lt;br /&gt;
+
+As a result, nodes with lower `\(G\)` values are more pure, and the decision tree
+will try to minimize `\(G\)` with the variables provided.
+
+---
+
+We can pretty quickly calculate the impurity of each of our nodes:
+
+&lt;img src="week_4_imgs/twy_impurity_nodes.png" width="2160" /&gt;
+
+(You'll never need to do this by hand.)
+
+---
+
+To calculate the variable which reduces impurity the most for _both_ nodes at
+the same time, however, we need to take the average of these node impurities,
+weighted by how many observations are in each node.
+
+&lt;img src="week_4_imgs/twy_impurity_nodes.png" width="2160" /&gt;
+
+---
+
+Because our root node has 100% of the observations, we can just multiply each 
+impurity by the percentage of all observations in that bin and then add them 
+together. We get a total impurity of 0.2694.
+
+&lt;img src="week_4_imgs/twy_impurity_overall.png" width="2160" /&gt;
+
+---
+class: middle
+
+When deciding what variable to use for a split, a decision tree will calculate
+overall impurity like this for every possible variable. It then picks the one
+that results in the most pure nodes.
+
+&lt;br /&gt;
+
+When working with continuous variables (like we did above), the decision tree 
+will evaluate the value halfway between all the values present in the variable. 
+
+For example, if the column in your data frame has the values 1, 3, and 5, the 
+decision tree will evaluate splitting using that variable at both 2 and 4.
+
+&lt;br /&gt;
+
+When working with categorical variables, the decision tree will evaluate each
+combination of categories it can and choose the most successful grouping.
+
+&lt;br /&gt;
+
+And the tree will keep adding branches through this process until it has 
+correctly classified all of the training data (all leaf nodes are pure), or 
+until it hits some user-specified maximum number of splits or
+minimum number of observations per leaf node.
+
+---
+
+Now, why would a user specify a maximum number of splits or minimum number of
+observations? It comes down to the two types of errors our models can make. 
+
+We're used to, from traditional regression, models which produce simple, smooth
+surfaces when fit to our training data. The prediction these models make an `\(X\)`
+value of 2 is pretty close to the prediction when `\(X\)` is 2.1 or 1.9.
+We call these models **underfit**, and say they have high **bias**.
+
+![](https://bradleyboehmke.github.io/HOML/02-modeling-process_files/figure-html/modeling-process-bias-model-1.png)
+
+(This graph and the one on the next slide are from the course textbook 
+[Hands-On Machine Learning with R](https://bradleyboehmke.github.io/HOML/))
+
+---
+
+Our machine learning models, however, aren't going to make those same smooth
+surfaces for predictions. The first split in our decision tree, for instance,
+is based on whether or not `TotalWorkingYears &gt;= 2` -- someone with 1.9 years
+of experience goes down a completely different half of the tree than someone 
+with 2.1! 
+
+What's more, where those splits are drawn can change dramatically
+based on the training data itself -- with a different training and test set, 
+there might be a different variable that produces a better first split.
+
+We say that these models have high **variance**, since small changes in `\(X\)` can
+create huge changes to `\(Y\)`. When a lot of our error comes from variance, our
+model is **overfit**.
+
+![](https://bradleyboehmke.github.io/HOML/02-modeling-process_files/figure-html/modeling-process-variance-model-1.png)
+
+
+---
+class: middle
+
+Decision trees are notorious overfitters. If they grow until every observation 
+is correctly categorized, they get incredibly specific in how they split; 
+however, making general prediction rules based on the best way to categorize a 
+single observation is a pretty bad idea.
+
+&lt;br /&gt;
+
+To demonstrate this, let's look at two confusion matrices. The next slide will
+have the confusion matrix for this decision tree when predicting the training 
+set, and then the slide after that will have the test set confusion matrix.
+
+---
+
+
+```r
+confusionMatrix(predict(decision_tree, training, type = "class"), 
+                training$Attrition, 
+                positive = "Yes")
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction  No Yes
+##        No  955 122
+##        Yes  16  82
+##                                           
+##                Accuracy : 0.8826          
+##                  95% CI : (0.8628, 0.9004)
+##     No Information Rate : 0.8264          
+##     P-Value [Acc &gt; NIR] : 6.203e-08       
+##                                           
+##                   Kappa : 0.485           
+##                                           
+##  Mcnemar's Test P-Value : &lt; 2.2e-16       
+##                                           
+##             Sensitivity : 0.40196         
+##             Specificity : 0.98352         
+##          Pos Pred Value : 0.83673         
+##          Neg Pred Value : 0.88672         
+##              Prevalence : 0.17362         
+##          Detection Rate : 0.06979         
+##    Detection Prevalence : 0.08340         
+##       Balanced Accuracy : 0.69274         
+##                                           
+##        'Positive' Class : Yes             
+## 
+```
+
+---
+
+
+```r
+confusionMatrix(predict(decision_tree, testing, type = "class"), 
+                testing$Attrition, 
+                positive = "Yes")
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction  No Yes
+##        No  254  22
+##        Yes   8  11
+##                                          
+##                Accuracy : 0.8983         
+##                  95% CI : (0.858, 0.9303)
+##     No Information Rate : 0.8881         
+##     P-Value [Acc &gt; NIR] : 0.32901        
+##                                          
+##                   Kappa : 0.3717         
+##                                          
+##  Mcnemar's Test P-Value : 0.01762        
+##                                          
+##             Sensitivity : 0.33333        
+##             Specificity : 0.96947        
+##          Pos Pred Value : 0.57895        
+##          Neg Pred Value : 0.92029        
+##              Prevalence : 0.11186        
+##          Detection Rate : 0.03729        
+##    Detection Prevalence : 0.06441        
+##       Balanced Accuracy : 0.65140        
+##                                          
+##        'Positive' Class : Yes            
+## 
+```
+
+---
+class: middle
+
+Our model which against the training set had 83% positive predictive value and
+40% sensitivity all of a sudden has only 57% positive predictive value and 33%
+sensitivity! 
+
+&lt;br /&gt;
+
+When a model performs dramatically better against the training data than the 
+test set, that's a sign of **overfitting** -- it means our model fails to 
+generalize when predicting data it's never seen before, because it's "learned" 
+how to categorize each observation in the training data based on relationships
+and correlations that aren't in the test set.
+
+&lt;br /&gt;
+
+Unlike traditional regression, where the solution for overfitting is to remove
+weakly correlated variables, with machine learning our solution for overfitting
+is to change things about the model algorithm itself.
+
+---
+
+For instance, if we want our model to make at most two splits, we can use the
+`control` argument in `rpart` to specify that `maxdepth` should equal `2`:
+
+
+```r
+rpart(Attrition ~ ., data = training, control = list(maxdepth = 2)) |&gt; 
+  rpart.plot(type = 4)
+```
+
+&lt;img src="week_4_imgs/maxdepth.png" width="2120" /&gt;
+
+---
+
+If we wanted to make sure that every leaf had at least 100 observations,
+we could set the `minbucket` argument:
+
+
+```r
+rpart(Attrition ~ ., data = training, control = list(minbucket = 100)) |&gt; 
+  rpart.plot(type = 4)
+```
+
+&lt;img src="week_4_imgs/minbucket.png" width="2160" /&gt;
+
+---
+class: middle
+
+Values like `maxdepth` and `minbucket` which control the behavior of our 
+algorithm are known as **hyperparameters**. 
+
+&lt;br /&gt;
+
+Just like the coefficients in a linear regression, the precise values of each 
+hyperparameter can be very important in influencing our predictions; unlike 
+coefficients, however, hyperparameters can't be automatically determined when 
+fitting your model to the training data.
+
+&lt;br /&gt;
+
+Instead, the optimal hyperparameter values have to be determined separately from
+fitting the model. While there might be some common default values that people
+start with, generally speaking finding the right hyperparameter values requires
+a process of trial and error, eventually choosing the values that give you the
+best results against your validation set.
+
+&lt;br /&gt;
+
+That's all that we'll talk about hyperparameters today; we'll spend more time 
+talking about how to find the best values in two weeks.
+
+---
+
+In addition to being nasty overfitters, decision trees have one more major 
+drawback. For instance, here's the histogram of probabilities predicted by a
+full logistic model:
+
+![](week_5_slides_files/figure-html/unnamed-chunk-32-1.png)&lt;!-- --&gt;
+
+And now, here's the histogram of probabilities predicted by our decision tree:
+
+![](week_5_slides_files/figure-html/unnamed-chunk-33-1.png)&lt;!-- --&gt;
+
+The logistic graph looks like what we might expect -- a smooth curve, 
+asymptotically approaching 0 as you get towards 100% quitting. The decision tree
+graph does not.
+
+---
+
+That's because, for a decision tree, your probability of being "Yes" is equal to
+the percentage of your bin that is "Yes". This means that our tree, which has
+15 leaf nodes, is only capable of predicting at most 15 different values. 
+
+&lt;img src="week_4_imgs/rpartplot.png" width="2160" /&gt;
+
+---
+class: middle
+
+This can lead to some very weird prediction surfaces -- while traditional 
+methods like logistic regression create smooth transitions in probability, 
+decision trees are known for creating odd surfaces with hard right angles at
+their splits.
+
+For instance, here's the prediction surface for our logistic regression model
+on the attrition data (on the left) compared to the same model formula run
+through a decision tree (on the right):
+
+.pull-left[
+
+![](week_5_slides_files/figure-html/unnamed-chunk-35-1.png)&lt;!-- --&gt;
+
+]
+
+.pull-right[
+
+![](week_5_slides_files/figure-html/unnamed-chunk-36-1.png)&lt;!-- --&gt;
+
+]
+
+This can be difficult to interpret, since it doesn't really mesh with the way we
+tend to understand cause and effect in the real world -- a change in your `\(X\)`
+value doesn't always (or even _often_) cause a change in the predicted `\(Y\)`.
+
+---
+
+And while we've focused today entirely on classification, I want to point out 
+that all the same techniques can be applied to regression as well. 
+
+For instance, if we load our Ames housing data:
+
+
+```r
+library(AmesHousing)
+ames &lt;- make_ames()
+row_idx &lt;- sample(seq_len(nrow(ames)), nrow(ames))
+training &lt;- ames[row_idx &lt; nrow(ames) * 0.8, ]
+testing &lt;- ames[row_idx &gt;= nrow(ames) * 0.8, ]
+```
+
+We can use the exact same syntax to fit a regression model:
+
+
+```r
+ames_tree &lt;- rpart(Sale_Price ~ ., data = training)
+```
+
+Which we can then calculate the holdout set RMSE of via:
+
+
+```r
+sqrt(mean((predict(ames_tree, testing) - testing$Sale_Price)^2))
+```
+
+```
+## [1] 35849.42
+```
+
+Which is an improvement from the last linear model we fit to the same data!
+
+---
+class: middle
+
+And just like with classification, our model will only be able to predict a set
+number of values. For instance, here's what the prediction surface of a decision
+tree trained using only two variables, `Year_Built` and `Gr_Liv_Area`, looks
+like:
+
+![](week_5_slides_files/figure-html/unnamed-chunk-40-1.png)&lt;!-- --&gt;
+
+Just as before, we get harsh right-angle thresholds where our predictions change
+dramatically as the result of a small increase in our predictors.
+
+---
+class: middle
+
+This is for the exact same reason as with classification: our decision tree can 
+only predict as many distinct
+values as it has leaf nodes. We can compare this prediction surface against the
+one from a linear regression model, like we saw back in week 2. The linear 
+regression surface is on the left, the decision tree on the right.
+
+.pull-left[
+
+![](week_5_slides_files/figure-html/unnamed-chunk-41-1.png)&lt;!-- --&gt;
+
+]
+
+.pull-right[
+
+![](week_5_slides_files/figure-html/unnamed-chunk-42-1.png)&lt;!-- --&gt;
+
+]
+
+---
+class: middle
+
+These weird prediction surfaces can still generate really good predictions. But
+it does make model interpretation a bit harder -- in the last graph, for 
+instance, we could say that homes built after 1980 sell for more money, as well 
+as homes built after 1950 if they're under 1,500 square feet, and also after
+2000 if they're between 1,600 and 2,000 square feet, and so on and so forth.
+
+&lt;br /&gt;
+
+That's a lot more complicated than a simple linear regression, where a 1-unit 
+change in `\(X\)` always results in the same amount of change to `\(Y\)`.
+
+---
+class: middle
+
+Decision trees are our first machine learning algorithm in this course, and they
+bridge the gap from estimation methods (such as linear regression) to pure 
+predictive algorithms like we'll focus on for the rest of the semester. These 
+methods trade model interpretability for flexibility -- we don't need to worry
+about any of the linear model assumptions with these tools -- and predictive 
+accuracy. 
+
+&lt;br /&gt;
+
+Next week, we'll make the jump all the way into pure prediction with random 
+forests. 
+
+---
+
+.bg-washed-green.b--dark-green.ba.bw2.br3.shadow-5.ph4.mt5[
+
+Binary trees give an interesting and often illuminating way of looking at data in classification or regression problems. They should not be used to the exclusion of other methods. We do not claim that they are always better. They do add a flexible nonparametric tool to the data analyst’s arsenal.
+
+.tr[
+— [Leo Breiman, Jerome Friedman, Charles J. Stone, R.A. Olshen: Classification and Regression Trees.](https://www.routledge.com/Classification-and-Regression-Trees/Breiman-Friedman-Stone-Olshen/p/book/9780412048418)
+]
+]
+
+---
+class: middle title
+
+# References
+
+---
+
+This week pulls from a few different sources (as usual, titles are links):
+
++ [CASI](https://web.stanford.edu/~hastie/CASI_files/PDF/casi.pdf) section 8.4 for the math behind decision trees
++ [Classification and Regression Trees](https://www.routledge.com/Classification-and-Regression-Trees/Breiman-Friedman-Stone-Olshen/p/book/9780412048418) for some of the history and original methodology behind CART trees
++ [HOML](https://bradleyboehmke.github.io/HOML/) section 2.5 for bias/variance and chapter 9 for decision trees
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

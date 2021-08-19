@@ -196,13 +196,13 @@ table(training$Attrition)
 
 <br />
 
-Our data set has almost 5 times more "No" values for attrition than "Yes", so 
-models which are super accurate on "No" and not very accurate on "Yes" can be 
-just as "accurate" overall as a model trying its best on both classes.
+Our data set has almost 5 times more "No" values (0s) for attrition than "Yes"es 
+(1s), so models which are super accurate on "No" and not very accurate on "Yes" 
+can be just as accurate overall as a model trying its best on both classes.
 
 <br />
 
-We call this an example of **imbalanced classes**, and this problem an example 
+Our data has **imbalanced classes**, and this problem is an example 
 of **imbalanced classification**. 
 
 ---
@@ -389,7 +389,7 @@ new data.
 <br />
 
 Of course, this method depends on our original sample being sufficiently 
-representative of the population; if that wasn't true, however, you also wouldn't
+representative of the population. If that wasn't true, though, you also wouldn't
 be able to fit good models _without_ resampling.
 
 <br />
@@ -443,7 +443,7 @@ table(resampled_training$Attrition)
 
 <br />
 
-If anything, we've actually slightly too many "yes" cases to this data set!
+If anything, we've actually added slightly too many "yes" cases to this data set!
 
 Now let's go ahead and fit a new model on the resampled data:
 
@@ -511,14 +511,14 @@ increasing the importance of "Yes" values to the model by 500%, so it makes sens
 for two methods with the same goals to have similar outcomes.
 
 When you're able to specify weights, that's often a better way to adjust for 
-imbalanced classes than resampling; your intent is a lot more obvious and you
-avoid the pitfalls associated with pseudoreplicating your data. But often, model
+imbalanced classes than resampling; it makes your intent more obvious and is 
+computationally more efficient. But often, model
 implementations won't provide obvious ways to weight your classes, requiring you
 to take matters into your own hands.
 
 ---
 
-Note also the difference in the probabilities predicted by these methods:
+Note also these methods produce slightly different probabilities:
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=2.5}
 qplot(predict(attrition_model, testing, type = "response"))
