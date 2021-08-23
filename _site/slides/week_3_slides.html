@@ -6,7 +6,7 @@
     <meta name="author" content="Mike Mahoney" />
     <meta name="date" content="2021-09-15" />
     <script src="libs/header-attrs/header-attrs.js"></script>
-    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"acbcfb80fdaf4171ae644569af16d357","expires":1}</script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"b9b1727d973a4e5c9215a62ff210b837","expires":1}</script>
     <script src="libs/himalaya/himalaya.js"></script>
     <script src="libs/js-cookie/js.cookie.js"></script>
     <link href="libs/editable/editable.css" rel="stylesheet" />
@@ -94,7 +94,7 @@ third option.
 &lt;br /&gt;
 
 We're focusing on this because it's easier, and because the methods we talk 
-about today can't _really_ handle more than two categories. 
+about today can't easily handle more than two categories. 
 
 &lt;br /&gt;
 
@@ -160,7 +160,7 @@ and, most importantly, whether or not they still work for IBM.
 
 That last variable is stored in the `Attrition` column, where `Yes` means the
 employee left IBM and `No` means they're still there. This is what we're going 
-to focus on predicting today.
+to focus on predicting.
 
 &lt;br /&gt; 
 
@@ -213,12 +213,11 @@ Alright, this time we got an error! Progress!
 class: middle
 
 The problem here is that our `Attrition` column -- our outcome/response/dependent
-variable -- is stored as a character, while `lm` is expecting a number. We 
-should go ahead and create a dummy variable to replace it! 
+variable -- is stored as a character, while `lm` is expecting a number. 
 
-There's a somewhat more straightforward way to make dummy variables for binary
-variables -- rather than use `pivot_wider` like we did last week, we can just 
-manually specify replacement variables using `recode` from `dplyr`.
+We should go ahead and create a dummy variable to replace it! Because we only
+have two values (Yes and No), we can use `recode` from `dplyr` to encode our
+variable faster than we could with `pivot_wider` last week.
 
 Let's do that and try refitting our model:
 
@@ -249,7 +248,7 @@ This is not exactly an intuitive graph to look at.
 
 ---
 
-If you recall, we recoded our Attrition variable so that "Yes" (employees who quit)
+We recoded our Attrition variable so that "Yes" (employees who quit)
 were transformed to "1", and "No" was transformed to "0". So the dots at the top
 are employees who quit at a given age, and the dots at the bottom are employees
 who stayed on.
@@ -311,7 +310,9 @@ number being predicted by `lm` mean?
 The short answer is **nothing**, it means nothing.
 
 Importantly, it is _not_ the probability of attrition; linear classifiers 
-_do not calculate probability_. Imagine for example what this model would predict
+_do not calculate probability_. 
+
+Imagine for example what this model would predict
 for a 75 year old employee (more common at IBM than you'd think) -- what would a 
 negative probability even mean?
 
@@ -485,9 +486,16 @@ qplot(predict(attrition_model, training, type = "response"))
 
 ![](week_3_slides_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
 
+I wanted to call this out because I mess this up a lot. If you're getting 
+impossible probabilities from a logistic model, make sure you've set the `type`
+argument.
+
+You can see that, once we've set that argument, all of our predicted 
+probabilities fall between 0 and roughly 0.35.
+
 ---
 
-To calculate accuracy, we'll first need to calculate the probability of each 
+To calculate accuracy, we'll first need the probability of each 
 employee quitting:
 
 
@@ -529,7 +537,7 @@ You might already see the issue with this way of assessing accuracy.
 
 &lt;br /&gt;
 
-Our histogram of probabilities topped out at about 0.3 -- there wasn't a single 
+Our histogram of probabilities topped out at about 0.35 -- there wasn't a single 
 employee our model gave more than a 30ish percent chance of quitting.
 
 &lt;br /&gt;
@@ -707,10 +715,6 @@ You can see "Accuracy" here represents our overall accuracy (across both classes
 
 Also listed is the accuracy we'd get just by guessing the more common class for all of our
 predictions ("AccuracyNull" -- here the same as our overall accuracy). 
-
-&lt;br /&gt;
-
-Better models will have a larger "Accuracy" - "AccuracyNull".
 
 ---
 class: middle
@@ -969,8 +973,9 @@ plot(attrition_roc)
 ![](week_3_slides_files/figure-html/unnamed-chunk-37-1.png)&lt;!-- --&gt;
 ]
 
-Each point on the black line the sensitivity and specificity associated with a
-different probability threshold -- so while we used a cutoff of 0.5 earlier, 
+Each point on the black line represents the sensitivity and specificity 
+associated with a different probability threshold -- so while we used a cutoff 
+of 0.5 earlier, 
 we could use other values to get different values of specificity and sensitivity.
 
 ---
@@ -1244,11 +1249,23 @@ So we'd call this model pretty poor at predicting attrition -- which we knew
 already.
 
 ---
-class: middle center title-slide
+class: middle
 
-## Assignment 3
+That's it for this week.
 
-(Due week 4)
+Next week, we'll talk about other ways to deal with classification when you have
+a lot more of one class than the other.
+
+---
+
+# References
+
+---
+
+Titles link to references:
+
++ [HOML](https://bradleyboehmke.github.io/HOML/logistic-regression.html), 
+  specifically section 2.6 (model accuracy) and chapter 5 (logistic regression)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

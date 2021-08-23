@@ -11,12 +11,12 @@ navbar:
       href: schedule.html
     - text: "Handouts"
       menu:
-        - text: "Week 1"
+        - text: "Week 1 (2021-09-01)"
           href: slides/week_1_slides.html
-        - text: "Week 2"
+        - text: "Week 2 (2021-09-08)"
           href: slides/week_2_slides.html
-#        - text: "Week 3"
-#          href: slides/week_3_slides.html
+        - text: "Week 3 (2021-09-15)"
+          href: slides/week_3_slides.html
 #    - text: "Assignments"
 #      menu:
 #        - text: "Week 1"
