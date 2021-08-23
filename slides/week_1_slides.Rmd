@@ -3,7 +3,7 @@ title: "MLCA Week 1:"
 subtitle: "What Are We Doing Here?"  
 author: 
   - "Mike Mahoney"
-date: '`r Sys.Date()`'
+date: "2021-09-01"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -60,8 +60,11 @@ class: center, middle
 All content for this class lives on the course website: 
 [https://mlca.mm218.dev/](https://mlca.mm218.dev/)
 
-This includes the syllabus, schedule, course handouts, and weekly
-assignments.
+This includes the syllabus, schedule, and course handouts (these slides).
+
+We're going to spend this week establishing how this course will run and setting
+the scene for the rest of the semester. Next week we'll start talking about 
+regression and then lead into machine learning.
 
 ---
 class: middle
@@ -72,17 +75,6 @@ Each week you should expect:
   week's class.
 * A one-hour class period for discussing and answering any questions you have
   about the topic of the week.
-* A short application-focused R worksheet
-  
-<br />
-  
-The worksheets are completely optional, you do not ever need to hand them in.
-If you do want feedback or have questions about any worksheet, feel free to
-send me an email or come to office hours.
-
-
----
-class: middle
 
 The only graded assignment in this class is the final assignment, where you'll
 apply these techniques to a data set of your own choosing (potentially, but 
@@ -94,10 +86,6 @@ We'll spend the last three weeks of the course focused on the assignment --
 two weeks for troubleshooting and working on the project, and then the final 
 week will be dedicated to presenting results. The assignment will be graded 
 based on how well you apply the concepts from the course to your problem. 
-
-<br />
-
-More information on the assignment can be found on the course website.
 
 ---
 class: middle
@@ -112,7 +100,7 @@ content.
 
 <br />
 
-Second, these notes have a few features added to try and make them easier to 
+Second, these notes include a few features to try and make them easier to 
 use and navigate. The two I want to highlight is that you 
 can press `o` to see all the slides at a glance, and `h` to see a list of other
 keyboard shortcuts.
@@ -375,7 +363,7 @@ We might also use a model to tell us what value of growth we could expect at
 every single value of sunlight there could ever be. If we graphed that 
 relationship, we'd get a line like this:
 
-```{r fig.height=6}
+```{r fig.height=5, fig.width=10}
 ggplot(plants, aes(sunlight, growth)) + 
   geom_smooth(method = "lm", formula = y ~ x) + 
   theme(axis.text = element_blank())
@@ -387,7 +375,7 @@ If we plotted our data on top of that, we'd see the expected relationship is a
 pretty good match for what we measured, give or take some noise (from variables
 we didn't measure, or error):
 
-```{r fig.height=5}
+```{r fig.height=5, fig.width=10}
 ggplot(plants, aes(sunlight, growth)) + 
   geom_smooth(method = "lm", formula = y ~ x) + 
   geom_point() + 
@@ -417,20 +405,13 @@ Estimation and attribution are two sides of the same coin:
 * estimation aims to determine how some outcome varies over the different levels
   of some input variables, while
 
-<br />
-
 * attribution aims to determine which of those variables are causing the 
   variation (and which are only correlated).
 
 <br />
 
 In this course, we're going to focus on prediction. 
-Prediction is an entirely different coin. 
-
----
-class: center middle
-
-# Prediction
+Prediction is... different.
 
 ---
 class: middle
@@ -457,7 +438,7 @@ with models designed for other purposes.
 
 For instance, we can predict plant growth using our simple linear model:
 
-```{r fig.height=4}
+```{r fig.height=5, fig.width=10}
 plants$pred <- predict(plants_model, plants)
 
 ggplot(plants, aes(sunlight, growth)) + 
@@ -471,7 +452,7 @@ ggplot(plants, aes(sunlight, growth)) +
 Our predictions fall right along that line of best fit. 
 
 In the world of the linear model, "predicting" is the same thing as estimation.
-We're estimating how our response varies with our predictors -- here, we're
+We're estimating how our response varies with our predictors. In this case, we're
 saying it increases linearly.
 
 ```{r fig.height=4}
@@ -490,7 +471,7 @@ $\operatorname{growth}$?"
 
 In an ideal world, our predictions would look like this:
 
-```{r, fig.height=4}
+```{r fig.height=5, fig.width=10}
 ggplot(plants, aes(sunlight, growth)) + 
   geom_point() + 
   geom_point(color = "red", shape = 21, fill = NA) + 
@@ -501,6 +482,7 @@ Knowing the underlying relationship between our variables isn't the goal when
 we're assessing predictions. The only thing that matters is accuracy.
 
 ---
+class: middle
 
 We can't measure the accuracy of predictive models using all the same tools we 
 use for estimation and attribution.
@@ -508,6 +490,7 @@ use for estimation and attribution.
 <br />
 
 Importantly, we aren't going to use p-values to assess our model fits. 
+
 Model p-values represent the probability that your model is equivalent to a 
 model fit using no predictors; the p-values for each individual coefficient 
 represent the probability that the coefficient's true value is 0. But 
@@ -537,8 +520,6 @@ We write this out in English as
 ```{r}
 sqrt(mean((plants$pred - plants$growth)^2))
 ```
-
-<br />
 
 Our linear model has an RMSE of about 3.5, measured in the same units as our 
 made-up "growth" measurement. 
@@ -574,7 +555,8 @@ while they walk like traditional statistics and quack like traditional
 statistics, they work in a different way than the majority of statistics used in 
 environmental science. 
 
-By making use of weak correlations and almost completely ignoring estimation and 
+By making use of weak correlations, embracing high variance, and almost 
+completely ignoring estimation and 
 attribution, these methods are able to optimize entirely for predictive 
 accuracy. 
 
@@ -608,6 +590,12 @@ the most important.
 
 We're optimizing for accuracy, and we'll spend the rest of the semester talking 
 about how to get it.
+
+---
+class: middle
+
+That's it for this week; I'll see you on Wednesday to talk about what the rest
+of the semester looks like.
 
 ---
 .bg-washed-green.b--dark-green.ba.bw2.br3.shadow-5.ph4.mt5[

@@ -3,7 +3,7 @@ title: "MLCA Week 4:"
 subtitle: "Imbalanced Classification"  
 author: 
   - "Mike Mahoney"
-date: '`r Sys.Date()`'
+date: "2021-09-22"
 output:
   xaringan::moon_reader:
     lib_dir: libs

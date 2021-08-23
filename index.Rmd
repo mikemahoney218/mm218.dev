@@ -1,7 +1,7 @@
 ---
-title: "Machine Learning for Prediction: Concepts and Applications in R"
+title: "Machine Learning Concepts and Applications"
 description: |
-  Slides, notes, and assignments for FOR 796
+  Slides, notes, and syllabus for FOR 796
 site: distill::distill_website
 ---
 
@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = FALSE)
 
 **Instructor**: Mike Mahoney  
 **Email**: mike.mahoney.218@gmail.com  
-
+**Office Hours**: Tuesday 11:30-12:30 (location TBA), or by appointment
 
 ## Course Description
 
@@ -47,15 +47,17 @@ boosting machine algorithms as well as cross validation and loss functions.
 
 ## Course Structure
 
-Each week students are expected to read a handout on the concepts and 
-applications of a particular machine learning algorithm. Weekly assignments are
-then designed to walk students through applying these concepts to real 
-prediction problems, easing students into writing their own machine learning 
-code.
+Each week there will be a handout to read before class. You are encouraged to 
+type the code from the handouts into your own R session, in order to develop
+familiarity with the syntax and develop muscle memory for common tasks.
 
-Weekly classes are a one-hour mix of lecture and discussion, designed to support
-and expand upon the concepts of that week's assignment and allow students to 
-clarify their understanding of the topics at hand.
+Class time on Wednesday will be a discussion format, dedicated to answering any
+questions from the reading. Office hours will be available weekly to help debug
+code problems or answer more specific questions.
+
+The course culminates in a final project where students apply concepts from the
+course to a data set of their choosing. The final week of class will be spent
+presenting results from these projects.
 
 ## Learning Objectives
 
@@ -92,9 +94,8 @@ packages on.
 
 ## Grading
 
-Most weeks, students will be given a hands-on programming assignment due the 
-following class. Grades are based solely on 
-assignment performance. Each assignment is worth an equal number of points.
+Grades will be assigned based upon the final project. There are no other 
+assignments in this course.
 
 ## Students with Learning and Physical Disabilities
 

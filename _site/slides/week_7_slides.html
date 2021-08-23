@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>MLCA Week 7:</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Mahoney" />
+    <meta name="date" content="2021-10-13" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"xbcf686f2436417cb3294ac4929a5c22","expires":1}</script>
+    <script src="libs/himalaya/himalaya.js"></script>
+    <script src="libs/js-cookie/js.cookie.js"></script>
+    <link href="libs/editable/editable.css" rel="stylesheet" />
+    <script src="libs/editable/editable.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/mark.js/mark.min.js"></script>
+    <link href="libs/xaringanExtra-search/search.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-search/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":true,"autoSearch":true}) })</script>
+    <link href="libs/tachyons/tachyons.min.css" rel="stylesheet" />
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# MLCA Week 7:
+## Hyperparameter Tuning
+### Mike Mahoney
+### 2021-10-13
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: center, middle
+
+# Hyperparameter Tuning
+
+---
+class: middle
+
+We ended last week with a question: how can we find the best combinations of 
+hyperparameters for our models?
+
+I mentioned that the short answer is trial and error. We need to test out 
+many different combinations of hyperparameters, and then use the set that
+produces the most accurate results to fit our final model.
+
+But how can we evaluate these different models? 
+
+We don't want to evaluate models
+against their own training data, since that'll encourage overfitting; we also
+don't want to test multiple models against our test set, because that 
+invalidates our test set altogether. 
+
+We need to somehow pick our final hyperparameters before we evaluate using the 
+test set.
+
+---
+class: middle
+
+Back in week 2 we talked about using validation sets to compare models before
+selecting one to evaluate using the test set. 
+
+This works, but can be a challenge
+with smaller data sets. 
+
+If you don't have many observations, a large validation set can make your 
+remaining training set too small to fit strong models. 
+
+On the other hand, a small validation set can result in your accuracy metrics 
+being heavily influenced by outliers.
+
+What if there were a way to test our models using multiple small validation sets
+-- so we still had large training sets to fit our models, but could minimize
+the impacts of outliers?
+
+---
+
+Turns out, there's a way to do this, known as **cross validation**. In cross
+validation, you fit multiple models using different subsets of your training 
+data, and then use observations that the model _wasn't_ trained on for validation.
+
+For example, in **k-fold cross validation** (AKA "k-fold CV") you split your
+data into `\(k\)` pieces (**folds**) of equal size.
+
+You then fit `\(k\)` models, each time leaving out one fold from the training data, 
+and evaluate each model _on the excluded fold_. The average accuracy on excluded 
+folds is your validation accuracy.
+
+For example, this cartoon illustrates 5-fold CV. Each column represents a 
+separate model, and each block of data is used for testing exactly once:
+
+![](https://bradleyboehmke.github.io/HOML/images/cv.png)
+(Image from [Hands-On Machine Learning with R](https://bradleyboehmke.github.io/HOML/process.html#resampling))
+
+---
+class: middle
+
+The most extreme form of `\(k\)`-fold CV is where you set `\(k\)` to the number of rows
+in your training data, so that each observation is its own fold. 
+
+Also known as **leave-one-out cross validation** (or LOOCV), this is a common 
+way to assess model accuracy in situations where you can't have a hold-out test 
+set.
+
+The problem with this approach is that LOOCV is extremely computationally 
+intensive, especially as your number of observations increases. More often, 
+people use 5- or 10-fold CV; the results have been shown to be similar _enough_
+to LOOCV.
+
+We'll also keep using a hold-out set to evaluate our final models. Some papers
+only use cross validation to assess models, but there's been concern in
+recent years that this paints a too-optimistic picture of model accuracy. 
+
+The safest bet is to always have a separate test set you use to evaluate your 
+models and to find your final accuracy statistics on.
+
+---
+class: middle
+
+Let's walk through an example of using 5-fold CV to validate 
+models.
+
+First, we need to load our Ames data and break it into train/test splits:
+
+
+```r
+set.seed(123)
+
+ames &lt;- AmesHousing::make_ames()
+row_idx &lt;- sample(seq_len(nrow(ames)), nrow(ames))
+training &lt;- ames[row_idx &lt; nrow(ames) * 0.8, ]
+testing &lt;- ames[row_idx &gt;= nrow(ames) * 0.8, ]
+```
+
+We'll also load the `ranger` package for building random forests:
+
+
+```r
+library(ranger)
+```
+
+And finally, I'm going to write a small `calc_rmse` function to calculate RMSE
+for us so that I can cut back on the amount of copying-and-pasting I have to do:
+
+
+```r
+calc_rmse &lt;- function(rf_model, data) {
+  rf_predictions &lt;- predictions(predict(rf_model, data))
+  sqrt(mean((rf_predictions - data$Sale_Price)^2))
+}
+```
+
+---
+class: middle
+
+The core problem that CV tries to solve is that model accuracy measured against
+the training data is not a good way to estimate test-set accuracy. 
+
+For instance, take a random forest fit using all default parameters:
+
+
+```r
+first_rf &lt;- ranger(Sale_Price ~ ., training)
+```
+
+Using our new `calc_rmse` function, we can see that our model thinks it's doing
+a _great_ job predicting sale prices:
+
+
+```r
+calc_rmse(first_rf, training)
+```
+
+```
+## [1] 11422.89
+```
+
+However, our test set RMSE is nearly double the training set number:
+
+
+```r
+calc_rmse(first_rf, testing)
+```
+
+```
+## [1] 22600.08
+```
+
+So we're hoping that CV provides us a more accurate accuracy number than the 
+training set RMSE.
+
+---
+class: middle
+
+Let's start by splitting our data frame into folds. We're going to do 5-fold CV,
+so let's calculate the number of observations that are going to go into each 
+fold. 
+
+Because the number of rows in our data frame isn't exactly divisible by 5,
+we'll use the `floor` function to round _down_ the number of observations in 
+each fold; this will make sure that each observation is only used as test data
+once:
+
+
+```r
+per_fold &lt;- floor(nrow(training) / 5)
+```
+
+Now let's assign rows into the folds. We want to randomly assign each row to 
+a different split, so we can use the `sample` function here just like we do when
+creating our training and test splits:
+
+
+```r
+fold_order &lt;- sample(seq_len(nrow(training)), 
+                     size = per_fold * 5)
+```
+
+---
+class: middle
+
+We're now going to cut our vector into a list with five parts, each representing
+a fold:
+
+
+```r
+fold_rows &lt;- split(
+  fold_order,
+  rep(1:5, each = per_fold)
+)
+```
+
+We can see that each of the elements in `fold_rows` is now all the row numbers
+assigned to a given fold:
+
+
+```r
+str(fold_rows)
+```
+
+```
+## List of 5
+##  $ 1: int [1:468] 398 217 1357 999 1289 1641 1612 809 1161 905 ...
+##  $ 2: int [1:468] 1722 1587 1033 1052 705 306 1066 2103 1242 1748 ...
+##  $ 3: int [1:468] 434 1117 641 2155 767 20 2301 562 1948 1588 ...
+##  $ 4: int [1:468] 869 708 1065 1869 55 1103 752 1836 1277 1639 ...
+##  $ 5: int [1:468] 566 43 1152 1109 602 597 1024 1259 1540 2292 ...
+```
+
+---
+class: middle
+
+Next, we're going to five different models to our training data, each one 
+trained on four folds and then evaluated against the remaining fifth fold.
+
+To do that manually, we'd build each model in the same way we fit models to the 
+entire data set. First, we'll use `fold_rows` to split our training data into 
+training and "testing" pieces:
+
+
+```r
+first_fold_test &lt;- training[fold_rows[[1]], ]
+first_fold_train &lt;- training[-fold_rows[[1]], ]
+```
+
+And then we fit our model and calculate RMSE using those new data frames:
+
+
+```r
+first_fold_rf &lt;- ranger(Sale_Price ~ ., first_fold_train)
+calc_rmse(first_fold_rf, first_fold_test)
+```
+
+```
+## [1] 33055.23
+```
+
+---
+class: middle
+
+To run all of our cross validation steps at once, we can wrap this code in 
+`vapply`. 
+
+This function will run our models for each item in `fold_rows`, 
+calculate RMSE, and then return a vector of RMSE values:
+
+
+```r
+cv_rmse &lt;- vapply(
+  fold_rows,
+  \(fold_idx) {
+    fold_test &lt;- training[fold_idx, ]
+    fold_train &lt;- training[-fold_idx, ]
+    
+    fold_rf &lt;- ranger(Sale_Price ~ ., fold_train)
+    calc_rmse(fold_rf, fold_test)
+  },
+  numeric(1)
+) 
+cv_rmse
+```
+
+```
+##        1        2        3        4        5 
+## 32716.54 28459.72 24648.93 25717.42 25533.20
+```
+
+---
+
+We'll then take the mean of those values to get our final 5-fold CV RMSE:
+
+
+```r
+mean(cv_rmse)
+```
+
+```
+## [1] 27415.16
+```
+
+Compared to our training RMSE:
+
+
+```r
+calc_rmse(first_rf, training)
+```
+
+```
+## [1] 11422.89
+```
+This is a _much_ better estimate of our model's accuracy against the test set:
+
+
+```r
+calc_rmse(first_rf, testing)
+```
+
+```
+## [1] 22600.08
+```
+
+And that's cross validation in a nutshell!
+
+---
+class: middle
+
+Note, by the way, that randomly assigned folds like we're using here aren't 
+always appropriate ways to assess a model.
+
+For instance, with time series data (or any data with a strong temporal element),
+selecting folds randomly means that you're sometimes predicting events based on 
+data from the future, relative to the "test" event. 
+
+This isn't a realistic
+scenario for your model in real-world applications.
+
+In these situations, rather than randomly select observations to be test data,
+you should use what's called "rolling forecasting origin evaluation", where you
+predict each observation using models built only on prior data. 
+
+Similarly, 
+rather than selecting test sets randomly, your test set should use all of the 
+most recent observations.
+
+This topic is covered in more depth in the (free!) textbook 
+Forecasting: Principles and Practice (https://otexts.com/fpp3/tscv.html), which
+is the dominant time-series forecasting book. If you're doing 
+forecasting work, you should read that book.
+
+---
+
+In order to save on typing going forward, let's go ahead and write a small 
+function to handle k-fold CV for us. 
+
+If we wrap the code we've used so far in a function, it would look like this --
+note that I've swapped the hard-coded 5-fold setup to instead use an argument, 
+`k`, which is set to 5 by default:
+
+
+```r
+k_fold_cv &lt;- function(data, k = 5) {
+  per_fold &lt;- floor(nrow(data) / k)
+  fold_order &lt;- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows &lt;- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test &lt;- data[fold_idx, ]
+      fold_train &lt;- data[-fold_idx, ]
+      
+      fold_rf &lt;- ranger(Sale_Price ~ ., fold_train)
+      calc_rmse(fold_rf, fold_test)
+    },
+    numeric(1)
+  ) |&gt; 
+    mean()
+}
+```
+
+---
+class: middle
+
+Now we can run k-fold CV as easily as:
+
+
+```r
+k_fold_cv(training, 10)
+```
+
+```
+## [1] 26824.95
+```
+
+This function does a decent job of calculating cross-validated accuracy for a
+single model. Remember, however, that we're interested in cross validation as a 
+way to compare _different_ models, using different hyperparameters. We need a 
+way to pass different hyperparameter levels to our `ranger` call.
+
+---
+
+Luckily, R makes this relatively easy. We can simply add a `...` argument to our
+function here, and then pass that `...` to `ranger`:
+
+
+```r
+k_fold_cv &lt;- function(data, k, ...) {
+  per_fold &lt;- floor(nrow(data) / k)
+  fold_order &lt;- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows &lt;- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test &lt;- data[fold_idx, ]
+      fold_train &lt;- data[-fold_idx, ]
+      
+      fold_rf &lt;- ranger(Sale_Price ~ ., fold_train, ...)
+      calc_rmse(fold_rf, fold_test)
+    },
+    numeric(1)
+  ) |&gt; 
+    mean()
+}
+```
+
+That lets us pass whatever arguments we want to the `ranger` function; we just
+need to name them explicitly. For instance, if I wanted to grow a random forest
+of only 10 trees and force the leaves to each have 100 observations:
+
+
+```r
+k_fold_cv(training, 10, num.trees = 10, min.node.size = 100)
+```
+
+```
+## [1] 32833.58
+```
+
+---
+class: middle
+
+So we now have a way to evaluate models using different hyperparameters; all 
+that's left to do now is try a bunch of models. 
+
+Remember that we have five main hyperparameters to tune with a random forest:
+
++ `mtry`: How many variables should be considered at each split? Minimum value
+  is 1, maximum is the number of predictors in the model.
+  
++ `min.node.size`: How many observations should each leaf node contain? Minimum 
+  is 1, maximum is theoretically the number of rows in the training data but
+  _practically_ is rarely higher than 20.
+  
++ `num.trees`: How many decision trees should be grown? Minimum is 1, maximum is
+  infinite, but more trees take more time to grow.
+  
++ `sample.fraction`: What percent of observations should be sampled for each 
+  tree? Minimum is just above 0, maximum is 1.
+  
++ `replace`: Sample observations with replacement? Either TRUE or FALSE.
+
+We _could_ try to manually guess a bunch of different combinations and see what
+works the best, but that seems impractical. It'd be better to find a way to 
+automatically run a ton of models, and report back what worked best.
+
+(By the way, all these parameters are documented in `?ranger`. There's no way to
+use common sense to guess what these parameters are called, what their ranges 
+are, or what sensible defaults might be; this is the sort of knowledge that's 
+only picked up from trial and error and desperate Google searches.)
+
+---
+
+The standard way to do this is to run what's known as a **grid search**. 
+We'll start off by making a "grid" containing every combination of evenly-spaced
+predictors, using the `expand.grid` function:
+
+
+```r
+tuning_grid &lt;- expand.grid(
+  mtry = floor(ncol(training) * c(0.3, 0.6, 0.9)),
+  min.node.size = c(1, 3, 5), 
+  replace = c(TRUE, FALSE),                               
+  sample.fraction = c(0.5, 0.63, 0.8),                       
+  rmse = NA                                               
+)
+
+head(tuning_grid)
+```
+
+```
+##   mtry min.node.size replace sample.fraction rmse
+## 1   24             1    TRUE             0.5   NA
+## 2   48             1    TRUE             0.5   NA
+## 3   72             1    TRUE             0.5   NA
+## 4   24             3    TRUE             0.5   NA
+## 5   48             3    TRUE             0.5   NA
+## 6   72             3    TRUE             0.5   NA
+```
+
+We've also included an empty `rmse` column, where we'll store RMSE values after 
+testing each combination.
+
+---
+
+So now that we've generated a bunch of combinations of hyperparameters to test,
+all that's left is to test them.
+
+We can do this using a for-loop and our `k_fold_cv` function. We'll loop through
+the rows of `tuning_grid`, and with each iteration call `k_fold_cv` using 
+that row of hyperparameters. By storing the RMSE back in `tuning_grid`, we'll 
+be able to identify which combinations produced the best models.
+
+Fair warning: on my computer, this grid search took 6 minutes to run.
+
+
+```r
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$rmse[i] &lt;- k_fold_cv(
+    training, 
+    k = 5,
+    mtry = tuning_grid$mtry[i],
+    min.node.size = tuning_grid$min.node.size[i],
+    replace = tuning_grid$replace[i],
+    sample.fraction = tuning_grid$sample.fraction[i]
+    )
+}
+
+head(tuning_grid[order(tuning_grid$rmse), ])
+```
+
+```
+##    mtry min.node.size replace sample.fraction     rmse
+## 53   48             5   FALSE            0.80 24693.65
+## 50   48             3   FALSE            0.80 24959.52
+## 46   24             1   FALSE            0.80 25019.50
+## 32   48             3   FALSE            0.63 25264.45
+## 52   24             5   FALSE            0.80 25384.90
+## 38   48             1    TRUE            0.80 25451.66
+```
+
+---
+
+So we can identify some trends in which hyperparameters seem to work the best.
+Our models do better with `mtry` at the intermediate values of 24 and 48, 
+`sample.fraction` at 0.63 or above, `replace` set to `FALSE`, and 
+`min.node.size` doesn't seem to matter much.
+
+We can then use this information to refine our grid further! Let's rebuild the
+grid, focusing on the most promising ranges of hyperparameters:
+
+
+```r
+tuning_grid &lt;- expand.grid(
+  mtry = c(20, 25, 30, 35, 40, 45, 50),
+  min.node.size = c(1, 3, 5), 
+  replace = FALSE,                               
+  sample.fraction = c(0.6, 0.8, 1),                       
+  rmse = NA                                               
+)
+```
+
+---
+
+And we can re-use the code from earlier to run this grid search. Another 
+warning, this search takes about 6 minutes on my machine:
+
+
+```r
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$rmse[i] &lt;- k_fold_cv(
+    training, 
+    k = 5,
+    mtry = tuning_grid$mtry[i],
+    min.node.size = tuning_grid$min.node.size[i],
+    replace = tuning_grid$replace[i],
+    sample.fraction = tuning_grid$sample.fraction[i]
+    )
+}
+head(tuning_grid[order(tuning_grid$rmse), ])
+```
+
+```
+##    mtry min.node.size replace sample.fraction     rmse
+## 57   20             5   FALSE             1.0 24351.89
+## 51   25             3   FALSE             1.0 24455.63
+## 45   30             1   FALSE             1.0 24485.03
+## 54   40             3   FALSE             1.0 24504.40
+## 53   35             3   FALSE             1.0 24556.64
+## 36   20             5   FALSE             0.8 24605.95
+```
+
+
+---
+
+And we can keep doing this until we've narrowed down on the specific individual
+values of hyperparameters that give us the best result.
+
+You'll notice, by the way, that we haven't touched the number of trees per 
+random forest yet. That's because while all our other hyperparameters might 
+interact -- the ideal number of observations per leaf might be higher with 
+higher sample fractions, for example -- the accuracy of a random forest tends
+to increase with additional trees no matter what. 
+
+A safe bet is to set the number of trees equal to 10 times the number of 
+predictors (so here, 800); you can add more trees to get a more stable random
+forest, but increasing trees also increases computation time.
+
+---
+
+If we stop tuning here, we can use our best combination of hyperparameters to 
+evaluate our final model:
+
+
+```r
+grid_rf &lt;- ranger(
+  Sale_Price ~ .,
+  training,
+  num.trees = 800,
+  mtry = 20,
+  min.node.size = 5,
+  replace = FALSE,
+  sample.fraction = 1
+)
+
+calc_rmse(grid_rf, testing)
+```
+
+```
+## [1] 21684.68
+```
+
+Compare that to our model fit using default values:
+
+
+```r
+calc_rmse(first_rf, testing)
+```
+
+```
+## [1] 22600.08
+```
+
+And you can see that we've knocked about $1,000 off our RMSE, just by tuning 
+hyperparameters.
+
+---
+
+There's two variations on this type of grid search which are worth talking about.
+
+First off, if you have access to large amounts of computing power or time, you
+can set your first grid to contain every single value of hyperparameter that you
+might want to test. For instance, you might build a grid that looks like this:
+
+
+```r
+tuning_grid &lt;- expand.grid(
+  mtry = 1:80,
+  min.node.size = 1:10, 
+  replace = c(TRUE, FALSE),                               
+  sample.fraction = seq(0.01, 1, 0.01),                       
+  rmse = NA                                               
+)
+```
+
+This grid has 160,000 rows, much more than the two grids we used before, 
+combined. Most of these combinations will produce awful models, but you can be
+confident that your best model is hiding somewhere in that grid.
+
+---
+
+Another strategy is to build that same massive grid and then randomly select
+a subset of combinations to actually try.
+
+This is a **random grid search**, and if you select enough rows you can be 
+confident it'll produce equally good results as the full grid for much less 
+effort. I'm going to try it using 300 rows right now:
+
+
+```r
+which_trials &lt;- sample(1:nrow(tuning_grid), 300)
+
+tuning_grid &lt;- tuning_grid[which_trials, ]
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$rmse[i] &lt;- k_fold_cv(
+    training, 
+    k = 5,
+    mtry = tuning_grid$mtry[i],
+    min.node.size = tuning_grid$min.node.size[i],
+    replace = tuning_grid$replace[i],
+    sample.fraction = tuning_grid$sample.fraction[i]
+    )
+}
+head(tuning_grid[order(tuning_grid$rmse), ])
+```
+
+```
+##        mtry min.node.size replace sample.fraction     rmse
+## 159550   30             5   FALSE            1.00 24190.32
+## 159407   47             3   FALSE            1.00 24656.13
+## 103385   25             3   FALSE            0.65 24819.93
+## 124115   35             2   FALSE            0.78 24885.43
+## 122604   44             3   FALSE            0.77 24968.41
+## 134336   16            10   FALSE            0.84 24968.76
+```
+
+---
+
+We can then evaluate the best model from the random grid against our test set:
+
+
+```r
+random_rf &lt;- ranger(
+  Sale_Price ~ .,
+  training,
+  num.trees = 800,
+  mtry = 30,
+  min.node.size = 5,
+  replace = FALSE,
+  sample.fraction = 1
+)
+
+calc_rmse(random_rf, testing)
+```
+
+```
+## [1] 22273.62
+```
+
+And while it's a bit worse than the result we got from our multi-stage grid 
+search, it's still a bit better than the default values! We could also try 
+selecting more rows from the full grid -- I went with 300 just so these slides
+wouldn't take too long to render.
+
+---
+
+There are plenty of other methods for tuning hyperparameters, which 
+automatically attempt to find the best values available. 
+
+These methods -- the most popular being Bayesian optimization, simulated 
+annealing, and genetic algorithms -- work similarly to our multi-stage grid 
+search: they test a handful of hyperparameter values and then make tweaks to try
+and bring the RMSE (or other loss) down. The method will select whatever 
+hyperparameters minimize your loss function.
+
+These methods are a bit too complex for what we have time for in this course, 
+and don't work the same for each type of model, so we won't talk any further
+about them.
+
+---
+
+So we've covered how to tune ML models for regression problems. Can we use the
+same approach for classification?
+
+The answer is: mostly. The issue is that, when we're comparing different 
+hyperparameter sets, we need to rank our models based on a single loss function.
+For regression, that's easy enough, because we can measure errors numerically; 
+we normally pick either RMSE or MAE and minimize loss accordingly.
+
+As we've talked about with classification, however, most of the common loss 
+functions -- overall accuracy, sensitivity and specificity, positive and 
+negative predictive power -- require you to make decisions about what you 
+actually care about. Most of the loss functions we use to think and talk about 
+our models don't work well for tuning them.
+
+---
+
+As a result, for tuning classification problems, we tend to use a different type 
+of loss function called **cross-entropy loss**. 
+
+Cross-entropy loss attempts to 
+penalize models based not only on if their predictions were correct, but also by
+how _confident_ the model was in its prediction. If the model predicted 
+an observation correctly with 100% probability, then that gets a score of 0 -- 
+no loss, because the model did perfectly. But as the model's certainty 
+decreases, the cross-entropy loss increases.
+
+For instance, here's a quick graph of what this loss function looks like when
+the correct prediction is "Yes". Models that predict "Yes" with 100% probability
+get a score of 0 -- they've minimized their loss -- while lower probabilities
+are associated with higher and higher values:
+
+&lt;img src="week_7_slides_files/figure-html/unnamed-chunk-30-1.png" width="10" height="4" /&gt;
+
+You might recognize this as a logarithmic decay curve -- it is! Functionally, to 
+calculate cross-entropy loss, you take the negative logarithm of the probability
+assigned to the correct class.
+
+---
+
+Let's walk through an example, using our attrition data set. First, we'll load
+the data and split it into training and testing like usual:
+
+
+```r
+library(modeldata)
+data(attrition)
+row_idx &lt;- sample(seq_len(nrow(attrition)), nrow(attrition))
+training &lt;- attrition[row_idx &lt; nrow(attrition) * 0.8, ]
+testing &lt;- attrition[row_idx &gt;= nrow(attrition) * 0.8, ]
+```
+
+We're then going to fit a random forest to this data, starting off by using the
+default hyperparameters. Because we care about the probability our model assigns
+each class, not just the predicted class, we'll also need to set 
+`probability = TRUE` in our call to `ranger`:
+
+
+```r
+first_rf &lt;- ranger(Attrition ~ ., training, probability = TRUE)
+```
+
+---
+
+When we make predictions from a random forest fit with `probability = TRUE`, we
+wind up getting back a matrix with the probabilities of all our predicted 
+classes:
+
+
+```r
+predict(first_rf, training) |&gt; 
+  predictions() |&gt; 
+  head(2)
+```
+
+```
+##             No        Yes
+## [1,] 0.4266214 0.57337857
+## [2,] 0.9535190 0.04648095
+```
+
+While matrices can be a little hard to work with, we can pipe this directly 
+into `cbind` to add these predictions to our data frame:
+
+
+```r
+predict(first_rf, training) |&gt; 
+  predictions() |&gt; 
+  cbind(training) |&gt; 
+  head(2)
+```
+
+```
+##          No        Yes Age Attrition    BusinessTravel DailyRate
+## 1 0.4266214 0.57337857  41       Yes     Travel_Rarely      1102
+## 2 0.9535190 0.04648095  49        No Travel_Frequently       279
+##             Department DistanceFromHome     Education EducationField
+## 1                Sales                1       College  Life_Sciences
+## 2 Research_Development                8 Below_College  Life_Sciences
+##   EnvironmentSatisfaction Gender HourlyRate JobInvolvement JobLevel
+## 1                  Medium Female         94           High        2
+## 2                    High   Male         61         Medium        2
+##              JobRole JobSatisfaction MaritalStatus MonthlyIncome MonthlyRate
+## 1    Sales_Executive       Very_High        Single          5993       19479
+## 2 Research_Scientist          Medium       Married          5130       24907
+##   NumCompaniesWorked OverTime PercentSalaryHike PerformanceRating
+## 1                  8      Yes                11         Excellent
+## 2                  1       No                23       Outstanding
+##   RelationshipSatisfaction StockOptionLevel TotalWorkingYears
+## 1                      Low                0                 8
+## 2                Very_High                1                10
+##   TrainingTimesLastYear WorkLifeBalance YearsAtCompany YearsInCurrentRole
+## 1                     0             Bad              6                  4
+## 2                     3          Better             10                  7
+##   YearsSinceLastPromotion YearsWithCurrManager
+## 1                       0                    5
+## 2                       1                    7
+```
+
+---
+
+Since cross-entropy loss is equal to the negative log of the probability for the
+correct class, we need to use an `ifelse` to create a column containing just 
+that probability:
+
+
+```r
+predict(first_rf, training) |&gt; 
+  predictions() |&gt; 
+  cbind(training) |&gt; 
+  mutate(prediction = ifelse(Attrition == "Yes", Yes, No)) |&gt; 
+  select(Attrition, No, Yes, prediction) |&gt; 
+  head(2)
+```
+
+```
+##   Attrition        No        Yes prediction
+## 1       Yes 0.4266214 0.57337857  0.5733786
+## 2        No 0.9535190 0.04648095  0.9535190
+```
+
+And we can then take the negative log of that column to get our loss:
+
+
+```r
+predict(first_rf, training) |&gt; 
+  predictions() |&gt; 
+  cbind(training) |&gt; 
+  mutate(prediction = ifelse(Attrition == "Yes", Yes, No),
+         loss = -log(prediction)) |&gt; 
+  select(Attrition, No, Yes, prediction, loss) |&gt; 
+  head(2)
+```
+
+```
+##   Attrition        No        Yes prediction       loss
+## 1       Yes 0.4266214 0.57337857  0.5733786 0.55620910
+## 2        No 0.9535190 0.04648095  0.9535190 0.04759588
+```
+
+If you sum the loss column, you get the total cross-entropy loss for our model.
+
+---
+
+Just like with RMSE, we're going to wrap that code into a function. 
+
+One last detail here is that, if our model is 100% confident in the wrong 
+answer, we wind up with a probability of 0. Since the log of 0 is infinite, 
+we'll add a line of code here so that our prediction is never _exactly_ 0 or 1,
+but rather a tiny value (1^-15):
+
+
+```r
+calc_cross_entropy &lt;- function(rf_model, data) {
+  data &lt;- predict(rf_model, data) |&gt; 
+  predictions() |&gt; 
+  cbind(data) |&gt; 
+  mutate(prediction = ifelse(Attrition == "Yes", Yes, No),
+         # Force prediction to not be exactly 0 or 1
+         prediction = max(1e-15, min(1 - 1e-15, prediction)),
+         loss = -log(prediction))
+  sum(-log(data$prediction))
+}
+
+calc_cross_entropy(first_rf, testing)
+```
+
+```
+## [1] 963.09
+```
+
+---
+
+And we need to make a handful of changes to our `k_fold_cv` function. First off,
+we need to change the `ranger` call so that we're now predicting `Attrition`
+instead of `Sale_Price`, and to set `probability = TRUE`. We also are going to
+make sure we're calculating cross-entropy instead of RMSE:
+
+
+```r
+k_fold_cv &lt;- function(data, k, ...) {
+  per_fold &lt;- floor(nrow(data) / k)
+  fold_order &lt;- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows &lt;- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test &lt;- data[fold_idx, ]
+      fold_train &lt;- data[-fold_idx, ]
+      
+      fold_rf &lt;- ranger(Attrition ~ ., fold_train, probability = TRUE, ...)
+      calc_cross_entropy(fold_rf, fold_test)
+    },
+    numeric(1)
+  ) |&gt; 
+    mean()
+}
+```
+
+---
+
+But once we've done that, tuning this classification model works just the same
+as tuning a regression:
+
+
+```r
+tuning_grid &lt;- expand.grid(
+  mtry = floor(ncol(training) * c(0.3, 0.6, 0.9)),
+  min.node.size = c(1, 3, 5), 
+  replace = c(TRUE, FALSE),                               
+  sample.fraction = c(0.5, 0.63, 0.8),                       
+  loss = NA                                               
+)
+
+head(tuning_grid)
+```
+
+```
+##   mtry min.node.size replace sample.fraction loss
+## 1    9             1    TRUE             0.5   NA
+## 2   18             1    TRUE             0.5   NA
+## 3   27             1    TRUE             0.5   NA
+## 4    9             3    TRUE             0.5   NA
+## 5   18             3    TRUE             0.5   NA
+## 6   27             3    TRUE             0.5   NA
+```
+
+
+```r
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$loss[i] &lt;- k_fold_cv(
+    training, 
+    k = 5,
+    mtry = tuning_grid$mtry[i],
+    min.node.size = tuning_grid$min.node.size[i],
+    replace = tuning_grid$replace[i],
+    sample.fraction = tuning_grid$sample.fraction[i]
+    )
+}
+
+head(tuning_grid[order(tuning_grid$loss), ])
+```
+
+```
+##    mtry min.node.size replace sample.fraction     loss
+## 19    9             1    TRUE            0.63 790.3518
+## 40    9             3    TRUE            0.80 803.1010
+## 4     9             3    TRUE            0.50 823.0342
+## 10    9             1   FALSE            0.50 837.0313
+## 7     9             5    TRUE            0.50 840.5779
+## 1     9             1    TRUE            0.50 841.8220
+```
+
+---
+
+We could then take the best combination of hyperparameters from our grid search
+and refine our model further, just like we did with regression.
+
+One last thing to note is that cross-entropy loss, while a useful tool for model
+tuning, is not a great model statistic. Cross-entropy will usually increase with
+the number of observations in your test set, so doesn't communicate much about 
+the actual predictive accuracy of the model; it simply does a better job of 
+comparing models using the same test set than overall accuracy or similar 
+metrics.
+
+Cross-entropy loss is also not a silver bullet for imbalanced classification
+problems. For instance, the next slide will have the confusion matrix for the
+best model selected by our grid search. While our specificity is higher than
+we've seen in the past, it's still not _great_ -- we'd probably want to weight
+our classes while tuning to get better results overall.
+
+
+```r
+grid_rf &lt;- ranger(
+  Attrition ~ .,
+  training,
+  num.trees = 310,
+  mtry = 9,
+  min.node.size = 5,
+  replace = FALSE,
+  sample.fraction = 0.5
+)
+```
+
+---
+
+
+```r
+caret::confusionMatrix(
+  predictions(predict(grid_rf, testing)),
+  testing$Attrition
+)
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction  No Yes
+##        No  246  34
+##        Yes   2  13
+##                                          
+##                Accuracy : 0.878          
+##                  95% CI : (0.8351, 0.913)
+##     No Information Rate : 0.8407         
+##     P-Value [Acc &gt; NIR] : 0.04387        
+##                                          
+##                   Kappa : 0.3709         
+##                                          
+##  Mcnemar's Test P-Value : 2.383e-07      
+##                                          
+##             Sensitivity : 0.9919         
+##             Specificity : 0.2766         
+##          Pos Pred Value : 0.8786         
+##          Neg Pred Value : 0.8667         
+##              Prevalence : 0.8407         
+##          Detection Rate : 0.8339         
+##    Detection Prevalence : 0.9492         
+##       Balanced Accuracy : 0.6343         
+##                                          
+##        'Positive' Class : No             
+## 
+```
+
+
+---
+class: middle
+
+# References
+
+---
+
+Titles link to resources:
+
++ [Hands-On Machine Learning With R](https://bradleyboehmke.github.io/HOML/): 
+  Chapter 2 (pretty much all the parts we haven't covered before now) and 11 
+  (for random forest tuning)
++ [Forecasting: Principles and Practice](https://otexts.com/fpp3/tscv.html) section 5.10 for time series cross validation
+
+A lot of the sidenotes this week come from recent papers talking about the
+limitations of cross validation, specifically:
+
++ [Cross-validation: what does it estimate and how well does it do it?](http://statweb.stanford.edu/~tibs/ftp/NCV.pdf)
++ [Prediction, Estimation, and Attribution](https://www.tandfonline.com/doi/full/10.1080/01621459.2020.1762613)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

@@ -7,14 +7,14 @@ navbar:
   right:
     - text: "Syllabus"
       href: index.html
-#    - text: "Schedule"
-#      href: schedule.html
-#    - text: "Slides"
-#      menu:
-#        - text: "Week 1"
-#          href: slides/week_1_slides.html
-#        - text: "Week 2"
-#          href: slides/week_2_slides.html
+    - text: "Schedule"
+      href: schedule.html
+    - text: "Handouts"
+      menu:
+        - text: "Week 1"
+          href: slides/week_1_slides.html
+        - text: "Week 2"
+          href: slides/week_2_slides.html
 #        - text: "Week 3"
 #          href: slides/week_3_slides.html
 #    - text: "Assignments"

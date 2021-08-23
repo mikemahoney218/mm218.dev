@@ -3,7 +3,7 @@ title: "MLCA Week 2:"
 subtitle: "Regression, Linear Regression, and Statistics"  
 author: 
   - "Mike Mahoney"
-date: '`r Sys.Date()`'
+date: "2021-09-08"
 output:
   xaringan::moon_reader:
     lib_dir: libs
@@ -378,8 +378,8 @@ someone uses the acronym without specifying.
 ---
 class: middle
 
-So if MAE is more easily interpreted than RMSE, why is RMSE more popular for 
-prediction? 
+So if MAE is more easily interpreted than RMSE, why is RMSE a more popular loss
+function? 
 
 It has to do with how individual errors are weighted. Because RMSE takes the 
 mean of the _squared_ errors, it penalizes larger errors much more than MAE.
@@ -486,7 +486,7 @@ able to minimize its error on all of the data points we used to create it.
 <br />
 
 Instead, we want to know how well our model will do at
-predicting data where we don't (or can't) know what the "right" answer will be.
+predicting data when we don't know what the "right" answer will be.
 
 <br />
 
@@ -512,15 +512,12 @@ industry, with models trained on trillions of records, it's not uncommon to see
 <br />
 
 Generally speaking, your goal is to have enough of your data in training to have
-your model fully capture patterns in the data, while enough of your data is in 
-training to fully capture the variation in the data (since if all the values are 
-similar, you won't have any idea how the model performs on more extreme 
-observations). 
+your model fully capture patterns in the data and enough data in testing to 
+make sure your testing data looks like the real-world data you're predicting.
 
 <br />
 
-If you don't have any reasons for concern about these goals 
-(which we'll talk about during week 4), an 80/20 or 70/30 training/testing split 
+If you don't have any reasons for concern about this, an 80/20 or 70/30 training/testing split 
 is probably appropriate.
 
 <br />
@@ -560,8 +557,9 @@ testing %>%
 
 Our full model performs a bit worse on the hold-out set than it did when we were
 evaluating using training data, which is to be expected -- it wasn't 
-specifically fit to these values, so it makes sense it performs worse. Our 
-component models, however, actually perform slightly _better_ on the new data!
+fit to these values, so wasn't able to minimize its error on specifically these
+points. Our component models, however, actually perform slightly _better_ on the 
+new data!
 
 ---
 class: middle
@@ -614,8 +612,8 @@ the model is trained on 60% of the data, 20% of the data is used to compare
 models and make changes, and the last 20% of the data is used to calculate 
 final accuracy metrics. 
 
-This week's assignment will walk through this process in a bit more detail. For
-now, we're just going to keep using our test and train sets.
+For now, we're just going to keep using our test and train sets. We'll talk more
+about validation sets in the weeks to come.
 
 ---
 class: middle
@@ -635,12 +633,12 @@ testing %>%
 Looks like the answer is yes, slightly. 
 
 It's worth noting that `Foundation` is
-the first non-numeric variable we've used -- let's spend a little time talking
+the first non-numeric variable we've used. Let's spend a little time talking
 about how models use non-numeric variables.
 
 ---
 
-The short answer is that, behind the scenes, `lm` has turned our single column
+Behind the scenes, `lm` has turned our single column
 into a handful of temporary variables. We can see this in the 
 output when we run `summary(ames_two)` -- the `Foundation` variables don't exist
 in our data frame:
@@ -652,9 +650,9 @@ summary(ames_two)
 ---
 class: middle
 
-Those variables are effectively **binary** variables (also referred to as 
-**booleans**): columns with a values of
-either 0 or 1, where 0 corresponds to `FALSE` and 1 to `TRUE`.
+Those variables are **binary** variables (also referred to as **booleans**): 
+columns with values of either 0 or 1, where 0 corresponds to `FALSE` and 1 to 
+`TRUE`.
 
 <br />
 
@@ -665,9 +663,11 @@ So in this example, a house with a stone foundation would have a 1 in the
 
 We need to do this because our models don't actually know how to process text 
 data; we need to convert it into some numeric representation before we can use
-that information to help us make predictions. This is worth emphasizing: every
-model we talk about in this course is only capable of dealing with numeric data,
-and we need to make all of our data numeric to use them. 
+that information to help us make predictions. 
+
+This is worth emphasizing: every model we talk about in this course is only 
+capable of dealing with numeric data, so the data we provide the model needs to
+be numeric.
 
 <br />
 
@@ -686,7 +686,7 @@ library(tidyr)
 one_hot_training <- training %>% 
   mutate(dummy_value = 1) %>% # Create a dummy value column
   pivot_wider(
-     # "Turn each value of Foundation into a variable"
+    # "Turn each value of Foundation into a variable"
     names_from = Foundation,
     # Optional -- add the column name prefix lm uses
     names_prefix = "Foundation", 
@@ -750,15 +750,17 @@ Two pieces of trivia that might be helpful in remembering these encoding methods
 
 * Dummy variables are "dummies" because the model is relying on some information
   that doesn't exist as a variable on its own, but is a combination of the other
-  variables -- for instance, by removing the BrkTil variable, we've effectively 
+  variables . For instance, by removing the BrkTil variable, we've effectively 
   told our models that houses which are 0 for every other type of foundation are
   actually their own BrkTil group.
 
-<br />
+---
+class: middle
+
+That's it for this week. We'll come back to regression, hold-out set validation,
+and categorical variable encoding throughout the rest of the course.
   
-These methods -- hold-out set validation and categorical variable encoding -- 
-will show up frequently throughout this course, even as we move towards pure 
-prediction algorithms and leave linear regression behind.
+Next week, classification.
 
 ---
 class: middle center title
@@ -767,8 +769,9 @@ class: middle center title
 
 ---
 
-This week we're using a lot of material from 
-[Hands-On Machine Learning with R (link)](https://bradleyboehmke.github.io/HOML/).
+Titles link to references:
+
++ [Hands-On Machine Learning with R](https://bradleyboehmke.github.io/HOML/).
 Specifically, we're using Chapter 1 (background and Ames housing data),
 2 (hold-out sets, loss) and 4 (linear regression).
 
