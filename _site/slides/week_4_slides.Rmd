@@ -227,8 +227,10 @@ classes are "worth" the same amount to the model.
 class: middle
 
 To put this into practice, we'd first want to create a "weight" column in our 
-training data set. We'll set the weights of "No" values to 1 and "Yes" to 5, to
-try and balance our classes:
+training data set. 
+
+We'll set the weights of "No" values to 1 and "Yes" to 5 to try and balance our 
+classes:
 
 ```{r}
 training_weights <- ifelse(training$Attrition, 5, 1)
@@ -242,7 +244,7 @@ training |>
 ---
 class: middle
 
-We then need to provide this new "weight" column to the "weights" argument of
+We then need to provide this new "weight" vector to the "weights" argument of
 `glm`:
 
 ```{r}
@@ -417,8 +419,8 @@ observations like this:
 n_pos <- nrow(positive_training)
 
 resampled_positives <- sample(1:n_pos, 
-                                 size = 5 * n_pos, 
-                                 replace = TRUE)
+                              size = 5 * n_pos, 
+                              replace = TRUE)
 
 resampled_positives <- positive_training[resampled_positives, ]
 ```
@@ -469,6 +471,8 @@ testing$prediction <- predict(resampled_model,
 testing$prediction <- round(testing$prediction)
 ```
 
+<br />
+
 Let's take a look at our confusion matrix...
 
 ---
@@ -512,9 +516,10 @@ for two methods with the same goals to have similar outcomes.
 
 When you're able to specify weights, that's often a better way to adjust for 
 imbalanced classes than resampling; it makes your intent more obvious and is 
-computationally more efficient. But often, model
-implementations won't provide obvious ways to weight your classes, requiring you
-to take matters into your own hands.
+computationally more efficient. 
+
+But often, model implementations won't provide obvious ways to weight your 
+classes, requiring you to try resampling instead.
 
 ---
 
@@ -548,7 +553,7 @@ real-world classification problem you have to work with.
 ---
 class: middle
 
-One final note: I want to highlight that both weighting and bootstrapping used
+One final note: I want to highlight that both weighting and resampling used
 the class abundances from the _training set_. 
 
 <br />
@@ -566,11 +571,3 @@ set, if you can avoid it.
 
 That's it for this week. Next week we leave the world of traditional statistics
 and start in with our first pure prediction algorithm: the decision tree.
-
----
-class: middle center title-slide
-
-## Assignment 4
-
-(Due week 5)
-

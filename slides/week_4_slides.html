@@ -6,7 +6,7 @@
     <meta name="author" content="Mike Mahoney" />
     <meta name="date" content="2021-09-22" />
     <script src="libs/header-attrs/header-attrs.js"></script>
-    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"x223ad27d1444a42b6dddf05b3ef7c4d","expires":1}</script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"xf470da4ea7741d3b4a54f7bfc59c2c6","expires":1}</script>
     <script src="libs/himalaya/himalaya.js"></script>
     <script src="libs/js-cookie/js.cookie.js"></script>
     <link href="libs/editable/editable.css" rel="stylesheet" />
@@ -276,8 +276,10 @@ classes are "worth" the same amount to the model.
 class: middle
 
 To put this into practice, we'd first want to create a "weight" column in our 
-training data set. We'll set the weights of "No" values to 1 and "Yes" to 5, to
-try and balance our classes:
+training data set. 
+
+We'll set the weights of "No" values to 1 and "Yes" to 5 to try and balance our 
+classes:
 
 
 ```r
@@ -302,7 +304,7 @@ training |&gt;
 ---
 class: middle
 
-We then need to provide this new "weight" column to the "weights" argument of
+We then need to provide this new "weight" vector to the "weights" argument of
 `glm`:
 
 
@@ -533,8 +535,8 @@ observations like this:
 n_pos &lt;- nrow(positive_training)
 
 resampled_positives &lt;- sample(1:n_pos, 
-                                 size = 5 * n_pos, 
-                                 replace = TRUE)
+                              size = 5 * n_pos, 
+                              replace = TRUE)
 
 resampled_positives &lt;- positive_training[resampled_positives, ]
 ```
@@ -594,6 +596,8 @@ testing$prediction &lt;- predict(resampled_model,
 
 testing$prediction &lt;- round(testing$prediction)
 ```
+
+&lt;br /&gt;
 
 Let's take a look at our confusion matrix...
 
@@ -678,9 +682,10 @@ for two methods with the same goals to have similar outcomes.
 
 When you're able to specify weights, that's often a better way to adjust for 
 imbalanced classes than resampling; it makes your intent more obvious and is 
-computationally more efficient. But often, model
-implementations won't provide obvious ways to weight your classes, requiring you
-to take matters into your own hands.
+computationally more efficient. 
+
+But often, model implementations won't provide obvious ways to weight your 
+classes, requiring you to try resampling instead.
 
 ---
 
@@ -708,7 +713,7 @@ real-world classification problem you have to work with.
 ---
 class: middle
 
-One final note: I want to highlight that both weighting and bootstrapping used
+One final note: I want to highlight that both weighting and resampling used
 the class abundances from the _training set_. 
 
 &lt;br /&gt;
@@ -726,14 +731,6 @@ set, if you can avoid it.
 
 That's it for this week. Next week we leave the world of traditional statistics
 and start in with our first pure prediction algorithm: the decision tree.
-
----
-class: middle center title-slide
-
-## Assignment 4
-
-(Due week 5)
-
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
