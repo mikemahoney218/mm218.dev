@@ -18,5 +18,7 @@ navbar:
         - text: "Week 3 (2021-09-15)"
           href: slides/week_3_slides.html
         - text: "Week 4 (2021-09-22)"
-          href: slides/week_3_slides.html
+          href: slides/week_4_slides.html
+        - text: "Week 5 (2021-09-29)"
+          href: slides/week_5_slides.html
 output: distill::distill_article
