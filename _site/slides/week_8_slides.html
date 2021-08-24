@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>MLCA Week 8:</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Mahoney" />
+    <meta name="date" content="2021-10-20" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/mark.js/mark.min.js"></script>
+    <link href="libs/xaringanExtra-search/search.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-search/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":true,"autoSearch":true}) })</script>
+    <link href="libs/tachyons/tachyons.min.css" rel="stylesheet" />
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# MLCA Week 8:
+## Gradient Boosting Machines
+### Mike Mahoney
+### 2021-10-20
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: center, middle
+
+# Gradient Boosting Machines
+
+---
+class: middle
+
+We're going to move on this week to talk about **gradient boosting machines** (GBMs). 
+Like random forests, GBMs aggregate decision trees in order to reduce model 
+variance, resulting in more accurate predictions. 
+
+However, unlike random forests, trees in a GBM are not grown all at once to 
+predict the same outcome. Instead, trees are grown in sequence, and each tree
+predicts the residuals of the trees grown before it.
+
+GBMs are computationally intensive and a downright bear to tune, but done right 
+GBMs are often the best predictive model for a given task, and have
+a long history of winning competitive machine learning challenges.
+
+---
+
+But before we get to all that, let's talk about **boosting** -- the "B" in GBM.
+
+Boosting, to put it simply, is the process of sequentially adding models to a 
+base model in order to reduce errors and refine the predictions of the initial
+model.
+
+Let's walk through an example, using our Ames data. First off, we'll create our
+training and testing splits as usual:
+
+
+```r
+set.seed(123)
+ames &lt;- AmesHousing::make_ames()
+row_idx &lt;- sample(seq_len(nrow(ames)), nrow(ames))
+training &lt;- ames[row_idx &lt; nrow(ames) * 0.8, ]
+testing &lt;- ames[row_idx &gt;= nrow(ames) * 0.8, ]
+```
+
+---
+
+The first step in creating a boosted model is to fit a "base" model. While we 
+can use any model for this -- it's not uncommon to see boosted linear models, 
+for instance -- most often we'll use decision trees.
+
+To keep things simple, we'll go ahead and fit our default decision tree:
+
+
+```r
+library(rpart)
+first_tree &lt;- rpart(Sale_Price ~ ., training)
+```
+
+As we've seen before, this decision tree is a weak learner which doesn't do 
+great at predicting sale prices:
+
+
+```r
+training$first_prediction &lt;- predict(first_tree, training)
+sqrt(mean((training$first_prediction - training$Sale_Price)^2))
+```
+
+```
+## [1] 38055.45
+```
+
+(We'll look at test-set accuracy in a minute.)
+
+---
+
+So we now have our base model, and we want to improve its accuracy through 
+boosting. In order to do that, we're going to fit a new model to predict the
+_errors_ of our base model.
+
+First, we need to calculate the residuals from our model:
+
+
+```r
+training$residual &lt;- training$Sale_Price - training$first_prediction
+```
+
+We'll then go ahead and create a new training data frame, without our original
+sale price or prediction columns (since we don't want to include those in the
+model):
+
+
+```r
+library(dplyr)
+new_training &lt;- select(training, -Sale_Price, -first_prediction)
+```
+
+And finally, we'll fit another decision tree to try and predict the _residuals_
+from our first tree:
+
+
+```r
+second_tree &lt;- rpart(residual ~ ., new_training)
+```
+
+---
+
+We now have two separate models -- one that predicts sale prices, and one that
+predicts the error of that prediction.
+
+To get a single, combined predicted sale price from those models, we can just 
+add the two predictions together:
+
+
+```r
+training$second_prediction &lt;- predict(second_tree, training)
+training$adjusted_prediction &lt;- 
+  training$first_prediction + training$second_prediction
+```
+
+Now we can compare the RMSE of this combined model against our original decision 
+tree:
+
+
+```r
+sqrt(mean((training$first_prediction - training$Sale_Price)^2))
+```
+
+```
+## [1] 38055.45
+```
+
+```r
+sqrt(mean((training$adjusted_prediction - training$Sale_Price)^2))
+```
+
+```
+## [1] 28530.86
+```
+
+And it looks like the boosted model does dramatically than the single tree!
+
+---
+
+Of course, this is the training set error. We already know that decision trees
+can be notorious overfitters, with much lower errors on the test set than the
+training set. 
+
+With that in mind, let's look at how our boosted model does on the test set:
+
+
+```r
+testing$first_prediction &lt;- predict(first_tree, testing)
+testing$second_prediction &lt;- predict(second_tree, testing)
+testing$adjusted_prediction &lt;- 
+  testing$first_prediction + testing$second_prediction
+
+sqrt(mean((testing$first_prediction - testing$Sale_Price)^2))
+```
+
+```
+## [1] 39131.38
+```
+
+```r
+sqrt(mean((testing$adjusted_prediction - testing$Sale_Price)^2))
+```
+
+```
+## [1] 35830.06
+```
+
+Looking at these RMSEs, it does seem that the boosted model improves the single 
+decision tree -- but by much less than when we looked at training RMSE. 
+
+This looks like classic overfitting -- our model is becoming far too confident
+when predicting the training set, so it makes extreme predictions which don't 
+work when predicting new data.
+
+What can we do about that?
+
+---
+
+Well, what if we made our model less confident? 
+
+For instance, what if instead of believing that our second model perfectly 
+corrects the base prediction, we viewed it as being a weak indicator of how
+far off the base prediction was? 
+
+When we think about our second model in that way, it might make sense for us to
+not add the entire residual predicted by the model. Instead, we might try
+nudging our initial prediction by, say, half the correction factor:
+
+
+```r
+testing$adjusted_prediction &lt;- 
+  testing$first_prediction + (testing$second_prediction * 0.5)
+```
+
+If we evaluate this new adjustment method:
+
+
+```r
+sqrt(mean((testing$first_prediction - testing$Sale_Price)^2))
+```
+
+```
+## [1] 39131.38
+```
+
+```r
+sqrt(mean((testing$adjusted_prediction - testing$Sale_Price)^2))
+```
+
+```
+## [1] 35635.45
+```
+
+Though it's still not as good as we did on the training data,
+we can see that this weaker nudge actually out-performs our first attempt.
+
+---
+
+We can think of that 0.5 multiplier as being a "learning rate" for our model.
+Conceptually, the learning rate represents how fast we want our model to 
+incorporate corrections into its predictions. 
+
+For instance, we could go on to add a third tree to this model, using a learning
+rate of 0.5. To do so, we'd first want to calculate the residuals from our 
+second tree:
+
+
+```r
+training$adjusted_prediction &lt;- 
+  training$first_prediction + (training$second_prediction * 0.5)
+
+training$residual &lt;- training$Sale_Price - training$adjusted_prediction
+```
+
+Then we'll recreate a data frame without our predictions, and fit a new tree:
+
+
+```r
+new_training &lt;- select(training, 
+                       -Sale_Price, 
+                       -first_prediction, 
+                       -second_prediction, 
+                       -adjusted_prediction)
+
+third_tree &lt;- rpart(residual ~ ., new_training)
+```
+
+---
+
+And then we can add that third tree to our model, just like we did with the
+second one:
+
+
+```r
+testing$third_prediction &lt;- predict(third_tree, testing)
+testing$final_prediction &lt;- 
+  testing$adjusted_prediction + (testing$third_prediction * 0.5)
+
+sqrt(mean((testing$first_prediction - testing$Sale_Price)^2))
+```
+
+```
+## [1] 39131.38
+```
+
+```r
+sqrt(mean((testing$adjusted_prediction - testing$Sale_Price)^2))
+```
+
+```
+## [1] 35635.45
+```
+
+```r
+sqrt(mean((testing$final_prediction - testing$Sale_Price)^2))
+```
+
+```
+## [1] 34034.33
+```
+
+Our third tree improves our prediction accuracy even further!
+
+This is how boosting works, at its core. Most of the time, we'll be working with
+much smaller learning rates and many more trees, but the essential process of
+building trees to predict the residuals of past predictions is the same.
+
+---
+
+Of course, when we want to use more trees and smaller learning rates, we usually
+won't fit all the trees ourselves. Gradient boosting machines provide a way to 
+fit all the trees automatically. 
+
+We'll use the `gbm` package to fit our GBMs today -- go ahead and install it if
+you need to:
+
+
+```r
+install.packages("gbm")
+```
+
+We've also made a mess of our training and testing sets, so let's use our 
+original `ames` data and `row_idx` vector to recreate those:
+
+
+```r
+training &lt;- ames[row_idx &lt; nrow(ames) * 0.8, ]
+testing &lt;- ames[row_idx &gt;= nrow(ames) * 0.8, ]
+```
+
+---
+
+Fitting a simple GBM works just like every other type of model we've seen so 
+far -- we'll load the `gbm` package and then fit a model using `gbm`:
+
+
+```r
+library(gbm)
+```
+
+```
+## Loaded gbm 2.1.8
+```
+
+```r
+first_gbm &lt;- gbm(Sale_Price ~ ., data = training)
+```
+
+```
+## Distribution not specified, assuming gaussian ...
+```
+
+Note that the second argument to `gbm` is `distribution`, not `data`, so we need
+to specify our data explicitly.
+
+We can then evaluate our test-set RMSE:
+
+
+```r
+sqrt(mean((predict(first_gbm, testing) - testing$Sale_Price)^2))
+```
+
+```
+## Using 100 trees...
+```
+
+```
+## [1] 27374.61
+```
+
+Out-of-the-box, GBM does an _alright_ job predicting sale price -- better than
+linear regression, but worse than random forests.
+
+---
+
+But, much like random forests, GBMs have a number of hyperparameters for us to 
+tune. The main ones in `gbm` include:
+
++ `shrinkage`: The learning rate for the model. 
+
++ `n.trees`: How many trees to grow. Unlike random forests, GBMs can wind up
+  overfitting if they're grown with too many trees, so it's important to tune
+  this value with the other hyperparameters.
+
++ `interaction.depth`: The maximum depth of each tree (how many splits). Tends 
+  to be from 3-8, though older papers often use 1.
+
++ `n.minobsinnode`: The minimum number of observations per leaf node in each 
+  tree (like `min.node.size` in ranger).
+
+GBMs are incredibly sensitive to hyperparameter values, and tend to need more
+careful tuning than random forests to predict effectively.
+
+---
+
+We can tune these hyperparameters using grid searches, just like last week. 
+However, because GBMs need to grow their trees sequentially (unlike random 
+forests, which can grow all their trees at the same time), grid searches for 
+GBMs can take quite a bit of time.
+
+As such, we tend to tune GBM in multiple stages. 
+
+We're going to start off by tuning the learning rate for our GBM. Smaller 
+learning rates tend to produce better models, but require more trees to be 
+effective and so take a long time to run. Higher learning rates are faster, but
+might not be as effective. 
+
+For this reason, we're going to try a range of learning rates and choose the 
+value that balances accuracy and training time, which we'll measure using 
+`system.time`. 
+
+One very nice thing about `gbm` is that we can implement k-fold CV just by 
+using the `cv.folds` argument; we don't need to write our own function this 
+time.
+
+---
+
+As a result, our grid to choose a learning rate looks like this. 
+
+Fair warning, this takes about 6 minutes to run:
+
+
+```r
+tuning_grid &lt;- expand.grid(
+  learning_rate = c(0.3, 0.1, 0.05, 0.01, 0.005),
+  rmse = NA,
+  trees = NA,
+  time = NA
+)
+
+for(i in seq_len(nrow(tuning_grid))) {
+  train_time &lt;- system.time({
+    m &lt;- gbm(
+      formula = Sale_Price ~ .,
+      # Optional -- silences a warning:
+      distribution = "gaussian",
+      data = training,
+      n.trees = 6000, 
+      shrinkage = tuning_grid$learning_rate[i], 
+      interaction.depth = 3, 
+      n.minobsinnode = 10,
+      cv.folds = 5 
+   )
+  })
+  
+  tuning_grid$rmse[i]  &lt;- sqrt(min(m$cv.error))
+  tuning_grid$trees[i] &lt;- which.min(m$cv.error)
+  tuning_grid$time[i]  &lt;- train_time[["elapsed"]]
+
+}
+
+arrange(tuning_grid, rmse)
+```
+
+```
+##   learning_rate     rmse trees   time
+## 1         0.010 22118.63  6000 66.708
+## 2         0.100 22766.41  1566 64.917
+## 3         0.050 22791.24  2527 65.713
+## 4         0.005 25319.20  5074 67.951
+## 5         0.300 28541.96    37 63.267
+```
+
+---
+
+We'll go ahead and run with a learning rate of 0.1 for the rest of our tuning.
+
+With a learning rate chosen, we'll go ahead and tune our tree-specific 
+parameters (namely, interaction depth and observations per node) using a new 
+grid. This one took about 15 minutes to complete:
+
+
+```r
+tuning_grid &lt;- expand.grid(
+  learning_rate = 0.01,
+  interaction.depth = c(3, 5, 7),
+  n.minobsinnode = c(5, 10, 15),
+  trees = NA,
+  rmse = NA
+)
+
+tictoc::tic()
+for(i in seq_len(nrow(tuning_grid))) {
+    m &lt;- gbm(
+      formula = Sale_Price ~ .,
+      distribution = "gaussian",
+      data = training,
+      n.trees = 6000, 
+      shrinkage = tuning_grid$learning_rate[i], 
+      interaction.depth = tuning_grid$interaction.depth[i], 
+      n.minobsinnode = tuning_grid$n.minobsinnode[i],
+      cv.folds = 5 
+   )
+  
+  tuning_grid$trees[i] &lt;- which.min(m$cv.error)
+  tuning_grid$rmse[i]  &lt;- sqrt(min(m$cv.error))
+
+}
+tictoc::toc()
+```
+
+```
+## 899.194 sec elapsed
+```
+
+```r
+arrange(tuning_grid, rmse)
+```
+
+```
+##   learning_rate interaction.depth n.minobsinnode trees     rmse
+## 1          0.01                 5              5  5999 21841.67
+## 2          0.01                 3              5  6000 22090.23
+## 3          0.01                 5             10  5999 22111.81
+## 4          0.01                 3             10  6000 22217.39
+## 5          0.01                 3             15  6000 22466.78
+## 6          0.01                 5             15  5999 22749.58
+## 7          0.01                 7             10  5990 23254.00
+## 8          0.01                 7             15  5975 23381.03
+## 9          0.01                 7              5  5082 25522.62
+```
+
+
+---
+
+As with random forests, we could continue tuning with narrower and narrower 
+ranges until we were confident we arrived at the absolute best hyperparameters.
+We'd also experiment with smaller and smaller shrinkages, to see if they 
+improved fit at all.
+
+However, even the values we've landed at from two rounds of tuning produce a 
+pretty good model:
+
+
+```r
+final_gbm &lt;- gbm(
+  Sale_Price ~ .,
+  data = training,
+  n.trees = 6000,
+  shrinkage = 0.01,
+  interaction.depth = 7,
+  n.minobsinnode = 10
+)
+```
+
+```
+## Distribution not specified, assuming gaussian ...
+```
+
+```r
+sqrt(mean((predict(final_gbm, testing) - testing$Sale_Price)^2))
+```
+
+```
+## Using 6000 trees...
+```
+
+```
+## [1] 19265.86
+```
+
+This is dramatically better than our fully tuned random forest!
+
+---
+class: middle
+
+GBMs are incredibly effective predictive models. With proper tuning, they're 
+often one of the best tools for any predictive task.
+
+However, GBMs aren't without their drawbacks. These models can be incredibly 
+computationally intensive to train and tune, especially compared to random 
+forests. They also do a good job of reducing bias, but are worse at removing 
+error from variance than random forests.
+
+Next week we'll talk about a variation of GBMs designed to fix both those issues.
+
+---
+class: middle
+
+# References
+
+---
+
+Titles are links:
+
++ [HOML Chapter 12](https://bradleyboehmke.github.io/HOML/gbm.html)
+
+A few papers 
+
++ [Additive logistic regression: a statistical view of boosting](https://projecteuclid.org/journals/annals-of-statistics/volume-28/issue-2/Additive-logistic-regression--a-statistical-view-of-boosting-With/10.1214/aos/1016218223.full)
++ [Greedy function approximation: A gradient boosting machine.](https://projecteuclid.org/journals/annals-of-statistics/volume-29/issue-5/Greedy-function-approximation-A-gradient-boostingmachine/10.1214/aos/1013203451.full)
++ [Stochastic gradient boosting](https://www.sciencedirect.com/science/article/pii/S0167947301000652)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

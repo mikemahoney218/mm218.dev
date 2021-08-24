@@ -84,7 +84,7 @@ saturate and slow down over time.
 ---
 class: middle
 
-Today we're going to talk about our first truly machine learning algorithm, the 
+Today we're going to talk about our first true machine learning algorithm, the 
 decision tree, which was specifically designed to help social scientists deal 
 with a nonlinear world. 
 
@@ -108,8 +108,8 @@ how to use them properly.
 ---
 class: middle
 
-The last thing I want to point out before we start actually building trees is 
-that decision trees are almost never actually the best choice for a problem. 
+The last thing I want to point out before we start building trees is 
+that decision trees are almost never the best choice for a problem. 
 
 <br />
 
@@ -121,9 +121,7 @@ the next few weeks).
 <br />
 
 But decision trees underpin those more advanced ML techniques, so we need to 
-discuss them here. However, there's no worksheet for this week's topic;
-it doesn't make sense to practice coding decision trees, as it's rare to 
-actually use them in the real world.
+discuss them here.
 
 ---
 
@@ -151,7 +149,7 @@ data(attrition)
 
 And will use `caret` and `pROC` for assessing our models:
 
-```{r}
+```{r, message=FALSE}
 library(caret)
 library(pROC)
 ```
@@ -172,7 +170,7 @@ testing <- attrition[row_idx >= nrow(attrition) * 0.8, ]
 <br />
 
 To create a decision tree, we can use the `rpart` function from the `rpart` 
-package. The syntax is almost exactly like `lm` -- we just need to provide a 
+package. The syntax is almost exactly like `lm` -- we just provide a 
 formula and our data:
 
 ```{r}
@@ -180,7 +178,9 @@ decision_tree <- rpart(Attrition ~ ., data = training)
 ```
 
 We can then create a confusion matrix for our classifications just as we did 
-with logistic regressions. I've printed this out on the next slide.
+with logistic regressions. 
+
+I've printed this out on the next slide.
 
 ---
 
@@ -227,8 +227,10 @@ knitr::include_graphics("week_4_imgs/rpartplot_root.png")
 ---
 
 Because only 17% of our employees in the training data quit (labeled "No"), we 
-can see that `rpart` assigns this node "No". Below the label, we can see the 
-probability of a data point in this node being a "No" (17%) and the percentage 
+can see that `rpart` assigns this node "No". 
+
+Below the label, we can see the 
+probability of a data point in this node being a "Yes" (17%) and the percentage 
 of our data that has to go through this node to be classified (100%).
 
 ```{r echo = FALSE}
@@ -449,7 +451,7 @@ We call these models **underfit**, and say they have high **bias**.
 
 ![](https://bradleyboehmke.github.io/HOML/02-modeling-process_files/figure-html/modeling-process-bias-model-1.png)
 
-(This graph and the one on the next slide are from the course textbook 
+(This graph and the next one are from the course textbook 
 [Hands-On Machine Learning with R](https://bradleyboehmke.github.io/HOML/))
 
 ---
@@ -600,7 +602,9 @@ graph does not.
 ---
 
 That's because, for a decision tree, your probability of being "Yes" is equal to
-the percentage of your bin that is "Yes". This means that our tree, which has
+the percentage of your bin that is "Yes". 
+
+This means that our tree, which has
 15 leaf nodes, is only capable of predicting at most 15 different values. 
 
 ```{r echo = FALSE}

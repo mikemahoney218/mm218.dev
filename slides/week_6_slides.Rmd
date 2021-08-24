@@ -342,6 +342,11 @@ non-aggregated tree:
 tail(tree_rmse)
 ```
 
+<br />
+
+We call these individual decision trees, which aren't much better than randomly 
+guessing sale prices, **weak learners**.
+
 ---
 class: middle
 
@@ -359,7 +364,11 @@ improve predictions.
 You don't necessarily need any given person person to be 
 an incredible guesser, but you're hoping that someone else in the crowd is 
 guessing equally badly in the opposite direction so that all the predictions 
-average out to the "truth".
+average out to the "truth". 
+
+<br />
+
+You can improve your predictive accuracy just by combining weak learners.
 
 ---
 

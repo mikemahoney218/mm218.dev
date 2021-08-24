@@ -6,7 +6,7 @@
     <meta name="author" content="Mike Mahoney" />
     <meta name="date" content="2021-09-29" />
     <script src="libs/header-attrs/header-attrs.js"></script>
-    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"xa3cfa06ffcc4aea9ac219ff18042e01","expires":1}</script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"xe3f471fe0734b60ab340fe6311ed419","expires":1}</script>
     <script src="libs/himalaya/himalaya.js"></script>
     <script src="libs/js-cookie/js.cookie.js"></script>
     <link href="libs/editable/editable.css" rel="stylesheet" />
@@ -81,7 +81,7 @@ saturate and slow down over time.
 ---
 class: middle
 
-Today we're going to talk about our first truly machine learning algorithm, the 
+Today we're going to talk about our first true machine learning algorithm, the 
 decision tree, which was specifically designed to help social scientists deal 
 with a nonlinear world. 
 
@@ -105,8 +105,8 @@ how to use them properly.
 ---
 class: middle
 
-The last thing I want to point out before we start actually building trees is 
-that decision trees are almost never actually the best choice for a problem. 
+The last thing I want to point out before we start building trees is 
+that decision trees are almost never the best choice for a problem. 
 
 &lt;br /&gt;
 
@@ -118,9 +118,7 @@ the next few weeks).
 &lt;br /&gt;
 
 But decision trees underpin those more advanced ML techniques, so we need to 
-discuss them here. However, there's no worksheet for this week's topic;
-it doesn't make sense to practice coding decision trees, as it's rare to 
-actually use them in the real world.
+discuss them here.
 
 ---
 
@@ -154,29 +152,7 @@ And will use `caret` and `pROC` for assessing our models:
 
 ```r
 library(caret)
-```
-
-```
-## Loading required package: lattice
-```
-
-```r
 library(pROC)
-```
-
-```
-## Type 'citation("pROC")' for a citation.
-```
-
-```
-## 
-## Attaching package: 'pROC'
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     cov, smooth, var
 ```
 
 ---
@@ -196,7 +172,7 @@ testing &lt;- attrition[row_idx &gt;= nrow(attrition) * 0.8, ]
 &lt;br /&gt;
 
 To create a decision tree, we can use the `rpart` function from the `rpart` 
-package. The syntax is almost exactly like `lm` -- we just need to provide a 
+package. The syntax is almost exactly like `lm` -- we just provide a 
 formula and our data:
 
 
@@ -205,7 +181,9 @@ decision_tree &lt;- rpart(Attrition ~ ., data = training)
 ```
 
 We can then create a confusion matrix for our classifications just as we did 
-with logistic regressions. I've printed this out on the next slide.
+with logistic regressions. 
+
+I've printed this out on the next slide.
 
 ---
 
@@ -278,8 +256,10 @@ top of the diagram, at what's called the **root node**.
 ---
 
 Because only 17% of our employees in the training data quit (labeled "No"), we 
-can see that `rpart` assigns this node "No". Below the label, we can see the 
-probability of a data point in this node being a "No" (17%) and the percentage 
+can see that `rpart` assigns this node "No". 
+
+Below the label, we can see the 
+probability of a data point in this node being a "Yes" (17%) and the percentage 
 of our data that has to go through this node to be classified (100%).
 
 &lt;img src="week_4_imgs/rpartplot_root.png" width="2160" /&gt;
@@ -475,7 +455,7 @@ We call these models **underfit**, and say they have high **bias**.
 
 ![](https://bradleyboehmke.github.io/HOML/02-modeling-process_files/figure-html/modeling-process-bias-model-1.png)
 
-(This graph and the one on the next slide are from the course textbook 
+(This graph and the next one are from the course textbook 
 [Hands-On Machine Learning with R](https://bradleyboehmke.github.io/HOML/))
 
 ---
@@ -681,7 +661,9 @@ graph does not.
 ---
 
 That's because, for a decision tree, your probability of being "Yes" is equal to
-the percentage of your bin that is "Yes". This means that our tree, which has
+the percentage of your bin that is "Yes". 
+
+This means that our tree, which has
 15 leaf nodes, is only capable of predicting at most 15 different values. 
 
 &lt;img src="week_4_imgs/rpartplot.png" width="2160" /&gt;

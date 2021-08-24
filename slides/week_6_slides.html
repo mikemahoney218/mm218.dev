@@ -6,7 +6,7 @@
     <meta name="author" content="Mike Mahoney" />
     <meta name="date" content="2021-10-06" />
     <script src="libs/header-attrs/header-attrs.js"></script>
-    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"c8188c319e864c699d6a4d5ccbc0f2d6","expires":1}</script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"a7de3848ce844568b8b7d37d6a539710","expires":1}</script>
     <script src="libs/himalaya/himalaya.js"></script>
     <script src="libs/js-cookie/js.cookie.js"></script>
     <link href="libs/editable/editable.css" rel="stylesheet" />
@@ -369,6 +369,11 @@ tail(tree_rmse)
 ## 6 tree_25 47496.
 ```
 
+&lt;br /&gt;
+
+We call these individual decision trees, which aren't much better than randomly 
+guessing sale prices, **weak learners**.
+
 ---
 class: middle
 
@@ -386,7 +391,11 @@ improve predictions.
 You don't necessarily need any given person person to be 
 an incredible guesser, but you're hoping that someone else in the crowd is 
 guessing equally badly in the opposite direction so that all the predictions 
-average out to the "truth".
+average out to the "truth". 
+
+&lt;br /&gt;
+
+You can improve your predictive accuracy just by combining weak learners.
 
 ---
 

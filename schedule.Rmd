@@ -18,9 +18,9 @@ tribble(
   "6", "Random Forests",
   "7", "Hyperparameters and Model Tuning",
   "8", "Gradient Boosting Machines",
-  "9", "Stochastic GBMs",
-  "10", "Stacked Ensembles",
-  "11", "Feature Engineering (as time allows)",
+  "9", "Stochastic GBMs and Stacked Ensembles",
+  "10", "k-Nearest Neighbors",
+  "11", "Support Vector Machines (as time allows)",
   "12-13", "Project Work",
   "14", "Presentations"
 ) %>% 

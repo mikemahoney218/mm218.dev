@@ -27,10 +27,6 @@ style_mono_light(base_color = "#23395b")
 theme_set(theme_xaringan())
 ```
 
-```{r xaringan-editable, echo=FALSE}
-xaringanExtra::use_editable(expires = 1)
-```
-
 ```{r xaringan-panelset, echo=FALSE}
 xaringanExtra::use_panelset()
 ```
