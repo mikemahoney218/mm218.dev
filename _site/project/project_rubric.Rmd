@@ -1,0 +1,35 @@
+
+# Deliverables
+
+You may submit these as a zip folder containing your data, report, and code 
+files, or you may combine 
+
+
+# Grading
+
++ Introduction
+  - Explain background
+  - Clearly state objective
++ Methods
+  - Explain data set
+  - Necessary pre-processing was justified and performed (ie encoding categorical variables, ) (TK points)
+  - Appropriately used at least one "simple" model (linear/logistic regression, decision tree, KNN) (5 points)
+  - Appropriately used at least two "complex" models (random forest, GBM, SVM, ensembling methods) (5 points each, max 15)
+  - Report is reproducible:
+    - Sets a seed (5 points)
+    - Code runs _immediately_ on my machine (no hard-coded file paths, no bugs, no `setwd()`) (30 points)
++ Results
+  - Multiple accuracy metrics are reported appropriately (i.e., using a hold-out set) (5 points)
++ Discussion
+  - Discussion of model implications (areas of more/less accuracy)
+  - Discussion of what could have been done better
++ Presentation
+  - Presentation included objectives, methods, results, and reflection (5 points each)
+  
+  
+Grades are assigned as follows:
+
+< 70 points: F
+70-80 points: C
+80-90 points: B
+\> 90 points: A

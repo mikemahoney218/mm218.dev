@@ -1,0 +1,8 @@
+# Things We Do Not Cover
+
++ Time-series forecasting
++ Spatial or temporal variations
++ Feature engineering
++ Neural networks
++ tidymodels
++ Image classification

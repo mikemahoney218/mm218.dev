@@ -1,0 +1,317 @@
+---
+title: "Which Stems Will Beaver Harvest? A Final Project for FOR 796."
+authors:
+  - name: Mike Mahoney
+    department: Graduate Program in Environmental Science
+    affiliation: State University of New York College of Environmental Science and Forestry
+    location: Syracuse, NY, 13210
+    email: mike.mahoney.218@gmail.com
+abstract: |
+  Enter the text of your abstract here.
+bibliography: project.bib
+biblio-style: unsrt
+output: 
+  rticles::elsevier_article:
+    keep_tex: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, echo=FALSE, message = FALSE}
+library(dplyr)
+library(tidyr)
+
+load("SelectivityData.rda")
+load("ElevationData.rda")
+load("ModeledSpecies.rda")
+
+SelectivityData$Beaver <- as.numeric(SelectivityData$Beaver)
+
+tree_data <- SelectivityData %>%
+  filter(!(Site == "Masawepie Creek" & PlotCode == 44)) %>%
+  left_join(ElevationData) |> 
+  select(-Lat, -Long, -Site, -OU, -Plot, -Transect, -Gnaw, -Stump, -Elevation, -Species, -HeightClass, -DBHClass) |> 
+  drop_na() 
+
+attr(tree_data, "spec") <- NULL
+```
+
+# Introduction
+
+
+
+# Methods
+
+## Field Data
+
+Data was collected between May and August 2018 as part of a study of beaver 
+foraging habits within New York's Adirondack State Park [@Mahoney2020]. The
+data is structured as a data frame with `r nrow(tree_data)` observations of 
+`r ncol(tree_data)` variables:
+
+```{r}
+str(tree_data)
+```
+
+The following variables were recorded:
+
++ PlotCode: Distance of the plot centroid from the riparian area.
++ Phyla: Categorical variable indicating whether a tree is coniferous 
+  (needle-bearing including larch) or deciduous (broadleaved excluding larch).
++ CommonNames: The USDA Forest Service common name for each tree. If the tree
+  or stump could not be identified down to species level, equivalent to Phyla.
++ DBHAvg: Tree diameter at breast height in centimeters. Trees with DBH less 
+  than 15 centimeters were measured using angle gauges; this field represents
+  the mean diameter of the gauge measurement.
++ Beaver: Whether or not the tree was harvested. 
+  `r sum(tree_data$Beaver == "No")` live stems and 
+  `r sum(tree_data$Beaver == "Yes")` harvested stems were recorded. Due to the relatively
+  similar number of live and harvested stems, this dataset was considered to 
+  have balanced classes and no resampling or weighting of classes was performed.
++ LakeRiver: Whether the tree was measured within the riparian area of a lake or
+  a stream.
+
+For more information, see Mahoney [-@Mahoney2020].
+
+## Models
+
+All models were fit to a random 80% subsample of the original data set, with the
+remaining 20% reserved as a hold-out set.
+
+```{r}
+set.seed(123)
+row_idx <- sample(1:nrow(tree_data), nrow(tree_data))
+training <- tree_data[row_idx < nrow(tree_data) * 0.8, ]
+testing <- tree_data[row_idx >= nrow(tree_data) * 0.8, ]
+```
+
+Three classification models were evaluated. 
+The first of these was a simple 
+logistic regression model which incorporated all predictors without interaction
+effects to predict probability of harvest.
+
+```{r}
+trained_logit <- glm(Beaver ~ ., training, family = "binomial")
+```
+
+The second model evaluated was a random forest, fit using the ranger package
+[@ranger]. 
+
+```{r}
+library(ranger)
+library(pROC)
+
+rf_auc <- function(rf_model, data) {
+  roc(
+    data$Beaver,
+    predictions(predict(rf_model, data))[, 2]
+  ) |> 
+    auc() |> 
+    suppressMessages()
+}
+
+k_fold_rf <- function(data, k, ...) {
+  per_fold <- floor(nrow(data) / k)
+  fold_order <- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows <- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test <- data[fold_idx, ]
+      fold_train <- data[-fold_idx, ]
+
+      fold_model <- ranger(Beaver ~ ., fold_train, probability = TRUE, ...)
+      rf_auc(fold_model, fold_test)
+    },
+    numeric(1)
+  ) |> 
+    mean()
+}
+
+tuning_grid <- expand.grid(
+  mtry = 1:5,
+  min.node.size = 1:15, 
+  replace = c(TRUE, FALSE),                               
+  sample.fraction = seq(0.01, 1, 0.01),                       
+  loss = NA                                               
+)
+
+which_trials <- sample(1:nrow(tuning_grid), 1000)
+
+tuning_grid <- tuning_grid[which_trials, ]
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$loss[i] <- k_fold_rf(
+    training, 
+    k = 5,
+    mtry = tuning_grid$mtry[i],
+    min.node.size = tuning_grid$min.node.size[i],
+    replace = tuning_grid$replace[i],
+    sample.fraction = tuning_grid$sample.fraction[i]
+    )
+}
+
+arrange(tuning_grid, -loss)
+
+trained_ranger <- ranger(
+  Beaver ~ .,
+  training,
+  mtry = 2,
+  min.node.size = 15,
+  replace = TRUE,
+  sample.fraction = 0.97,
+  probability = TRUE
+)
+```
+
+
+
+```{r}
+library(lightgbm)
+library(recipes)
+
+lgb_recipe <- recipe(Beaver ~ ., data = training) |> 
+  step_dummy(all_nominal_predictors()) |> 
+  prep()
+
+lgb_training <- bake(lgb_recipe, training)
+lgb_testing <- bake(lgb_recipe, testing)
+
+lgb_auc <- function(lgb_model, data) {
+  xtest <- as.matrix(data[setdiff(names(data), "Beaver")])
+  ytest <- data[["Beaver"]]
+  roc(
+    ytest,
+    predict(lgb_model, xtest)
+  ) |> 
+    auc() |> 
+    suppressMessages()
+}
+
+k_fold_lgb <- function(data, k, ...) {
+  per_fold <- floor(nrow(data) / k)
+  fold_order <- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows <- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test <- data[fold_idx, ]
+      fold_train <- data[-fold_idx, ]
+      
+      xtrain <- as.matrix(fold_train[setdiff(names(fold_train), "Beaver")])
+      ytrain <- fold_train[["Beaver"]]
+      
+      fold_lgb <- lightgbm(
+        data = xtrain,
+        label = ytrain,
+        verbose = -1L,
+        obj = "cross_entropy",
+        ...
+      )
+      lgb_auc(fold_lgb, fold_test)
+    },
+    numeric(1)
+  ) |> 
+    mean()
+}
+```
+
+```{r}
+tuning_grid <- expand.grid(
+  learning_rate = 0.1,
+  nrounds = c(10, 50, 100, 500, 1000, 1500, 2000, 2500, 3000),
+  auc = NA
+)
+
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$auc[i] <- k_fold_lgb(
+    lgb_training, 
+    k = 5,
+    learning_rate = tuning_grid$learning_rate[i],
+    nrounds = tuning_grid$nrounds[i]
+    )
+}
+
+head(arrange(tuning_grid, -auc), 2)
+
+tuning_grid <- expand.grid(
+  learning_rate = 0.1,
+  nrounds = 1500,
+  max_depth = c(-1, 2, 8, 32, 63),
+  min_data_in_bin = c(3, 8, 13, 18),
+  auc = NA
+)
+
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$auc[i] <- k_fold_lgb(
+    lgb_training, 
+    k = 5,
+    learning_rate = tuning_grid$learning_rate[i],
+    nrounds = tuning_grid$nrounds[i],
+    max_depth = tuning_grid$max_depth[i],
+    min_data_in_bin = tuning_grid$min_data_in_bin[i]
+    )
+}
+
+head(arrange(tuning_grid, -auc), 2)
+
+tuning_grid <- expand.grid(
+  learning_rate = 0.1,
+  nrounds = 1500,
+  max_depth = -1,
+  min_data_in_bin = 3,
+  bagging_freq = c(0, 1, 5, 10), 
+  bagging_fraction = seq(0.3, 1.0, 0.1),
+  feature_fraction = seq(0.3, 1.0, 0.1),
+  auc = NA
+)
+
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$auc[i] <- k_fold_lgb(
+    lgb_training, 
+    k = 5,
+    learning_rate = tuning_grid$learning_rate[i],
+    nrounds = tuning_grid$nrounds[i],
+    max_depth = tuning_grid$max_depth[i],
+    min_data_in_bin = tuning_grid$min_data_in_bin[i],
+    bagging_freq = tuning_grid$bagging_freq[i],
+    bagging_fraction = tuning_grid$bagging_fraction[i],
+    feature_fraction = tuning_grid$feature_fraction[i]
+    )
+}
+
+head(arrange(tuning_grid, -auc), 2)
+
+trained_lgb <- lightgbm(
+  as.matrix(lgb_training[setdiff(names(lgb_training), "Beaver")]),
+  lgb_training$Beaver,
+  verbose = -1L,
+  obj = "cross_entropy",
+  learning_rate = 0.1,
+  nrounds = 1500,
+  max_depth = -1,
+  min_data_in_bin = 3,
+  bagging_freq = 0,
+  bagging_fraction = 0.6,
+  feature_fraction = 0.9
+)
+```
+
+
+All analyses used the R statistical modeling software [@R].
+
+
+# Results
+
+
+
+# Discussion

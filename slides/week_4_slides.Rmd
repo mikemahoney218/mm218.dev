@@ -78,6 +78,7 @@ Let's start by loading packages and recreating our dataframes:
 library(modeldata)
 library(caret)
 library(pROC)
+library(dplyr)
 ```
 
 <br />

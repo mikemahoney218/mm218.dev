@@ -1,0 +1,90 @@
+---
+title: "MLCA Week 11:"
+subtitle: "Support Vector Machines"  
+author: 
+  - "Mike Mahoney"
+date: "2021-11-10"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(ggplot2)
+library(dplyr)
+knitr::opts_chunk$set(fig.showtext = TRUE)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+style_mono_light(base_color = "#23395b")
+theme_set(theme_xaringan())
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+```{r xaringanExtra-search, echo=FALSE}
+xaringanExtra::use_search(show_icon = TRUE)
+```
+
+```{r xaringan-tachyons, echo=FALSE}
+xaringanExtra::use_tachyons()
+```
+
+```{r xaringan-extra-styles, echo = FALSE}
+xaringanExtra::use_extra_styles(
+  hover_code_line = TRUE,         #<<
+  mute_unhighlighted_code = TRUE  #<<
+)
+```
+
+```{r xaringan-tile-view, echo=FALSE}
+xaringanExtra::use_tile_view()
+```
+
+---
+
+Before we get started, I've got a little bit of housekeeping to go over.
+
+This is our last week of regular class. The next two weeks (weeks 12 and 13) are
+dedicated time to work on your course project. 
+
+I'll still be in Bray 300 during class time if you have questions or want help
+with your project, and I'll still be holding my regular office hours. That said,
+if you don't think coming to class will be a productive way for you to spend 
+your time, that's totally fine.
+
+Three weeks from now (week 14, our last day of class) everyone will share their
+final presentation on the project. You should hand in all your files
+(report and code) by the start of that class.
+
+---
+
+Your final presentation should be about five minutes (or less). Ideally you'll
+talk about the problem you wanted to solve, the methods you used, and how well
+it went. You can use slides if you want, or you can feel free to just talk about
+your project for five minutes.
+
+The presentations are meant as an opportunity for us to find out what everyone
+else has been working on; they should not be a high-stakes event. 
+
+---
+
+
+
+
+
+
+
+
+
+
+

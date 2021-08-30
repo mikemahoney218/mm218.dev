@@ -378,7 +378,22 @@ first_gbm &lt;- gbm(Sale_Price ~ ., data = training)
 Note that the second argument to `gbm` is `distribution`, not `data`, so we need
 to specify our data explicitly.
 
-We can then evaluate our test-set RMSE:
+The `gbm` package will walk through the same steps as we did, fitting sequential
+trees to our data to try and reduce prediction error. 
+
+However, `gbm` will fit
+a lot more trees than we did -- by default, 100, but we'll usually use more than
+that -- and will also fit those trees on a different random subsample of the
+training data each time. 
+
+The theory here is similar to random forests -- we want to increase the variance
+between our trees, so that the aggregated prediction is better. We'll talk more
+about this next week.
+
+---
+class: middle
+
+With our model fit, we can then evaluate our test-set RMSE:
 
 
 ```r
@@ -393,10 +408,11 @@ sqrt(mean((predict(first_gbm, testing) - testing$Sale_Price)^2))
 ## [1] 27374.61
 ```
 
-Out-of-the-box, GBM does an _alright_ job predicting sale price -- better than
+Out-of-the-box, GBM does an _alright_ job predicting sale price. It's better than
 linear regression, but worse than random forests.
 
 ---
+class: middle
 
 But, much like random forests, GBMs have a number of hyperparameters for us to 
 tune. The main ones in `gbm` include:

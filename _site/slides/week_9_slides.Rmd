@@ -57,14 +57,896 @@ class: center, middle
 ---
 class: middle
 
+```{r, echo=FALSE}
+options(warn = -1)
+```
+
+
+We ended last week's discussion of GBMs by talking about how GBMs can be 
+incredibly effective prediction algorithms, but at the cost of being 
+computationally intensive to fit and less adept at reducing variance error than
+random forests.
+
+This week, we'll focus on extensions to the basic GBM which help address that.
+
+---
+
+Last week, I briefly mentioned that the `gbm` package fits each of its trees on 
+a different random subsample of the training data each time. 
+
+This algorithm is more properly known as **stochastic gradient boosting machines**, 
+as the data each tree is fit to will change every time you re-run the model
+(assuming you haven't set a seed).
+
+This simple change improves GBM accuracy enough that I'm not actually aware of
+a GBM implementation that doesn't resample.
+
+But this left researchers wondering -- could other forms of randomness, like
+we use in random forests, improve GBMs even further?
+
+---
+
+Remember that random forests use two main forms of randomness to increase the
+variance between their decision trees.
+
+First off, each tree is fit to a different bootstrap sample; rather than 
+subsampling the training data, random forests fit decision trees to data with 
+the same number of observations as the training data, sampled with replacement.
+
+Secondly, each split in each decision tree is selected from a different 
+subsample of predictors. 
+
+What if we introduced these forms of randomness to GBMs?
+
+---
+class: middle
+
+There's currently a lot of competition between packages for fitting these sorts
+of stochastic GBMs. There are three main contenders worth mentioning briefly:
+
++ `xgboost`, released in 2014, was the first mainstream stochastic GBM 
+  implementation to really take off and is still very popular today.
+  
++ `lightGBM`, released in 2016, runs dramatically faster than `xgboost` while
+  still producing highly accurate models.
+  
++ `catboost`, released in 2019, is slower and less accurate than `lightGBM` but 
+  makes it a bit easier to deal with categorical variables.
+
+We're going to use `lightGBM`, because I like it the most. Go ahead and install it
+now:
+
 ```{r, eval = FALSE}
 install.packages("lightgbm")
 ```
+
+---
+
+Before we actually fit a model, however, we need to prepare our data. We'll use
+the Ames housing data set today:
+
+```{r}
+ames <- AmesHousing::make_ames()
+```
+
+Before we split this into testing and training sets, however, we first need to 
+encode our categorical variables. `lightGBM` (as well as `xgboost`) can't handle
+categorical variables directly, so we'll need to one-hot encode them first.
+
+Way back in Week 2 we talked about how to do this with `dplyr` and `tidyr`:
+
+```{r}
+library(tidyr)
+library(dplyr)
+ames %>% 
+  mutate(dummy_value = 1) %>% # Create a dummy value column
+  pivot_wider(
+    names_from = Foundation,
+    names_prefix = "Foundation", 
+    values_from = dummy_value, 
+    values_fill = 0 
+    ) %>% 
+  select(starts_with("Foundation"), Sale_Price, Year_Built, Gr_Liv_Area) |> 
+  head(2)
+```
+
+
+---
+class: middle
+
+However, the Ames data has 46 categorical variables to encode, so doing them
+one-at-a-time is going to take a while.
+
+Instead, we're going to use a new package named `recipes` to dummy encode all of 
+our variables at once. Let's install it now:
+
+```{r, eval = FALSE}
+install.packages("recipes")
+```
+
+---
+
+The `recipes` package is a fantastic tool that helps us pre-process our data 
+before we fit our models. In order to use it to encode our variables, we need
+to walk through a few steps.
+
+First off, we'll load the package:
+
+```{r, message=FALSE}
+library(recipes)
+```
+
+Then we'll create a "recipe" object, which tells the other functions from the
+package what formula and data we're trying to work with:
+
+```{r}
+ames_recipe <- recipe(Sale_Price ~ ., data = ames)
+```
+
+We're now able to specify what pre-processing steps we want to take using any of
+the `step_` functions from `recipes`. To say that we want to dummy encode all
+the factors in our data, we can use the `step_dummy` function:
+
+```{r}
+ames_recipe <- step_dummy(ames_recipe, where(is.factor))
+```
+
+---
+
+If we wanted, we could keep adding pre-processing steps to our "recipe" object.
+Since we just want to encode our factors, we'll tell the `recipes` package we're
+done by using the `prep` function:
+
+```{r}
+ames_recipe <- prep(ames_recipe) 
+```
+
+And finally, we'll actually encode our variables by way of the `bake` function:
+
+```{r}
+ames <- bake(ames_recipe, ames)
+```
+
+With that all done, we've finally got a data frame with encoded categorical 
+variables:
+
+```{r}
+head(ames[36:309], 6)
+```
+
+---
+
+I should point out that the `recipes` package is really designed to work with
+the pipe operator. 
+
+While the process of dummy encoding our variables seems
+like a lot when broken into separate lines, like I just did for explanation,
+the code is a lot neater when piped together:
+
+```{r}
+ames <- AmesHousing::make_ames()
+ames <- recipe(Sale_Price ~ ., data = ames) |> 
+  step_dummy(where(is.factor)) |> 
+  prep() |> 
+  bake(ames)
+head(ames[36:309], 6)
+```
+
+We'll talk a little bit more about using `recipes` for data processing next week.
+
+---
+
+With our variables now encoded, we can go ahead and split our data into training
+and testing:
+
+```{r}
+set.seed(123)
+
+row_idx <- sample(seq_len(nrow(ames)), nrow(ames))
+training <- ames[row_idx < nrow(ames) * 0.8, ]
+testing <- ames[row_idx >= nrow(ames) * 0.8, ]
+```
+
+And load lightgbm:
 
 ```{r}
 library(lightgbm)
 ```
 
+If you look at `?lightgbm`, you'll notice that it looks a little bit different
+than `?lm` or the other models we've worked with so far. 
+
+Specifically, 
+`lightgbm` doesn't have a `formula` argument for us to use to specify our model.
+
+---
+
+Instead, we need to provide `lightgbm` with a _matrix_ of our predictors and a
+_vector_ of our outcome.
+
+We can create those objects like this:
+
+```{r}
+xtrain <- as.matrix(training[setdiff(names(training), "Sale_Price")])
+ytrain <- training[["Sale_Price"]]
+```
+
+With our objects created, the syntax to fit a `lightgbm` model is then:
+
+```{r}
+first_lgb <- lightgbm(
+  data = xtrain,
+  label = ytrain,
+  verbose = -1L,
+  obj = "regression",
+)
+```
+
+In addition to providing our predictors and outcome, we also need to specify
+that we want to do regression via `obj = "regression"`. 
+
+I also like `lightgbm`
+to run in quiet mode, so I set the argument `verbose = -1L`, but this is optional.
+
+---
+
+In order to predict with this model, we also need to convert our test set into
+a matrix:
+
+```{r}
+xtest <- as.matrix(testing[setdiff(names(testing), "Sale_Price")])
+```
+
+We can then use `predict` as normal to generate predictions:
+
+```{r}
+lgb_predictions <- predict(first_lgb, xtest)
+```
+
+We can then calculate RMSE as normal:
+
+```{r}
+sqrt(mean((lgb_predictions - testing$Sale_Price)^2))
+```
+
+And all in all, this seems like a lot of work for a really crappy model.
+
+---
+
+But of course, GBMs are very sensitive to their hyperparameter values, and we
+haven't tuned this model at all yet.
+
+We'll tune this lightgbm model in a pretty similar way as to the last two weeks. 
+
+First, we'll tweak the `calc_rmse` function from week 7 so that it will create
+a matrix to predict on:
+
+```{r}
+calc_rmse <- function(model, data) {
+  xtest <- as.matrix(data[setdiff(names(data), "Sale_Price")])
+  lgb_predictions <- predict(model, xtest)
+  sqrt(mean((lgb_predictions - data$Sale_Price)^2))
+}
+```
+
+We'll also tweak our `k_fold_cv` function so that it works with `lightgbm`. 
+This function is a bit longer than last time, so it's on the next slide all by
+itself.
+
+---
+
+```{r}
+k_fold_cv <- function(data, k, ...) {
+  per_fold <- floor(nrow(data) / k)
+  fold_order <- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows <- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test <- data[fold_idx, ]
+      fold_train <- data[-fold_idx, ]
+      
+      xtrain <- as.matrix(fold_train[setdiff(names(fold_train), "Sale_Price")])
+      ytrain <- fold_train[["Sale_Price"]]
+      
+      fold_lgb <- lightgbm(
+        data = xtrain,
+        label = ytrain,
+        verbose = -1L,
+        obj = "regression",
+        ...
+      )
+      calc_rmse(fold_lgb, fold_test)
+    },
+    numeric(1)
+  ) |> 
+    mean()
+}
+```
+
+---
+
+With the prep work out of the way, we can get started tuning hyperparameters.
+At its core, `lightgbm` is still a GBM, and so has the same basic 
+hyperparameters as our `gbm` model did. 
+
+For instance, we'll start off by using a learning rate of 0.1 and tuning how
+many trees our models should use. In `lightgbm`, this is called `nrounds`.
+
+```{r, cache = TRUE}
+tuning_grid <- expand.grid(
+  learning_rate = 0.1,
+  nrounds = c(10, 50, 100, 500, 1000, 1500, 2000, 2500, 3000),
+  rmse = NA
+)
+
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$rmse[i] <- k_fold_cv(
+    training, 
+    k = 5,
+    learning_rate = tuning_grid$learning_rate[i],
+    nrounds = tuning_grid$nrounds[i]
+    )
+}
+
+head(arrange(tuning_grid, rmse), 2)
+```
+
+---
+
+We can keep going to tune the other parameters we used in `gbm`. 
+
+The maximum depth of trees here is called `max_depth`, instead of 
+`interaction.depth`, and the minimum number of observations per leaf is called
+`min_data_in_bin` rather than `n.minobsinnode`, but mechanically these 
+hyperparameters do the same thing here as they did back in `gbm`. 
+
+Among the normal values we're going to try for `max_depth`, we're also going to
+try the special value "-1". When `max_depth` is set to -1, each decision tree is
+allowed to grow as deep as it wants, with no hard limit set by the algorithm.
+
+---
+
+Our grid to tune these variables looks like this:
+
+```{r, cache = TRUE}
+tuning_grid <- expand.grid(
+  learning_rate = 0.1,
+  nrounds = 1000,
+  max_depth = c(-1, 2, 8, 32, 63),
+  min_data_in_bin = c(3, 8, 13, 18),
+  rmse = NA
+)
+
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$rmse[i] <- k_fold_cv(
+    training, 
+    k = 5,
+    learning_rate = tuning_grid$learning_rate[i],
+    nrounds = tuning_grid$nrounds[i],
+    max_depth = tuning_grid$max_depth[i],
+    min_data_in_bin = tuning_grid$min_data_in_bin[i]
+    )
+}
+
+head(arrange(tuning_grid, rmse), 2)
+```
+
+---
+
+With the basic GBM hyperparameters sorted out, we can now start tuning the 
+stochastic hyperparameters that make lightgbm so interesting.
+
+Specifically, there are three new hyperparameters worth playing with:
+
++ `bagging_fraction` represents what percent of observations should be sampled 
+  for each tree, just like `sampling.fraction` back in `ranger`.
+  
++ `bagging_freq` represents how often bootstrapping should be resampled. If you
+  set it to 1, then each tree is fit to a different bootstrap sample; if you set
+  it to 5, then the model will fit five trees to the same sample before 
+  resampling. If you set it to 0, the model won't resample ever.
+  
++ `feature_fraction` represents the percentage of variables that should be 
+  available to each tree. For instance, if you set it to 0.8, each tree would 
+  be fit using a random 80% of predictors.
+
+We'll tune these parameters on the next slide.
+
+---
+
+```{r, cache = TRUE}
+tuning_grid <- expand.grid(
+  learning_rate = 0.1,
+  nrounds = 1000,
+  max_depth = 2,
+  min_data_in_bin = 18,
+  bagging_freq = c(0, 1, 5, 10), 
+  bagging_fraction = seq(0.3, 1.0, 0.1),
+  feature_fraction = seq(0.3, 1.0, 0.1),
+  rmse = NA
+)
+
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$rmse[i] <- k_fold_cv(
+    training, 
+    k = 5,
+    learning_rate = tuning_grid$learning_rate[i],
+    nrounds = tuning_grid$nrounds[i],
+    max_depth = tuning_grid$max_depth[i],
+    min_data_in_bin = tuning_grid$min_data_in_bin[i],
+    bagging_freq = tuning_grid$bagging_freq[i],
+    bagging_fraction = tuning_grid$bagging_fraction[i],
+    feature_fraction = tuning_grid$feature_fraction[i]
+    )
+}
+
+head(arrange(tuning_grid, rmse), 2)
+```
+
+---
+
+At this point, we've tuned our model using the most important hyperparameters.
+These hyperparameters are the ones that are most likely to impact our model 
+accuracy.
+
+But they aren't the only hyperparameters available. In fact, there are 86
+hyperparameters in total, many of which might give some slight improvement to 
+your model.
+
+But this is a 1-credit class, and I simply don't have the space to walk through
+all available hyperparameters. If you're using `lightgbm` or `xgboost` 
+professionally and want more information, I highly recommend [this website (link) on available parameters](https://sites.google.com/view/lauraepp/parameters). 
+
+The
+[`lightgbm` docs also have some pointers on hyperparameters which might help
+improve speed, accuracy, or overfitting (link).](https://lightgbm.readthedocs.io/en/latest/Parameters-Tuning.html)
+
+---
+
+With all that said and our tuning complete, let's go ahead and evaluate our
+final test set accuracy:
+
+```{r}
+xtrain <- as.matrix(training[setdiff(names(training), "Sale_Price")])
+ytrain <- training[["Sale_Price"]]
+
+final_lgb <- lightgbm(
+  data = xtrain,
+  label = ytrain,
+  verbose = -1L,
+  obj = "regression",
+  learning_rate = 0.1,
+  nrounds = 1000,
+  max_depth = 2,
+  min_data_in_bin = 18,
+  bagging_freq = 5,
+  bagging_fraction = 0.9,
+  feature_fraction = 0.6
+)
+
+calc_rmse(final_lgb, testing)
+```
+
+This is roughly comparable to the base GBM, but ran a lot faster -- and with
+further tuning, we could likely beat GBM altogether.
+
+---
+
+So we now have three pretty alright models -- from `ranger`, `gbm`, and 
+`lightgbm` -- all doing a good job predicting sale price for the Ames data.
+What do we do with them now?
+
+A lot of times in research, we'd go on to rank our models (by RMSE, MAE, or god
+forbid, p-values) and then only talk about our "best" model, with all our 
+results and conclusions drawn from the top-ranked model.
+
+This is weird. We went through all the trouble of fitting multiple models 
+because we thought they were all plausible options for the best tool for the job;
+suddenly having 100% confidence in a single model being the best based on its 
+ranking against the test set places a _lot_ of faith in your test set being 
+exactly representative of real-world data.
+
+What if there was a way to benefit from the work we put into training _all_ 
+our models?
+
+---
+
+Turns out, there is. We can combine the predictions of our models to better 
+represent our confidence in _each_ model's predictive accuracy, and as a side
+effect usually generate better predictions overall.
+
+This method is called **stacking** (or sometimes stacked generalization, or 
+sometimes "super learners"). 
+
+Just like GBMs and random forests, stacking 
+aggregates multiple models in order to improve predictive accuracy. 
+
+However, 
+unlike those methods, stacking tries to combine _strong learners_ 
+(models which are pretty accurate on their own) rather than weak learner
+decision trees.
+
+---
+
+We'll walk through a few examples of stacking. First things first, we need to 
+recreate our `ranger` and `gbm` models:
+
+```{r, echo = FALSE, message=FALSE}
+library(ranger)
+library(gbm)
+```
+
+
+```{r, cache = TRUE}
+library(ranger)
+final_ranger <- ranger(
+  Sale_Price ~ .,
+  training,
+  num.trees = 800,
+  mtry = 20,
+  min.node.size = 5,
+  replace = FALSE,
+  sample.fraction = 1
+)
+```
+
+```{r, cache = TRUE}
+library(gbm)
+final_gbm <- gbm(
+  Sale_Price ~ .,
+  data = training,
+  n.trees = 6000,
+  shrinkage = 0.01,
+  interaction.depth = 7,
+  n.minobsinnode = 10
+)
+```
+
+---
+
+In order to combine the predictions from these models, we'll first need to go
+ahead and make some predictions. I'll create a new testing data frame, just to
+keep our original test set clean:
+
+```{r}
+stacked_test <- testing
+```
+
+And now I'll add columns with predictions to the data frame:
+
+```{r}
+xtest <- as.matrix(stacked_test[setdiff(names(stacked_test), "Sale_Price")])
+stacked_test$lgb <- predict(final_lgb, xtest)
+stacked_test$rf <- predictions(predict(final_ranger, stacked_test))
+stacked_test$gbm <- predict(final_gbm, stacked_test)
+```
+
+---
+
+So now that we have our predictions, how can we combine them into a single 
+stacked ensemble?
+
+We have a few options. The easiest is to simply average the predictions together:
+
+```{r}
+stacked_test$avg <- (stacked_test$lgb + stacked_test$rf + stacked_test$gbm) / 3
+```
+
+Conceptually, doing this is a way of saying "all of these models are equally 
+likely to be the best one". 
+
+Pragmatically, even this simple ensemble beats all but our GBM on the test data:
+
+```{r}
+stacked_test |> 
+  summarise(
+    across(c(lgb, rf, gbm, avg), 
+           \(x) sqrt(mean((x - Sale_Price)^2)))
+  )
+```
+
+---
+
+But realistically, we don't think that all our models are equally likely to be
+the best. We already know that, for instance, this random forest is a bit worse
+at prediction than the two GBMs.
+
+Instead of the simple average, it often makes sense to use a weighted average,
+weighting each model's contribution to the final prediction based on its 
+accuracy against a validation set or from k-fold CV.
+
+Let's try that now. We'll first have to calculate RMSE for each of our models
+from 5-fold CV. This takes a lot of code, so the next few slides will walk 
+through each of the pieces.
+
+First off, we'll write a function to fit our ranger models and return RMSEs:
+
+```{r}
+fit_ranger <- function(training, testing) {
+  cv_model <- ranger(
+  Sale_Price ~ .,
+  training,
+  num.trees = 800,
+  mtry = 20,
+  min.node.size = 5,
+  replace = FALSE,
+  sample.fraction = 1
+)
+  preds <- predictions(predict(cv_model, testing))
+  sqrt(mean((preds - testing$Sale_Price)^2))
+}
+```
+
+---
+
+We'll do the same for GBM:
+
+```{r}
+fit_gbm <- function(training, testing) {
+  cv_model <- gbm(
+  Sale_Price ~ .,
+  data = training,
+  n.trees = 6000,
+  shrinkage = 0.01,
+  interaction.depth = 7,
+  n.minobsinnode = 10
+)
+  preds <- predict(cv_model, testing)
+  sqrt(mean((preds - testing$Sale_Price)^2))
+}
+```
+
+---
+
+And lastly, our `lightgbm`:
+
+```{r}
+fit_lgb <- function(training, testing) {
+  xtrain <- as.matrix(training[setdiff(names(training), "Sale_Price")])
+  ytrain <- training[["Sale_Price"]]
+  xtest <- as.matrix(testing[setdiff(names(testing), "Sale_Price")])
+  
+  cv_model <- lightgbm(
+  data = xtrain,
+  label = ytrain,
+  verbose = -1L,
+  obj = "regression",
+  learning_rate = 0.1,
+  nrounds = 1000,
+  max_depth = 2,
+  min_data_in_bin = 18,
+  bagging_freq = 5,
+  bagging_fraction = 0.9,
+  feature_fraction = 0.6
+)
+  preds <- predict(cv_model, xtest)
+  sqrt(mean((preds - testing$Sale_Price)^2))
+}
+```
+
+---
+
+We can then use those functions to estimate model accuracy against each of the
+five folds:
+
+```{r, cache=TRUE}
+per_fold <- floor(nrow(training) / 5)
+fold_order <- sample(seq_len(nrow(training)), 
+                       size = per_fold * 5)
+fold_rows <- split(
+  fold_order,
+  rep(1:5, each = per_fold)
+)
+
+model_rmse <- data.frame(
+  rf = rep(NA, 5),
+  gbm = rep(NA, 5),
+  lgb = rep(NA, 5)
+)
+
+for (i in seq_along(fold_rows)) {
+  fold_test <- training[fold_rows[[i]], ]
+  fold_train <- training[-fold_rows[[i]], ]
+  
+  model_rmse$rf[i] <- fit_ranger(fold_test, fold_train)
+  model_rmse$gbm[i] <- suppressWarnings(fit_gbm(fold_test, fold_train))
+  model_rmse$lgb[i] <- fit_lgb(fold_test, fold_train)
+  
+}
+```
+
+---
+
+We now have RMSE estimates for each iteration of each of our models:
+
+```{r}
+model_rmse
+```
+
+Let's get the mean RMSE for each of those:
+
+```{r}
+model_rmse <- apply(model_rmse, 2, mean)
+model_rmse
+```
+
+
+In order to convert these into weights, we first want to invert the RMSEs:
+
+```{r}
+inverse_rmse <- (1 / model_rmse)
+```
+
+And then calculate weights based on the relative sizes of the RMSEs:
+
+```{r}
+rmse_weights <- inverse_rmse / sum(inverse_rmse)
+rmse_weights
+```
+
+This vector now represents the proportion that each model will contribute to our 
+final prediction. Intuitively enough, GBM here has a somewhat larger weight and 
+the random forest has had its weight reduced from the baseline 1/3.
+
+---
+
+We can then use these weights to adjust our aggregated predictions:
+
+```{r}
+stacked_test$weighted <- 
+  stacked_test$lgb * rmse_weights[["lgb"]] + 
+  stacked_test$rf * rmse_weights[["rf"]] + 
+  stacked_test$gbm * rmse_weights[["gbm"]]
+
+stacked_test |> 
+  summarise(
+    across(c(lgb, rf, gbm, avg, weighted), 
+           \(x) sqrt(mean((x - Sale_Price)^2)))
+  )
+```
+
+And this method beats our simple average!
+
+---
+
+It's possible to stack models in even more complex ways than that. For instance,
+what if rather than using the same weights to predict each observation, we used
+a model to aggregate our model predictions?
+
+To do that, we'd need to be able to observe our model predicting data it had 
+never seen before. We can accomplish this by breaking off a piece of our 
+training set to use as a validation set instead:
+
+```{r}
+training <- ames[row_idx < nrow(ames) * 0.6, ]
+validation <- ames[row_idx >= nrow(ames) * 0.6 & 
+                     row_idx < nrow(ames) * 0.8, ]
+```
+
+---
+
+Once that's accomplished, we need to fit new models on the smaller training 
+data, starting with the random forest and GBM:
+
+```{r, cache = TRUE}
+validation_rf <- ranger(
+  Sale_Price ~ .,
+  training,
+  num.trees = 800,
+  mtry = 20,
+  min.node.size = 5,
+  replace = FALSE,
+  sample.fraction = 1
+)
+validation_gbm <- gbm(
+  Sale_Price ~ .,
+  data = training,
+  n.trees = 6000,
+  shrinkage = 0.01,
+  interaction.depth = 7,
+  n.minobsinnode = 10
+)
+```
+
+---
+
+Then continuing with `lightgbm`:
+
+```{r}
+xtrain <- as.matrix(training[setdiff(names(training), "Sale_Price")])
+ytrain <- training[["Sale_Price"]]
+
+validation_lgb <- lightgbm(
+  data = xtrain,
+  label = ytrain,
+  verbose = -1L,
+  obj = "regression",
+  learning_rate = 0.1,
+  nrounds = 1000,
+  max_depth = 2,
+  min_data_in_bin = 18,
+  bagging_freq = 5,
+  bagging_fraction = 0.9,
+  feature_fraction = 0.6
+)
+```
+
+---
+
+With our models fit, we can now use them to predict the validation data:
+
+```{r}
+xtest <- as.matrix(validation[setdiff(names(validation), "Sale_Price")])
+
+validation$rf <- predictions(predict(validation_rf, validation))
+validation$gbm <- predict(validation_gbm, validation)
+validation$lgb <- predict(validation_lgb, xtest)
+```
+
+And then fit some model to predict sale price based on our predictions. 
+
+Here I'm going to use a simple linear model as an ensemble, but we could use
+anything -- including random forests or GBMs -- to aggregate our predictions:
+
+```{r}
+ensemble_model <- lm(Sale_Price ~ rf * gbm * lgb, data = validation)
+```
+
+---
+
+All that's left is to generate predictions from this ensemble model:
+
+```{r}
+stacked_test$model_weight <- predict(ensemble_model, stacked_test)
+
+stacked_test |> 
+  summarise(
+    across(c(lgb, rf, gbm, avg, weighted, model_weight), 
+           \(x) sqrt(mean((x - Sale_Price)^2)))
+  )
+```
+
+And this model-weighted ensemble outperforms both the averages!
+
+Stacked ensembles are incredibly useful ways to reflect uncertainty about which
+of your models is the "best", and can often give you increased predictive 
+accuracy as well. 
+
+---
+
+Even when they aren't your outright best model -- such as our
+example here, where GBM is still on top -- stacked ensembles are a useful way to 
+make your predictions more robust on unknown data. 
+
+It might be the case that this GBM 
+is always a better model in the situations we'll use it in, or it might be the 
+case that with different test data the random forest or lightgbm model would 
+take the lead.
+
+We can't know for certain, and stacking is a good way to reflect and protect
+against that uncertainty.
+
+---
+
+You can also extend stacking to some pretty silly places, if you want to.
+
+For instance, we create a whole bunch of models while doing grid searches, 
+because we think they might be the best version of that model for our data.
+What if, instead of selecting the best set of hyperparameters, we ensembled
+all of the models in the grid instead?
+
+Depending on your models, this might actually give you huge gains in accuracy.
+But at some point, the accuracy gains from stacking are outweighed by the time 
+and computational power it requires. But of course, where exactly that point is 
+will be different for every project.
+
+That's all for this week. Next week we move away from tree-based models onto 
+our last class of ML algorithms.
 
 ---
 class: middle

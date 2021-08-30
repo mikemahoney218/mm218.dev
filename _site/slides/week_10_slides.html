@@ -1,0 +1,977 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>MLCA Week 10:</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Mahoney" />
+    <meta name="date" content="2021-11-03" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/mark.js/mark.min.js"></script>
+    <link href="libs/xaringanExtra-search/search.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-search/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":true,"autoSearch":true}) })</script>
+    <link href="libs/tachyons/tachyons.min.css" rel="stylesheet" />
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# MLCA Week 10:
+## k-Nearest Neighbors
+### Mike Mahoney
+### 2021-11-03
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.bg-washed-green.b--dark-green.ba.bw2.br3.shadow-5.ph4.mt5[
+
+The introduction of numbers as coordinates is an act of violence.
+
+.tr[
+— Hermann Weyl: Philosophy of Mathematics and Natural Science
+]
+]
+
+---
+
+# k-Nearest Neighbors and Kernel-Based ML
+
+---
+
+Today we're going to switch gears and stop talking about tree-based models. 
+
+Our last two methods are examples of what are known as **kernel-based models**
+(or **kernel machines**). However, I don't necessarily want to spend a ton of
+time getting into the math behind what a "kernel" is.
+
+Instead, for this class we can think about these models as being 
+**distance-based methods**, which make predictions based on how _close_ an
+observation is to other data in the training set.
+
+---
+
+The method we'll walk through today is called **k-nearest neighbors** (KNN), 
+which bases its predictions based on some number ("k") of the closest points to 
+your unknown observation.
+
+KNN is almost never the best model for the job. First proposed in 1951, KNN
+is incredibly computationally inefficient, is very slow to predict on most data,
+and rarely if ever is as accurate as a well-tuned random forest or
+GBM.
+
+However, KNN models are simple to understand and use, are somewhat common in the 
+literature given their age, and will help to set up our final model next week, 
+so we'll walk through them here.
+
+---
+
+Let's say that you've just gotten back from the field, where you measured the 
+size and greenness of a bunch of plants in both interior and edge forests.
+
+You plot your data and it looks like this:
+
+![](week_10_slides_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+
+---
+
+Unfortunately, though, you forgot to label where one of your plants was sampled
+from. 
+
+When you add this plant to the plot, it looks like this:
+
+![](week_10_slides_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+
+Can you guess where the plant was found?
+
+---
+
+We can easily assume the plant was found on a forest edge, because it's right in
+the middle of the rest of our edge observations.
+
+This is exactly how k-nearest neighbors works. For some value of k that you 
+choose, KNN looks at the closest k neighbors and predicts whatever the majority
+class is.
+
+For instance, if k = 1 our model would look at the closest point (attached by
+a black line) and predict that our unknown observation was an edge plant:
+
+![](week_10_slides_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+---
+
+For KNN, k is a hyperparameter which we'll pick through tuning. We could 
+imagine, for instance, setting it to 2, in which case KNN would look at the two
+closest plots and still predict edge:
+
+![](week_10_slides_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+---
+
+With that said, some values of k make more sense than others.
+
+For instance, imagine if this was our mystery point:
+
+![](week_10_slides_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+---
+
+If we set k to 2 here, we'd have one nearest neighbor from each class:
+
+![](week_10_slides_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+In this case, our model would think that both classes are equally likely! What
+that means for your predictions depends on the package -- some implementations 
+will fail entirely, some will flip a coin, and others will default to one of 
+your classes -- but no matter what, it's not an ideal situation.
+
+---
+
+So at least for binary classification, we prefer to always set k to odd values 
+so that we don't wind up with ties in our predictions:
+
+![](week_10_slides_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+---
+
+I know this seems extremely simple, but I think it's useful to think about what
+exactly "distance" is representing here -- that is, how we're calculating 
+"closeness".
+
+On our 2D graphs, we can see the "closest" point pretty intuitively. We put a 
+variable on the X and Y axis, and then the closest point is the one that we can
+draw the shortest line between. It's the "nearest" in some combination of both
+the X and the Y values.
+
+And we could imagine doing the same thing in 3D: plotting each of our variables
+on an axis and then finding the shortest 1D line between two points.
+
+This is effectively what KNN is doing, except in many more dimensions -- as many
+dimensions as your data frame has columns. KNN is attempting to find the nearest
+neighbors based on all of your variables at once; it's trying to draw that 1D
+line in extremely high-dimensional space.
+
+---
+
+We're going to come back to this idea of higher-dimensional space next week
+(sorry). 
+
+For now, let's move on to  actually fitting KNNs in R. We'll be working with
+our attrition data to start off with -- go ahead and load it now, then create
+our testing and training splits:
+
+
+```r
+library(modeldata)
+data(attrition)
+set.seed(123)
+row_idx &lt;- sample(seq_len(nrow(attrition)), nrow(attrition))
+training &lt;- attrition[row_idx &lt; nrow(attrition) * 0.8, ]
+testing &lt;- attrition[row_idx &gt;= nrow(attrition) * 0.8, ]
+```
+
+---
+
+Before we fit our model, we have to do a bit of data cleaning. 
+
+Our attrition data contains a bunch of numeric variables in it. For instance,
+it's got data on the `Age` and `DailyRate` of employees:
+
+![](week_10_slides_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+
+---
+
+However, this isn't how these variables look to a KNN. KNNs don't understand
+the implicit units in our data, or the fact that you can have a lot more 
+variation in a daily rate than in age. 
+
+To a KNN, a one-unit change in one variable is the same size as a one-unit 
+change in another. To a KNN, our scatterplot looks like this:
+
+![](week_10_slides_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+
+---
+
+Since all of our data is extremely close in age, the model won't pay any 
+attention to age when finding neighbors or making predictions -- which isn't 
+great, since we know age is an adequate predictor!
+
+![](week_10_slides_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+
+---
+
+To fix this, we'll have to **rescale** our data so that a one-unit change in
+one variable is _actually_ as dramatic as a one-unit change in another.
+
+First, we'll center our data at 0 by subtracting the mean value from each
+observation:
+
+![](week_10_slides_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+
+---
+
+We'll then divide each observation by the original standard deviation of the 
+vector. 
+
+Our variables are now all rescaled so that one unit represents one standard 
+deviation -- an Age value of 1 means that the employee was exactly one standard
+deviation above the mean age:
+
+![](week_10_slides_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+
+---
+
+So in order for KNN to treat all our variables equally, we should center and
+scale them.
+
+However, we don't want to do this directly to our `attrition` data frame, before
+we split it into testing and training pieces! 
+
+Remember that the testing data is supposed to be entirely unknown to the model 
+and the modeler; including testing data in your calculations of mean and 
+standard deviation violates that assumption. 
+
+This type of mistake, where testing data influences your training data and your
+models themselves, is known as **data leakage** and can result in too-optimistic
+estimates of model accuracy, as your hold-out set is no longer truly being held
+out.
+
+As a result, we need to calculate the mean and standard deviation of each variable
+on our training data, and scale both the training and test sets by those values.
+
+While we don't have time to cover much data pre-processing in this course, I 
+want to emphasize that this rule applies to anything you do to your data before
+fitting a model -- whether it's filtering out variables, rescaling data,
+imputation, creating principal components, or anything else, you _need_ to make
+sure testing data never influences the data you train your models with.
+
+---
+
+This is where the `recipes` package we mentioned last week really shines. 
+You might remember that we can specify our pre-processing steps by creating a
+"recipe" object, using `step_` functions to declare what steps we want to 
+perform, and then finishing up with `prep()`:
+
+
+```r
+library(recipes)
+
+scaling_recipe &lt;- recipe(Attrition ~ ., data = training) |&gt; 
+  step_center(where(is.numeric)) |&gt; 
+  step_scale(where(is.numeric)) |&gt; 
+  prep()
+```
+
+The beauty of `recipes` is that, because we've specified what data to use in
+the recipe in our `recipe()` call, our `scaling_recipe` will automatically use
+values from our training data to center and scale whatever data we want.
+
+All we have to do is pass our training and testing data to the `bake` function
+to rescale our data without any threat of leakage:
+
+
+```r
+training &lt;- bake(scaling_recipe, training)
+testing &lt;- bake(scaling_recipe, testing)
+```
+
+---
+
+And now we're finally able to get started fitting our model!
+
+The best R package for fitting KNNs is actually one we've used before: `caret`.
+We'll load it now:
+
+
+```r
+library(caret)
+```
+
+```
+## Loading required package: lattice
+```
+
+Fitting a KNN is then as simple as using `knn3` just like `lm` or most of the 
+other model functions we've seen:
+
+
+```r
+first_knn &lt;- knn3(Attrition ~ ., training)
+```
+
+Once that finishes, we'll get a 5-nearest neighbors model object!
+
+
+```r
+first_knn
+```
+
+```
+## 5-nearest neighbor model
+## Training set outcome distribution:
+## 
+##  No Yes 
+## 971 204
+```
+
+As usual, we can investigate this model using a confusion matrix (on the next 
+slide). 
+
+---
+
+
+```r
+confusionMatrix(
+  predict(first_knn, testing, type = "class"),
+  testing$Attrition
+)
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction  No Yes
+##        No  258  30
+##        Yes   4   3
+##                                           
+##                Accuracy : 0.8847          
+##                  95% CI : (0.8427, 0.9188)
+##     No Information Rate : 0.8881          
+##     P-Value [Acc &gt; NIR] : 0.6175          
+##                                           
+##                   Kappa : 0.1154          
+##                                           
+##  Mcnemar's Test P-Value : 1.807e-05       
+##                                           
+##             Sensitivity : 0.98473         
+##             Specificity : 0.09091         
+##          Pos Pred Value : 0.89583         
+##          Neg Pred Value : 0.42857         
+##              Prevalence : 0.88814         
+##          Detection Rate : 0.87458         
+##    Detection Prevalence : 0.97627         
+##       Balanced Accuracy : 0.53782         
+##                                           
+##        'Positive' Class : No              
+## 
+```
+
+
+---
+
+We can also use our old friend the ROC curve to calculate the AUC of this model:
+
+
+```r
+library(pROC)
+
+auc(
+  roc(
+    testing$Attrition,
+    predict(first_knn, testing)[, 2],
+    plot = TRUE
+  )
+)
+```
+
+![](week_10_slides_files/figure-html/unnamed-chunk-20-1.png)&lt;!-- --&gt;
+
+```
+## Area under the curve: 0.58
+```
+
+It turns out, this model does a pretty bad job predicting our test set.
+
+---
+
+Looking at our specificity rates, it might be helpful if we balance our classes
+before predicting. `knn3` doesn't take weights as an argument, so we'll need
+to resample our data in order to balance our training data.
+
+
+```r
+training &lt;- attrition[row_idx &lt; nrow(attrition) * 0.8, ]
+testing &lt;- attrition[row_idx &gt;= nrow(attrition) * 0.8, ]
+
+positive_training &lt;- training[training$Attrition == "Yes", ]
+negative_training &lt;- training[training$Attrition == "No", ]
+n_pos &lt;- nrow(positive_training)
+
+resampled_positives &lt;- sample(1:n_pos, 
+                              size = 5 * n_pos, 
+                              replace = TRUE)
+
+resampled_positives &lt;- positive_training[resampled_positives, ]
+training &lt;- rbind(
+  negative_training,
+  resampled_positives
+)
+```
+
+---
+
+We also might get better results from choosing a different value of k. Like
+all other hyperparameters, we can tune this via a grid search.
+
+However, cross-entropy is a bad loss function for KNNs. KNNs don't
+_really_ predict probability, they just predict whatever class the majority of 
+neighbors are. 
+
+If we force KNN to report probabilities, what we get back instead are 
+percentages of how many neighbors belong to each class. This means that a k of 1
+can only predict 100% and 0% probabilities, a k of 3 0%, 33%, 67%, and 100% and
+so on.
+
+Since cross-entropy specifically penalizes confident-but-wrong guesses, this 
+means that cross-entropy decreases as k increases and guesses become less 
+confident, so can't actually tell us what the best k value might be.
+
+So instead, we'll use our old friend AUC as a loss function to tune KNNs.
+
+---
+
+When we predict with `knn3`, we get a matrix of the "probabilities" 
+(really proportions) of each class:
+
+
+```r
+predict(first_knn, testing) |&gt; head(1)
+```
+
+```
+##             No       Yes
+## [1,] 0.7777778 0.2222222
+```
+
+To just get our positive probability, we'll index into the data frame:
+
+
+```r
+predict(first_knn, testing)[, 2] |&gt; head(1)
+```
+
+```
+## [1] 0.2222222
+```
+
+And so our function to calculate the AUC looks like this:
+
+
+```r
+calc_auc &lt;- function(model, data) {
+  roc(data$Attrition, predict(model, data)[, 2]) |&gt; 
+    auc() |&gt; 
+    suppressMessages()
+}
+```
+
+I've also added a `suppressMessages` function here because `roc` is a pretty
+chatty function, which can get annoying when running it 100 times.
+
+---
+
+We can then repurpose our `k_fold_cv` function from last time to tune our KNN.
+Note that we're going to scale our data during each iteration -- just like with
+the hold-out set, it's important we not let data from the validation fold leak 
+into the pre-processing step:
+
+
+```r
+k_fold_cv &lt;- function(data, k, n) {
+  per_fold &lt;- floor(nrow(data) / k)
+  fold_order &lt;- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows &lt;- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test &lt;- data[fold_idx, ]
+      fold_train &lt;- data[-fold_idx, ]
+      scaling_recipe &lt;- recipe(Attrition ~ ., data = fold_train) |&gt; 
+        step_center(where(is.numeric)) |&gt; 
+        step_scale(where(is.numeric)) |&gt; 
+        prep()
+      
+      fold_train &lt;- bake(scaling_recipe, fold_train)
+      fold_test &lt;- bake(scaling_recipe, fold_test)
+      
+      fold_knn &lt;- knn3(Attrition ~ ., fold_train, k = n)
+      calc_auc(fold_knn, fold_test)
+    },
+    numeric(1)
+  ) |&gt; 
+    mean()
+}
+```
+
+---
+
+k can go as high as the total number of rows in your data (in which case you'll 
+always predict the more common class) or as low as 1 (using only the closest
+neighbor), and there's really not a good rule of thumb for what k values to try. 
+
+We'll go ahead and try 20 k values evenly spaced between 1 and 401:
+
+
+```r
+tuning_grid &lt;- expand.grid(
+  n = floor(seq(1, 401, length.out = 20)),
+  auc = NA
+)
+tuning_grid$n
+```
+
+```
+##  [1]   1  22  43  64  85 106 127 148 169 190 211 232 253 274 295 316 337 358 379
+## [20] 401
+```
+
+We still don't want k to be even, however, in order to avoid ties in our 
+classifications. We'll add 1 to all our even k values in order to make sure 
+we've always got a tiebreaker neighbor:
+
+
+```r
+tuning_grid$n &lt;- ifelse(
+  tuning_grid$n %% 2 == 0,
+  tuning_grid$n + 1,
+  tuning_grid$n
+)
+tuning_grid$n
+```
+
+```
+##  [1]   1  23  43  65  85 107 127 149 169 191 211 233 253 275 295 317 337 359 379
+## [20] 401
+```
+
+---
+
+And with all that done, the code to iterate over our grid is pretty simple:
+
+
+```r
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$auc[i] &lt;- k_fold_cv(
+    attrition,
+    5,
+    n = tuning_grid$n[i]
+  )
+}
+
+head(arrange(tuning_grid, -auc), 2)
+```
+
+```
+##     n       auc
+## 1  85 0.7572562
+## 2 107 0.7544213
+```
+
+Plotting k makes it pretty obvious that the optimal value is somewhere just 
+under 100.
+
+
+```r
+ggplot(tuning_grid, aes(n, auc)) + 
+  geom_line() + 
+  geom_point() + 
+  labs(x = "k")
+```
+
+![](week_10_slides_files/figure-html/unnamed-chunk-29-1.png)&lt;!-- --&gt;
+
+If we wanted, we could run a second grid search to investigate that area more
+thoroughly; right now we'll just run with k = 85.
+
+---
+
+We have to rescale our training and testing sets in order to evaluate our 
+hold-out accuracy:
+
+
+```r
+scaling_recipe &lt;- recipe(Attrition ~ ., data = training) |&gt; 
+  step_center(where(is.numeric)) |&gt; 
+  step_scale(where(is.numeric)) |&gt; 
+  prep()
+
+training &lt;- bake(scaling_recipe, training)
+testing &lt;- bake(scaling_recipe, testing)
+```
+
+And with that done, we can evaluate our accuracy using AUC:
+
+
+```r
+final_knn &lt;- knn3(Attrition ~ ., training, k = 85)
+calc_auc(final_knn, testing)
+```
+
+```
+## Area under the curve: 0.7627
+```
+
+As well as via a confusion matrix, on the next page.
+
+---
+
+
+```r
+confusionMatrix(
+  predict(final_knn, testing, type = "class"),
+  testing$Attrition
+)
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction  No Yes
+##        No  192  12
+##        Yes  70  21
+##                                           
+##                Accuracy : 0.722           
+##                  95% CI : (0.6672, 0.7724)
+##     No Information Rate : 0.8881          
+##     P-Value [Acc &gt; NIR] : 1               
+##                                           
+##                   Kappa : 0.2088          
+##                                           
+##  Mcnemar's Test P-Value : 3.082e-10       
+##                                           
+##             Sensitivity : 0.7328          
+##             Specificity : 0.6364          
+##          Pos Pred Value : 0.9412          
+##          Neg Pred Value : 0.2308          
+##              Prevalence : 0.8881          
+##          Detection Rate : 0.6508          
+##    Detection Prevalence : 0.6915          
+##       Balanced Accuracy : 0.6846          
+##                                           
+##        'Positive' Class : No              
+## 
+```
+
+---
+
+Overall, this KNN makes pretty adequate predictions! Odds are, we could do 
+better with a well-tuned random forest or GBM, but as far as easily-explainable
+models go the KNN did alright.
+
+And that's KNN for classification! But the technique can be applied to 
+regression tasks as well.
+
+Rather than predict the most common value, KNNs built for regression tasks 
+predict the _average_ value of the neighbors (sometimes weighted by distance,
+sometimes not).
+
+We'll walk through the process quickly, but the fundamental steps are the same
+as when using KNNs for classification. First, we'll load our data:
+
+
+```r
+ames &lt;- AmesHousing::make_ames()
+row_idx &lt;- sample(seq_len(nrow(ames)), nrow(ames))
+training &lt;- ames[row_idx &lt; nrow(ames) * 0.8, ]
+testing &lt;- ames[row_idx &gt;= nrow(ames) * 0.8, ]
+```
+
+And create our function to calculate RMSE:
+
+
+```r
+calc_rmse &lt;- function(model, data) {
+  sqrt(mean((predict(model, data) - data$Sale_Price)^2))
+}
+```
+
+---
+
+And lastly, we'll repurpose our `k_fold_cv` function. We need to make a few 
+changes:
+
++ Instead of `knn3`, we'll use `knnreg` for regression modeling;
++ We're going to add `-all_outcomes` to our recipe steps, to make sure we don't
+  scale and center our sale price
++ And we'll change the formula in `recipe` and `knnreg` to `Sale_Price ~ .` and
+  our loss function to `calc_rmse`
+
+
+```r
+k_fold_cv &lt;- k_fold_cv &lt;- function(data, k, n) {
+  per_fold &lt;- floor(nrow(data) / k)
+  fold_order &lt;- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows &lt;- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test &lt;- data[fold_idx, ]
+      fold_train &lt;- data[-fold_idx, ]
+      
+      scaling_recipe &lt;- recipe(Sale_Price ~ ., data = fold_train) |&gt; 
+        step_center(where(is.numeric), -all_outcomes()) |&gt; 
+        step_scale(where(is.numeric),  -all_outcomes()) |&gt; 
+        prep()
+      
+      fold_train &lt;- bake(scaling_recipe, fold_train)
+      fold_test &lt;- bake(scaling_recipe, fold_test)
+      
+      fold_knn &lt;- knnreg(Sale_Price ~ ., fold_train, k = n)
+      calc_rmse(fold_knn, fold_test)
+    },
+    numeric(1)
+  ) |&gt; 
+    mean()
+}
+```
+
+---
+
+Just as before, we can iterate through possible k values, find the best one, 
+and plot the relationship between k and RMSE:
+
+
+```r
+tuning_grid &lt;- expand.grid(
+  n = floor(seq(1, 401, length.out = 20)),
+  rmse = NA
+)
+
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$rmse[i] &lt;- k_fold_cv(
+    training,
+    5,
+    n = tuning_grid$n[i]
+  )
+}
+head(arrange(tuning_grid, rmse), 2)
+```
+
+```
+##    n     rmse
+## 1 22 34544.91
+## 2 43 36479.43
+```
+
+
+```r
+ggplot(tuning_grid, aes(n, rmse)) + 
+  geom_line() + 
+  geom_point() + 
+  labs(x = "k")
+```
+
+![](week_10_slides_files/figure-html/unnamed-chunk-37-1.png)&lt;!-- --&gt;
+
+It looks like the best k is somewhere under 40! We'll run with k = 22 for now.
+
+---
+
+Just as before, we need to rescale our training and testing data before fitting
+a KNN to the full training data:
+
+
+```r
+scaling_recipe &lt;- recipe(Sale_Price ~ ., data = training) |&gt; 
+  step_center(where(is.numeric), -all_outcomes()) |&gt; 
+  step_scale(where(is.numeric), - all_outcomes()) |&gt; 
+  prep()
+
+training &lt;- bake(scaling_recipe, training)
+testing &lt;- bake(scaling_recipe, testing)
+```
+
+And we can now go ahead and evaluate our RMSE:
+
+
+```r
+final_knn &lt;- knnreg(Sale_Price ~ ., training, k = 22)
+calc_rmse(final_knn, testing)
+```
+
+```
+## [1] 29419.37
+```
+
+Not too bad! We've done dramatically better with random forests and GBMs, but
+KNN at least beats linear regression.
+
+---
+
+And that, in a nutshell, is the k-nearest neighbors algorithm. 
+
+As I mentioned at the start of these slides, KNN is extremely computationally
+inefficient and tends to not create as accurate models as the random forests and
+GBMs we've talked about in the past.
+
+However, k-nearest neighbor models are still somewhat prevalent in the 
+scientific literature, and are a useful way for us to shift from tree-based 
+to kernel-based models. 
+
+Next week, we'll wrap up with the most famous kernel-based method of them all,
+the support vector machine.
+
+---
+class: middle
+
+# References
+
+---
+
+Titles are links:
+
++ [HOML Chapter 8](https://bradleyboehmke.github.io/HOML/knn.html)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

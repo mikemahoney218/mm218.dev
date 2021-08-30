@@ -1,7 +1,7 @@
 ---
 title: "Machine Learning Concepts and Applications"
 description: |
-  Slides, notes, and syllabus for FOR 796
+  Slides, notes, and syllabus for FOR 796.
 site: distill::distill_website
 ---
 
@@ -15,12 +15,12 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Course Title and Instructor
 
-**Title**: FOR 796: Machine Learning for Prediction: Concepts and Applications in R  
+**Title**: FOR 796: Machine Learning Concepts and Applications  
 **Time and Place**: Wednesday 2:15-3:10, Bray 300
 
 **Instructor**: Mike Mahoney  
 **Email**: mike.mahoney.218@gmail.com  
-**Office Hours**: Tuesday 11:30-12:30 (location TBA), or by appointment
+**Office Hours**: Tuesday 11:30-12:30 (Baker 231), or by appointment
 
 ## Course Description
 
