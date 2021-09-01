@@ -645,7 +645,8 @@ As well as via a confusion matrix, on the next page.
 ```r
 confusionMatrix(
   predict(final_knn, testing, type = "class"),
-  testing$Attrition
+  testing$Attrition,
+  positive = "Yes"
 )
 ```
 
@@ -666,16 +667,16 @@ confusionMatrix(
 ##                                           
 ##  Mcnemar's Test P-Value : 3.082e-10       
 ##                                           
-##             Sensitivity : 0.7328          
-##             Specificity : 0.6364          
-##          Pos Pred Value : 0.9412          
-##          Neg Pred Value : 0.2308          
-##              Prevalence : 0.8881          
-##          Detection Rate : 0.6508          
-##    Detection Prevalence : 0.6915          
-##       Balanced Accuracy : 0.6846          
+##             Sensitivity : 0.63636         
+##             Specificity : 0.73282         
+##          Pos Pred Value : 0.23077         
+##          Neg Pred Value : 0.94118         
+##              Prevalence : 0.11186         
+##          Detection Rate : 0.07119         
+##    Detection Prevalence : 0.30847         
+##       Balanced Accuracy : 0.68459         
 ##                                           
-##        'Positive' Class : No              
+##        'Positive' Class : Yes             
 ## 
 ```
 

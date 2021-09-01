@@ -74,17 +74,1016 @@ it went. You can use slides if you want, or you can feel free to just talk about
 your project for five minutes.
 
 The presentations are meant as an opportunity for us to find out what everyone
-else has been working on; they should not be a high-stakes event. 
+else has been working on; they should not feel like a high-stakes event. 
+
+As usual, feel free to reach out for any questions or concerns.
 
 ---
 
+# Support Vector Machines
+
+---
+
+We're wrapping up this course with one final type of model, the 
+**support vector machine** (or SVM).
+
+SVMs are our second kernel-based method, and the most common kernel-based method
+in use today. 
+
+SVMs are highly flexible, robust to outliers, and are resilent to overfitting.
+However, they can also be slow to train, particularly on data sets with many 
+observations. 
+
+As a result, SVMs are often viewed as more specialized models than
+random forests and GBMs; if nothing else is working right, SVM might be the 
+model for you.
+
+---
+
+But before we get into all that, let's go back to our fake data from last week:
+
+<br />
+
+```{r, echo = FALSE, fig.width=10, fig.height=5}
+set.seed(123)
+example_df <- 
+  rbind(
+    data.frame(
+      x = rnorm(20),
+      y = rnorm(20),
+      class = "A"
+    ),
+    data.frame(
+      x = rnorm(20, 3),
+      y = rnorm(20, 3),
+      class = "B"
+    )
+  )
+selected_point <- 40
+example_df$class[selected_point] <- "?"
+example_df$class <- factor(example_df$class, levels = c("A", "B", "?"))
+
+library(ggplot2)
+example_df |> 
+  ggplot(aes(x, y, color = class, shape = class)) +
+  geom_point(size = 3.5, color = "black") + 
+  geom_point(size = 3) + 
+  scale_shape_manual(values = c(19, 19, 17),
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  labs(x = "Size", y = "Greenness")
+```
+
+---
+
+Last week, we focused on classifying our mystery points (the purple triangle) 
+based on its nearest neighbors -- if the majority of neighbors nearby were edge
+plants, we'd predict an edge plant.
+
+But there might be an easier way to classify things. There's a big gap between
+our two classes -- what if we drew a line across it?
+
+```{r, echo = FALSE, fig.width=10, fig.height=5}
+example_df |> 
+  ggplot(aes(x, y, color = class, shape = class)) +
+  geom_point(size = 3.5, color = "black") + 
+  geom_point(size = 3) + 
+  geom_abline(slope = -1, intercept = 3) + 
+  scale_shape_manual(values = c(19, 19, 17),
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  labs(x = "Size", y = "Greenness")
+```
+
+---
+
+Now instead of having to find the neighbors for each point we want to predict, 
+we can just look at where the point falls compared to the line. If the point
+is above the line, it's an edge plant; if it's below, it's an interior plant.
+
+When our data can be separated into two classes by a straight line, we call it
+**linearly separable**. We can think of the line as a **decision boundary**, 
+because our predictions depend entirely on what side of the boundary a point 
+falls.
+
+```{r, echo = FALSE, fig.width=10, fig.height=5}
+example_df |> 
+  ggplot(aes(x, y, color = class, shape = class)) +
+  geom_point(size = 3.5, color = "black") + 
+  geom_point(size = 3) + 
+  geom_abline(slope = -1, intercept = 3) + 
+  scale_shape_manual(values = c(19, 19, 17),
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  labs(x = "Size", y = "Greenness")
+```
+
+---
+
+Another name for this line is a **separating hyperplane**. Remember from way 
+back in week 2 that we can call model surfaces in any dimension a hyperplane;
+rather than directly modeling an outcome or probability, however, these 
+hyperplanes are trying to split our data into two classes.
+
+But how do we choose where to draw the decision boundary? There are many 
+possible different separating hyperplanes that perfectly classify our data:
+
+```{r, echo = FALSE, fig.width=10, fig.height=5}
+example_df |> 
+  ggplot(aes(x, y, color = class, shape = class)) +
+  geom_point(size = 3.5, color = "black") + 
+  geom_point(size = 3) + 
+  geom_abline(slope = -1, intercept = 3) + 
+  geom_abline(slope = -1, intercept = 3.5) + 
+  geom_abline(slope = -1.45, intercept = 3.5) + 
+  geom_abline(slope = -0.75, intercept = 2.5) + 
+  scale_shape_manual(values = c(19, 19, 17),
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  labs(x = "Size", y = "Greenness")
+```
+
+---
+
+But immediately, just by looking at this graph, we can tell that some of these
+hyperplanes seem "better" than others. How can we choose the "best"?
+
+One approach is to choose the hyperplane that is the _furthest_ from both 
+classes. That _should_ maximize how generalizable the decision boundary is, so
+that a point with X and Y values a bit further out from the class mean will 
+still be calculated correctly.
+
+Finding that line is a two step process. First, we need to find the points from
+each class which are closest to the _other_ class:
+
+```{r, echo = FALSE, fig.width=10, fig.height=5}
+example_df[-c(16, 32), ] |> 
+  ggplot(aes(x, y, color = class, shape = class)) +
+  geom_point(data = example_df, size = 3.5, color = "black") + 
+  geom_point(data = example_df[16, ], color = "red", size = 3) + 
+  geom_point(data = example_df[32, ], color = "red", size = 3) + 
+  geom_point(size = 3) + 
+  #geom_abline(slope = -0.95, intercept = 3) + 
+  scale_shape_manual(values = c(19, 19, 17),
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  labs(x = "Size", y = "Greenness")
+```
+
+---
+
+Then we draw the line that maximizes the distance of _both_ of those points from 
+the line.
+
+We call this decision boundary the **optimal separating hyperplane**, and the
+points we use to draw it **support vectors**.
+
+```{r, echo = FALSE, fig.width=10, fig.height=5}
+example_df[-c(16, 32), ] |> 
+  ggplot(aes(x, y, color = class, shape = class)) +
+  annotate("segment", x = example_df[32, ]$x, y = example_df[32, ]$y, 
+           xend = 2.83, yend = 0.29) + 
+  annotate("segment", x = example_df[16, ]$x, y = example_df[16, ]$y, 
+           xend = 1.95, yend = 1.12) + 
+  geom_point(data = example_df, size = 3.5, color = "black") + 
+  geom_point(data = example_df[16, ], color = "red", size = 3) + 
+  geom_point(data = example_df[32, ], color = "red", size = 3) + 
+  geom_point(size = 3) + 
+  geom_abline(slope = -0.95, intercept = 2.95) + 
+  
+  scale_shape_manual(values = c(19, 19, 17),
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  labs(x = "Size", y = "Greenness")
+```
+
+---
+
+This method maximizes the distance between the two classes (the area between the
+dotted lines, also known as a **margin**). Because we're drawing our decision
+boundary so that no points are inside the margin and no points are 
+misclassified, we call this a **hard margin classifier**.
+
+This is the simplest version of a support vector machine!
+
+```{r, echo = FALSE, fig.width=10, fig.height=5}
+example_df[-c(16, 32), ] |> 
+  ggplot(aes(x, y, color = class, shape = class)) +
+  annotate("segment", x = example_df[32, ]$x, y = example_df[32, ]$y, 
+           xend = 2.83, yend = 0.29) + 
+  annotate("segment", x = example_df[16, ]$x, y = example_df[16, ]$y, 
+           xend = 1.95, yend = 1.12) + 
+  geom_abline(slope = -0.95, intercept = 3.525, linetype = 2) + 
+  geom_abline(slope = -0.95, intercept = 2.38, linetype = 2) + 
+  geom_point(data = example_df, size = 3.5, color = "black") + 
+  geom_point(data = example_df[16, ], color = "red", size = 3) + 
+  geom_point(data = example_df[32, ], color = "red", size = 3) + 
+  geom_point(size = 3) + 
+  geom_abline(slope = -0.95, intercept = 2.95) + 
+  
+  scale_shape_manual(values = c(19, 19, 17),
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  labs(x = "Size", y = "Greenness")
+```
+
+---
+
+However, the hard margin classifier has some weaknesses. For instance, let's 
+look at a different data set, showing how income and lot size are associated 
+with riding lawnmower ownership:
+
+```{r, echo = FALSE, fig.width=10, fig.height=5}
+# Load required packages
+library(ggplot2)
+library(kernlab)
+library(svmpath)
+# Helper packages
+library(dplyr)    # for data wrangling
+library(ggplot2)  # for awesome graphics
+library(rsample)  # for data splitting
+# Modeling packages
+library(caret)    # for classification and regression training
+library(kernlab)  # for fitting SVMs
+
+# Colors
+dark2 <- RColorBrewer::brewer.pal(8, "Dark2")
+set1 <- RColorBrewer::brewer.pal(9, "Set1")
+# Plotting function; modified from svmpath::svmpath()
+plot_svmpath <- function(x, step = max(x$Step), main = "") {
+  
+  # Extract model info
+  object <- x
+  f <- predict(object, lambda = object$lambda[step], type = "function")
+  x <- object$x
+  y <- object$y
+  Elbow <- object$Elbow[[step]]
+  alpha <- object$alpha[, step]
+  alpha0 <- object$alpha0[step]
+  lambda <- object$lambda[step]
+  df <- as.data.frame(x[, 1L:2L])
+  names(df) <- c("x1", "x2")
+  df$y <- norm2d$y
+  beta <- (alpha * y) %*% x
+  # Construct plot
+  ggplot(df, aes(x = x1, y = x2)) +
+    geom_point(aes(shape = y, color = y), size = 3, alpha = 0.75) +
+    xlab("Income (standardized)") +
+    ylab("Lot size (standardized)") +
+    xlim(-6, 6) +
+    ylim(-6, 6) +
+    coord_fixed() +
+    theme(legend.position = "none") +
+    theme_bw() +
+    scale_shape_discrete(
+      name = "Owns a riding\nmower?",
+      breaks = c(1, 2),
+      labels = c("Yes", "No")
+    ) +
+    scale_color_brewer(
+      name = "Owns a riding\nmower?",
+      palette = "Dark2",
+      breaks = c(1, 2),
+      labels = c("Yes", "No")
+    ) +
+    geom_abline(intercept = -alpha0/beta[2], slope = -beta[1]/beta[2], 
+                color = "black") +
+    geom_abline(intercept = lambda/beta[2] - alpha0/beta[2], 
+                slope = -beta[1]/beta[2], 
+                color = "black", linetype = 2) +
+    geom_abline(intercept = -lambda/beta[2] - alpha0/beta[2], 
+                slope = -beta[1]/beta[2], 
+                color = "black", linetype = 2) +
+    geom_point(data = df[Elbow, ], size = 3) +
+    ggtitle(main)
+    
+}
+
+# Simulate data
+set.seed(805)
+norm2d <- as.data.frame(mlbench::mlbench.2dnormals(
+  n = 100,
+  cl = 2,
+  r = 4,
+  sd = 1
+))
+names(norm2d) <- c("x1", "x2", "y")  # rename columns
+# Add an outlier
+norm2d <- rbind(norm2d, data.frame("x1" = 0.5, "x2" = 1, "y" = 2))
+
+invisible(capture.output(fit_hmc <- ksvm(  # use ksvm() to find the OSH
+  x = data.matrix(norm2d[c("x1", "x2")]),
+  y = as.factor(norm2d$y), 
+  kernel = "vanilladot",  # no fancy kernel, just ordinary dot product
+  C = Inf,                # to approximate maximal margin classifier
+  prob.model = TRUE       # needed to obtain predicted probabilities
+)))
+# Grid over which to evaluate decision boundaries
+npts <- 500
+xgrid <- expand.grid(
+  x1 = seq(from = -6, 6, length = npts),
+  x2 = seq(from = -6, 6, length = npts)
+)
+prob_hmc <- predict(fit_hmc, newdata = xgrid, type = "probabilities")
+# Add predicted class probabilities
+xgrid2 <- xgrid %>%
+  cbind("Hard Margin Classifier" = prob_hmc[, 1L]) %>%
+  tidyr::gather(Model, Prob, -x1, -x2)
+# Scatterplot
+ggplot(norm2d, aes(x = x1, y = x2)) +
+    # Scatterplot, etc.
+  geom_point(aes(shape = y, color = y), size = 3, alpha = 0.75) +
+  xlab("Income (standardized)") +
+  ylab("Lot size (standardized)") +
+  xlim(-6, 6) +
+  ylim(-6, 6) +
+  theme(legend.position = "none") +
+  theme_bw() +
+  scale_shape_discrete(
+    name = "Owns a riding\nmower?",
+    breaks = c(1, 2),
+    labels = c("Yes", "No")
+  ) +
+  scale_color_brewer(
+    name = "Owns a riding\nmower?",
+    palette = "Dark2",
+    breaks = c(1, 2),
+    labels = c("Yes", "No")
+  ) +
+  theme_light()
+```
+
+(This graph adapted from [Hands-on Machine Learning with R](https://bradleyboehmke.github.io/HOML/svm.html#the-soft-margin-classifier).)
+
+---
+
+This data is still linearly separable -- we could draw a straight line that 
+would perfectly split our data set into two classes.
+
+However, this data set has a potential outlier here which will seriously impact
+how we split our data into classes:
+
+```{r, echo = FALSE, fig.width=10, fig.height=5}
+# Scatterplot
+ggplot(norm2d, aes(x = x1, y = x2)) +
+  
+  # Label outlier
+  geom_curve(x = tail(norm2d, n = 1)$x1 - 0.2, y = tail(norm2d, n = 1)$x2 - 0.2, 
+             xend = -4, yend = 3, curvature = -0.5, angle = 90,
+             arrow = arrow(length = unit(0.03, units = "npc"))) +
+  annotate("text", label = "Outlier?", x = -4, y = 3.5, size = 5) +
+  # Scatterplot, etc.
+  geom_point(aes(shape = y, color = y), size = 3, alpha = 0.75) +
+  xlab("Income (standardized)") +
+  ylab("Lot size (standardized)") +
+  xlim(-6, 6) +
+  ylim(-6, 6) +
+  theme(legend.position = "none") +
+  theme_bw() +
+  scale_shape_discrete(
+    name = "Owns a riding\nmower?",
+    breaks = c(1, 2),
+    labels = c("Yes", "No")
+  ) +
+  scale_color_brewer(
+    name = "Owns a riding\nmower?",
+    palette = "Dark2",
+    breaks = c(1, 2),
+    labels = c("Yes", "No")
+  ) +
+  theme_light()
+```
 
 
+---
 
+If we go through the same process as earlier to find our optimal separating 
+hyperplane, we'll find that this decision boundary is much closer to the 
+"Yes" point cloud than we'd expect. 
 
+This likely won't generalize well -- as we test our model on new data, we're 
+very likely to mischaracterize "Yes" points as "No"s!
 
+```{r, echo = FALSE, fig.width=10, fig.height=5}
+# Scatterplot
+ggplot(norm2d, aes(x = x1, y = x2)) +
+  
+  # Label outlier
+  geom_curve(x = tail(norm2d, n = 1)$x1 - 0.2, y = tail(norm2d, n = 1)$x2 - 0.2, 
+             xend = -4, yend = 3, curvature = -0.5, angle = 90,
+             arrow = arrow(length = unit(0.03, units = "npc"))) +
+  annotate("text", label = "Outlier?", x = -4, y = 3.5, size = 5) +
+  # Scatterplot, etc.
+  geom_point(aes(shape = y, color = y), size = 3, alpha = 0.75) +
+  xlab("Income (standardized)") +
+  ylab("Lot size (standardized)") +
+  xlim(-6, 6) +
+  ylim(-6, 6) +
+  theme(legend.position = "none") +
+  theme_bw() +
+  scale_shape_discrete(
+    name = "Owns a riding\nmower?",
+    breaks = c(1, 2),
+    labels = c("Yes", "No")
+  ) +
+  scale_color_brewer(
+    name = "Owns a riding\nmower?",
+    palette = "Dark2",
+    breaks = c(1, 2),
+    labels = c("Yes", "No")
+  ) +
+  stat_contour(data = xgrid2, aes(x = x1, y = x2, z = Prob, linetype = Model), 
+               breaks = 0.5, color = "black") + 
+  theme_light()
+```
 
+---
 
+What if, rather than drawing our hyperplane so that there are no points inside
+the margin (like we do with the hard margin classifier), we allowed a few points
+to fall inside that space? 
 
+That way, we could use other points as support vectors, making our SVM more 
+resilient to outliers. This is known as the **soft-margin classifier** (because
+we've _softened_ the requirement that no points fall inside the margin).
 
+How many points we let inside the margin is an important hyperparameter of SVMs,
+usually referred to as $C$. 
 
+If $C$ is 0, you let 0 points inside the margin -- 
+you use the points which are closest to each other as support vectors to 
+produce the hard margin classifier. If $C$ is infinite, you use the furthest
+removed points as support vectors and let all of your data into the margin.
+
+![](https://bradleyboehmke.github.io/HOML/11b-svm_files/figure-html/smc-1.png)
+
+---
+
+This is the core of how SVMs work: decide how many points are allowed inside the
+margin, find the support vectors, and then find the decision boundary that's 
+halfway between them.
+
+But what if our data isn't linearly separable? This is pretty common in the real
+world -- if there was an obvious linear boundary between our two classes,
+we wouldn't need machine learning to tell them apart.
+
+```{r, echo = FALSE, fig.width=5, fig.height=5}
+# Load required packages
+library(grid)
+library(lattice)
+# Simulate data
+set.seed(1432)
+circle <- as.data.frame(mlbench::mlbench.circle(
+  n = 200,
+  d = 2
+))
+names(circle) <- c("x1", "x2", "y")  # rename columns
+# Fit a support vector machine (SVM)
+fit_svm_poly <- ksvm( 
+  x = data.matrix(circle[c("x1", "x2")]),
+  y = as.factor(circle$y), 
+  kernel = "polydot",       # polynomial kernel
+  kpar = list(degree = 2),  # kernel parameters
+  C = Inf,                  # to approximate maximal margin classifier
+  prob.model = TRUE         # needed to obtain predicted probabilities
+)
+# Grid over which to evaluate decision boundaries
+npts <- 500
+xgrid <- expand.grid(
+  x1 = seq(from = -1.25, 1.25, length = npts),
+  x2 = seq(from = -1.25, 1.25, length = npts)
+)
+# Predicted probabilities (as a two-column matrix)
+prob_svm_poly <- predict(fit_svm_poly, newdata = xgrid, type = "probabilities")
+# Scatterplot
+(p1 <- contourplot(
+  x = prob_svm_poly[, 1] ~ x1 * x2, 
+  data = xgrid, 
+  at = 0, 
+  labels = FALSE,
+  scales = list(tck = c(1, 0)),
+  xlab = "X",
+  ylab = "Y",
+  main = "Original feature space",
+  panel = function(x, y, z, ...) {
+    panel.contourplot(x, y, z, ...)
+    panel.xyplot(
+      x = circle$x1, 
+      y = circle$x2, 
+      groups = circle$y, 
+      pch = 19, 
+      cex = 1,
+      col = adjustcolor(dark2[1L:2L], alpha.f = 0.5),
+      ...
+    )
+  }
+))
+```
+
+---
+
+Well, what if we could create a new variable so that our data was linearly 
+separable in higher dimensions?
+
+For instance, imagine we created a new variable $Z$ such that $Z = X^2 + Y^2$. If
+we use that variable to plot our data in 3D, it seems like we might be able to
+draw a linear decision boundary for our data:
+
+```{r, echo = FALSE, fig.width=10, fig.height=5}
+# Enlarge feature space
+circle_3d <- circle
+circle_3d$x3 <- circle_3d$x1^2 + circle_3d$x2^2
+# 3-D scatterplot
+p2 <- cloud(
+  x = x3 ~ x1 * x2, 
+  zlab = "Z",
+  xlab = "X",
+  ylab = "Y",
+  data = circle_3d, 
+  groups = y,
+  main = "Enlarged feature space",
+  par.settings = list(
+    superpose.symbol = list(
+      pch = 19,
+      cex = 1,
+      col = adjustcolor(dark2[1L:2L], alpha.f = 0.5)
+    )
+  )
+) 
+gridExtra::grid.arrange(p1, p2, nrow = 1)
+```
+
+---
+
+We can use that new Z variable to draw a linear decision boundary in 
+higher-dimensional space than our original 2D X/Y graph. But when we come back 
+to 2D (so plotting the hyperplane using only X and Y values), it's entirely 
+nonlinear.
+
+This is the core thing that makes SVMs special: they combine variables to cast 
+your data into some higher dimensional space where it is linearly separable,
+which lets them approximate any non-linear relationships your predictors have.
+
+```{r, echo = FALSE, fig.width=10, fig.height=5}
+# Scatterplot with decision boundary
+p3 <- contourplot(
+  x = prob_svm_poly[, 1] ~ x1 * x2, 
+  data = xgrid, 
+  at = 0.5, 
+  labels = FALSE,
+  scales = list(tck = c(1, 0)),
+  xlab = "x1",
+  ylab = "x2",
+  main = "Non-linear decision boundary",
+  panel = function(x, y, z, ...) {
+    panel.contourplot(x, y, z, ...)
+    panel.xyplot(
+      x = circle$x1, 
+      y = circle$x2, 
+      groups = circle$y, 
+      xlab = "X",
+      ylab = "Y",
+      pch = 19, 
+      cex = 1,
+      col = adjustcolor(dark2[1L:2L], alpha.f = 0.5),
+      ...
+    )
+  }
+) 
+# Combine plots
+gridExtra::grid.arrange(p3, p2, nrow = 1)
+
+```
+
+---
+
+In order to cast your data into more dimensions, SVMs make use of what are known
+as _kernel functions_.
+
+Kernel functions are effectively a guess about how your variables are related to
+each other; they specify some transformation to your variables that will 
+_hopefully_ make your data linearly separable.
+
+There are a number of different kernel functions available to choose from, each
+a different transformation which might work well for your data. 
+In practice, we generally start with something called the 
+"**radial basis function**" kernel (or RBF) and try out other kernels only if 
+that one doesn't work. 
+This is a fundamentally dissatisfying way to do things, and yet.
+
+---
+
+One last thing before we move on to implementing SVMs in R.
+
+Just like KNNs, SVM are trying to calculate the distance between your points in
+order to find separating hyperplanes. This means that, just like with KNNs, you
+need to scale and center your data in order to make sure all your variables 
+"count" for distance equally, regardless of units.
+
+This also means that, to an SVM, categorical variables (which are encoded to be
+either 0 or 1) have lower variance than continuous variables, and so tend to 
+contribute less to the final prediction. If your data contains many continuous
+variables, SVM may make worse predictions than other methods.
+
+---
+
+Alright, that's enough hyperdimensional thinking for today. Let's get down to 
+brass tacks.
+
+We'll be using the `kernlab` package to fit SVMs today -- go ahead and install
+and load it now:
+
+```{r, eval = FALSE}
+install.packages("kernlab")
+```
+
+```{r, message=FALSE}
+library(kernlab)
+```
+
+We'll also go ahead and set our attrition data set up for one last time:
+
+```{r}
+library(modeldata)
+data(attrition)
+set.seed(123)
+row_idx <- sample(seq_len(nrow(attrition)), nrow(attrition))
+training <- attrition[row_idx < nrow(attrition) * 0.8, ]
+testing <- attrition[row_idx >= nrow(attrition) * 0.8, ]
+```
+
+---
+
+We're going to start off predicting attrition by fitting an SVM using the 
+RBF kernel function, which is the default method in the `ksvm` function we use
+to fit SVMs. That means that we can use `ksvm` to create our SVM using the 
+exact same syntax as `lm`:
+
+```{r}
+first_svm <- ksvm(Attrition ~ ., training)
+first_svm
+```
+
+---
+
+There's a few useful pieces of information in the output from `ksvm`:
+
++ We're told we're using a `Gaussian Radial Basis kernel function`, which is 
+  the formal name for the RBF kernel
++ We can see the value of our C hyperparameter (which controls how "hard" the 
+  margin is), which by default is 1
++ We're told that there's another hyperparameter, `sigma`, which we haven't 
+  talked about at all and is set to some extremely small value
+
+```{r}
+first_svm
+```
+
+---
+
+Sigma (usually written $\sigma$) is what we call a **kernel hyperparameter**. 
+If we chose to use a different kernel, we might have entirely different kernel
+hyperparameters; you can see a full list of the options in `kernlab` via 
+`?kernlab::dots`.
+
+If you're using any non-RBF kernel, you can think of kernel hyperparameters just
+like any other hyperparameter -- a value you need to find through model tuning.
+However, when we're using RBF kernels, we're actually able to find $\sigma$ 
+without fitting a model at all.
+
+This lets us cut down the number of models we need to test when tuning 
+hyperparameters -- when using RBF kernels, we only need to tune C!
+
+---
+
+C can be any positive number, which means there are a lot of potential values to
+check. A common recommendation is to start off by testing powers of 2 -- we'll
+try from 2^-8 to 2^8:
+
+```{r}
+(tuning_grid <- data.frame(
+  C = 2^(-8:8),
+  loss = NA
+))
+```
+
+The next thing we need to do to tune our parameters is to write our loss 
+function. But there's a hitch here: what loss can we use? 
+
+SVMs classify points based entirely on what side of the decision boundary they
+fall on. By default, this doesn't generate probabilities for our points -- a
+point is either one side or the other. 
+
+While there _are_ ways to get SVMs to generate probabilities (such as the 
+`prob.model` argument to `ksvm`), they aren't very commonly used, which means 
+using cross-entropy or AUC loss like we've done in the past is harder.
+
+---
+
+Instead, we tend to use overall model accuracy as a loss function for SVMs. 
+Of course, we've already seen how that can be a problem when we have imbalanced 
+classes. For that reason, we're going to go ahead and resample our training set
+so that our classes are balanced before we tune our SVMs:
+
+```{r}
+positive_training <- training[training$Attrition == "Yes", ]
+negative_training <- training[training$Attrition == "No", ]
+
+n_pos <- nrow(positive_training)
+resampled_positives <- sample(1:n_pos, 
+                              size = 5 * n_pos, 
+                              replace = TRUE)
+resampled_positives <- positive_training[resampled_positives, ]
+
+resampled_training <- rbind(
+  negative_training,
+  resampled_positives
+)
+```
+
+---
+
+And now we can go ahead and write a function to calculate overall model accuracy.
+
+When we predict with our SVM, we'll get a set of class predictions -- so for our
+attrition data, we'll get either Yes or No predictions:
+
+```{r}
+predict(first_svm, training) |> head()
+```
+
+We can use `==` to quickly check which of those predictions match the "true"
+value in our data frame:
+
+```{r}
+(matching <- predict(first_svm, training) == training$Attrition) |>  head()
+```
+
+---
+
+With this new vector we can find how many of our predictions were correct 
+using `sum` (because `TRUE` is counted as 1 while `FALSE` counts as 0):
+
+```{r}
+sum(matching)
+```
+
+We can also use `length` to get the total number of predictions made:
+
+```{r}
+length(matching)
+```
+
+And dividing one by the other gets us our overall accuracy number:
+
+```{r}
+sum(matching) / length(matching)
+```
+
+---
+
+We can turn this into a short function for the purposes of our grid search:
+
+```{r}
+calc_accuracy <- function(model, data) {
+  matching <- predict(model, data) == data$Attrition
+  sum(matching) / length(matching)
+}
+```
+
+And we can plug this right into our same old `k_fold_cv` function:
+
+```{r}
+k_fold_cv <- function(data, k, ...) {
+  per_fold <- floor(nrow(data) / k)
+  fold_order <- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows <- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test <- data[fold_idx, ]
+      fold_train <- data[-fold_idx, ]
+
+      fold_svm <- ksvm(Attrition ~ ., fold_train, ...)
+      calc_accuracy(fold_svm, fold_test)
+    },
+    numeric(1)
+  ) |> 
+    mean()
+}
+```
+
+---
+
+The code to loop through our tuning grid is then pretty simple:
+
+```{r}
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$loss[i] <- k_fold_cv(
+    resampled_training, 
+    5,
+    C = tuning_grid$C[i]
+  )
+}
+```
+
+We can look at how accuracy changes as we try different values of C:
+
+```{r, fig.width=10, fig.height=5}
+ggplot(tuning_grid, aes(C, loss)) + 
+  geom_point() + 
+  geom_line() 
+```
+
+It looks like higher C values are more effective here! We'll run with C = 64
+for now.
+
+---
+
+As usual, we can then go on and fit our final model on the entire training set:
+
+```{r}
+final_svm <- ksvm(
+  Attrition ~ .,
+  resampled_training,
+  C = 64
+)
+```
+
+We could go ahead and use our `calc_accuracy` function to find the overall 
+accuracy for this model:
+
+```{r}
+calc_accuracy(final_svm, testing)
+```
+
+But as usual, looking at the overall accuracy obscures how well our model does
+at predicting each class. Instead, we'll look at the full confusion matrix on
+the next slide. 
+
+---
+
+```{r}
+caret::confusionMatrix(
+  predict(final_svm, testing),
+  testing$Attrition,
+  positive = "Yes"
+)
+```
+
+---
+
+So far, we've focused entirely on SVM as a classification model. However, SVMs
+can be used for regression as well! Sometimes referred to as 
+**support vector regression** (or SVR), SVM-based regression models are 
+excellent at modeling non-linear relationships between your predictors and 
+outcome.
+
+Rather than casting your data into higher dimensions in an attempt to find an 
+optimal separating hyperplane, SVR attempts to find a dimension where 
+as many points lie along the hyperplane as possible -- that is, a dimension where 
+your data can be captured perfectly by simple linear regression.
+
+When using SVMs for regression, we're no longer trying to keep as many points 
+outside of our margin as possible. Instead, we want all of our points to fall
+on the hyperplane, or at the very least within a certain range of it. To avoid
+overfitting, we can control how wide that range is via a new hyperparameter, 
+$\epsilon$ (or "epsilon").
+
+---
+
+In practice, using SVMs for regression is pretty similar to when we used it for
+classification. We'll need to first re-create our Ames housing data:
+
+```{r}
+ames <- AmesHousing::make_ames()
+row_idx <- sample(seq_len(nrow(ames)), nrow(ames))
+training <- ames[row_idx < nrow(ames) * 0.8, ]
+testing <- ames[row_idx >= nrow(ames) * 0.8, ]
+```
+
+As well as our usual RMSE loss function:
+
+```{r}
+calc_rmse <- function(model, data) {
+  predictions <- predict(model, data)
+  sqrt(mean((predictions - data$Sale_Price)^2))
+}
+```
+
+---
+
+We'll repurpose our `k_fold_cv` function as well, so that it's modeling 
+`Sale_Price` as an outcome and using `calc_rmse` for loss:
+
+```{r}
+k_fold_cv <- function(data, k, ...) {
+  per_fold <- floor(nrow(data) / k)
+  fold_order <- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows <- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test <- data[fold_idx, ]
+      fold_train <- data[-fold_idx, ]
+
+      fold_svm <- ksvm(Sale_Price ~ ., fold_train, ...)
+      calc_rmse(fold_svm, fold_test)
+    },
+    numeric(1)
+  ) |> 
+    mean()
+}
+```
+
+---
+
+And now we'll set up our tuning grid! We're going to test the same values for C
+as we did with classification. $\epsilon$, meanwhile, tends to be a very small
+positive number, so we'll focus on testing possible values under 1:
+
+```{r}
+tuning_grid <- expand.grid(
+  C = 2^(-5:5),
+  epsilon = 2^(-8:0),
+  rmse = NA
+)
+```
+
+With that work out of the way, we can use an almost identical loop to run each
+stage of our grid search:
+
+```{r}
+for (i in seq_len(nrow(tuning_grid))) {
+  tuning_grid$rmse[i] <- k_fold_cv(
+    training, 
+    5,
+    C = tuning_grid$C[i],
+    epsilon = tuning_grid$epsilon[i]
+  )
+}
+
+head(arrange(tuning_grid, rmse), 2)
+```
+
+---
+
+As usual, we can take the best hyperparameters from that grid search and use 
+them to fit our final model, then 
+
+```{r}
+final_svr <- ksvm(
+  Sale_Price ~ .,
+  training,
+  C = 2,
+  epsilon = 2^-4
+)
+
+calc_rmse(final_svr, testing)
+```
+
+matches RF, worse than GBMs, data-dependent
+
+---
+
+and that's SVM folks
+
+---
+class: middle
+
+# References
+
+---
+
+Titles are links:
+
++ [Hands-on Machine Learning Chapter 14](https://bradleyboehmke.github.io/HOML/svm.html)

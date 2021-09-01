@@ -520,7 +520,8 @@ slide).
 ```{r}
 confusionMatrix(
   predict(first_knn, testing, type = "class"),
-  testing$Attrition
+  testing$Attrition,
+  positive = "Yes"
 )
 ```
 
@@ -741,7 +742,8 @@ As well as via a confusion matrix, on the next page.
 ```{r}
 confusionMatrix(
   predict(final_knn, testing, type = "class"),
-  testing$Attrition
+  testing$Attrition,
+  positive = "Yes"
 )
 ```
 

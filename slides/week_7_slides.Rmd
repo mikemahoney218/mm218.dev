@@ -914,7 +914,8 @@ grid_rf <- ranger(
 ```{r}
 caret::confusionMatrix(
   predictions(predict(grid_rf, testing)),
-  testing$Attrition
+  testing$Attrition,
+  positive = "Yes"
 )
 ```
 

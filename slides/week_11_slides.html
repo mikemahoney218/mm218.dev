@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>MLCA Week 11:</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Mahoney" />
+    <meta name="date" content="2021-11-10" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/mark.js/mark.min.js"></script>
+    <link href="libs/xaringanExtra-search/search.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-search/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":true,"autoSearch":true}) })</script>
+    <link href="libs/tachyons/tachyons.min.css" rel="stylesheet" />
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# MLCA Week 11:
+## Support Vector Machines
+### Mike Mahoney
+### 2021-11-10
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---
+
+Before we get started, I've got a little bit of housekeeping to go over.
+
+This is our last week of regular class. The next two weeks (weeks 12 and 13) are
+dedicated time to work on your course project. 
+
+I'll still be in Bray 300 during class time if you have questions or want help
+with your project, and I'll still be holding my regular office hours. That said,
+if you don't think coming to class will be a productive way for you to spend 
+your time, that's totally fine.
+
+Three weeks from now (week 14, our last day of class) everyone will share their
+final presentation on the project. You should hand in all your files
+(report and code) by the start of that class.
+
+---
+
+Your final presentation should be about five minutes (or less). Ideally you'll
+talk about the problem you wanted to solve, the methods you used, and how well
+it went. You can use slides if you want, or you can feel free to just talk about
+your project for five minutes.
+
+The presentations are meant as an opportunity for us to find out what everyone
+else has been working on; they should not feel like a high-stakes event. 
+
+As usual, feel free to reach out for any questions or concerns.
+
+---
+
+# Support Vector Machines
+
+---
+
+We're wrapping up this course with one final type of model, the 
+**support vector machine** (or SVM).
+
+SVMs are our second kernel-based method, and the most common kernel-based method
+in use today. 
+
+SVMs are highly flexible, robust to outliers, and are resilent to overfitting.
+However, they can also be slow to train, particularly on data sets with many 
+observations. 
+
+As a result, SVMs are often viewed as more specialized models than
+random forests and GBMs; if nothing else is working right, SVM might be the 
+model for you.
+
+---
+
+But before we get into all that, let's go back to our fake data from last week:
+
+&lt;br /&gt;
+
+![](week_11_slides_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+
+---
+
+Last week, we focused on classifying our mystery points (the purple triangle) 
+based on its nearest neighbors -- if the majority of neighbors nearby were edge
+plants, we'd predict an edge plant.
+
+But there might be an easier way to classify things. There's a big gap between
+our two classes -- what if we drew a line across it?
+
+![](week_11_slides_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+
+---
+
+Now instead of having to find the neighbors for each point we want to predict, 
+we can just look at where the point falls compared to the line. If the point
+is above the line, it's an edge plant; if it's below, it's an interior plant.
+
+When our data can be separated into two classes by a straight line, we call it
+**linearly separable**. We can think of the line as a **decision boundary**, 
+because our predictions depend entirely on what side of the boundary a point 
+falls.
+
+![](week_11_slides_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+---
+
+Another name for this line is a **separating hyperplane**. Remember from way 
+back in week 2 that we can call model surfaces in any dimension a hyperplane;
+rather than directly modeling an outcome or probability, however, these 
+hyperplanes are trying to split our data into two classes.
+
+But how do we choose where to draw the decision boundary? There are many 
+possible different separating hyperplanes that perfectly classify our data:
+
+![](week_11_slides_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+---
+
+But immediately, just by looking at this graph, we can tell that some of these
+hyperplanes seem "better" than others. How can we choose the "best"?
+
+One approach is to choose the hyperplane that is the _furthest_ from both 
+classes. That _should_ maximize how generalizable the decision boundary is, so
+that a point with X and Y values a bit further out from the class mean will 
+still be calculated correctly.
+
+Finding that line is a two step process. First, we need to find the points from
+each class which are closest to the _other_ class:
+
+![](week_11_slides_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+---
+
+Then we draw the line that maximizes the distance of _both_ of those points from 
+the line.
+
+We call this decision boundary the **optimal separating hyperplane**, and the
+points we use to draw it **support vectors**.
+
+![](week_11_slides_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+---
+
+This method maximizes the distance between the two classes (the area between the
+dotted lines, also known as a **margin**). Because we're drawing our decision
+boundary so that no points are inside the margin and no points are 
+misclassified, we call this a **hard margin classifier**.
+
+This is the simplest version of a support vector machine!
+
+![](week_11_slides_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+---
+
+However, the hard margin classifier has some weaknesses. For instance, let's 
+look at a different data set, showing how income and lot size are associated 
+with riding lawnmower ownership:
+
+
+```
+## 
+## Attaching package: 'kernlab'
+```
+
+```
+## The following object is masked from 'package:ggplot2':
+## 
+##     alpha
+```
+
+```
+## Loaded svmpath 0.970
+```
+
+```
+## Loading required package: lattice
+```
+
+![](week_11_slides_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+
+(This graph adapted from [Hands-on Machine Learning with R](https://bradleyboehmke.github.io/HOML/svm.html#the-soft-margin-classifier).)
+
+---
+
+This data is still linearly separable -- we could draw a straight line that 
+would perfectly split our data set into two classes.
+
+However, this data set has a potential outlier here which will seriously impact
+how we split our data into classes:
+
+![](week_11_slides_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+
+---
+
+If we go through the same process as earlier to find our optimal separating 
+hyperplane, we'll find that this decision boundary is much closer to the 
+"Yes" point cloud than we'd expect. 
+
+This likely won't generalize well -- as we test our model on new data, we're 
+very likely to mischaracterize "Yes" points as "No"s!
+
+![](week_11_slides_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+
+---
+
+What if, rather than drawing our hyperplane so that there are no points inside
+the margin (like we do with the hard margin classifier), we allowed a few points
+to fall inside that space? 
+
+That way, we could use other points as support vectors, making our SVM more 
+resilient to outliers. This is known as the **soft-margin classifier** (because
+we've _softened_ the requirement that no points fall inside the margin).
+
+How many points we let inside the margin is an important hyperparameter of SVMs,
+usually referred to as `\(C\)`. 
+
+If `\(C\)` is 0, you let 0 points inside the margin -- 
+you use the points which are closest to each other as support vectors to 
+produce the hard margin classifier. If `\(C\)` is infinite, you use the furthest
+removed points as support vectors and let all of your data into the margin.
+
+![](https://bradleyboehmke.github.io/HOML/11b-svm_files/figure-html/smc-1.png)
+
+---
+
+This is the core of how SVMs work: decide how many points are allowed inside the
+margin, find the support vectors, and then find the decision boundary that's 
+halfway between them.
+
+But what if our data isn't linearly separable? This is pretty common in the real
+world -- if there was an obvious linear boundary between our two classes,
+we wouldn't need machine learning to tell them apart.
+
+![](week_11_slides_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+
+---
+
+Well, what if we could create a new variable so that our data was linearly 
+separable in higher dimensions?
+
+For instance, imagine we created a new variable `\(Z\)` such that `\(Z = X^2 + Y^2\)`. If
+we use that variable to plot our data in 3D, it seems like we might be able to
+draw a linear decision boundary for our data:
+
+![](week_11_slides_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+
+---
+
+We can use that new Z variable to draw a linear decision boundary in 
+higher-dimensional space than our original 2D X/Y graph. But when we come back 
+to 2D (so plotting the hyperplane using only X and Y values), it's entirely 
+nonlinear.
+
+This is the core thing that makes SVMs special: they combine variables to cast 
+your data into some higher dimensional space where it is linearly separable,
+which lets them approximate any non-linear relationships your predictors have.
+
+![](week_11_slides_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+
+---
+
+In order to cast your data into more dimensions, SVMs make use of what are known
+as _kernel functions_.
+
+Kernel functions are effectively a guess about how your variables are related to
+each other; they specify some transformation to your variables that will 
+_hopefully_ make your data linearly separable.
+
+There are a number of different kernel functions available to choose from, each
+a different transformation which might work well for your data. 
+In practice, we generally start with something called the 
+"**radial basis function**" kernel (or RBF) and try out other kernels only if 
+that one doesn't work. 
+This is a fundamentally dissatisfying way to do things, and yet.
+
+---
+
+One last thing to note before we move on to implementing SVMs in R.
+
+Just like KNNs, SVM are trying to calculate the distance between your points in
+order to find separating hyperplanes. This means that, just like with KNNs, you
+need to scale and center your data in order to make sure all your variables 
+"count" for distance equally, regardless of units.
+
+This also means that, to an SVM, categorical variables (which are encoded to be
+either 0 or 1) have lower variance than continuous variables, and so tend to 
+contribute less to the final prediction. If your data contains many continuous
+variables, SVM may make worse predictions than other methods.
+
+---
+
+Alright, that's enough hyperdimensional thinking for today. Let's get down to 
+brass tacks.
+
+
+We'll be using the `kernlab` package to fit SVMs today -- go ahead and install
+and load it now:
+
+
+```r
+install.packages("kernlab")
+```
+
+
+```r
+library(kernlab)
+```
+
+We'll also go ahead and set our attrition data set up for one last time:
+
+
+```r
+library(modeldata)
+data(attrition)
+set.seed(123)
+row_idx &lt;- sample(seq_len(nrow(attrition)), nrow(attrition))
+training &lt;- attrition[row_idx &lt; nrow(attrition) * 0.8, ]
+testing &lt;- attrition[row_idx &gt;= nrow(attrition) * 0.8, ]
+```
+
+---
+
+
+
+
+```r
+ksvm(
+  Attrition ~ .,
+  data = training,
+  kernel = "rbfdot",
+  kpar = list(
+    sigma = sigest(Attrition ~ ., data = training)
+  ),
+  C = 1
+)
+```
+
+```
+## Support Vector Machine object of class "ksvm" 
+## 
+## SV type: C-svc  (classification) 
+##  parameter : cost C = 1 
+## 
+## Gaussian Radial Basis kernel function. 
+##  Hyperparameter : sigma =  0.0137448289020885 
+##  Gaussian Radial Basis kernel function. 
+##  Hyperparameter : sigma =  0.0237754242011181 
+##  Gaussian Radial Basis kernel function. 
+##  Hyperparameter : sigma =  0.035663580131513 
+## 
+## Number of Support Vectors : 477 
+## 
+## Objective Function Value : -370.6302 
+## Training error : 0.388936
+```
+
+
+---
+
+So far, we've focused entirely on SVM as a classification model. However, SVMs
+can be used for regression as well!
+
+Rather than casting your data into higher dimensions in an attempt to find an 
+optimal separating hyperplane, you're attempting to find a dimension where 
+as many points lie on the hyperplane as possible -- that is, a dimension where 
+your data can be captured perfectly by simple linear regression.
+
+When using SVMs for regression, we're no longer trying to keep as many points 
+outside of our margin as possible. Instead, we want all of our points to fall
+on the hyperplane, or at the very least within a certain range of it. To avoid
+overfitting, we can control how wide that range is via a new hyperparameter, 
+`\(\epsilon\)` (or "epsilon").
+
+---
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

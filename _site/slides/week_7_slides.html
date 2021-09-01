@@ -6,11 +6,6 @@
     <meta name="author" content="Mike Mahoney" />
     <meta name="date" content="2021-10-13" />
     <script src="libs/header-attrs/header-attrs.js"></script>
-    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"xbcf686f2436417cb3294ac4929a5c22","expires":1}</script>
-    <script src="libs/himalaya/himalaya.js"></script>
-    <script src="libs/js-cookie/js.cookie.js"></script>
-    <link href="libs/editable/editable.css" rel="stylesheet" />
-    <script src="libs/editable/editable.js"></script>
     <link href="libs/panelset/panelset.css" rel="stylesheet" />
     <script src="libs/panelset/panelset.js"></script>
     <script src="libs/mark.js/mark.min.js"></script>
@@ -33,8 +28,6 @@ class: center, middle, inverse, title-slide
 ### 2021-10-13
 
 ---
-
-
 
 
 
@@ -471,8 +464,13 @@ k_fold_cv &lt;- function(data, k, ...) {
 }
 ```
 
-That lets us pass whatever arguments we want to the `ranger` function; we just
-need to name them explicitly. For instance, if I wanted to grow a random forest
+---
+class: middle
+
+With that change made, we can pass whatever arguments we want to the `ranger` 
+function, so long as we name them explicitly. 
+
+For instance, if I wanted to grow a random forest
 of only 10 trees and force the leaves to each have 100 observations:
 
 
@@ -1109,7 +1107,8 @@ grid_rf &lt;- ranger(
 ```r
 caret::confusionMatrix(
   predictions(predict(grid_rf, testing)),
-  testing$Attrition
+  testing$Attrition,
+  positive = "Yes"
 )
 ```
 
@@ -1130,16 +1129,16 @@ caret::confusionMatrix(
 ##                                          
 ##  Mcnemar's Test P-Value : 2.383e-07      
 ##                                          
-##             Sensitivity : 0.9919         
-##             Specificity : 0.2766         
-##          Pos Pred Value : 0.8786         
-##          Neg Pred Value : 0.8667         
-##              Prevalence : 0.8407         
-##          Detection Rate : 0.8339         
-##    Detection Prevalence : 0.9492         
-##       Balanced Accuracy : 0.6343         
+##             Sensitivity : 0.27660        
+##             Specificity : 0.99194        
+##          Pos Pred Value : 0.86667        
+##          Neg Pred Value : 0.87857        
+##              Prevalence : 0.15932        
+##          Detection Rate : 0.04407        
+##    Detection Prevalence : 0.05085        
+##       Balanced Accuracy : 0.63427        
 ##                                          
-##        'Positive' Class : No             
+##        'Positive' Class : Yes            
 ## 
 ```
 
