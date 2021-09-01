@@ -827,43 +827,8 @@ resampled_training <- rbind(
 And now we can go ahead and write a function to calculate overall model accuracy.
 
 When we predict with our SVM, we'll get a set of class predictions -- so for our
-attrition data, we'll get either Yes or No predictions:
-
-```{r}
-predict(first_svm, training) |> head()
-```
-
-We can use `==` to quickly check which of those predictions match the "true"
-value in our data frame:
-
-```{r}
-(matching <- predict(first_svm, training) == training$Attrition) |>  head()
-```
-
----
-
-With this new vector we can find how many of our predictions were correct 
-using `sum` (because `TRUE` is counted as 1 while `FALSE` counts as 0):
-
-```{r}
-sum(matching)
-```
-
-We can also use `length` to get the total number of predictions made:
-
-```{r}
-length(matching)
-```
-
-And dividing one by the other gets us our overall accuracy number:
-
-```{r}
-sum(matching) / length(matching)
-```
-
----
-
-We can turn this into a short function for the purposes of our grid search:
+attrition data, we'll get either Yes or No predictions. We can use those
+in a function to calculate overall accuracy like this:
 
 ```{r}
 calc_accuracy <- function(model, data) {
