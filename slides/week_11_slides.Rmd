@@ -50,7 +50,6 @@ xaringanExtra::use_extra_styles(
 xaringanExtra::use_tile_view()
 ```
 
----
 
 Before we get started, I've got a little bit of housekeeping to go over.
 
@@ -62,9 +61,9 @@ with your project, and I'll still be holding my regular office hours. That said,
 if you don't think coming to class will be a productive way for you to spend 
 your time, that's totally fine.
 
-Three weeks from now (week 14, our last day of class) everyone will share their
-final presentation on the project. You should hand in all your files
-(report and code) by the start of that class.
+Three weeks from now (week 14, 2021-12-08, our last day of class) everyone will 
+share their final presentation on the project. You should hand in all your files
+(report, data, and code) by the start of that class.
 
 ---
 
@@ -76,13 +75,14 @@ your project for five minutes.
 The presentations are meant as an opportunity for us to find out what everyone
 else has been working on; they should not feel like a high-stakes event. 
 
-As usual, feel free to reach out for any questions or concerns.
+As usual, feel free to reach out with any questions or concerns.
 
 ---
 
 # Support Vector Machines
 
 ---
+class: middle
 
 We're wrapping up this course with one final type of model, the 
 **support vector machine** (or SVM).
@@ -95,8 +95,8 @@ However, they can also be slow to train, particularly on data sets with many
 observations. 
 
 As a result, SVMs are often viewed as more specialized models than
-random forests and GBMs; if nothing else is working right, SVM might be the 
-model for you.
+random forests and GBMs. If nothing else is working right, it might be time to 
+try an SVM.
 
 ---
 
@@ -194,6 +194,23 @@ back in week 2 that we can call model surfaces in any dimension a hyperplane;
 rather than directly modeling an outcome or probability, however, these 
 hyperplanes are trying to split our data into two classes.
 
+```{r, echo = FALSE, fig.width=10, fig.height=5}
+example_df |> 
+  ggplot(aes(x, y, color = class, shape = class)) +
+  geom_point(size = 3.5, color = "black") + 
+  geom_point(size = 3) + 
+  geom_abline(slope = -1, intercept = 3) + 
+  scale_shape_manual(values = c(19, 19, 17),
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  scale_color_brewer(palette = "Dark2", 
+                     name = "Location", 
+                     labels = c("Interior", "Edge", "?")) + 
+  labs(x = "Size", y = "Greenness")
+```
+
+---
+
 But how do we choose where to draw the decision boundary? There are many 
 possible different separating hyperplanes that perfectly classify our data:
 
@@ -215,10 +232,12 @@ example_df |>
   labs(x = "Size", y = "Greenness")
 ```
 
+Which one would we want to use to classify our data?
+
 ---
 
-But immediately, just by looking at this graph, we can tell that some of these
-hyperplanes seem "better" than others. How can we choose the "best"?
+Well, just by looking at this graph we can tell that some of these hyperplanes 
+seem "better" than others. How can we choose the "best"?
 
 One approach is to choose the hyperplane that is the _furthest_ from both 
 classes. That _should_ maximize how generalizable the decision boundary is, so
@@ -314,14 +333,12 @@ However, the hard margin classifier has some weaknesses. For instance, let's
 look at a different data set, showing how income and lot size are associated 
 with riding lawnmower ownership:
 
-```{r, echo = FALSE, fig.width=10, fig.height=5}
+```{r, echo = FALSE, fig.width=10, fig.height=5, message=FALSE, cache=TRUE, warning=FALSE}
 # Load required packages
-library(ggplot2)
 library(kernlab)
 library(svmpath)
 # Helper packages
 library(dplyr)    # for data wrangling
-library(ggplot2)  # for awesome graphics
 library(rsample)  # for data splitting
 # Modeling packages
 library(caret)    # for classification and regression training
@@ -531,6 +548,8 @@ we've _softened_ the requirement that no points fall inside the margin).
 How many points we let inside the margin is an important hyperparameter of SVMs,
 usually referred to as $C$. 
 
+---
+
 If $C$ is 0, you let 0 points inside the margin -- 
 you use the points which are closest to each other as support vectors to 
 produce the hard margin classifier. If $C$ is infinite, you use the furthest
@@ -547,6 +566,8 @@ halfway between them.
 But what if our data isn't linearly separable? This is pretty common in the real
 world -- if there was an obvious linear boundary between our two classes,
 we wouldn't need machine learning to tell them apart.
+
+Imagine a data set that looked like this, where our classes were mixed together:
 
 ```{r, echo = FALSE, fig.width=5, fig.height=5}
 # Load required packages
@@ -603,8 +624,8 @@ prob_svm_poly <- predict(fit_svm_poly, newdata = xgrid, type = "probabilities")
 
 ---
 
-Well, what if we could create a new variable so that our data was linearly 
-separable in higher dimensions?
+What if we could create a new variable so that our data was linearly separable 
+in higher dimensions?
 
 For instance, imagine we created a new variable $Z$ such that $Z = X^2 + Y^2$. If
 we use that variable to plot our data in 3D, it seems like we might be able to
@@ -737,7 +758,9 @@ testing <- attrition[row_idx >= nrow(attrition) * 0.8, ]
 
 We're going to start off predicting attrition by fitting an SVM using the 
 RBF kernel function, which is the default method in the `ksvm` function we use
-to fit SVMs. That means that we can use `ksvm` to create our SVM using the 
+to fit SVMs. 
+
+That means that we can use `ksvm` to create our SVM using the 
 exact same syntax as `lm`:
 
 ```{r}
@@ -750,11 +773,11 @@ first_svm
 There's a few useful pieces of information in the output from `ksvm`:
 
 + We're told we're using a `Gaussian Radial Basis kernel function`, which is 
-  the formal name for the RBF kernel
+  the formal name for the RBF kernel.
 + We can see the value of our C hyperparameter (which controls how "hard" the 
-  margin is), which by default is 1
-+ We're told that there's another hyperparameter, `sigma`, which we haven't 
-  talked about at all and is set to some extremely small value
+  margin is), which by default is 1.
++ We're told that there's another hyperparameter, `sigma`, set to some extremely
+  small value, which we haven't talked about at all.
 
 ```{r}
 first_svm
@@ -764,8 +787,7 @@ first_svm
 
 Sigma (usually written $\sigma$) is what we call a **kernel hyperparameter**. 
 If we chose to use a different kernel, we might have entirely different kernel
-hyperparameters; you can see a full list of the options in `kernlab` via 
-`?kernlab::dots`.
+hyperparameters.
 
 If you're using any non-RBF kernel, you can think of kernel hyperparameters just
 like any other hyperparameter -- a value you need to find through model tuning.
@@ -775,18 +797,27 @@ without fitting a model at all.
 This lets us cut down the number of models we need to test when tuning 
 hyperparameters -- when using RBF kernels, we only need to tune C!
 
+You can see a full list of the kernels available in `kernlab`, and their 
+hyperparameters, via `?kernlab::dots`.
+
 ---
 
 C can be any positive number, which means there are a lot of potential values to
-check. A common recommendation is to start off by testing powers of 2 -- we'll
+check. 
+
+A common recommendation is to start off by testing powers of 2 -- we'll
 try from 2^-8 to 2^8:
 
 ```{r}
-(tuning_grid <- data.frame(
+tuning_grid <- data.frame(
   C = 2^(-8:8),
   loss = NA
-))
+)
+
+tuning_grid
 ```
+
+---
 
 The next thing we need to do to tune our parameters is to write our loss 
 function. But there's a hitch here: what loss can we use? 
@@ -797,11 +828,12 @@ point is either one side or the other.
 
 While there _are_ ways to get SVMs to generate probabilities (such as the 
 `prob.model` argument to `ksvm`), they aren't very commonly used, which means 
-using cross-entropy or AUC loss like we've done in the past is harder.
+using cross-entropy or AUC loss like we've done in the past is rarer.
 
 ---
 
 Instead, we tend to use overall model accuracy as a loss function for SVMs. 
+
 Of course, we've already seen how that can be a problem when we have imbalanced 
 classes. For that reason, we're going to go ahead and resample our training set
 so that our classes are balanced before we tune our SVMs:
@@ -837,7 +869,9 @@ calc_accuracy <- function(model, data) {
 }
 ```
 
-And we can plug this right into our same old `k_fold_cv` function:
+---
+
+We can plug `calc_accuracy` right into our same old `k_fold_cv` function:
 
 ```{r}
 k_fold_cv <- function(data, k, ...) {
@@ -867,7 +901,7 @@ k_fold_cv <- function(data, k, ...) {
 
 The code to loop through our tuning grid is then pretty simple:
 
-```{r}
+```{r, cache = TRUE}
 for (i in seq_len(nrow(tuning_grid))) {
   tuning_grid$loss[i] <- k_fold_cv(
     resampled_training, 
@@ -879,7 +913,7 @@ for (i in seq_len(nrow(tuning_grid))) {
 
 We can look at how accuracy changes as we try different values of C:
 
-```{r, fig.width=10, fig.height=5}
+```{r, fig.width=10, fig.height=4}
 ggplot(tuning_grid, aes(C, loss)) + 
   geom_point() + 
   geom_line() 
@@ -910,6 +944,11 @@ calc_accuracy(final_svm, testing)
 But as usual, looking at the overall accuracy obscures how well our model does
 at predicting each class. Instead, we'll look at the full confusion matrix on
 the next slide. 
+
+This model has higher sensitivity but lower specificity than our random forest
+from way back in week 7, and lower sensitivity and higher specificity than our
+logistic models from week 4. Which of these models is "best" for your data is, 
+as usual, a question of what you're looking for.
 
 ---
 
@@ -1007,7 +1046,7 @@ tuning_grid <- expand.grid(
 With that work out of the way, we can use an almost identical loop to run each
 stage of our grid search:
 
-```{r}
+```{r, cache=TRUE}
 for (i in seq_len(nrow(tuning_grid))) {
   tuning_grid$rmse[i] <- k_fold_cv(
     training, 
@@ -1022,8 +1061,8 @@ head(arrange(tuning_grid, rmse), 2)
 
 ---
 
-As usual, we can take the best hyperparameters from that grid search and use 
-them to fit our final model, then 
+And then, as usual, we can use the optimal values of our hyperparameters to 
+evaluate how an SVM fit on the full training data performs against the test set:
 
 ```{r}
 final_svr <- ksvm(
@@ -1036,11 +1075,124 @@ final_svr <- ksvm(
 calc_rmse(final_svr, testing)
 ```
 
-matches RF, worse than GBMs, data-dependent
+The answer is "not great" -- our random forest and GBMs have both posted better
+accuracy numbers.
+
+In this situation, we might start exploring other kernels, try a larger grid to
+find hyperparameters, or perhaps just accept that GBM is a better model for this
+data. 
 
 ---
 
-and that's SVM folks
+And that's SVM, folks: create new variables to find a linear surface that 
+perfectly separates your classes or perfectly predicts your outcome, with the
+definition of "perfectly" controlled by $C$ and $\epsilon$.
+
+SVM are not the best model for all situations. Like traditional regressions, SVM
+uses all predictors equally, and therefore perform worse with noisy data. SVM 
+can also be slow to fit, and they don't always produce as accurate models as 
+GBMs.
+
+So why did we talk about SVM at all?
+
+---
+
+Well, on the one hand, sometimes SVM are actually the best model for your data.
+
+They can approximate smooth nonlinear relationships better than tree-based 
+methods, whose hard binary thresholds create a lot of right-edges in the 
+prediction surface. Additionally, the ability to change between different 
+kernels makes SVM incredibly flexible for many tasks in machine learning.
+
+They might not be the first model you try for a given problem, but if nothing
+else is working then you may as well give SVM a go.
+
+---
+
+But also, I think it's worth stepping through the timeline of the models we've 
+gone over in this course.
+
+Linear regression, where we started, traces all the way back to 1805. Logistic 
+regression first appears around 1838. 
+
+Our next stop on the timeline was then KNN, first introduced in 1951, followed 
+by decision trees in 1960. SVMs would then appear in 1992, quickly becoming the 
+dominant machine learning algorithm until bootstrap aggregated decision trees
+were introduced in 1994. 
+
+With the introduction of random forests and GBMs in 
+2001, followed by stochastic GBMs in 2002, the world suddenly had a wide variety
+of equally powerful machine learning methods for predictive tasks.
+
+Each of these introductions was followed by a flurry of interest, with new 
+extensions to each model being proposed and new improvements bolted on. Whole 
+fields of research rose up following the initial introduction of each algorithm.
+
+It wasn't until 2012 that neural networks, which we didn't have time for in this
+course, became extremely popular due to their success as image 
+classifiers. 
+
+It wasn't until 2014 that xgboost brought GBMs into the spotlight by making them 
+consistently highly accurate; it wasn't until 2016 that lightgbm made them fast 
+to train as well.
+
+---
+
+Richard Hamming, in his book The Art of Doing Science and Engineering, offers a 
+theory of how most fields develop over time. 
+
+He suggests most fields grow in an S-curve fashion after being sparked by some 
+initial innovation. Once that initial momentum slows, a new innovation is needed 
+to kick growth off once again:
+
+![](hamming.png)
+
+(This graph is pulled straight from his book, typos and all.)
+
+---
+class: middle
+
+Here's my point.
+
+Machine learning is moving incredibly quickly, and it's hard to guess exactly
+where the field will be heading next. It seemed for ages that kernel-based 
+methods like SVM would be consistently the best method for prediction, then it
+seemed for ages that decision trees were the way of the future. Fields grow 
+exponentially, then plateau.
+
+Right now, a lot of attention is being spent on neural networks. And all that 
+attention is producing good (or at least effective) results; our algorithmic
+culture is entirely powered by artificial neurons guessing what news story 
+you'll click on or which video you'll enjoy.
+
+But I don't think that means we should believe that this time we got it right 
+and that neural nets will always dominate the ML space. Maybe we'll go back to 
+kernel methods, maybe decision trees, maybe something new altogether.
+
+I have no
+idea, but I think it's worth covering older options like SVMs just in case they
+take over once again. 
+
+And hey, sometimes they work.
+
+---
+class: middle
+
+I wanted to end with Hamming because of two quotes from his book I've had 
+rattling around in my head while writing this course. The first one goes like
+this:
+
+> Education is what, when, and why to do things. Training is how to do it.
+
+And I've attempted to design this course to reach both ends.
+
+<br />
+
+The second quote is:
+
+> Teachers should prepare the student for the student’s future, not for the teacher’s past.
+
+And, well, I hope I did.
 
 ---
 class: middle
@@ -1052,3 +1204,5 @@ class: middle
 Titles are links:
 
 + [Hands-on Machine Learning Chapter 14](https://bradleyboehmke.github.io/HOML/svm.html)
+
++ [Richard W Hamming: The Art of Doing Science and Engineering](http://worrydream.com/refs/Hamming-TheArtOfDoingScienceAndEngineering.pdf)
