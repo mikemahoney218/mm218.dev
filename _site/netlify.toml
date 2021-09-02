@@ -85,3 +85,7 @@
 [[redirects]]
   from = "/workshop"
   to = "https://docs.google.com/spreadsheets/d/1Nu0RFNixHfQvZcxdLe0WROPEw51TAa_9mg0CxNswAcY/edit?usp=sharing"
+  
+[[redirects]]
+  from = "/esip2021"
+  to = "https://mikemahoney218.github.io/2021-09-08_esip/esip.html#2"
