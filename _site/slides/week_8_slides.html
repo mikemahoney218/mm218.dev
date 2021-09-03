@@ -67,7 +67,7 @@ a long history of winning competitive machine learning challenges.
 
 But before we get to all that, let's talk about **boosting** -- the "B" in GBM.
 
-Boosting, to put it simply, is the process of sequentially adding models to a 
+Boosting is the process of sequentially adding models to a 
 base model in order to reduce errors and refine the predictions of the initial
 model.
 
@@ -154,6 +154,7 @@ add the two predictions together:
 
 ```r
 training$second_prediction &lt;- predict(second_tree, training)
+
 training$adjusted_prediction &lt;- 
   training$first_prediction + training$second_prediction
 ```
@@ -178,7 +179,7 @@ sqrt(mean((training$adjusted_prediction - training$Sale_Price)^2))
 ## [1] 28530.86
 ```
 
-And it looks like the boosted model does dramatically than the single tree!
+And it looks like the boosted model does dramatically better than the single tree!
 
 ---
 
@@ -192,6 +193,7 @@ With that in mind, let's look at how our boosted model does on the test set:
 ```r
 testing$first_prediction &lt;- predict(first_tree, testing)
 testing$second_prediction &lt;- predict(second_tree, testing)
+
 testing$adjusted_prediction &lt;- 
   testing$first_prediction + testing$second_prediction
 
@@ -237,7 +239,7 @@ testing$adjusted_prediction &lt;-
   testing$first_prediction + (testing$second_prediction * 0.5)
 ```
 
-If we evaluate this new adjustment method:
+We can then evaluate this new adjustment method:
 
 
 ```r
@@ -298,6 +300,7 @@ second one:
 
 ```r
 testing$third_prediction &lt;- predict(third_tree, testing)
+
 testing$final_prediction &lt;- 
   testing$adjusted_prediction + (testing$third_prediction * 0.5)
 
@@ -326,9 +329,27 @@ sqrt(mean((testing$final_prediction - testing$Sale_Price)^2))
 
 Our third tree improves our prediction accuracy even further!
 
-This is how boosting works, at its core. Most of the time, we'll be working with
-much smaller learning rates and many more trees, but the essential process of
+This is how boosting works, at its core. Most of the time we'll be working with
+many more trees, but the essential process of
 building trees to predict the residuals of past predictions is the same.
+
+---
+
+The other big way that boosting algorithms reduce overfitting is by using weaker
+learners. 
+
+For instance, when boosting decision trees, you might wind up fitting a bunch
+of trees with only one split, sometimes referred to as **decision stumps**. 
+
+These stumps will have _extremely_ low predictive accuracy, but not 0
+accuracy altogether. If you add enough of them together, you might be able to 
+aggregate all those non-0 accuracies together into a solid final prediction.
+
+We won't walk through the process of using decision stumps manually, because it
+takes _many_ trees to see real improvements over the base learner. But it's 
+worth highlighting that usually when we talk about boosting algorithms, we're 
+purposefully using extremely weak versions of our component models to 
+avoid overfitting.
 
 ---
 
@@ -424,7 +445,7 @@ tune. The main ones in `gbm` include:
   this value with the other hyperparameters.
 
 + `interaction.depth`: The maximum depth of each tree (how many splits). Tends 
-  to be from 3-8, though older papers often use 1.
+  to be from 3-8, though older papers often use 1 to make decision stumps.
 
 + `n.minobsinnode`: The minimum number of observations per leaf node in each 
   tree (like `min.node.size` in ranger).
@@ -489,26 +510,36 @@ for(i in seq_len(nrow(tuning_grid))) {
   tuning_grid$time[i]  &lt;- train_time[["elapsed"]]
 
 }
+```
 
+---
+
+We can then see which of our learning rates best balances accuracy and time:
+
+
+```r
 arrange(tuning_grid, rmse)
 ```
 
 ```
 ##   learning_rate     rmse trees   time
-## 1         0.010 22118.63  6000 66.708
-## 2         0.100 22766.41  1566 64.917
-## 3         0.050 22791.24  2527 65.713
-## 4         0.005 25319.20  5074 67.951
-## 5         0.300 28541.96    37 63.267
+## 1         0.010 22118.63  6000 73.184
+## 2         0.100 22766.41  1566 72.209
+## 3         0.050 22791.24  2527 73.719
+## 4         0.005 25319.20  5074 71.187
+## 5         0.300 28541.96    37 65.283
 ```
+
+In this case, we'll go ahead and run with a learning rate of 0.1 for the rest of 
+our tuning.
 
 ---
 
-We'll go ahead and run with a learning rate of 0.1 for the rest of our tuning.
-
 With a learning rate chosen, we'll go ahead and tune our tree-specific 
 parameters (namely, interaction depth and observations per node) using a new 
-grid. This one took about 15 minutes to complete:
+grid. 
+
+This one took about 15 minutes to complete:
 
 
 ```r
@@ -520,7 +551,6 @@ tuning_grid &lt;- expand.grid(
   rmse = NA
 )
 
-tictoc::tic()
 for(i in seq_len(nrow(tuning_grid))) {
     m &lt;- gbm(
       formula = Sale_Price ~ .,
@@ -537,15 +567,16 @@ for(i in seq_len(nrow(tuning_grid))) {
   tuning_grid$rmse[i]  &lt;- sqrt(min(m$cv.error))
 
 }
-tictoc::toc()
 ```
 
-```
-## 899.194 sec elapsed
-```
+---
+
+And just as before, we'll look to see which of our hyperparameter combinations
+produced the best models:
+
 
 ```r
-arrange(tuning_grid, rmse)
+head(arrange(tuning_grid, rmse))
 ```
 
 ```
@@ -556,18 +587,15 @@ arrange(tuning_grid, rmse)
 ## 4          0.01                 3             10  6000 22217.39
 ## 5          0.01                 3             15  6000 22466.78
 ## 6          0.01                 5             15  5999 22749.58
-## 7          0.01                 7             10  5990 23254.00
-## 8          0.01                 7             15  5975 23381.03
-## 9          0.01                 7              5  5082 25522.62
 ```
 
-
----
 
 As with random forests, we could continue tuning with narrower and narrower 
 ranges until we were confident we arrived at the absolute best hyperparameters.
 We'd also experiment with smaller and smaller shrinkages, to see if they 
 improved fit at all.
+
+---
 
 However, even the values we've landed at from two rounds of tuning produce a 
 pretty good model:
@@ -579,8 +607,8 @@ final_gbm &lt;- gbm(
   data = training,
   n.trees = 6000,
   shrinkage = 0.01,
-  interaction.depth = 7,
-  n.minobsinnode = 10
+  interaction.depth = 5,
+  n.minobsinnode = 5
 )
 ```
 
@@ -597,7 +625,7 @@ sqrt(mean((predict(final_gbm, testing) - testing$Sale_Price)^2))
 ```
 
 ```
-## [1] 19265.86
+## [1] 19867.59
 ```
 
 This is dramatically better than our fully tuned random forest!
@@ -610,10 +638,12 @@ often one of the best tools for any predictive task.
 
 However, GBMs aren't without their drawbacks. These models can be incredibly 
 computationally intensive to train and tune, especially compared to random 
-forests. They also do a good job of reducing bias, but are worse at removing 
+forests. Unlike random forests, they also rarely work well "out of the box" -- 
+GBMs almost always require tuning before they're effective predictors.
+Lastly, GBMs also do a good job of reducing bias, but are worse at removing 
 error from variance than random forests.
 
-Next week we'll talk about a variation of GBMs designed to fix both those issues.
+Next week we'll talk about a variation of GBMs designed to fix most of these issues.
 
 ---
 class: middle

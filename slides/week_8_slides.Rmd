@@ -73,7 +73,7 @@ a long history of winning competitive machine learning challenges.
 
 But before we get to all that, let's talk about **boosting** -- the "B" in GBM.
 
-Boosting, to put it simply, is the process of sequentially adding models to a 
+Boosting is the process of sequentially adding models to a 
 base model in order to reduce errors and refine the predictions of the initial
 model.
 
@@ -149,6 +149,7 @@ add the two predictions together:
 
 ```{r}
 training$second_prediction <- predict(second_tree, training)
+
 training$adjusted_prediction <- 
   training$first_prediction + training$second_prediction
 ```
@@ -162,7 +163,7 @@ sqrt(mean((training$first_prediction - training$Sale_Price)^2))
 sqrt(mean((training$adjusted_prediction - training$Sale_Price)^2))
 ```
 
-And it looks like the boosted model does dramatically than the single tree!
+And it looks like the boosted model does dramatically better than the single tree!
 
 ---
 
@@ -175,6 +176,7 @@ With that in mind, let's look at how our boosted model does on the test set:
 ```{r}
 testing$first_prediction <- predict(first_tree, testing)
 testing$second_prediction <- predict(second_tree, testing)
+
 testing$adjusted_prediction <- 
   testing$first_prediction + testing$second_prediction
 
@@ -208,7 +210,7 @@ testing$adjusted_prediction <-
   testing$first_prediction + (testing$second_prediction * 0.5)
 ```
 
-If we evaluate this new adjustment method:
+We can then evaluate this new adjustment method:
 
 ```{r}
 sqrt(mean((testing$first_prediction - testing$Sale_Price)^2))
@@ -254,6 +256,7 @@ second one:
 
 ```{r}
 testing$third_prediction <- predict(third_tree, testing)
+
 testing$final_prediction <- 
   testing$adjusted_prediction + (testing$third_prediction * 0.5)
 
@@ -264,9 +267,27 @@ sqrt(mean((testing$final_prediction - testing$Sale_Price)^2))
 
 Our third tree improves our prediction accuracy even further!
 
-This is how boosting works, at its core. Most of the time, we'll be working with
-much smaller learning rates and many more trees, but the essential process of
+This is how boosting works, at its core. Most of the time we'll be working with
+many more trees, but the essential process of
 building trees to predict the residuals of past predictions is the same.
+
+---
+
+The other big way that boosting algorithms reduce overfitting is by using weaker
+learners. 
+
+For instance, when boosting decision trees, you might wind up fitting a bunch
+of trees with only one split, sometimes referred to as **decision stumps**. 
+
+These stumps will have _extremely_ low predictive accuracy, but not 0
+accuracy altogether. If you add enough of them together, you might be able to 
+aggregate all those non-0 accuracies together into a solid final prediction.
+
+We won't walk through the process of using decision stumps manually, because it
+takes _many_ trees to see real improvements over the base learner. But it's 
+worth highlighting that usually when we talk about boosting algorithms, we're 
+purposefully using extremely weak versions of our component models to 
+avoid overfitting.
 
 ---
 
@@ -340,7 +361,7 @@ tune. The main ones in `gbm` include:
   this value with the other hyperparameters.
 
 + `interaction.depth`: The maximum depth of each tree (how many splits). Tends 
-  to be from 3-8, though older papers often use 1.
+  to be from 3-8, though older papers often use 1 to make decision stumps.
 
 + `n.minobsinnode`: The minimum number of observations per leaf node in each 
   tree (like `min.node.size` in ranger).
@@ -404,17 +425,26 @@ for(i in seq_len(nrow(tuning_grid))) {
   tuning_grid$time[i]  <- train_time[["elapsed"]]
 
 }
-
-arrange(tuning_grid, rmse)
 ```
 
 ---
 
-We'll go ahead and run with a learning rate of 0.1 for the rest of our tuning.
+We can then see which of our learning rates best balances accuracy and time:
+
+```{r}
+arrange(tuning_grid, rmse)
+```
+
+In this case, we'll go ahead and run with a learning rate of 0.1 for the rest of 
+our tuning.
+
+---
 
 With a learning rate chosen, we'll go ahead and tune our tree-specific 
 parameters (namely, interaction depth and observations per node) using a new 
-grid. This one took about 15 minutes to complete:
+grid. 
+
+This one took about 15 minutes to complete:
 
 ```{r, cache = TRUE}
 tuning_grid <- expand.grid(
@@ -425,7 +455,6 @@ tuning_grid <- expand.grid(
   rmse = NA
 )
 
-tictoc::tic()
 for(i in seq_len(nrow(tuning_grid))) {
     m <- gbm(
       formula = Sale_Price ~ .,
@@ -442,18 +471,24 @@ for(i in seq_len(nrow(tuning_grid))) {
   tuning_grid$rmse[i]  <- sqrt(min(m$cv.error))
 
 }
-tictoc::toc()
-
-arrange(tuning_grid, rmse)
 ```
 
-
 ---
+
+And just as before, we'll look to see which of our hyperparameter combinations
+produced the best models:
+
+```{r}
+head(arrange(tuning_grid, rmse))
+```
+
 
 As with random forests, we could continue tuning with narrower and narrower 
 ranges until we were confident we arrived at the absolute best hyperparameters.
 We'd also experiment with smaller and smaller shrinkages, to see if they 
 improved fit at all.
+
+---
 
 However, even the values we've landed at from two rounds of tuning produce a 
 pretty good model:
@@ -464,8 +499,8 @@ final_gbm <- gbm(
   data = training,
   n.trees = 6000,
   shrinkage = 0.01,
-  interaction.depth = 7,
-  n.minobsinnode = 10
+  interaction.depth = 5,
+  n.minobsinnode = 5
 )
 
 sqrt(mean((predict(final_gbm, testing) - testing$Sale_Price)^2))
@@ -481,10 +516,12 @@ often one of the best tools for any predictive task.
 
 However, GBMs aren't without their drawbacks. These models can be incredibly 
 computationally intensive to train and tune, especially compared to random 
-forests. They also do a good job of reducing bias, but are worse at removing 
+forests. Unlike random forests, they also rarely work well "out of the box" -- 
+GBMs almost always require tuning before they're effective predictors.
+Lastly, GBMs also do a good job of reducing bias, but are worse at removing 
 error from variance than random forests.
 
-Next week we'll talk about a variation of GBMs designed to fix both those issues.
+Next week we'll talk about a variation of GBMs designed to fix most of these issues.
 
 ---
 class: middle

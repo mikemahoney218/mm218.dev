@@ -23,7 +23,7 @@
 class: center, middle, inverse, title-slide
 
 # MLCA Week 9:
-## Stochastic Gradient Boosting Machines
+## Stochastic Gradient Boosting Machines and Stacked Ensembles
 ### Mike Mahoney
 ### 2021-10-27
 
@@ -62,6 +62,7 @@ random forests.
 This week, we'll focus on extensions to the basic GBM which help address that.
 
 ---
+class: middle
 
 Last week, I briefly mentioned that the `gbm` package fits each of its trees on 
 a different random subsample of the training data each time. 
@@ -77,6 +78,7 @@ But this left researchers wondering -- could other forms of randomness, like
 we use in random forests, improve GBMs even further?
 
 ---
+class: middle
 
 Remember that random forests use two main forms of randomness to increase the
 variance between their decision trees.
@@ -142,15 +144,14 @@ ames %&gt;%
     values_fill = 0 
     ) %&gt;% 
   select(starts_with("Foundation"), Sale_Price, Year_Built, Gr_Liv_Area) |&gt; 
-  head(2)
+  head(1)
 ```
 
 ```
-## # A tibble: 2 × 9
+## # A tibble: 1 × 9
 ##   FoundationCBlock FoundationPConc FoundationWood FoundationBrkTil
 ##              &lt;dbl&gt;           &lt;dbl&gt;          &lt;dbl&gt;            &lt;dbl&gt;
 ## 1                1               0              0                0
-## 2                1               0              0                0
 ## # … with 5 more variables: FoundationSlab &lt;dbl&gt;, FoundationStone &lt;dbl&gt;,
 ## #   Sale_Price &lt;int&gt;, Year_Built &lt;int&gt;, Gr_Liv_Area &lt;int&gt;
 ```
@@ -191,8 +192,10 @@ package what formula and data we're trying to work with:
 ames_recipe &lt;- recipe(Sale_Price ~ ., data = ames)
 ```
 
-We're now able to specify what pre-processing steps we want to take using any of
-the `step_` functions from `recipes`. To say that we want to dummy encode all
+We're now able to specify what pre-processing steps we want to take using any 
+number of functions from `recipes`, all using the `step_` prefix.
+
+For example, to say that we want to dummy encode all
 the factors in our data, we can use the `step_dummy` function:
 
 
@@ -223,7 +226,7 @@ variables:
 
 
 ```r
-head(ames[36:309], 6)
+head(ames[36:309])
 ```
 
 ```
@@ -261,7 +264,7 @@ ames &lt;- recipe(Sale_Price ~ ., data = ames) |&gt;
   step_dummy(where(is.factor)) |&gt; 
   prep() |&gt; 
   bake(ames)
-head(ames[36:309], 6)
+head(ames[36:309])
 ```
 
 ```
@@ -283,12 +286,12 @@ head(ames[36:309], 6)
 ## #   MS_SubClass_One_and_Half_Story_PUD_All_Ages &lt;dbl&gt;, …
 ```
 
-We'll talk a little bit more about using `recipes` for data processing next week.
-
 ---
 
-With our variables now encoded, we can go ahead and split our data into training
-and testing:
+We'll talk a little bit more about using `recipes` for data processing next week.
+
+For now, once our variables are encoded, we'll go ahead and split our data into 
+training and testing sets:
 
 
 ```r
@@ -304,21 +307,6 @@ And load lightgbm:
 
 ```r
 library(lightgbm)
-```
-
-```
-## Loading required package: R6
-```
-
-```
-## 
-## Attaching package: 'lightgbm'
-```
-
-```
-## The following object is masked from 'package:dplyr':
-## 
-##     slice
 ```
 
 If you look at `?lightgbm`, you'll notice that it looks a little bit different
@@ -375,7 +363,7 @@ We can then use `predict` as normal to generate predictions:
 lgb_predictions &lt;- predict(first_lgb, xtest)
 ```
 
-We can then calculate RMSE as normal:
+Then we calculate RMSE as normal:
 
 
 ```r
@@ -393,7 +381,7 @@ And all in all, this seems like a lot of work for a really crappy model.
 But of course, GBMs are very sensitive to their hyperparameter values, and we
 haven't tuned this model at all yet.
 
-We'll tune this lightgbm model in a pretty similar way as to the last two weeks. 
+We'll tune this `lightgbm` model in a pretty similar way as to the last two weeks. 
 
 First, we'll tweak the `calc_rmse` function from week 7 so that it will create
 a matrix to predict on:
@@ -429,7 +417,8 @@ k_fold_cv &lt;- function(data, k, ...) {
       fold_test &lt;- data[fold_idx, ]
       fold_train &lt;- data[-fold_idx, ]
       
-      xtrain &lt;- as.matrix(fold_train[setdiff(names(fold_train), "Sale_Price")])
+      xtrain &lt;- as.matrix(fold_train[setdiff(names(fold_train), 
+                                             "Sale_Price")])
       ytrain &lt;- fold_train[["Sale_Price"]]
       
       fold_lgb &lt;- lightgbm(
@@ -579,31 +568,32 @@ for (i in seq_len(nrow(tuning_grid))) {
     )
 }
 
-head(arrange(tuning_grid, rmse), 2)
+head(arrange(tuning_grid, rmse), 2) |&gt; 
+  select(bagging_freq, bagging_fraction, feature_fraction, rmse)
 ```
 
 ```
-##   learning_rate nrounds max_depth min_data_in_bin bagging_freq bagging_fraction
-## 1           0.1    1000         2              18            5              0.9
-## 2           0.1    1000         2              18            0              0.4
-##   feature_fraction     rmse
-## 1              0.6 23053.00
-## 2              0.8 23241.62
+##   bagging_freq bagging_fraction feature_fraction     rmse
+## 1            5              0.9              0.6 23053.00
+## 2            0              0.4              0.8 23241.62
 ```
 
 ---
+class: middle
 
 At this point, we've tuned our model using the most important hyperparameters.
 These hyperparameters are the ones that are most likely to impact our model 
-accuracy.
+accuracy; 90%+ of the possible improvements to your model come from these seven
+hyperparameters.
 
 But they aren't the only hyperparameters available. In fact, there are 86
 hyperparameters in total, many of which might give some slight improvement to 
 your model.
 
-But this is a 1-credit class, and I simply don't have the space to walk through
-all available hyperparameters. If you're using `lightgbm` or `xgboost` 
-professionally and want more information, I highly recommend [this website (link) on available parameters](https://sites.google.com/view/lauraepp/parameters). 
+Most of the time you won't need to worry about the other hyperparameters 
+available. But if you're using `lightgbm` or `xgboost` 
+professionally and need the best performance at all costs, I highly recommend 
+[this website (link) on available parameters](https://sites.google.com/view/lauraepp/parameters). 
 
 The
 [`lightgbm` docs also have some pointers on hyperparameters which might help
@@ -709,8 +699,8 @@ final_gbm &lt;- gbm(
   data = training,
   n.trees = 6000,
   shrinkage = 0.01,
-  interaction.depth = 7,
-  n.minobsinnode = 10
+  interaction.depth = 5,
+  n.minobsinnode = 5
 )
 ```
 
@@ -733,7 +723,9 @@ And now I'll add columns with predictions to the data frame:
 
 
 ```r
-xtest &lt;- as.matrix(stacked_test[setdiff(names(stacked_test), "Sale_Price")])
+xtest &lt;- as.matrix(stacked_test[setdiff(names(stacked_test), 
+                                        "Sale_Price")])
+
 stacked_test$lgb &lt;- predict(final_lgb, xtest)
 stacked_test$rf &lt;- predictions(predict(final_ranger, stacked_test))
 stacked_test$gbm &lt;- predict(final_gbm, stacked_test)
@@ -752,13 +744,15 @@ We have a few options. The easiest is to simply average the predictions together
 
 
 ```r
-stacked_test$avg &lt;- (stacked_test$lgb + stacked_test$rf + stacked_test$gbm) / 3
+stacked_test$avg &lt;- (stacked_test$lgb + 
+                       stacked_test$rf + 
+                       stacked_test$gbm) / 3
 ```
 
 Conceptually, doing this is a way of saying "all of these models are equally 
 likely to be the best one". 
 
-Pragmatically, even this simple ensemble beats all but our GBM on the test data:
+Pragmatically, even this simple ensemble beats all our models on the test data:
 
 
 ```r
@@ -773,7 +767,7 @@ stacked_test |&gt;
 ## # A tibble: 1 × 4
 ##      lgb     rf    gbm    avg
 ##    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
-## 1 19731. 22583. 18243. 18635.
+## 1 19731. 22583. 19277. 18990.
 ```
 
 ---
@@ -821,8 +815,8 @@ fit_gbm &lt;- function(training, testing) {
   data = training,
   n.trees = 6000,
   shrinkage = 0.01,
-  interaction.depth = 7,
-  n.minobsinnode = 10
+  interaction.depth = 5,
+  n.minobsinnode = 5
 )
   preds &lt;- predict(cv_model, testing)
   sqrt(mean((preds - testing$Sale_Price)^2))
@@ -831,7 +825,7 @@ fit_gbm &lt;- function(training, testing) {
 
 ---
 
-And lastly, our `lightgbm`:
+And lastly for `lightgbm`:
 
 
 ```r
@@ -886,48 +880,15 @@ for (i in seq_along(fold_rows)) {
   model_rmse$rf[i] &lt;- fit_ranger(fold_test, fold_train)
   model_rmse$gbm[i] &lt;- suppressWarnings(fit_gbm(fold_test, fold_train))
   model_rmse$lgb[i] &lt;- fit_lgb(fold_test, fold_train)
-  
 }
 ```
 
 ```
 ## Distribution not specified, assuming gaussian ...
-```
-
-```
-## Using 6000 trees...
-```
-
-```
 ## Distribution not specified, assuming gaussian ...
-```
-
-```
-## Using 6000 trees...
-```
-
-```
 ## Distribution not specified, assuming gaussian ...
-```
-
-```
-## Using 6000 trees...
-```
-
-```
 ## Distribution not specified, assuming gaussian ...
-```
-
-```
-## Using 6000 trees...
-```
-
-```
 ## Distribution not specified, assuming gaussian ...
-```
-
-```
-## Using 6000 trees...
 ```
 
 ---
@@ -941,24 +902,23 @@ model_rmse
 
 ```
 ##         rf      gbm      lgb
-## 1 34385.77 29863.10 29900.48
-## 2 30172.44 29922.13 29284.42
-## 3 33759.57 31038.23 31634.38
-## 4 28883.56 26591.62 29794.65
-## 5 30152.59 29246.56 28876.70
+## 1 34385.77 28824.92 29900.48
+## 2 30172.44 28571.99 29284.42
+## 3 33759.57 30432.66 31634.38
+## 4 28883.56 26352.62 29794.65
+## 5 30152.59 27581.81 28876.70
 ```
 
 Let's get the mean RMSE for each of those:
 
 
 ```r
-model_rmse &lt;- apply(model_rmse, 2, mean)
-model_rmse
+(model_rmse &lt;- apply(model_rmse, 2, mean))
 ```
 
 ```
 ##       rf      gbm      lgb 
-## 31470.78 29332.33 29898.13
+## 31470.78 28352.80 29898.13
 ```
 
 
@@ -973,20 +933,20 @@ And then calculate weights based on the relative sizes of the RMSEs:
 
 
 ```r
-rmse_weights &lt;- inverse_rmse / sum(inverse_rmse)
-rmse_weights
+(rmse_weights &lt;- inverse_rmse / sum(inverse_rmse))
 ```
 
 ```
 ##        rf       gbm       lgb 
-## 0.3199483 0.3432739 0.3367778
+## 0.3161984 0.3509710 0.3328306
 ```
 
-This vector now represents the proportion that each model will contribute to our 
-final prediction. Intuitively enough, GBM here has a somewhat larger weight and 
-the random forest has had its weight reduced from the baseline 1/3.
-
 ---
+
+The vector `rmse_weights` now represents the proportion that each model will 
+contribute to our final prediction. Intuitively enough, GBM here has a somewhat 
+larger weight and the random forest has had its weight reduced from the baseline 
+1/3.
 
 We can then use these weights to adjust our aggregated predictions:
 
@@ -1008,7 +968,7 @@ stacked_test |&gt;
 ## # A tibble: 1 × 5
 ##      lgb     rf    gbm    avg weighted
 ##    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;
-## 1 19731. 22583. 18243. 18635.   18598.
+## 1 19731. 22583. 19277. 18990.   18955.
 ```
 
 And this method beats our simple average!
@@ -1133,10 +1093,13 @@ stacked_test |&gt;
 ## # A tibble: 1 × 6
 ##      lgb     rf    gbm    avg weighted model_weight
 ##    &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;        &lt;dbl&gt;
-## 1 19731. 22583. 18243. 18635.   18598.       18327.
+## 1 19731. 22583. 19277. 18990.   18955.       19171.
 ```
 
-And this model-weighted ensemble outperforms both the averages!
+While this model doesn't outperform our simple averages, we might try using more
+complex models to see if we could eke out any further improvements in RMSE. 
+Or, of course, we could decide that our simple averages are good enough for 
+the purposes of our model; it all depends on your application.
 
 Stacked ensembles are incredibly useful ways to reflect uncertainty about which
 of your models is the "best", and can often give you increased predictive 
@@ -1144,14 +1107,12 @@ accuracy as well.
 
 ---
 
-Even when they aren't your outright best model -- such as our
-example here, where GBM is still on top -- stacked ensembles are a useful way to 
+Even when they aren't your outright best model, stacked ensembles are a useful way to 
 make your predictions more robust on unknown data. 
 
-It might be the case that this GBM 
-is always a better model in the situations we'll use it in, or it might be the 
-case that with different test data the random forest or lightgbm model would 
-take the lead.
+It might be the case that a given model is always the best option in the 
+situations we'll use it in, or it might be the case that with different test 
+data a different model would take the lead.
 
 We can't know for certain, and stacking is a good way to reflect and protect
 against that uncertainty.
@@ -1162,12 +1123,13 @@ You can also extend stacking to some pretty silly places, if you want to.
 
 For instance, we create a whole bunch of models while doing grid searches, 
 because we think they might be the best version of that model for our data.
+
 What if, instead of selecting the best set of hyperparameters, we ensembled
 all of the models in the grid instead?
 
 Depending on your models, this might actually give you huge gains in accuracy.
 But at some point, the accuracy gains from stacking are outweighed by the time 
-and computational power it requires. But of course, where exactly that point is 
+and computational power it requires. Of course, where exactly that point is 
 will be different for every project.
 
 That's all for this week. Next week we move away from tree-based models onto 
