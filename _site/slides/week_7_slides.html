@@ -49,6 +49,17 @@ class: center, middle
 # Hyperparameter Tuning
 
 ---
+
+.bg-washed-green.b--dark-green.ba.bw2.br3.shadow-5.ph4.mt5[
+
+In science, if you know what you are doing, you should not be doing it. In engineering, if you do not know what you are doing, you should not be doing it. Of course, you seldom, if ever, see either pure state.
+
+.tr[
+— [Richard Hamming: The Art of Doing Science and Engineering](http://worrydream.com/refs/Hamming-TheArtOfDoingScienceAndEngineering.pdf)
+]
+]
+
+---
 class: middle
 
 We ended last week with a question: how can we find the best combinations of 
@@ -89,8 +100,8 @@ the impacts of outliers?
 
 ---
 
-Turns out, there's a way to do this, known as **cross validation**. In cross
-validation, you fit multiple models using different subsets of your training 
+Turns out, there's a way to do this, known as **cross validation** ("CV"). In 
+cross validation, you fit multiple models using different subsets of your training 
 data, and then use observations that the model _wasn't_ trained on for validation.
 
 For example, in **k-fold cross validation** (AKA "k-fold CV") you split your
@@ -117,7 +128,9 @@ way to assess model accuracy in situations where you can't have a hold-out test
 set.
 
 The problem with this approach is that LOOCV is extremely computationally 
-intensive, especially as your number of observations increases. More often, 
+intensive, especially as your number of observations increases. 
+
+More often, 
 people use 5- or 10-fold CV; the results have been shown to be similar _enough_
 to LOOCV.
 
@@ -200,8 +213,8 @@ calc_rmse(first_rf, testing)
 ## [1] 22600.08
 ```
 
-So we're hoping that CV provides us a more accurate accuracy number than the 
-training set RMSE.
+So we need a better way to estimate our test set RMSE. Our hope is that CV can
+give us that better estimate.
 
 ---
 class: middle
@@ -220,8 +233,11 @@ once:
 per_fold &lt;- floor(nrow(training) / 5)
 ```
 
-Now let's assign rows into the folds. We want to randomly assign each row to 
-a different split, so we can use the `sample` function here just like we do when
+Now let's assign rows into the folds. The first step in randomly assigning each
+row to a fold is going to be to randomly reorder our data frame, so that we can
+simply cut our data into fifths according to the new order.
+
+We can use the `sample` function for this task, just like we do when
 creating our training and test splits:
 
 
@@ -261,11 +277,14 @@ str(fold_rows)
 ##  $ 5: int [1:468] 566 43 1152 1109 602 597 1024 1259 1540 2292 ...
 ```
 
+Each row is assigned to one -- and only one -- fold.
+
 ---
 class: middle
 
-Next, we're going to five different models to our training data, each one 
-trained on four folds and then evaluated against the remaining fifth fold.
+Next, we're going to fit five different models to our training data, each one 
+trained on a set of four folds and then evaluated against the remaining fifth 
+fold.
 
 To do that manually, we'd build each model in the same way we fit models to the 
 entire data set. First, we'll use `fold_rows` to split our training data into 
@@ -353,7 +372,8 @@ calc_rmse(first_rf, testing)
 ## [1] 22600.08
 ```
 
-And that's cross validation in a nutshell!
+Which means it worked! Cross validation provides us a better estimate of test-set
+accuracy than the training set RMSE.
 
 ---
 class: middle
@@ -430,13 +450,19 @@ k_fold_cv(training, 10)
 ```
 
 This function does a decent job of calculating cross-validated accuracy for a
-single model. Remember, however, that we're interested in cross validation as a 
-way to compare _different_ models, using different hyperparameters. We need a 
+single model. 
+
+Remember, however, that we're interested in cross validation as a 
+way to compare _different_ models, using different hyperparameters. 
+
+We need a 
 way to pass different hyperparameter levels to our `ranger` call.
 
 ---
 
-Luckily, R makes this relatively easy. We can simply add a `...` argument to our
+Luckily, R makes this relatively easy. 
+
+We can simply add a `...` argument to our
 function here, and then pass that `...` to `ranger`:
 
 
@@ -509,16 +535,18 @@ We _could_ try to manually guess a bunch of different combinations and see what
 works the best, but that seems impractical. It'd be better to find a way to 
 automatically run a ton of models, and report back what worked best.
 
-(By the way, all these parameters are documented in `?ranger`. There's no way to
-use common sense to guess what these parameters are called, what their ranges 
-are, or what sensible defaults might be; this is the sort of knowledge that's 
+(By the way, all these parameters are documented in `?ranger`. When you first 
+use a new machine learning package, there's no way to guess what these 
+parameters are called or what sensible 
+values might be; this is the sort of knowledge that's 
 only picked up from trial and error and desperate Google searches.)
 
 ---
 
 The standard way to do this is to run what's known as a **grid search**. 
-We'll start off by making a "grid" containing every combination of evenly-spaced
-predictors, using the `expand.grid` function:
+
+We'll start off by making a "grid" containing a number of combinations of 
+evenly-spaced predictors, using the `expand.grid` function:
 
 
 ```r
@@ -586,7 +614,8 @@ head(tuning_grid[order(tuning_grid$rmse), ])
 
 ---
 
-So we can identify some trends in which hyperparameters seem to work the best.
+We can now identify some trends in which hyperparameters seem to work the best.
+
 Our models do better with `mtry` at the intermediate values of 24 and 48, 
 `sample.fraction` at 0.63 or above, `replace` set to `FALSE`, and 
 `min.node.size` doesn't seem to matter much.
@@ -607,8 +636,9 @@ tuning_grid &lt;- expand.grid(
 
 ---
 
-And we can re-use the code from earlier to run this grid search. Another 
-warning, this search takes about 6 minutes on my machine:
+And we can re-use the code from earlier to run this grid search. 
+
+Another warning, this search takes about 6 minutes on my machine:
 
 
 ```r
@@ -641,15 +671,21 @@ head(tuning_grid[order(tuning_grid$rmse), ])
 And we can keep doing this until we've narrowed down on the specific individual
 values of hyperparameters that give us the best result.
 
-You'll notice, by the way, that we haven't touched the number of trees per 
-random forest yet. That's because while all our other hyperparameters might 
-interact -- the ideal number of observations per leaf might be higher with 
-higher sample fractions, for example -- the accuracy of a random forest tends
-to increase with additional trees no matter what. 
+By the way, you might have noticed that we haven't touched the number of trees 
+per random forest yet. All of the other hyperparameters we've been tuning might
+interact with one another -- the ideal number of observations per leaf node 
+might be higher with greater sample fractions, for instance, as the trees have
+more data to split -- but the ideal number of trees itself tends to not vary as 
+we change our other hyperparameters.
 
-A safe bet is to set the number of trees equal to 10 times the number of 
-predictors (so here, 800); you can add more trees to get a more stable random
-forest, but increasing trees also increases computation time.
+In fact, random forests generally benefit from having more trees, no matter 
+what; the restriction on the optimal number of trees is more about computing 
+power than it is about accuracy gains.
+
+A safe bet is to start by setting the number of trees equal to 10 times the 
+number of predictors (so here, 800). You can try tuning this value to see if 
+adding more trees improves your model or creates a more stable loss estimate,
+but increasing the number of trees also increases computation time.
 
 ---
 
@@ -773,9 +809,10 @@ calc_rmse(random_rf, testing)
 ```
 
 And while it's a bit worse than the result we got from our multi-stage grid 
-search, it's still a bit better than the default values! We could also try 
-selecting more rows from the full grid -- I went with 300 just so these slides
-wouldn't take too long to render.
+search, it's still a bit better than the default values! 
+
+To improve accuracy further, we could try selecting more rows from the full 
+grid -- I went with 300 just so these slides wouldn't take too long to render.
 
 ---
 
@@ -790,14 +827,18 @@ hyperparameters minimize your loss function.
 
 These methods are a bit too complex for what we have time for in this course, 
 and don't work the same for each type of model, so we won't talk any further
-about them.
+about them. I wanted to name drop them here, however, to emphasize that grid
+searches are not the _only_ way to tune hyperparameters, just the easiest to 
+explain.
 
 ---
 
 So we've covered how to tune ML models for regression problems. Can we use the
 same approach for classification?
 
-The answer is: mostly. The issue is that, when we're comparing different 
+The answer is: mostly. 
+
+The issue is that, when we're comparing different 
 hyperparameter sets, we need to rank our models based on a single loss function.
 For regression, that's easy enough, because we can measure errors numerically; 
 we normally pick either RMSE or MAE and minimize loss accordingly.
@@ -825,11 +866,19 @@ the correct prediction is "Yes". Models that predict "Yes" with 100% probability
 get a score of 0 -- they've minimized their loss -- while lower probabilities
 are associated with higher and higher values:
 
-&lt;img src="week_7_slides_files/figure-html/unnamed-chunk-30-1.png" width="10" height="4" /&gt;
+![](week_7_slides_files/figure-html/unnamed-chunk-30-1.png)&lt;!-- --&gt;
 
-You might recognize this as a logarithmic decay curve -- it is! Functionally, to 
+---
+
+You might recognize this as a logarithmic decay curve -- it is! 
+
+Functionally, to 
 calculate cross-entropy loss, you take the negative logarithm of the probability
 assigned to the correct class.
+
+&lt;br /&gt;
+
+![](week_7_slides_files/figure-html/unnamed-chunk-31-1.png)&lt;!-- --&gt;
 
 ---
 
@@ -846,7 +895,9 @@ testing &lt;- attrition[row_idx &gt;= nrow(attrition) * 0.8, ]
 ```
 
 We're then going to fit a random forest to this data, starting off by using the
-default hyperparameters. Because we care about the probability our model assigns
+default hyperparameters. 
+
+Because we care about the probability our model assigns
 each class, not just the predicted class, we'll also need to set 
 `probability = TRUE` in our call to `ranger`:
 
@@ -882,41 +933,20 @@ into `cbind` to add these predictions to our data frame:
 predict(first_rf, training) |&gt; 
   predictions() |&gt; 
   cbind(training) |&gt; 
-  head(2)
+  head(2) |&gt; 
+  select(1:6)
 ```
 
 ```
 ##          No        Yes Age Attrition    BusinessTravel DailyRate
 ## 1 0.4266214 0.57337857  41       Yes     Travel_Rarely      1102
 ## 2 0.9535190 0.04648095  49        No Travel_Frequently       279
-##             Department DistanceFromHome     Education EducationField
-## 1                Sales                1       College  Life_Sciences
-## 2 Research_Development                8 Below_College  Life_Sciences
-##   EnvironmentSatisfaction Gender HourlyRate JobInvolvement JobLevel
-## 1                  Medium Female         94           High        2
-## 2                    High   Male         61         Medium        2
-##              JobRole JobSatisfaction MaritalStatus MonthlyIncome MonthlyRate
-## 1    Sales_Executive       Very_High        Single          5993       19479
-## 2 Research_Scientist          Medium       Married          5130       24907
-##   NumCompaniesWorked OverTime PercentSalaryHike PerformanceRating
-## 1                  8      Yes                11         Excellent
-## 2                  1       No                23       Outstanding
-##   RelationshipSatisfaction StockOptionLevel TotalWorkingYears
-## 1                      Low                0                 8
-## 2                Very_High                1                10
-##   TrainingTimesLastYear WorkLifeBalance YearsAtCompany YearsInCurrentRole
-## 1                     0             Bad              6                  4
-## 2                     3          Better             10                  7
-##   YearsSinceLastPromotion YearsWithCurrManager
-## 1                       0                    5
-## 2                       1                    7
 ```
 
 ---
 
-Since cross-entropy loss is equal to the negative log of the probability for the
-correct class, we need to use an `ifelse` to create a column containing just 
-that probability:
+Since cross-entropy loss is equal to the negative log of the probability of the
+true class, we'll use an `ifelse` to create a column containing that probability:
 
 
 ```r
@@ -962,7 +992,7 @@ Just like with RMSE, we're going to wrap that code into a function.
 One last detail here is that, if our model is 100% confident in the wrong 
 answer, we wind up with a probability of 0. Since the log of 0 is infinite, 
 we'll add a line of code here so that our prediction is never _exactly_ 0 or 1,
-but rather a tiny value (1^-15):
+but rather a tiny value (10^-15):
 
 
 ```r
@@ -1007,7 +1037,10 @@ k_fold_cv &lt;- function(data, k, ...) {
       fold_test &lt;- data[fold_idx, ]
       fold_train &lt;- data[-fold_idx, ]
       
-      fold_rf &lt;- ranger(Attrition ~ ., fold_train, probability = TRUE, ...)
+      fold_rf &lt;- ranger(Attrition ~ ., 
+                        fold_train, 
+                        probability = TRUE, 
+                        ...)
       calc_cross_entropy(fold_rf, fold_test)
     },
     numeric(1)
@@ -1019,7 +1052,9 @@ k_fold_cv &lt;- function(data, k, ...) {
 ---
 
 But once we've done that, tuning this classification model works just the same
-as tuning a regression:
+as tuning a regression. 
+
+We'll make our initial tuning grid:
 
 
 ```r
@@ -1043,6 +1078,10 @@ head(tuning_grid)
 ## 5   18             3    TRUE             0.5   NA
 ## 6   27             3    TRUE             0.5   NA
 ```
+
+---
+
+And then we'll iterate through the grid in a for-loop:
 
 
 ```r
@@ -1070,20 +1109,24 @@ head(tuning_grid[order(tuning_grid$loss), ])
 ## 1     9             1    TRUE            0.50 841.8220
 ```
 
----
-
 We could then take the best combination of hyperparameters from our grid search
 and refine our model further, just like we did with regression.
 
+---
+
 One last thing to note is that cross-entropy loss, while a useful tool for model
-tuning, is not a great model statistic. Cross-entropy will usually increase with
-the number of observations in your test set, so doesn't communicate much about 
+tuning, is not a great model statistic. 
+
+Cross-entropy will usually increase with the number of observations in your test 
+set, so it fails to communicate much about 
 the actual predictive accuracy of the model; it simply does a better job of 
 comparing models using the same test set than overall accuracy or similar 
 metrics.
 
 Cross-entropy loss is also not a silver bullet for imbalanced classification
-problems. For instance, the next slide will have the confusion matrix for the
+problems. 
+
+For instance, the next slide will have the confusion matrix for the
 best model selected by our grid search. While our specificity is higher than
 we've seen in the past, it's still not _great_ -- we'd probably want to weight
 our classes while tuning to get better results overall.
@@ -1095,9 +1138,9 @@ grid_rf &lt;- ranger(
   training,
   num.trees = 310,
   mtry = 9,
-  min.node.size = 5,
-  replace = FALSE,
-  sample.fraction = 0.5
+  min.node.size = 1,
+  replace = TRUE,
+  sample.fraction = 0.63
 )
 ```
 
@@ -1117,31 +1160,41 @@ caret::confusionMatrix(
 ## 
 ##           Reference
 ## Prediction  No Yes
-##        No  246  34
-##        Yes   2  13
-##                                          
-##                Accuracy : 0.878          
-##                  95% CI : (0.8351, 0.913)
-##     No Information Rate : 0.8407         
-##     P-Value [Acc &gt; NIR] : 0.04387        
-##                                          
-##                   Kappa : 0.3709         
-##                                          
-##  Mcnemar's Test P-Value : 2.383e-07      
-##                                          
-##             Sensitivity : 0.27660        
-##             Specificity : 0.99194        
-##          Pos Pred Value : 0.86667        
-##          Neg Pred Value : 0.87857        
-##              Prevalence : 0.15932        
-##          Detection Rate : 0.04407        
-##    Detection Prevalence : 0.05085        
-##       Balanced Accuracy : 0.63427        
-##                                          
-##        'Positive' Class : Yes            
+##        No  247  37
+##        Yes   1  10
+##                                           
+##                Accuracy : 0.8712          
+##                  95% CI : (0.8275, 0.9072)
+##     No Information Rate : 0.8407          
+##     P-Value [Acc &gt; NIR] : 0.08546         
+##                                           
+##                   Kappa : 0.3027          
+##                                           
+##  Mcnemar's Test P-Value : 1.365e-08       
+##                                           
+##             Sensitivity : 0.21277         
+##             Specificity : 0.99597         
+##          Pos Pred Value : 0.90909         
+##          Neg Pred Value : 0.86972         
+##              Prevalence : 0.15932         
+##          Detection Rate : 0.03390         
+##    Detection Prevalence : 0.03729         
+##       Balanced Accuracy : 0.60437         
+##                                           
+##        'Positive' Class : Yes             
 ## 
 ```
 
+---
+
+And that's where we'll leave things for this week. 
+
+With cross validation and hyperparameter tuning, we've now fully entered the
+world of machine learning; we'll be using k-fold CV (and the function we wrote
+to do it) every single week from here on out. 
+
+Next week, we'll use these techniques to tune a brand new model, the gradient
+boosting machine.
 
 ---
 class: middle
