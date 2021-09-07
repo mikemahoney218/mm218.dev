@@ -65,8 +65,10 @@ class: middle center
 Today we're going to switch gears and stop talking about tree-based models. 
 
 Our last two methods are examples of what are known as **kernel-based models**
-(or **kernel machines**). However, I don't necessarily want to spend a ton of
-time getting into the math behind what a "kernel" is today.
+(or **kernel machines**). 
+
+However, I don't necessarily want to spend a ton of
+time today getting into the math behind what a "kernel" is.
 
 Instead, for this class we can think about these models as being 
 **distance-based methods**, which make predictions based on how _close_ an
@@ -74,7 +76,7 @@ observation is to other data in the training set.
 
 ---
 
-The method we'll walk through today is called **k-nearest neighbors** (KNN), 
+The method we'll walk through first is called **k-nearest neighbors** (KNN), 
 which bases its predictions based on some number ("k") of the closest points to 
 your unknown observation.
 
@@ -84,8 +86,8 @@ and rarely if ever is as accurate as a well-tuned random forest or
 GBM.
 
 However, KNN models are simple to understand and use, are somewhat common in the 
-literature given their age, and will help to set up our final model next week, 
-so we'll walk through them here.
+literature given their age, and will help to set up our final model next week. 
+As a result, it makes sense for us to walk through them here.
 
 ---
 
@@ -131,7 +133,7 @@ look at the two closest plots and still predict edge:
 
 ---
 
-With that said, some values of k make more sense than others.
+A k of 2 can sometimes cause problems, however.
 
 For instance, imagine if this plant instead was our mystery point:
 
@@ -151,7 +153,9 @@ your classes -- but no matter what, it's not an ideal situation.
 ---
 
 So at least for binary classification, we prefer to always set k to odd values 
-so that we don't wind up with ties in our predictions:
+so that we don't wind up with ties in our predictions. 
+
+For instance, with k = 3 we can easily categorize this plant as an edge plant:
 
 ![](week_10_slides_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
 
@@ -174,13 +178,9 @@ dimensions as your data frame has columns. KNN is attempting to find the nearest
 neighbors based on all of your variables at once; it's trying to draw that 1D
 line in extremely high-dimensional space.
 
-To talk about the implications of that, let's start actually fitting KNNs in R.
-
----
-
-We'll be working with
-our attrition data to start off with -- go ahead and load it now, then create
-our testing and training splits:
+But there's a problem with thinking of closeness in this way. To explain why,
+let's go ahead and load our attrition data into R and create our training/test
+splits:
 
 
 ```r
@@ -194,13 +194,21 @@ testing &lt;- attrition[row_idx &gt;= nrow(attrition) * 0.8, ]
 
 ---
 
-Before we fit our model, we have to do a bit of data cleaning. 
+Our attrition data has many numeric variables. For instance, it has `Age` and
+`DailyRate`, both of which were useful predictors back in our decision tree 
+models.
 
-Our attrition data contains a bunch of numeric variables in it. For instance,
-it's got data on the `Age` and `DailyRate` of employees:
+Plotted together, they look like this:
+
+
+```r
+training |&gt; 
+  ggplot(aes(DailyRate, Age, color = Attrition)) + 
+  geom_point() + 
+  scale_color_brewer(palette = "Dark2")
+```
 
 ![](week_10_slides_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
-
 
 ---
 
@@ -211,6 +219,16 @@ variation in a daily rate than in age.
 To a KNN, a one-unit change in one variable is the same size as a one-unit 
 change in another. To a KNN, our scatterplot looks like this:
 
+
+```r
+training |&gt; 
+  ggplot(aes(DailyRate, Age, color = Attrition)) + 
+  geom_point() + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_y_continuous(limits = c(0, max(training$DailyRate))) + 
+  scale_x_continuous(limits = c(min(training$Age), max(training$DailyRate)))
+```
+
 ![](week_10_slides_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
 
 ---
@@ -218,6 +236,16 @@ change in another. To a KNN, our scatterplot looks like this:
 Since all of our data is extremely close in age, the model won't pay any 
 attention to age when finding neighbors or making predictions -- which isn't 
 great, since we know age is an adequate predictor!
+
+
+```r
+training |&gt; 
+  ggplot(aes(DailyRate, Age, color = Attrition)) + 
+  geom_point() + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_y_continuous(limits = c(0, max(training$DailyRate))) + 
+  scale_x_continuous(limits = c(min(training$Age), max(training$DailyRate)))
+```
 
 ![](week_10_slides_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
 
@@ -229,6 +257,16 @@ one variable is _actually_ as dramatic as a one-unit change in another.
 First, we'll center our data at 0 by subtracting the mean value from each
 observation:
 
+
+```r
+training |&gt; 
+  mutate(across(where(is.numeric), 
+                \(x) ((x - mean(x))))) |&gt; 
+  ggplot(aes(DailyRate, Age, color = Attrition)) + 
+  geom_point() + 
+  scale_color_brewer(palette = "Dark2")
+```
+
 ![](week_10_slides_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
 
 ---
@@ -238,11 +276,20 @@ vector.
 
 Our variables are now all rescaled so that one unit represents one standard 
 deviation -- an Age value of 1 means that the employee was exactly one standard
-deviation above the mean age:
+deviation above the mean age. This way, a change of 1 means the same thing 
+across all of our variables.
+
+
+```r
+training |&gt; 
+  mutate(across(where(is.numeric), 
+                \(x) ((x - mean(x)) / sd(x)))) |&gt; 
+  ggplot(aes(DailyRate, Age, color = Attrition)) + 
+  geom_point() + 
+  scale_color_brewer(palette = "Dark2")
+```
 
 ![](week_10_slides_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
-
-This way, a change of 1 means the same across all of our variables.
 
 ---
 
@@ -322,7 +369,7 @@ testing &lt;- bake(scaling_recipe, testing)
 
 ---
 
-And now we're finally able to get started fitting our model!
+And now we're finally able to get started fitting our first KNN!
 
 The best R package for fitting KNNs is actually one we've used before: `caret`.
 We'll load it now:
@@ -330,10 +377,6 @@ We'll load it now:
 
 ```r
 library(caret)
-```
-
-```
-## Loading required package: lattice
 ```
 
 Fitting a KNN is then as simple as using `knn3` just like `lm` or most of the 
@@ -472,8 +515,9 @@ can only predict 100% and 0% probabilities, a k of 3 0%, 33%, 67%, and 100%, and
 so on.
 
 Since cross-entropy specifically penalizes confident-but-wrong guesses, this 
-means that cross-entropy decreases as k increases and guesses become less 
-confident, so can't actually tell us what the best k value might be.
+means that cross-entropy will usually decrease as k increases and guesses become 
+less confident. As a result, cross-entropy will often favor higher values of k
+whether or not it improves our actual predictions.
 
 So instead, we'll use our old friend AUC as a loss function to tune KNNs.
 
@@ -609,19 +653,23 @@ for (i in seq_len(nrow(tuning_grid))) {
   )
 }
 
-head(arrange(tuning_grid, -auc), 2)
+head(arrange(tuning_grid, -auc))
 ```
 
 ```
 ##     n       auc
 ## 1  85 0.7572562
 ## 2 107 0.7544213
+## 3 169 0.7537498
+## 4 127 0.7526416
+## 5 253 0.7514675
+## 6  65 0.7509871
 ```
 
 ---
 
-Plotting k makes it pretty obvious that the optimal value is somewhere just 
-under 100.
+Plotting k makes it pretty obvious that the value of k which maximizes AUC is 
+somewhere just under 100.
 
 
 ```r
@@ -748,7 +796,7 @@ changes:
 + Instead of `knn3`, we'll use `knnreg` for regression modeling;
 
 + We're going to add `-all_outcomes` to our recipe steps, to make sure we don't
-  scale and center our sale price
+  scale and center our sale price;
   
 + And we'll change the formula in `recipe` and `knnreg` to `Sale_Price ~ .` and
   our loss function to `calc_rmse`
@@ -809,6 +857,7 @@ for (i in seq_len(nrow(tuning_grid))) {
     n = tuning_grid$n[i]
   )
 }
+
 head(arrange(tuning_grid, rmse))
 ```
 
@@ -892,7 +941,7 @@ class: middle
 
 Titles are links:
 
-+ [HOML Chapter 8](https://bradleyboehmke.github.io/HOML/knn.html)
++ [HOML Chapter 8 (KNNs) and 3 (Feature Engineering)](https://bradleyboehmke.github.io/HOML/knn.html)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>

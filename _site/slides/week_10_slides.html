@@ -54,16 +54,21 @@ The introduction of numbers as coordinates is an act of violence.
 ]
 
 ---
+class: middle center
 
-# k-Nearest Neighbors and Kernel-Based ML
+# k-Nearest Neighbors 
+
+# and Kernel-Based ML
 
 ---
 
 Today we're going to switch gears and stop talking about tree-based models. 
 
 Our last two methods are examples of what are known as **kernel-based models**
-(or **kernel machines**). However, I don't necessarily want to spend a ton of
-time getting into the math behind what a "kernel" is.
+(or **kernel machines**). 
+
+However, I don't necessarily want to spend a ton of
+time today getting into the math behind what a "kernel" is.
 
 Instead, for this class we can think about these models as being 
 **distance-based methods**, which make predictions based on how _close_ an
@@ -71,7 +76,7 @@ observation is to other data in the training set.
 
 ---
 
-The method we'll walk through today is called **k-nearest neighbors** (KNN), 
+The method we'll walk through first is called **k-nearest neighbors** (KNN), 
 which bases its predictions based on some number ("k") of the closest points to 
 your unknown observation.
 
@@ -81,8 +86,8 @@ and rarely if ever is as accurate as a well-tuned random forest or
 GBM.
 
 However, KNN models are simple to understand and use, are somewhat common in the 
-literature given their age, and will help to set up our final model next week, 
-so we'll walk through them here.
+literature given their age, and will help to set up our final model next week. 
+As a result, it makes sense for us to walk through them here.
 
 ---
 
@@ -113,24 +118,24 @@ This is exactly how k-nearest neighbors works. For some value of k that you
 choose, KNN looks at the closest k neighbors and predicts whatever the majority
 class is.
 
-For instance, if k = 1 our model would look at the closest point (attached by
+For instance, if we set k = 1 our model would look at the closest point 
+(attached on the graph by
 a black line) and predict that our unknown observation was an edge plant:
 
 ![](week_10_slides_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
 
 ---
 
-For KNN, k is a hyperparameter which we'll pick through tuning. We could 
-imagine, for instance, setting it to 2, in which case KNN would look at the two
-closest plots and still predict edge:
+We could also imagine, for instance, setting k to 2, in which case KNN would 
+look at the two closest plots and still predict edge:
 
 ![](week_10_slides_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
 
 ---
 
-With that said, some values of k make more sense than others.
+A k of 2 can sometimes cause problems, however.
 
-For instance, imagine if this was our mystery point:
+For instance, imagine if this plant instead was our mystery point:
 
 ![](week_10_slides_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
 
@@ -148,7 +153,9 @@ your classes -- but no matter what, it's not an ideal situation.
 ---
 
 So at least for binary classification, we prefer to always set k to odd values 
-so that we don't wind up with ties in our predictions:
+so that we don't wind up with ties in our predictions. 
+
+For instance, with k = 3 we can easily categorize this plant as an edge plant:
 
 ![](week_10_slides_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
 
@@ -171,14 +178,9 @@ dimensions as your data frame has columns. KNN is attempting to find the nearest
 neighbors based on all of your variables at once; it's trying to draw that 1D
 line in extremely high-dimensional space.
 
----
-
-We're going to come back to this idea of higher-dimensional space next week
-(sorry). 
-
-For now, let's move on to  actually fitting KNNs in R. We'll be working with
-our attrition data to start off with -- go ahead and load it now, then create
-our testing and training splits:
+But there's a problem with thinking of closeness in this way. To explain why,
+let's go ahead and load our attrition data into R and create our training/test
+splits:
 
 
 ```r
@@ -192,13 +194,21 @@ testing &lt;- attrition[row_idx &gt;= nrow(attrition) * 0.8, ]
 
 ---
 
-Before we fit our model, we have to do a bit of data cleaning. 
+Our attrition data has many numeric variables. For instance, it has `Age` and
+`DailyRate`, both of which were useful predictors back in our decision tree 
+models.
 
-Our attrition data contains a bunch of numeric variables in it. For instance,
-it's got data on the `Age` and `DailyRate` of employees:
+Plotted together, they look like this:
+
+
+```r
+training |&gt; 
+  ggplot(aes(DailyRate, Age, color = Attrition)) + 
+  geom_point() + 
+  scale_color_brewer(palette = "Dark2")
+```
 
 ![](week_10_slides_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
-
 
 ---
 
@@ -209,6 +219,16 @@ variation in a daily rate than in age.
 To a KNN, a one-unit change in one variable is the same size as a one-unit 
 change in another. To a KNN, our scatterplot looks like this:
 
+
+```r
+training |&gt; 
+  ggplot(aes(DailyRate, Age, color = Attrition)) + 
+  geom_point() + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_y_continuous(limits = c(0, max(training$DailyRate))) + 
+  scale_x_continuous(limits = c(min(training$Age), max(training$DailyRate)))
+```
+
 ![](week_10_slides_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
 
 ---
@@ -216,6 +236,16 @@ change in another. To a KNN, our scatterplot looks like this:
 Since all of our data is extremely close in age, the model won't pay any 
 attention to age when finding neighbors or making predictions -- which isn't 
 great, since we know age is an adequate predictor!
+
+
+```r
+training |&gt; 
+  ggplot(aes(DailyRate, Age, color = Attrition)) + 
+  geom_point() + 
+  scale_color_brewer(palette = "Dark2") + 
+  scale_y_continuous(limits = c(0, max(training$DailyRate))) + 
+  scale_x_continuous(limits = c(min(training$Age), max(training$DailyRate)))
+```
 
 ![](week_10_slides_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
 
@@ -227,6 +257,16 @@ one variable is _actually_ as dramatic as a one-unit change in another.
 First, we'll center our data at 0 by subtracting the mean value from each
 observation:
 
+
+```r
+training |&gt; 
+  mutate(across(where(is.numeric), 
+                \(x) ((x - mean(x))))) |&gt; 
+  ggplot(aes(DailyRate, Age, color = Attrition)) + 
+  geom_point() + 
+  scale_color_brewer(palette = "Dark2")
+```
+
 ![](week_10_slides_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
 
 ---
@@ -236,14 +276,42 @@ vector.
 
 Our variables are now all rescaled so that one unit represents one standard 
 deviation -- an Age value of 1 means that the employee was exactly one standard
-deviation above the mean age:
+deviation above the mean age. This way, a change of 1 means the same thing 
+across all of our variables.
+
+
+```r
+training |&gt; 
+  mutate(across(where(is.numeric), 
+                \(x) ((x - mean(x)) / sd(x)))) |&gt; 
+  ggplot(aes(DailyRate, Age, color = Attrition)) + 
+  geom_point() + 
+  scale_color_brewer(palette = "Dark2")
+```
 
 ![](week_10_slides_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
 
 ---
 
-So in order for KNN to treat all our variables equally, we should center and
-scale them.
+So, because KNN uses all of our variables to calculate distance and doesn't 
+understand units in our data, we need to center and scale our variables for the
+model to work properly.
+
+The other implication here I want to highlight is that KNNs use _all_ of our
+variables to calculate distance between points. Unlike tree-based methods, KNNs
+don't select only the most effective variables to use while making predictions.
+
+This means that, unlike tree-based methods, KNNs are susceptible to noisy 
+variables, and might benefit from dimension reduction and feature engineering
+techniques (like PCA) which we don't cover in this course. This makes KNNs
+harder to use and often limits their accuracy compared to other methods.
+
+This is a consistent limitation of kernel-based methods; we'll return to this 
+idea next week.
+
+---
+
+So we need to center and scale our variables before fitting a KNN.
 
 However, we don't want to do this directly to our `attrition` data frame, before
 we split it into testing and training pieces! 
@@ -262,7 +330,7 @@ on our training data, and scale both the training and test sets by those values.
 
 While we don't have time to cover much data pre-processing in this course, I 
 want to emphasize that this rule applies to anything you do to your data before
-fitting a model -- whether it's filtering out variables, rescaling data,
+fitting a model -- whether it's deciding to filter out variables, rescaling data,
 imputation, creating principal components, or anything else, you _need_ to make
 sure testing data never influences the data you train your models with.
 
@@ -271,7 +339,10 @@ sure testing data never influences the data you train your models with.
 This is where the `recipes` package we mentioned last week really shines. 
 You might remember that we can specify our pre-processing steps by creating a
 "recipe" object, using `step_` functions to declare what steps we want to 
-perform, and then finishing up with `prep()`:
+perform, and then finishing up with `prep()`.
+
+Since we want to center and scale our data, we'll use the `step_center` and
+`step_scale` functions in our recipe:
 
 
 ```r
@@ -298,7 +369,7 @@ testing &lt;- bake(scaling_recipe, testing)
 
 ---
 
-And now we're finally able to get started fitting our model!
+And now we're finally able to get started fitting our first KNN!
 
 The best R package for fitting KNNs is actually one we've used before: `caret`.
 We'll load it now:
@@ -306,10 +377,6 @@ We'll load it now:
 
 ```r
 library(caret)
-```
-
-```
-## Loading required package: lattice
 ```
 
 Fitting a KNN is then as simple as using `knn3` just like `lm` or most of the 
@@ -344,7 +411,8 @@ slide).
 ```r
 confusionMatrix(
   predict(first_knn, testing, type = "class"),
-  testing$Attrition
+  testing$Attrition,
+  positive = "Yes"
 )
 ```
 
@@ -365,16 +433,16 @@ confusionMatrix(
 ##                                           
 ##  Mcnemar's Test P-Value : 1.807e-05       
 ##                                           
-##             Sensitivity : 0.98473         
-##             Specificity : 0.09091         
-##          Pos Pred Value : 0.89583         
-##          Neg Pred Value : 0.42857         
-##              Prevalence : 0.88814         
-##          Detection Rate : 0.87458         
-##    Detection Prevalence : 0.97627         
+##             Sensitivity : 0.09091         
+##             Specificity : 0.98473         
+##          Pos Pred Value : 0.42857         
+##          Neg Pred Value : 0.89583         
+##              Prevalence : 0.11186         
+##          Detection Rate : 0.01017         
+##    Detection Prevalence : 0.02373         
 ##       Balanced Accuracy : 0.53782         
 ##                                           
-##        'Positive' Class : No              
+##        'Positive' Class : Yes             
 ## 
 ```
 
@@ -407,8 +475,10 @@ It turns out, this model does a pretty bad job predicting our test set.
 ---
 
 Looking at our specificity rates, it might be helpful if we balance our classes
-before predicting. `knn3` doesn't take weights as an argument, so we'll need
-to resample our data in order to balance our training data.
+before predicting. 
+
+`knn3` doesn't take weights as an argument, so we'll need
+to resample our data in order to balance our training data:
 
 
 ```r
@@ -441,12 +511,13 @@ neighbors are.
 
 If we force KNN to report probabilities, what we get back instead are 
 percentages of how many neighbors belong to each class. This means that a k of 1
-can only predict 100% and 0% probabilities, a k of 3 0%, 33%, 67%, and 100% and
+can only predict 100% and 0% probabilities, a k of 3 0%, 33%, 67%, and 100%, and
 so on.
 
 Since cross-entropy specifically penalizes confident-but-wrong guesses, this 
-means that cross-entropy decreases as k increases and guesses become less 
-confident, so can't actually tell us what the best k value might be.
+means that cross-entropy will usually decrease as k increases and guesses become 
+less confident. As a result, cross-entropy will often favor higher values of k
+whether or not it improves our actual predictions.
 
 So instead, we'll use our old friend AUC as a loss function to tune KNNs.
 
@@ -493,9 +564,7 @@ chatty function, which can get annoying when running it 100 times.
 ---
 
 We can then repurpose our `k_fold_cv` function from last time to tune our KNN.
-Note that we're going to scale our data during each iteration -- just like with
-the hold-out set, it's important we not let data from the validation fold leak 
-into the pre-processing step:
+We'll scale our data each iteration to avoid data leakage from the testing fold:
 
 
 ```r
@@ -584,17 +653,23 @@ for (i in seq_len(nrow(tuning_grid))) {
   )
 }
 
-head(arrange(tuning_grid, -auc), 2)
+head(arrange(tuning_grid, -auc))
 ```
 
 ```
 ##     n       auc
 ## 1  85 0.7572562
 ## 2 107 0.7544213
+## 3 169 0.7537498
+## 4 127 0.7526416
+## 5 253 0.7514675
+## 6  65 0.7509871
 ```
 
-Plotting k makes it pretty obvious that the optimal value is somewhere just 
-under 100.
+---
+
+Plotting k makes it pretty obvious that the value of k which maximizes AUC is 
+somewhere just under 100.
 
 
 ```r
@@ -691,7 +766,7 @@ regression tasks as well.
 
 Rather than predict the most common value, KNNs built for regression tasks 
 predict the _average_ value of the neighbors (sometimes weighted by distance,
-sometimes not).
+sometimes not, depending on the package you use).
 
 We'll walk through the process quickly, but the fundamental steps are the same
 as when using KNNs for classification. First, we'll load our data:
@@ -719,10 +794,16 @@ And lastly, we'll repurpose our `k_fold_cv` function. We need to make a few
 changes:
 
 + Instead of `knn3`, we'll use `knnreg` for regression modeling;
+
 + We're going to add `-all_outcomes` to our recipe steps, to make sure we don't
-  scale and center our sale price
+  scale and center our sale price;
+  
 + And we'll change the formula in `recipe` and `knnreg` to `Sale_Price ~ .` and
   our loss function to `calc_rmse`
+
+The code with these changes is on the next slide.
+
+---
 
 
 ```r
@@ -776,14 +857,21 @@ for (i in seq_len(nrow(tuning_grid))) {
     n = tuning_grid$n[i]
   )
 }
-head(arrange(tuning_grid, rmse), 2)
+
+head(arrange(tuning_grid, rmse))
 ```
 
 ```
-##    n     rmse
-## 1 22 34544.91
-## 2 43 36479.43
+##     n     rmse
+## 1  22 34544.91
+## 2  43 36479.43
+## 3  64 37546.28
+## 4  85 38904.05
+## 5 106 39746.35
+## 6 127 40429.31
 ```
+
+---
 
 
 ```r
@@ -825,10 +913,11 @@ calc_rmse(final_knn, testing)
 ## [1] 29419.37
 ```
 
-Not too bad! We've done dramatically better with random forests and GBMs, but
+We've done dramatically better with random forests and GBMs, but
 KNN at least beats linear regression.
 
 ---
+class: middle
 
 And that, in a nutshell, is the k-nearest neighbors algorithm. 
 
@@ -852,7 +941,7 @@ class: middle
 
 Titles are links:
 
-+ [HOML Chapter 8](https://bradleyboehmke.github.io/HOML/knn.html)
++ [HOML Chapter 8 (KNNs) and 3 (Feature Engineering)](https://bradleyboehmke.github.io/HOML/knn.html)
     </textarea>
 <style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
 <script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
