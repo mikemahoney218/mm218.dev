@@ -75,9 +75,14 @@ your project for five minutes.
 The presentations are meant as an opportunity for us to find out what everyone
 else has been working on; they should not feel like a high-stakes event. 
 
+Your code should run immediately when I load it on my computer and return the
+same results as you report; this means no hard-coded file paths or `setwd` 
+calls (use the "here" package instead) and `set.seed` used before randomization.
+
 As usual, feel free to reach out with any questions or concerns.
 
 ---
+class: center middle
 
 # Support Vector Machines
 
@@ -185,6 +190,9 @@ When our data can be separated into two classes by a straight line, we call it
 because our predictions depend entirely on what side of the boundary a point 
 falls.
 
+For instance, our mystery point here falls on the "Edge" side of the boundary, 
+so we'd classify this point as an edge plant.
+
 ```{r, echo = FALSE, fig.width=10, fig.height=5}
 example_df |> 
   ggplot(aes(x, y, color = class, shape = class)) +
@@ -202,7 +210,9 @@ example_df |>
 
 ---
 
-Another name for this line is a **separating hyperplane**. Remember from way 
+Another name for this line is a **separating hyperplane**. 
+
+Remember from way 
 back in week 2 that we can call model surfaces in any dimension a hyperplane;
 rather than directly modeling an outcome or probability, however, these 
 hyperplanes are trying to split our data into two classes.
@@ -245,19 +255,19 @@ example_df |>
   labs(x = "Size", y = "Greenness")
 ```
 
-Which one would we want to use to classify our data?
+Which one would we want to use as a decision boundary?
 
 ---
 
-Well, just by looking at this graph we can tell that some of these hyperplanes 
+Just by looking at the graph, we can tell that some of these hyperplanes 
 seem "better" than others. How can we choose the "best"?
 
 One approach is to choose the hyperplane that is the _furthest_ from both 
 classes. That _should_ maximize how generalizable the decision boundary is, so
 that a point with X and Y values a bit further out from the class mean will 
-still be calculated correctly.
+still be correctly classified.
 
-Finding that line is a two step process. First, we need to find the points from
+In order to find that furthest line, we need to first find the points from
 each class which are closest to the _other_ class:
 
 ```{r, echo = FALSE, fig.width=10, fig.height=5}
@@ -314,7 +324,7 @@ dotted lines, also known as a **margin**). Because we're drawing our decision
 boundary so that no points are inside the margin and no points are 
 misclassified, we call this a **hard margin classifier**.
 
-This is the simplest version of a support vector machine!
+This is the simplest version of a **support vector machine**.
 
 ```{r, echo = FALSE, fig.width=10, fig.height=5}
 example_df[-c(16, 32), ] |> 
@@ -342,7 +352,7 @@ example_df[-c(16, 32), ] |>
 
 ---
 
-However, the hard margin classifier has some weaknesses. For instance, let's 
+This simple hard-margin SVM has some weaknesses. For instance, let's 
 look at a different data set, showing how income and lot size are associated 
 with riding lawnmower ownership:
 
@@ -512,7 +522,7 @@ If we go through the same process as earlier to find our optimal separating
 hyperplane, we'll find that this decision boundary is much closer to the 
 "Yes" point cloud than we'd expect. 
 
-This likely won't generalize well -- as we test our model on new data, we're 
+This probably won't generalize well -- as we test our model on new data, we're 
 very likely to mischaracterize "Yes" points as "No"s!
 
 ```{r, echo = FALSE, fig.width=10, fig.height=5}
@@ -565,16 +575,19 @@ usually referred to as $C$.
 
 If $C$ is 0, you let 0 points inside the margin -- 
 you use the points which are closest to each other as support vectors to 
-produce the hard margin classifier. If $C$ is infinite, you use the furthest
+produce the hard margin classifier. 
+
+If $C$ is infinite, you use the furthest
 removed points as support vectors and let all of your data into the margin.
 
 ![](https://bradleyboehmke.github.io/HOML/11b-svm_files/figure-html/smc-1.png)
 
 ---
 
-This is the core of how SVMs work: decide how many points are allowed inside the
-margin, find the support vectors, and then find the decision boundary that's 
-halfway between them.
+In practice, we almost always use soft margin classifiers when fitting SVMs.
+By deciding how many points are allowed inside the margin, we're able to find
+the linear decision boundary that best classifies training data while still 
+generalizing well to the test set.
 
 But what if our data isn't linearly separable? This is pretty common in the real
 world -- if there was an obvious linear boundary between our two classes,
@@ -582,10 +595,11 @@ we wouldn't need machine learning to tell them apart.
 
 Imagine a data set that looked like this, where our classes were mixed together:
 
-```{r, echo = FALSE, fig.width=5, fig.height=5}
+```{r, echo = FALSE, fig.width=5, fig.height=5, message = FALSE}
 # Load required packages
 library(grid)
 library(lattice)
+library(kernlab)
 # Simulate data
 set.seed(1432)
 circle <- as.data.frame(mlbench::mlbench.circle(
@@ -594,7 +608,7 @@ circle <- as.data.frame(mlbench::mlbench.circle(
 ))
 names(circle) <- c("x1", "x2", "y")  # rename columns
 # Fit a support vector machine (SVM)
-fit_svm_poly <- ksvm( 
+fit_svm_poly <- kernlab::ksvm( 
   x = data.matrix(circle[c("x1", "x2")]),
   y = as.factor(circle$y), 
   kernel = "polydot",       # polynomial kernel
@@ -675,9 +689,9 @@ higher-dimensional space than our original 2D X/Y graph. But when we come back
 to 2D (so plotting the hyperplane using only X and Y values), it's entirely 
 nonlinear.
 
-This is the core thing that makes SVMs special: they combine variables to cast 
-your data into some higher dimensional space where it is linearly separable,
-which lets them approximate any non-linear relationships your predictors have.
+By combining variables to cast your data into a higher-dimensional space to 
+find linear decision boundaries, SVMs are able to approximate any non-linear
+relationships your predictors have with your outcome.
 
 ```{r, echo = FALSE, fig.width=10, fig.height=5}
 # Scatterplot with decision boundary
@@ -712,11 +726,11 @@ gridExtra::grid.arrange(p3, p2, nrow = 1)
 
 ---
 
-In order to cast your data into more dimensions, SVMs make use of what are known
+In order to cast your data into higher dimensions, SVMs make use of what are known
 as _kernel functions_.
 
 Kernel functions are effectively a guess about how your variables are related to
-each other; they specify some transformation to your variables that will 
+your outcome; they specify some transformation to your variables that will 
 _hopefully_ make your data linearly separable.
 
 There are a number of different kernel functions available to choose from, each
@@ -724,7 +738,12 @@ a different transformation which might work well for your data.
 In practice, we generally start with something called the 
 "**radial basis function**" kernel (or RBF) and try out other kernels only if 
 that one doesn't work. 
-This is a fundamentally dissatisfying way to do things, and yet.
+
+I'm intentionally avoiding getting too deep into the math of how kernel 
+transformations work here; conceptually understanding that each kernel is a 
+different equation to create new features from your existing variables should be
+enough. For details on the mathematical expression of each kernel, check out
+`?kernlab::dots`.
 
 ---
 
@@ -733,7 +752,7 @@ One last thing before we move on to implementing SVMs in R.
 Just like KNNs, SVM are trying to calculate the distance between your points in
 order to find separating hyperplanes. This means that, just like with KNNs, you
 need to scale and center your data in order to make sure all your variables 
-"count" for distance equally, regardless of units.
+"count" for distance equally, regardless of units. 
 
 This also means that, to an SVM, categorical variables (which are encoded to be
 either 0 or 1) have lower variance than continuous variables, and so tend to 
@@ -769,8 +788,8 @@ testing <- attrition[row_idx >= nrow(attrition) * 0.8, ]
 
 ---
 
-We're going to start off predicting attrition by fitting an SVM using the 
-RBF kernel function, which is the default method in the `ksvm` function we use
+We're going to start off predicting attrition by fitting an SVM using an 
+RBF kernel, which is the default method in the `ksvm` function we use
 to fit SVMs. 
 
 That means that we can use `ksvm` to create our SVM using the 
@@ -787,9 +806,9 @@ There's a few useful pieces of information in the output from `ksvm`:
 
 + We're told we're using a `Gaussian Radial Basis kernel function`, which is 
   the formal name for the RBF kernel.
-+ We can see the value of our C hyperparameter (which controls how "hard" the 
++ We can see the value of our $C$ hyperparameter (which controls how "hard" the 
   margin is), which by default is 1.
-+ We're told that there's another hyperparameter, `sigma`, set to some extremely
++ We're told that there's another hyperparameter `sigma` set to some extremely
   small value, which we haven't talked about at all.
 
 ```{r}
@@ -799,7 +818,8 @@ first_svm
 ---
 
 Sigma (usually written $\sigma$) is what we call a **kernel hyperparameter**. 
-If we chose to use a different kernel, we might have entirely different kernel
+While we'll have to tune our $C$ hyperparameter no matter what kernel we use,
+if we chose to use a different kernel, we might have entirely different kernel
 hyperparameters.
 
 If you're using any non-RBF kernel, you can think of kernel hyperparameters just
@@ -815,8 +835,8 @@ hyperparameters, via `?kernlab::dots`.
 
 ---
 
-C can be any positive number, which means there are a lot of potential values to
-check. 
+$C$ can be any positive number, which means there are a lot of potential values 
+to check. 
 
 A common recommendation is to start off by testing powers of 2 -- we'll
 try from 2^-8 to 2^8:
@@ -841,7 +861,7 @@ point is either one side or the other.
 
 While there _are_ ways to get SVMs to generate probabilities (such as the 
 `prob.model` argument to `ksvm`), they aren't very commonly used, which means 
-using cross-entropy or AUC loss like we've done in the past is rarer.
+using cross-entropy or AUC loss like we've done in the past is rare.
 
 ---
 
@@ -932,10 +952,10 @@ ggplot(tuning_grid, aes(C, loss)) +
   geom_line() 
 ```
 
-It looks like higher C values are more effective here! We'll run with C = 64
-for now.
-
 ---
+
+It looks like higher C values are more effective here! We'll run with C = 64
+for now - that's where we got the little bump in the top of our curve.
 
 As usual, we can then go on and fit our final model on the entire training set:
 
@@ -959,9 +979,9 @@ at predicting each class. Instead, we'll look at the full confusion matrix on
 the next slide. 
 
 This model has higher sensitivity but lower specificity than our random forest
-from way back in week 7, and lower sensitivity and higher specificity than our
-logistic models from week 4. Which of these models is "best" for your data is, 
-as usual, a question of what you're looking for.
+from back in week 7, and lower sensitivity and higher specificity than our
+logistic models from way week 4. Which of these models is "best" for your data 
+is, as usual, a question of what you're looking for.
 
 ---
 
@@ -976,7 +996,9 @@ caret::confusionMatrix(
 ---
 
 So far, we've focused entirely on SVM as a classification model. However, SVMs
-can be used for regression as well! Sometimes referred to as 
+can be used for regression as well! 
+
+Sometimes referred to as 
 **support vector regression** (or SVR), SVM-based regression models are 
 excellent at modeling non-linear relationships between your predictors and 
 outcome.
@@ -1097,7 +1119,7 @@ data.
 
 ---
 
-And that's SVM, folks: create new variables to find a linear surface that 
+And that's SVM: create new variables to find a linear surface that 
 perfectly separates your classes or perfectly predicts your outcome, with the
 definition of "perfectly" controlled by $C$ and $\epsilon$.
 
@@ -1106,14 +1128,14 @@ uses all predictors equally, and therefore perform worse with noisy data. SVM
 can also be slow to fit, and they don't always produce as accurate models as 
 GBMs.
 
-So why did we talk about SVM at all?
+So why do we talk about SVM at all?
 
 ---
 
 Well, on the one hand, sometimes SVM are actually the best model for your data.
 
 They can approximate smooth nonlinear relationships better than tree-based 
-methods, whose hard binary thresholds create a lot of right-edges in the 
+methods, whose hard binary thresholds create a lot of right-angles in the 
 prediction surface. Additionally, the ability to change between different 
 kernels makes SVM incredibly flexible for many tasks in machine learning.
 
@@ -1195,15 +1217,24 @@ I wanted to end with Hamming because of two quotes from his book I've had
 rattling around in my head while writing this course. The first one goes like
 this:
 
-> Education is what, when, and why to do things. Training is how to do it.
+<br />
 
-And I've attempted to design this course to reach both ends.
+> Education is what, when, and why to do things. Training is how to do it.
 
 <br />
 
+And I've attempted to design this course to reach both ends.
+
+---
+class: middle
+
 The second quote is:
 
+<br />
+
 > Teachers should prepare the student for the student’s future, not for the teacher’s past.
+
+<br />
 
 And, well, I hope I did.
 
