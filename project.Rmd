@@ -20,6 +20,16 @@ problem you are addressing, the approach you took to tune and fit models, and
 the relative strengths and weaknesses of your final models. You will hand in 
 this report as well as all the code and data used to produce it.
 
+For our final class, everyone will give a brief (5 minute maximum) presentation
+on what they did for their report, covering their objectives, methods, results,
+and a reflection on how well things went and where they had issues. This 
+should not feel like a high stakes situation, but rather an opportunity to talk
+with the group about the process of actually implementing machine learning 
+methods. The 
+presentation is worth 5% of the final grade and is scored entirely on completion
+("did you give a presentation"), not quality. Slides and other presentation aids
+are permitted, but not required.
+
 You are allowed to get help with your code from the internet, other people in 
 the class, or myself, but the final product -- code and written report -- should
 be your own work. It's fine to copy code snippets from the lectures or 
