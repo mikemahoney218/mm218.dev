@@ -1,0 +1,89 @@
+---
+title: "FOR 796: Final Project Rubric"
+description: |
+  Decription and rubric for the course project for FOR 796.
+site: distill::distill_website
+---
+
+# Project Description
+
+The primary goal of this course is to prepare you to apply machine learning
+techniques to real-world problems. This project is intended to start you in 
+that direction.
+
+Working alone, you will identify a data set, use methods from the course to 
+create models predicting an outcome within that data set, and write a report
+(in the format of a short journal article). 
+
+This report will identify the 
+problem you are addressing, the approach you took to tune and fit models, and
+the relative strengths and weaknesses of your final models. You will hand in 
+this report as well as all the code and data used to produce it.
+
+You are allowed to get help with your code from the internet, other people in 
+the class, or myself, but the final product -- code and written report -- should
+be your own work. It's fine to copy code snippets from the lectures or 
+StackOverflow, but the structure and organization of your program should be your
+own, as should all the written report.
+
+An example report (without code) is available online at [https://mm218.dev/project/project_example.pdf](https://mm218.dev/project/project_example.pdf).
+
+# Deliverables
+
+You may submit your project as a zip folder containing your data, report, and 
+code files or as a link to a git repo of the same. The report can be a PDF, Word
+document, or R Markdown file (in which case the code can be either a separate
+R file or contained in the report itself). All projects should be submitted 
+to mike.mahoney.218@gmail.com via an email with the subject line "FOR 796 Course 
+Project" by the start of class on December 8th.
+
+Formatting should be appropriate for submitting to a journal in your field. 
+
+# Rubric
+
+### Abstract (5 points)
+
+- Short introduction to the report that summarizes the introduction, methods, results, and discussion (5 points)
+
+### Introduction (7.5 points)
+
+- Explain background of data and models, and why these models are worth building (5 points)
+- Clearly state objective of models (2.5 points)
+
+### Methods (45 points)
+
+- Introduce the data set -- number of observations and predictors, how and why it was obtained (5 points)
+- Appropriately used at least one "simple" model (linear/logistic regression, decision tree, KNN) (5 points)
+- Appropriately used at least two "complex" models (random forest, GBM, SVM, ensembling methods) (15 points)
+- Report is reproducible: no hard-coded file paths, no `setwd()`, no `rm(list = ls())`, sets a seed, returns the same results as are reported (20 points)
+
+### Results (15 points)
+
+- Multiple accuracy metrics are reported appropriately (i.e., using a hold-out set) (15 points)
+  - For classification, report includes overall accuracy, sensitivity, specificity, and AUC
+  - For regression, report includes RMSE and MAE
+
+### Discussion (15 points)
+
+- Discussion of results: how do your models rank against one another? Why do you think that's the case? (5 points)
+- Discussion of what could have been done better (5 points)
+- Discussion of what these models might be used for (5 points)
+
+###  References (7.5 points)
+
+**NOTE:** You do not need to do a literature review for this project. You do not need to deeply cite your introduction or discussion, _especially_ if this isn't data from your own work (so you don't have the citations on-hand already). While there is nothing _wrong_ with citing relevant work, the only required citations are:
+
+- Proper citation of your data source (2.5 points)
+- Proper citation of tools used (R, model packages, data wrangling packages; use the `citation()` function) (5 points)
+
+### Presentation (5 points)
+
+Presentation included objectives, methods, results, and reflection.
+
+# Grading
+
+Grades are assigned as follows:
+
+< 80 points: F  
+80-90 points: B  
+\> 90 points: A  

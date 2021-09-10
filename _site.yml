@@ -9,6 +9,12 @@ navbar:
       href: index.html
     - text: "Schedule"
       href: schedule.html
+    - text: "Project"
+      menu:
+        - text: "Project Outline"
+          href: project.html
+        - text: "Example Report"
+          href: project/project_example.pdf
     - text: "Handouts"
       menu:
         - text: "Week 1 (2021-09-01)"

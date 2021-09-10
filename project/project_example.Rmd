@@ -7,16 +7,36 @@ authors:
     location: Syracuse, NY, 13210
     email: mike.mahoney.218@gmail.com
 abstract: |
-  Enter the text of your abstract here.
+  North American beaver (Castor canadensis) populations are rebounding following 
+  regional extirpation throughout North America, leading to increased concern 
+  about the impacts beaver may have on communities as their populations increase.
+  As central place foragers, beaver restructure riparian forest communities
+  through the selective cutting of preferred woody species and size classes. 
+  Being able to predict which stems are likely to be harvested and which areas 
+  have a high abundance of desirable forage would allow land managers and 
+  ecologists to identify likely areas for beaver recolonization, enabling 
+  proactive management to encourage or deter population reestablishment
+  as appropriate.  
+  To this end, we fit three models -- a logistic regression, random forest 
+  classifier, and a stochastic gradient boosting machine as implemented in 
+  LightGBM -- to try and predict which stems would be harvested by beaver using 
+  data collected from riparian zones within New York State's Adirondack Park. 
+  Using tree species, stem size class, waterbody type (stream or lake), and 
+  distance from waterbodies as predictors, we found that all three methods 
+  produce highly accurate predictions, with logistic regression producing the 
+  classifier with the highest AUC and overall accuracy. These models can be used 
+  to inform forest management practices as beaver populations, and the impacts 
+  associated with them, continue to proliferate throughout northeastern North 
+  America.
 bibliography: project.bib
 biblio-style: unsrt
-output: 
-  rticles::elsevier_article:
-    keep_tex: true
+output:
+  bookdown::pdf_book:
+    base_format: rticles::elsevier_article
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
 ```
 
 ```{r, echo=FALSE, message = FALSE}
@@ -32,7 +52,7 @@ SelectivityData$Beaver <- as.numeric(SelectivityData$Beaver)
 tree_data <- SelectivityData %>%
   filter(!(Site == "Masawepie Creek" & PlotCode == 44)) %>%
   left_join(ElevationData) |> 
-  select(-Lat, -Long, -Site, -OU, -Plot, -Transect, -Gnaw, -Stump, -Elevation, -Species, -HeightClass, -DBHClass) |> 
+  select(-Lat, -Long, -Site, -OU, -Plot, -Transect, -Gnaw, -Stump, -Elevation, -Species, -HeightClass, -DBHClass, -Phyla) |> 
   drop_na() 
 
 attr(tree_data, "spec") <- NULL
@@ -40,7 +60,31 @@ attr(tree_data, "spec") <- NULL
 
 # Introduction
 
+The North American beaver (_Castor canadensis_) is an ecosystem engineer, 
+inducing landscape-level changes in hydrology and forest structure through a 
+combination of damming and foraging behaviors. By selectively harvesting stems,
+beaver are capable of fundamentally altering forest size structure and species
+composition. While this selection process has long been thought to primarily
+reflect preferences for individual species [@Raffel2009], recent work has 
+suggested that beaver select stems principally based upon stem size and distance 
+from a waterbody, which in turn are highly predictive of stem species within a 
+given ecosystem [@Mahoney2020]. No matter the mechanism of selection, beaver are
+known to preferentially colonize areas with more desirable food stock, and are
+more likely to abandon areas once the supply of desirable woody forage has been
+exhausted. As a result, being able to predict which stems are more likely to be
+harvested by beaver may allow us to predict which areas are more desirable for
+beaver recolonization, enabling land managers and ecologists to proactively 
+manage landscapes to promote or deter beaver activity.
 
+To this end, we set out to produce models to predict which stems would be 
+harvested by beaver. Using a dataset collected from 19 waterbodies within 
+New York State's Adirondack State Park [@Mahoney2020], we used logistic 
+regression, random forest, and stochastic gradient boosting machine (GBM) models
+to attempt to classify stems as either harvested by beaver or non-harvested.
+Accurate classifiers would be useful in order to predict areas which are likely
+to host future beaver populations as the species continues to recover from 
+regional extirpation, and would be highly useful for landscape management in 
+the years to come.
 
 # Methods
 
@@ -49,31 +93,23 @@ attr(tree_data, "spec") <- NULL
 Data was collected between May and August 2018 as part of a study of beaver 
 foraging habits within New York's Adirondack State Park [@Mahoney2020]. The
 data is structured as a data frame with `r nrow(tree_data)` observations of 
-`r ncol(tree_data)` variables:
-
-```{r}
-str(tree_data)
-```
+`r ncol(tree_data)` variables.
 
 The following variables were recorded:
 
-+ PlotCode: Distance of the plot centroid from the riparian area.
-+ Phyla: Categorical variable indicating whether a tree is coniferous 
-  (needle-bearing including larch) or deciduous (broadleaved excluding larch).
-+ CommonNames: The USDA Forest Service common name for each tree. If the tree
-  or stump could not be identified down to species level, equivalent to Phyla.
-+ DBHAvg: Tree diameter at breast height in centimeters. Trees with DBH less 
-  than 15 centimeters were measured using angle gauges; this field represents
-  the mean diameter of the gauge measurement.
-+ Beaver: Whether or not the tree was harvested. 
++ Distance of the plot centroid from the riparian area.
++ USDA Forest Service common name for each tree. If the tree
+  or stump could not be identified down to species level, phylum was recorded
+  instead.
++ Tree diameter at breast height in centimeters.
++ Whether the tree was located within the riparian area of a lake or a stream.
++ Whether or not the tree was harvested. 
   `r sum(tree_data$Beaver == "No")` live stems and 
   `r sum(tree_data$Beaver == "Yes")` harvested stems were recorded. Due to the relatively
   similar number of live and harvested stems, this dataset was considered to 
   have balanced classes and no resampling or weighting of classes was performed.
-+ LakeRiver: Whether the tree was measured within the riparian area of a lake or
-  a stream.
 
-For more information, see Mahoney [-@Mahoney2020].
+For more information, see Mahoney and Stella [-@Mahoney2020].
 
 ## Models
 
@@ -96,13 +132,21 @@ effects to predict probability of harvest.
 trained_logit <- glm(Beaver ~ ., training, family = "binomial")
 ```
 
-The second model evaluated was a random forest, fit using the ranger package
-[@ranger]. 
+The second model evaluated was a random forest, fit using the ranger R package
+[@ranger]. Model tuning was done using a random grid search, evaluating 1,000 
+randomly selected combinations of hyperparameters. The set of hyperparameters 
+which maximized AUC were selected, with the final model being fit using 12,500 
+trees, 2 variables per split ("mtry"), and minimum of 15 observations per leaf 
+node. Trees were fit to data sampled with replacement from the training data 
+set, with each resample 74% the size of the original training data.
 
-```{r}
+```{r, message=FALSE}
 library(ranger)
 library(pROC)
+```
 
+
+```{r, eval=FALSE}
 rf_auc <- function(rf_model, data) {
   roc(
     data$Beaver,
@@ -135,7 +179,7 @@ k_fold_rf <- function(data, k, ...) {
 }
 
 tuning_grid <- expand.grid(
-  mtry = 1:5,
+  mtry = 1:4,
   min.node.size = 1:15, 
   replace = c(TRUE, FALSE),                               
   sample.fraction = seq(0.01, 1, 0.01),                       
@@ -157,19 +201,31 @@ for (i in seq_len(nrow(tuning_grid))) {
 }
 
 arrange(tuning_grid, -loss)
+```
 
+```{r}
 trained_ranger <- ranger(
   Beaver ~ .,
   training,
+  num.trees = 12500,
   mtry = 2,
   min.node.size = 15,
   replace = TRUE,
-  sample.fraction = 0.97,
+  sample.fraction = 0.74,
   probability = TRUE
 )
 ```
 
-
+The third and final model evaluated was a stochastic gradient boosting machine, 
+fit using the lightgbm package [@lightgbm]. Model tuning was done using 
+iterative grid searches, evaluating progressively narrower ranges of multiple
+hyperparameters with each iteration. The set of hyperparameters 
+which maximized AUC were selected, with the final model being fit using 3,000 
+trees allowed to grow to arbitrary depths, with a learning rate of 0.1 and a 
+minimum of 13 observations per leaf node. Each tree was fit to a bootstrap 
+sample that was 90% the size of the original training data, with a new sample
+taken every 5 trees, and each tree was fit using a randomly selected 30% of
+all features.
 
 ```{r}
 library(lightgbm)
@@ -225,7 +281,7 @@ k_fold_lgb <- function(data, k, ...) {
 }
 ```
 
-```{r}
+```{r, eval = FALSE}
 tuning_grid <- expand.grid(
   learning_rate = 0.1,
   nrounds = c(10, 50, 100, 500, 1000, 1500, 2000, 2500, 3000),
@@ -245,7 +301,7 @@ head(arrange(tuning_grid, -auc), 2)
 
 tuning_grid <- expand.grid(
   learning_rate = 0.1,
-  nrounds = 1500,
+  nrounds = 3000,
   max_depth = c(-1, 2, 8, 32, 63),
   min_data_in_bin = c(3, 8, 13, 18),
   auc = NA
@@ -268,7 +324,7 @@ tuning_grid <- expand.grid(
   learning_rate = 0.1,
   nrounds = 1500,
   max_depth = -1,
-  min_data_in_bin = 3,
+  min_data_in_bin = 13,
   bagging_freq = c(0, 1, 5, 10), 
   bagging_fraction = seq(0.3, 1.0, 0.1),
   feature_fraction = seq(0.3, 1.0, 0.1),
@@ -290,7 +346,9 @@ for (i in seq_len(nrow(tuning_grid))) {
 }
 
 head(arrange(tuning_grid, -auc), 2)
+```
 
+```{r}
 trained_lgb <- lightgbm(
   as.matrix(lgb_training[setdiff(names(lgb_training), "Beaver")]),
   lgb_training$Beaver,
@@ -300,18 +358,127 @@ trained_lgb <- lightgbm(
   nrounds = 1500,
   max_depth = -1,
   min_data_in_bin = 3,
-  bagging_freq = 0,
-  bagging_fraction = 0.6,
-  feature_fraction = 0.9
+  bagging_freq = 5,
+  bagging_fraction = 0.9,
+  feature_fraction = 0.3
 )
 ```
 
+All models were fit using methods to predict class probabilities, in order to 
+produce ROC curves and AUC estimates. Classifications were then made using the
+thresholds which optimized both sensitivity and specificity, as identified using
+the training data. Models were assessed using their overall accuracy, 
+sensitivity, specificity, and AUC, calculated against the 20% holdout set. 
+ROC curves and AUC were calculated using the pROC package [@pROC]. Data 
+wrangling used the dplyr, tidyr, and recipes packages [@dplyr; @tidyr; @recipes]. 
+Manuscript preparation used the ggplot2 and kableExtra packages [@ggplot2; @kableExtra]. 
+All 
+analyses used the R statistical modeling software [@R].
 
-All analyses used the R statistical modeling software [@R].
-
+```{r, message = FALSE}
+thresholds <- vector("numeric", 3L)
+names(thresholds) <- c("logistic", "rf", "lgb")
+thresholds[["logistic"]] <- coords(roc(training$Beaver, predict(trained_logit, training, type = "response")), "best")$threshold
+thresholds[["rf"]] <- coords(roc(training$Beaver, predictions(predict(trained_ranger, training))[, 1]), "best")$threshold
+thresholds[["lgb"]] <- coords(roc(training$Beaver, predict(trained_lgb, as.matrix(lgb_training[setdiff(names(lgb_training), "Beaver")]))), "best")$threshold
+```
 
 # Results
 
+Model accuracies are reported in Table \@ref(tab:accuracy). 
+Logistic regression produced the model with the highest AUC, overall accuracy, 
+and sensitivity, while the stochastic GBM fit through LightGBM provided the 
+highest specificity. The random forest model performed the worst on all accuracy
+measured. ROC curves for each model are presented in Figure \@ref(fig:roc).
 
+```{r accuracy, echo = FALSE, message = FALSE, warning = FALSE}
+library(kableExtra)
+testing$logistic <- predict(trained_logit, testing, type = "response")
+testing$rf <- predictions(predict(trained_ranger, testing))[, 1]
+testing$lgb <- predict(trained_lgb, as.matrix(lgb_testing[setdiff(names(lgb_testing), "Beaver")]))
+
+testing |> 
+  mutate(
+    logistic = logistic >= thresholds[["logistic"]],
+    rf = rf >= thresholds[["rf"]],
+    lgb = lgb >= thresholds[["lgb"]],
+    across(where(is.logical), as.numeric),
+    across(where(is.numeric), factor)
+  ) |> 
+  summarise(
+    across(c(logistic, rf, lgb),
+           list(
+             accuracy = \(x) sum(x == Beaver) / length(x),
+             sensitivity = \(x) caret::sensitivity(x, Beaver),
+             specificity = \(x) caret::specificity(x, Beaver)
+           ))
+  ) |> 
+  pivot_longer(everything()) |> 
+  separate(name, into = c("model", "loss"), sep = "_") |> 
+  pivot_wider(loss, names_from = model, values_from = value) |> 
+  mutate(loss = tools::toTitleCase(loss)) |> 
+  rbind(
+    testing |> 
+  summarise(
+    across(c(logistic, rf, lgb), 
+           \(x) suppressMessages(auc(roc(Beaver, x))))) |> 
+  mutate(loss = "AUC")
+  ) |> 
+  mutate(across(where(is.numeric), scales::number, 0.001)) |> 
+  setNames(c("", "Logistic Regression", "Random Forest", "LightGBM")) |> 
+  kableExtra::kbl(booktabs = TRUE, align = "l",
+      caption = "Selected loss functions for logistic, random forest, and stochastic gradient boosting machine models predicting probability of a stem being harvested by beaver.",
+      linesep = "\\addlinespace") %>% 
+  row_spec(0, align = "c")
+```
+
+
+```{r roc, message = FALSE, fig.cap='ROC curves for three models of probability of stem harvest by beaver.', out.width='100%'}
+library(ggplot2)
+coords(roc(testing$Beaver, testing$logistic)) |> 
+  mutate("model" = "Logistic Regression") |> 
+  rbind(coords(roc(testing$Beaver, testing$rf)) |> 
+          mutate("model" = "Random Forest")) |> 
+  rbind(coords(roc(testing$Beaver, testing$lgb)) |> 
+          mutate("model" = "LightGBM")) |> 
+  group_by(model, specificity) |> 
+  filter(sensitivity == max(sensitivity)) |> 
+  ungroup() |> 
+  ggplot(aes(1 - specificity, sensitivity, color = model)) + 
+  geom_line(size = 0.7) + 
+  annotate("segment", x = -Inf, xend = -Inf, y = -Inf, yend = Inf) + 
+  annotate("segment", x = -Inf, xend = Inf, y = -Inf, yend = -Inf) + 
+  geom_abline(slope = 1, intercept = 0, color = "grey80") + 
+  scale_x_continuous(limits = c(0, 1), expand = expansion(c(0, 0.04))) + 
+  scale_y_continuous(limits = c(0, 1), expand = expansion(c(0, 0.04))) + 
+  theme_minimal() + 
+  scale_color_brewer(name = "", palette = "Dark2") + 
+  theme(legend.position = "bottom") + 
+  labs(x = "False Positive Rate", y = "Sensitivity")
+```
 
 # Discussion
+
+Given the relatively small data models were built with, it's unsurprising that
+the simple baseline model of logistic regression out-performed more complex 
+alternatives such as random forests and LightGBM. It is likely that with more 
+predictors or more noisy data the machine learning methods would become more 
+competitive; however, for this application, the best approach would likely be to
+not use machine learning at all.
+
+We could potentially see better results by ensembling these models together, 
+basing weights either upon a validation set or from a cross validation 
+procedure. Given that there are 51 observations (approximately 16.5% of the test
+set) where the models produce different predictions, this additional step might
+result in significant improvements in predictive accuracy overall.
+
+These models demonstrate the ability to predict the probability of beaver 
+harvest for riparian trees based on stem size class, species, and distance from 
+beaver-inhabited waterbodies. This information can be used to inform forest 
+management practices such as the management of riparian buffers and wildlife 
+habitat enhancement as beaver populations, and the impacts associated with them, 
+continue to proliferate throughout northeastern North America.
+
+\newpage{}
+
+# References {#references .unnumbered}
