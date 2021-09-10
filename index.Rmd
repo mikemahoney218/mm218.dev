@@ -33,8 +33,8 @@ In all of these projects I've worked to apply data science techniques
 to large-scale challenges, frequently serving as the statistical and technical 
 expert within my team.
 
-You can find a full list of my publications [at this link](papers), view [my CV](cv.pdf),
-or read my [technical blog](blog.html).
+On this site I keep a list of [my publications](papers), [presentations](talks), 
+and [my CV](cv.pdf), as well as a [technical blog](blog.html).
 
 <p></p>
 
