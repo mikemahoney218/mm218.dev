@@ -26,7 +26,7 @@ be your own work. It's fine to copy code snippets from the lectures or
 StackOverflow, but the structure and organization of your program should be your
 own, as should all the written report.
 
-An example report (without code) is available online at [https://mm218.dev/project/project_example.pdf](https://mm218.dev/project/project_example.pdf).
+An example report (without code) is available online at [https://mlca.mm218.dev/project/project_example.pdf](https://mlca.mm218.dev/project/project_example.pdf).
 
 # Deliverables
 
