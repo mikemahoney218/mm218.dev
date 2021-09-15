@@ -232,7 +232,26 @@ which we can do with `rowMeans`:
 
 ```r
 library(dplyr)
+```
 
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 tree_testing &lt;- tree_testing |&gt; 
   mutate(tree_aggregate = rowMeans(across(starts_with("tree_"))))
 ```

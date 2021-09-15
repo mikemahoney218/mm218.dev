@@ -15,11 +15,11 @@ output:
 ---
 
 ```{r setup, include=FALSE}
-options(htmltools.dir.version = FALSE)
 library(ggplot2)
-library(dplyr)
+options(htmltools.dir.version = FALSE)
 knitr::opts_chunk$set(fig.showtext = TRUE)
 ```
+
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
 library(xaringanthemer)
 style_mono_light(base_color = "#23395b")
@@ -79,6 +79,7 @@ library(modeldata)
 library(caret)
 library(pROC)
 library(dplyr)
+library(ggplot2)
 ```
 
 <br />

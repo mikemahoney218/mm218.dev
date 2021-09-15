@@ -17,9 +17,9 @@ output:
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
 library(ggplot2)
-library(dplyr)
 knitr::opts_chunk$set(fig.showtext = TRUE)
 ```
+
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
 library(xaringanthemer)
 style_mono_light(base_color = "#23395b")
@@ -585,6 +585,7 @@ drawback. For instance, here's the histogram of probabilities predicted by a
 full logistic model:
 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE, fig.width=10, fig.height=2.5}
+library(ggplot2)
 logistic_model <- glm(Attrition ~ ., data = training, family = "binomial")
 qplot(predict(logistic_model, testing, type = "response"))
 ```
@@ -746,6 +747,7 @@ regression surface is on the left, the decision tree on the right.
 .pull-left[
 
 ```{r, fig.height=4, fig.width=5, message=FALSE, echo = FALSE}
+library(dplyr)
 expand.grid(
   Year_Built = seq(min(ames$Year_Built), max(ames$Year_Built), length.out = 10),
   Gr_Liv_Area = seq(min(ames$Gr_Liv_Area), max(ames$Gr_Liv_Area), length.out =  10)

@@ -17,7 +17,6 @@ output:
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
 library(ggplot2)
-library(dplyr)
 knitr::opts_chunk$set(fig.showtext = TRUE)
 ```
 
@@ -137,7 +136,7 @@ categorical variables directly, so we'll need to one-hot encode them first.
 
 Way back in Week 2 we talked about how to do this with `dplyr` and `tidyr`:
 
-```{r}
+```{r, message=FALSE}
 library(tidyr)
 library(dplyr)
 ames %>% 

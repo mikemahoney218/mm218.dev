@@ -202,6 +202,7 @@ Plotted together, they look like this:
 
 
 ```r
+library(ggplot2)
 training |&gt; 
   ggplot(aes(DailyRate, Age, color = Attrition)) + 
   geom_point() + 
@@ -259,6 +260,7 @@ observation:
 
 
 ```r
+library(dplyr)
 training |&gt; 
   mutate(across(where(is.numeric), 
                 \(x) ((x - mean(x))))) |&gt; 

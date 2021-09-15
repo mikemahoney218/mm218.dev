@@ -17,7 +17,6 @@ output:
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
 library(ggplot2)
-library(dplyr)
 knitr::opts_chunk$set(fig.showtext = TRUE)
 ```
 
@@ -746,7 +745,8 @@ get a score of 0 -- they've minimized their loss -- while lower probabilities
 are associated with higher and higher values:
 
 ```{r, echo = FALSE, fig.width=10, fig.height=4}
-tibble(
+library(ggplot2)
+tibble::tibble(
   x = seq(0.0001, 1, 0.0001),
   y = -log(x)
 ) |> 
@@ -767,7 +767,7 @@ assigned to the correct class.
 <br />
 
 ```{r, echo = FALSE, fig.width=10, fig.height=4}
-tibble(
+tibble::tibble(
   x = seq(0.0001, 1, 0.0001),
   y = -log(x)
 ) |> 
@@ -817,6 +817,7 @@ While matrices can be a little hard to work with, we can pipe this directly
 into `cbind` to add these predictions to our data frame:
 
 ```{r}
+library(dplyr)
 predict(first_rf, training) |> 
   predictions() |> 
   cbind(training) |> 

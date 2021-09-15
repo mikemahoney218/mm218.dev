@@ -362,6 +362,7 @@ models.
 Plotted together, they look like this:
 
 ```{r, fig.width=10, fig.height=4}
+library(ggplot2)
 training |> 
   ggplot(aes(DailyRate, Age, color = Attrition)) + 
   geom_point() + 
@@ -410,6 +411,7 @@ First, we'll center our data at 0 by subtracting the mean value from each
 observation:
 
 ```{r, fig.width=10, fig.height=5}
+library(dplyr)
 training |> 
   mutate(across(where(is.numeric), 
                 \(x) ((x - mean(x))))) |> 

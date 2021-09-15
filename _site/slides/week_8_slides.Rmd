@@ -17,7 +17,6 @@ output:
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
 library(ggplot2)
-library(dplyr)
 knitr::opts_chunk$set(fig.showtext = TRUE)
 ```
 
@@ -127,7 +126,7 @@ We'll then go ahead and create a new training data frame, without our original
 sale price or prediction columns (since we don't want to include those in the
 model):
 
-```{r}
+```{r, message=FALSE}
 library(dplyr)
 new_training <- select(training, -Sale_Price, -first_prediction)
 ```

@@ -930,6 +930,27 @@ into `cbind` to add these predictions to our data frame:
 
 
 ```r
+library(dplyr)
+```
+
+```
+## 
+## Attaching package: 'dplyr'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+```
+
+```
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+```
+
+```r
 predict(first_rf, training) |&gt; 
   predictions() |&gt; 
   cbind(training) |&gt; 
