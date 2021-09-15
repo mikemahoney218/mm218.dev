@@ -17,9 +17,9 @@ output:
 ```{r setup, include=FALSE}
 options(htmltools.dir.version = FALSE)
 library(ggplot2)
-library(dplyr)
 knitr::opts_chunk$set(fig.showtext = TRUE)
 ```
+
 ```{r xaringan-themer, include=FALSE, warning=FALSE}
 library(xaringanthemer)
 style_mono_light(base_color = "#23395b")
@@ -168,7 +168,8 @@ class: middle
 Our warnings both mention `factors`, so let's try just converting every factor
 column in our dataframe to characters:
 
-```{r}
+```{r, message=FALSE}
+library(dplyr)
 attrition_cleaned <- attrition |>
   mutate(across(where(is.factor), as.character))
 
