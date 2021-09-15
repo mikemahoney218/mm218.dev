@@ -204,6 +204,7 @@ No warnings, no errors, we've got ourselves a model!
 But what are we actually modeling? Let's look at it on a graph:
 
 ```{r, message=FALSE, warning=FALSE, fig.width=10, fig.height=5}
+library(ggplot2)
 ggplot(attrition_cleaned, aes(Age, Attrition)) + 
   geom_jitter(height = 0) + 
   geom_smooth(method = "lm", formula = "y ~ x")

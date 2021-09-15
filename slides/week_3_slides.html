@@ -6,7 +6,7 @@
     <meta name="author" content="Mike Mahoney" />
     <meta name="date" content="2021-09-15" />
     <script src="libs/header-attrs/header-attrs.js"></script>
-    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"e26427bec6844e7ab820cff6d886784f","expires":1}</script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"xd1bcc5dea0748c6a900b8d05e46af6a","expires":1}</script>
     <script src="libs/himalaya/himalaya.js"></script>
     <script src="libs/js-cookie/js.cookie.js"></script>
     <link href="libs/editable/editable.css" rel="stylesheet" />
@@ -239,6 +239,7 @@ But what are we actually modeling? Let's look at it on a graph:
 
 
 ```r
+library(ggplot2)
 ggplot(attrition_cleaned, aes(Age, Attrition)) + 
   geom_jitter(height = 0) + 
   geom_smooth(method = "lm", formula = "y ~ x")
