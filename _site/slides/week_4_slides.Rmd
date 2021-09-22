@@ -549,7 +549,8 @@ deal with imbalanced classes.
 
 While new methods are being proposed every day --
 imbalanced classification problems are one of the most fundamental unsolved 
-problems in prediction -- these three should be generally applicable to any 
+problems in prediction -- setting thresholds based on ROC curves, weighting your
+classes, and resampling your data will be generally applicable to any 
 real-world classification problem you have to work with.
 
 ---
