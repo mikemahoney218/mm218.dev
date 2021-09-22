@@ -118,7 +118,7 @@ frame instead:
 
 ```{r}
 attrition_model <- glm(Attrition ~ ., 
-                       attrition_cleaned, 
+                       training, 
                        family = "binomial")
 ```
 
