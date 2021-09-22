@@ -6,7 +6,7 @@
     <meta name="author" content="Mike Mahoney" />
     <meta name="date" content="2021-09-22" />
     <script src="libs/header-attrs/header-attrs.js"></script>
-    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"x45678de991b4d339d512b2116afb2d3","expires":1}</script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"f8165365cc4e47e5a48896ed0d87c4ec","expires":1}</script>
     <script src="libs/himalaya/himalaya.js"></script>
     <script src="libs/js-cookie/js.cookie.js"></script>
     <link href="libs/editable/editable.css" rel="stylesheet" />
@@ -120,7 +120,7 @@ frame instead:
 
 ```r
 attrition_model &lt;- glm(Attrition ~ ., 
-                       attrition_cleaned, 
+                       training, 
                        family = "binomial")
 ```
 
@@ -156,28 +156,28 @@ attrition_confusion
 ## 
 ##           Reference
 ## Prediction   0   1
-##          0 254  18
-##          1   8  15
-##                                           
-##                Accuracy : 0.9119          
-##                  95% CI : (0.8735, 0.9416)
-##     No Information Rate : 0.8881          
-##     P-Value [Acc &gt; NIR] : 0.11251         
-##                                           
-##                   Kappa : 0.4887          
-##                                           
-##  Mcnemar's Test P-Value : 0.07756         
-##                                           
-##             Sensitivity : 0.45455         
-##             Specificity : 0.96947         
-##          Pos Pred Value : 0.65217         
-##          Neg Pred Value : 0.93382         
-##              Prevalence : 0.11186         
-##          Detection Rate : 0.05085         
-##    Detection Prevalence : 0.07797         
-##       Balanced Accuracy : 0.71201         
-##                                           
-##        'Positive' Class : 1               
+##          0 250  18
+##          1  12  15
+##                                          
+##                Accuracy : 0.8983         
+##                  95% CI : (0.858, 0.9303)
+##     No Information Rate : 0.8881         
+##     P-Value [Acc &gt; NIR] : 0.3290         
+##                                          
+##                   Kappa : 0.444          
+##                                          
+##  Mcnemar's Test P-Value : 0.3613         
+##                                          
+##             Sensitivity : 0.45455        
+##             Specificity : 0.95420        
+##          Pos Pred Value : 0.55556        
+##          Neg Pred Value : 0.93284        
+##              Prevalence : 0.11186        
+##          Detection Rate : 0.05085        
+##    Detection Prevalence : 0.09153        
+##       Balanced Accuracy : 0.70437        
+##                                          
+##        'Positive' Class : 1              
 ## 
 ```
 
@@ -208,7 +208,7 @@ auc(attrition_roc)
 ```
 
 ```
-## Area under the curve: 0.8958
+## Area under the curve: 0.8547
 ```
 
 ---
