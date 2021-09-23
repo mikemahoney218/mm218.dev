@@ -7,7 +7,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
   <meta name="generator" content="distill" />
-  <link rel="alternate" type="application/rss+xml" href="https://www.mm218.dev/blog.xml" />
 
   <style type="text/css">
   /* Hide doc at startup (prevent jankiness while JS renders/transforms) */
@@ -87,635 +86,39 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
 
   <!--radix_placeholder_meta_tags-->
-  <title>Mike Mahoney</title>
+  <title>Automated {drat} uploads with GitHub Actions</title>
+
+  <meta property="description" itemprop="description" content="Continuously deploy your code to personal CRAN-like repos, automatically and for free!"/>
 
 
-
+  <!--  https://schema.org/Article -->
+  <meta property="article:published" itemprop="datePublished" content="2021-09-23"/>
+  <meta property="article:created" itemprop="dateCreated" content="2021-09-23"/>
+  <meta name="article:author" content="Mike Mahoney"/>
 
   <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-  <meta property="og:title" content="Mike Mahoney"/>
+  <meta property="og:title" content="Automated {drat} uploads with GitHub Actions"/>
   <meta property="og:type" content="article"/>
+  <meta property="og:description" content="Continuously deploy your code to personal CRAN-like repos, automatically and for free!"/>
   <meta property="og:locale" content="en_US"/>
-  <meta property="og:site_name" content="Mike Mahoney"/>
 
   <!--  https://dev.twitter.com/cards/types/summary -->
   <meta property="twitter:card" content="summary"/>
-  <meta property="twitter:title" content="Mike Mahoney"/>
+  <meta property="twitter:title" content="Automated {drat} uploads with GitHub Actions"/>
+  <meta property="twitter:description" content="Continuously deploy your code to personal CRAN-like repos, automatically and for free!"/>
 
   <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
   <script type="text/json" id="radix-rmarkdown-metadata">
-  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","listing"]}},"value":[{"type":"character","attributes":{},"value":["Mike Mahoney"]},{"type":"character","attributes":{},"value":["posts"]}]}
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","categories","author","date","output"]}},"value":[{"type":"character","attributes":{},"value":["Automated {drat} uploads with GitHub Actions"]},{"type":"character","attributes":{},"value":["Continuously deploy your code to personal CRAN-like repos, automatically and for free!\n"]},{"type":"character","attributes":{},"value":["R","Tutorials","CI","CD","GitHub Actions"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name","url"]}},"value":[{"type":"character","attributes":{},"value":["Mike Mahoney"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":[]}},"value":[]}]}]},{"type":"character","attributes":{},"value":["09-23-2021"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained","toc"]}},"value":[{"type":"logical","attributes":{},"value":[false]},{"type":"logical","attributes":{},"value":[true]}]}]}]}
   </script>
   <!--/radix_placeholder_rmarkdown_metadata-->
+  
+  <script type="text/json" id="radix-resource-manifest">
+  {"type":"character","attributes":{},"value":["automated-drat-uploads-with-github-actions_files/anchor-4.2.2/anchor.min.js","automated-drat-uploads-with-github-actions_files/bowser-1.9.3/bowser.min.js","automated-drat-uploads-with-github-actions_files/distill-2.2.21/template.v2.js","automated-drat-uploads-with-github-actions_files/header-attrs-2.10/header-attrs.js","automated-drat-uploads-with-github-actions_files/jquery-1.11.3/jquery.min.js","automated-drat-uploads-with-github-actions_files/popper-2.6.0/popper.min.js","automated-drat-uploads-with-github-actions_files/tippy-6.2.7/tippy-bundle.umd.min.js","automated-drat-uploads-with-github-actions_files/tippy-6.2.7/tippy-light-border.css","automated-drat-uploads-with-github-actions_files/tippy-6.2.7/tippy.css","automated-drat-uploads-with-github-actions_files/tippy-6.2.7/tippy.umd.min.js","automated-drat-uploads-with-github-actions_files/webcomponents-2.0.0/webcomponents.js","box.png"]}
+  </script>
   <!--radix_placeholder_navigation_in_header-->
-  <meta name="distill:offset" content=""/>
-
-  <script type="application/javascript">
-
-    window.headroom_prevent_pin = false;
-
-    window.document.addEventListener("DOMContentLoaded", function (event) {
-
-      // initialize headroom for banner
-      var header = $('header').get(0);
-      var headerHeight = header.offsetHeight;
-      var headroom = new Headroom(header, {
-        tolerance: 5,
-        onPin : function() {
-          if (window.headroom_prevent_pin) {
-            window.headroom_prevent_pin = false;
-            headroom.unpin();
-          }
-        }
-      });
-      headroom.init();
-      if(window.location.hash)
-        headroom.unpin();
-      $(header).addClass('headroom--transition');
-
-      // offset scroll location for banner on hash change
-      // (see: https://github.com/WickyNilliams/headroom.js/issues/38)
-      window.addEventListener("hashchange", function(event) {
-        window.scrollTo(0, window.pageYOffset - (headerHeight + 25));
-      });
-
-      // responsive menu
-      $('.distill-site-header').each(function(i, val) {
-        var topnav = $(this);
-        var toggle = topnav.find('.nav-toggle');
-        toggle.on('click', function() {
-          topnav.toggleClass('responsive');
-        });
-      });
-
-      // nav dropdowns
-      $('.nav-dropbtn').click(function(e) {
-        $(this).next('.nav-dropdown-content').toggleClass('nav-dropdown-active');
-        $(this).parent().siblings('.nav-dropdown')
-           .children('.nav-dropdown-content').removeClass('nav-dropdown-active');
-      });
-      $("body").click(function(e){
-        $('.nav-dropdown-content').removeClass('nav-dropdown-active');
-      });
-      $(".nav-dropdown").click(function(e){
-        e.stopPropagation();
-      });
-    });
-  </script>
-
-  <style type="text/css">
-
-  /* Theme (user-documented overrideables for nav appearance) */
-
-  .distill-site-nav {
-    color: rgba(255, 255, 255, 0.8);
-    background-color: #0F2E3D;
-    font-size: 15px;
-    font-weight: 300;
-  }
-
-  .distill-site-nav a {
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .distill-site-nav a:hover {
-    color: white;
-  }
-
-  @media print {
-    .distill-site-nav {
-      display: none;
-    }
-  }
-
-  .distill-site-header {
-
-  }
-
-  .distill-site-footer {
-
-  }
-
-
-  /* Site Header */
-
-  .distill-site-header {
-    width: 100%;
-    box-sizing: border-box;
-    z-index: 3;
-  }
-
-  .distill-site-header .nav-left {
-    display: inline-block;
-    margin-left: 8px;
-  }
-
-  @media screen and (max-width: 768px) {
-    .distill-site-header .nav-left {
-      margin-left: 0;
-    }
-  }
-
-
-  .distill-site-header .nav-right {
-    float: right;
-    margin-right: 8px;
-  }
-
-  .distill-site-header a,
-  .distill-site-header .title {
-    display: inline-block;
-    text-align: center;
-    padding: 14px 10px 14px 10px;
-  }
-
-  .distill-site-header .title {
-    font-size: 18px;
-    min-width: 150px;
-  }
-
-  .distill-site-header .logo {
-    padding: 0;
-  }
-
-  .distill-site-header .logo img {
-    display: none;
-    max-height: 20px;
-    width: auto;
-    margin-bottom: -4px;
-  }
-
-  .distill-site-header .nav-image img {
-    max-height: 18px;
-    width: auto;
-    display: inline-block;
-    margin-bottom: -3px;
-  }
-
-
-
-  @media screen and (min-width: 1000px) {
-    .distill-site-header .logo img {
-      display: inline-block;
-    }
-    .distill-site-header .nav-left {
-      margin-left: 20px;
-    }
-    .distill-site-header .nav-right {
-      margin-right: 20px;
-    }
-    .distill-site-header .title {
-      padding-left: 12px;
-    }
-  }
-
-
-  .distill-site-header .nav-toggle {
-    display: none;
-  }
-
-  .nav-dropdown {
-    display: inline-block;
-    position: relative;
-  }
-
-  .nav-dropdown .nav-dropbtn {
-    border: none;
-    outline: none;
-    color: rgba(255, 255, 255, 0.8);
-    padding: 16px 10px;
-    background-color: transparent;
-    font-family: inherit;
-    font-size: inherit;
-    font-weight: inherit;
-    margin: 0;
-    margin-top: 1px;
-    z-index: 2;
-  }
-
-  .nav-dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: white;
-    min-width: 200px;
-    border: 1px solid rgba(0,0,0,0.15);
-    border-radius: 4px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
-    z-index: 1;
-    margin-top: 2px;
-    white-space: nowrap;
-    padding-top: 4px;
-    padding-bottom: 4px;
-  }
-
-  .nav-dropdown-content hr {
-    margin-top: 4px;
-    margin-bottom: 4px;
-    border: none;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  }
-
-  .nav-dropdown-active {
-    display: block;
-  }
-
-  .nav-dropdown-content a, .nav-dropdown-content .nav-dropdown-header {
-    color: black;
-    padding: 6px 24px;
-    text-decoration: none;
-    display: block;
-    text-align: left;
-  }
-
-  .nav-dropdown-content .nav-dropdown-header {
-    display: block;
-    padding: 5px 24px;
-    padding-bottom: 0;
-    text-transform: uppercase;
-    font-size: 14px;
-    color: #999999;
-    white-space: nowrap;
-  }
-
-  .nav-dropdown:hover .nav-dropbtn {
-    color: white;
-  }
-
-  .nav-dropdown-content a:hover {
-    background-color: #ddd;
-    color: black;
-  }
-
-  .nav-right .nav-dropdown-content {
-    margin-left: -45%;
-    right: 0;
-  }
-
-  @media screen and (max-width: 768px) {
-    .distill-site-header a, .distill-site-header .nav-dropdown  {display: none;}
-    .distill-site-header a.nav-toggle {
-      float: right;
-      display: block;
-    }
-    .distill-site-header .title {
-      margin-left: 0;
-    }
-    .distill-site-header .nav-right {
-      margin-right: 0;
-    }
-    .distill-site-header {
-      overflow: hidden;
-    }
-    .nav-right .nav-dropdown-content {
-      margin-left: 0;
-    }
-  }
-
-
-  @media screen and (max-width: 768px) {
-    .distill-site-header.responsive {position: relative; min-height: 500px; }
-    .distill-site-header.responsive a.nav-toggle {
-      position: absolute;
-      right: 0;
-      top: 0;
-    }
-    .distill-site-header.responsive a,
-    .distill-site-header.responsive .nav-dropdown {
-      display: block;
-      text-align: left;
-    }
-    .distill-site-header.responsive .nav-left,
-    .distill-site-header.responsive .nav-right {
-      width: 100%;
-    }
-    .distill-site-header.responsive .nav-dropdown {float: none;}
-    .distill-site-header.responsive .nav-dropdown-content {position: relative;}
-    .distill-site-header.responsive .nav-dropdown .nav-dropbtn {
-      display: block;
-      width: 100%;
-      text-align: left;
-    }
-  }
-
-  /* Site Footer */
-
-  .distill-site-footer {
-    width: 100%;
-    overflow: hidden;
-    box-sizing: border-box;
-    z-index: 3;
-    margin-top: 30px;
-    padding-top: 30px;
-    padding-bottom: 30px;
-    text-align: center;
-  }
-
-  /* Headroom */
-
-  d-title {
-    padding-top: 6rem;
-  }
-
-  @media print {
-    d-title {
-      padding-top: 4rem;
-    }
-  }
-
-  .headroom {
-    z-index: 1000;
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-  }
-
-  .headroom--transition {
-    transition: all .4s ease-in-out;
-  }
-
-  .headroom--unpinned {
-    top: -100px;
-  }
-
-  .headroom--pinned {
-    top: 0;
-  }
-
-  /* adjust viewport for navbar height */
-  /* helps vertically center bootstrap (non-distill) content */
-  .min-vh-100 {
-    min-height: calc(100vh - 100px) !important;
-  }
-
-  </style>
-
-  <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
-  <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
-  <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
-  <script src="site_libs/headroom-0.9.4/headroom.min.js"></script>
-  <script src="site_libs/autocomplete-0.37.1/autocomplete.min.js"></script>
-  <script src="site_libs/fuse-6.4.1/fuse.min.js"></script>
-
-  <script type="application/javascript">
-
-  function getMeta(metaName) {
-    var metas = document.getElementsByTagName('meta');
-    for (let i = 0; i < metas.length; i++) {
-      if (metas[i].getAttribute('name') === metaName) {
-        return metas[i].getAttribute('content');
-      }
-    }
-    return '';
-  }
-
-  function offsetURL(url) {
-    var offset = getMeta('distill:offset');
-    return offset ? offset + '/' + url : url;
-  }
-
-  function createFuseIndex() {
-
-    // create fuse index
-    var options = {
-      keys: [
-        { name: 'title', weight: 20 },
-        { name: 'categories', weight: 15 },
-        { name: 'description', weight: 10 },
-        { name: 'contents', weight: 5 },
-      ],
-      ignoreLocation: true,
-      threshold: 0
-    };
-    var fuse = new window.Fuse([], options);
-
-    // fetch the main search.json
-    return fetch(offsetURL('search.json'))
-      .then(function(response) {
-        if (response.status == 200) {
-          return response.json().then(function(json) {
-            // index main articles
-            json.articles.forEach(function(article) {
-              fuse.add(article);
-            });
-            // download collections and index their articles
-            return Promise.all(json.collections.map(function(collection) {
-              return fetch(offsetURL(collection)).then(function(response) {
-                if (response.status === 200) {
-                  return response.json().then(function(articles) {
-                    articles.forEach(function(article) {
-                      fuse.add(article);
-                    });
-                  })
-                } else {
-                  return Promise.reject(
-                    new Error('Unexpected status from search index request: ' +
-                              response.status)
-                  );
-                }
-              });
-            })).then(function() {
-              return fuse;
-            });
-          });
-
-        } else {
-          return Promise.reject(
-            new Error('Unexpected status from search index request: ' +
-                        response.status)
-          );
-        }
-      });
-  }
-
-  window.document.addEventListener("DOMContentLoaded", function (event) {
-
-    // get search element (bail if we don't have one)
-    var searchEl = window.document.getElementById('distill-search');
-    if (!searchEl)
-      return;
-
-    createFuseIndex()
-      .then(function(fuse) {
-
-        // make search box visible
-        searchEl.classList.remove('hidden');
-
-        // initialize autocomplete
-        var options = {
-          autoselect: true,
-          hint: false,
-          minLength: 2,
-        };
-        window.autocomplete(searchEl, options, [{
-          source: function(query, callback) {
-            const searchOptions = {
-              isCaseSensitive: false,
-              shouldSort: true,
-              minMatchCharLength: 2,
-              limit: 10,
-            };
-            var results = fuse.search(query, searchOptions);
-            callback(results
-              .map(function(result) { return result.item; })
-            );
-          },
-          templates: {
-            suggestion: function(suggestion) {
-              var img = suggestion.preview && Object.keys(suggestion.preview).length > 0
-                ? `<img src="${offsetURL(suggestion.preview)}"</img>`
-                : '';
-              var html = `
-                <div class="search-item">
-                  <h3>${suggestion.title}</h3>
-                  <div class="search-item-description">
-                    ${suggestion.description || ''}
-                  </div>
-                  <div class="search-item-preview">
-                    ${img}
-                  </div>
-                </div>
-              `;
-              return html;
-            }
-          }
-        }]).on('autocomplete:selected', function(event, suggestion) {
-          window.location.href = offsetURL(suggestion.path);
-        });
-        // remove inline display style on autocompleter (we want to
-        // manage responsive display via css)
-        $('.algolia-autocomplete').css("display", "");
-      })
-      .catch(function(error) {
-        console.log(error);
-      });
-
-  });
-
-  </script>
-
-  <style type="text/css">
-
-  .nav-search {
-    font-size: x-small;
-  }
-
-  /* Algolioa Autocomplete */
-
-  .algolia-autocomplete {
-    display: inline-block;
-    margin-left: 10px;
-    vertical-align: sub;
-    background-color: white;
-    color: black;
-    padding: 6px;
-    padding-top: 8px;
-    padding-bottom: 0;
-    border-radius: 6px;
-    border: 1px #0F2E3D solid;
-    width: 180px;
-  }
-
-
-  @media screen and (max-width: 768px) {
-    .distill-site-nav .algolia-autocomplete {
-      display: none;
-      visibility: hidden;
-    }
-    .distill-site-nav.responsive .algolia-autocomplete {
-      display: inline-block;
-      visibility: visible;
-    }
-    .distill-site-nav.responsive .algolia-autocomplete .aa-dropdown-menu {
-      margin-left: 0;
-      width: 400px;
-      max-height: 400px;
-    }
-  }
-
-  .algolia-autocomplete .aa-input, .algolia-autocomplete .aa-hint {
-    width: 90%;
-    outline: none;
-    border: none;
-  }
-
-  .algolia-autocomplete .aa-hint {
-    color: #999;
-  }
-  .algolia-autocomplete .aa-dropdown-menu {
-    width: 550px;
-    max-height: 70vh;
-    overflow-x: visible;
-    overflow-y: scroll;
-    padding: 5px;
-    margin-top: 3px;
-    margin-left: -150px;
-    background-color: #fff;
-    border-radius: 5px;
-    border: 1px solid #999;
-    border-top: none;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion {
-    cursor: pointer;
-    padding: 5px 4px;
-    border-bottom: 1px solid #eee;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion:last-of-type {
-    border-bottom: none;
-    margin-bottom: 2px;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item {
-    overflow: hidden;
-    font-size: 0.8em;
-    line-height: 1.4em;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item h3 {
-    font-size: 1rem;
-    margin-block-start: 0;
-    margin-block-end: 5px;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item-description {
-    display: inline-block;
-    overflow: hidden;
-    height: 2.8em;
-    width: 80%;
-    margin-right: 4%;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item-preview {
-    display: inline-block;
-    width: 15%;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item-preview img {
-    height: 3em;
-    width: auto;
-    display: none;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item-preview img[src] {
-    display: initial;
-  }
-
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion.aa-cursor {
-    background-color: #eee;
-  }
-  .algolia-autocomplete .aa-dropdown-menu .aa-suggestion em {
-    font-weight: bold;
-    font-style: normal;
-  }
-
-  </style>
-
-
   <!--/radix_placeholder_navigation_in_header-->
   <!--radix_placeholder_distill-->
 
@@ -2031,464 +1434,159 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </script>
 
   <!--/radix_placeholder_distill-->
-  <script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
-  <script src="site_libs/popper-2.6.0/popper.min.js"></script>
-  <link href="site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
-  <link href="site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
-  <script src="site_libs/tippy-6.2.7/tippy.umd.min.js"></script>
-  <script src="site_libs/anchor-4.2.2/anchor.min.js"></script>
-  <script src="site_libs/bowser-1.9.3/bowser.min.js"></script>
-  <script src="site_libs/webcomponents-2.0.0/webcomponents.js"></script>
-  <script src="site_libs/distill-2.2.21/template.v2.js"></script>
+  <script src="automated-drat-uploads-with-github-actions_files/header-attrs-2.10/header-attrs.js"></script>
+  <script src="automated-drat-uploads-with-github-actions_files/jquery-1.11.3/jquery.min.js"></script>
+  <script src="automated-drat-uploads-with-github-actions_files/popper-2.6.0/popper.min.js"></script>
+  <link href="automated-drat-uploads-with-github-actions_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="automated-drat-uploads-with-github-actions_files/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="automated-drat-uploads-with-github-actions_files/tippy-6.2.7/tippy.umd.min.js"></script>
+  <script src="automated-drat-uploads-with-github-actions_files/anchor-4.2.2/anchor.min.js"></script>
+  <script src="automated-drat-uploads-with-github-actions_files/bowser-1.9.3/bowser.min.js"></script>
+  <script src="automated-drat-uploads-with-github-actions_files/webcomponents-2.0.0/webcomponents.js"></script>
+  <script src="automated-drat-uploads-with-github-actions_files/distill-2.2.21/template.v2.js"></script>
   <!--radix_placeholder_site_in_header-->
   <!--/radix_placeholder_site_in_header-->
 
 
 </head>
 
-<body class="layout-listing">
+<body>
 
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Mike Mahoney","authors":[]}
+{"title":"Automated {drat} uploads with GitHub Actions","description":"Continuously deploy your code to personal CRAN-like repos, automatically and for free!","authors":[{"author":"Mike Mahoney","authorURL":{},"affiliation":"&nbsp;","affiliationURL":"#","orcidID":""}],"publishedDate":"2021-09-23T00:00:00.000-04:00","citationText":"Mahoney, 2021"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
 <!--radix_placeholder_navigation_before_body-->
-<header class="header header--fixed" role="banner">
-<nav class="distill-site-nav distill-site-header">
-<div class="nav-left">
-<a href="index.html" class="title">Mike Mahoney</a>
-<input id="distill-search" class="nav-search hidden" type="text" placeholder="Search..."/>
-</div>
-<div class="nav-right">
-<a href="index.html">Home</a>
-<a href="papers">Papers</a>
-<a href="talks">Talks</a>
-<a href="blog.html">Blog</a>
-<a href="https://github.com/mikemahoney218/mm218.dev">
-<i class="fab fa-github" aria-hidden="true"></i>
-</a>
-<a href="blog.xml">
-<i class="fa fa-rss" aria-hidden="true"></i>
-</a>
-<a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
-</div>
-</nav>
-</header>
 <!--/radix_placeholder_navigation_before_body-->
 <!--radix_placeholder_site_before_body-->
 <!--/radix_placeholder_site_before_body-->
-<!--radix_placeholder_article_listing-->
-
-
-<script type="application/javascript">
-
-function init_posts_list() {
-
-  function load_image(img) {
-    var src = $(img).attr('data-src');
-    if (src) {
-      $(img).attr('src', src);
-      $(img).load(function() {
-        img.removeAttribute('data-src');
-      });
-    }
-  }
-
-  function set_posts_visible(posts, visible) {
-    if (visible) {
-
-      // show bottom border by default
-      $(posts).removeClass('post-preview-last');
-
-      // apply limits if need be
-      var max_posts = 25;
-      var apply_limits = $('.posts-container').hasClass('posts-apply-limit');
-      if (apply_limits && posts.length > max_posts) {
-        posts = $(posts).slice(0, max_posts);
-      } else {
-        $('.posts-more a').addClass('hidden');
-      }
-
-      // apply last style
-      $(posts.slice(-1)[0]).addClass('post-preview-last');
-
-      $(posts).removeClass('hidden');
-      $(posts).find('img[data-src]').each(function(i, img) {
-        load_image(img);
-      });
-    } else {
-      $(posts).addClass('hidden');
-    }
-  }
-
-  function apply_hash_filter() {
-
-    // clear active state
-    $('.categories .active').removeClass('active');
-
-    // mark all posts invisible to start
-    set_posts_visible($('.posts-list').children('a'), false);
-
-    // if we have a hash filter
-    if (window.location.hash && window.location.hash.startsWith("#category:")) {
-
-      // mark posts that match the category visible
-      var page_category = window.location.hash.replace(/^#category:/, "");
-      var posts = $('.post-metadata').map(function(idx, script) {
-        var metadata = $.parseJSON($(script).html());
-        var post = null;
-        $.each(metadata.categories, function(idx, category) {
-          category = category.replace(/ /g,"_");
-          if ((page_category || '').toLowerCase() === "articles" || category === page_category) {
-            post = $(script).parent().get();
-            return false;
-          }
-        });
-        return post;
-      });
-      set_posts_visible(posts, true);
-
-      // mark the hash active
-      $('.categories li>a[href="' + window.location.hash + '"]').addClass('active');
-
-      // update the list_caption
-      var list_caption = $('.posts-list-caption');
-      var caption = (page_category || '').toLowerCase() === "articles"
-        ? list_caption.attr('data-caption')
-        : ('Category: ' + page_category.replace(/_/g," "));
-      list_caption.text(caption);
-
-    } else {
-
-      // no hash filter, make all posts visible (subject to max display)
-      set_posts_visible($('.posts-list').children(), true);
-
-      // reset list caption
-      var list_caption = $('.posts-list-caption');
-      list_caption.text(list_caption.attr('data-caption'));
-
-
-    }
-  }
-
-  // more articles
-  function apply_post_limits(apply) {
-    if (apply) {
-      $('.posts-container').addClass('posts-apply-limit');
-      $('.posts-more a').removeClass('hidden');
-    } else {
-      $('.posts-container').removeClass('posts-apply-limit');
-      $('.posts-more a').addClass('hidden');
-    }
-  }
-
-  // click handling for tags
-  $('.dt-tag').click(function(ev) {
-    window.location.hash = '#category:' + $(this).text().replace(/ /g, "_");
-    return false;
-  })
-
-  // hash filter handling
-  apply_hash_filter();
-  $(window).on('hashchange',function() {
-    apply_post_limits(true);
-    apply_hash_filter();
-  });
-
-  // more articles link
-  $('.posts-more a').click(function(e) {
-    e.preventDefault();
-    apply_post_limits(false);
-    apply_hash_filter();
-    return false;
-  });
-
-}
-
-</script>
-
-
-
-<div class="posts-container posts-apply-limit l-page">
-<div class="posts-list">
-<h1 class="posts-list-caption" data-caption="Mike Mahoney">Mike Mahoney</h1>
-<a href="posts/2021-09-22-automated-drat-uploads-with-github-actions/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R","Tutorials","CI","CD","GitHub Actions"]}</script>
-<div class="metadata">
-<div class="publishedDate">Sept. 23, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Automated {drat} uploads with GitHub Actions</h2>
-<p>Continuously deploy your code to personal CRAN-like repos, automatically and for free!</p>
-</div>
-</a>
-<a href="posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">June 14, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img src="posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/closer.jpg"/>
-</div>
-<div class="description">
-<h2>Interactive landscape simulations for visual resource assessment</h2>
-<p>New preprint for the 2021 Visual Resources Stewardship Conference.</p>
-</div>
-</a>
-<a href="posts/2021-06-12-virtual-environments-talk-at-user-2021/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">June 12, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Virtual Environments talk at useR! 2021</h2>
-<p>With slides and a rough outline available on GitHub.</p>
-</div>
-</a>
-<a href="posts/2021-04-22-terrainr-version-040-is-now-on-cran/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":[]}</script>
-<div class="metadata">
-<div class="publishedDate">April 22, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>What's new in terrainr 0.4.0?</h2>
-<p>The new CRAN release of terrainr improves consistency, CRS logic, and 
-fixes some bugs.</p>
-</div>
-</a>
-<a href="posts/2021/02/terrainr/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R","Data science","terrainr"]}</script>
-<div class="metadata">
-<div class="publishedDate">Feb. 17, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img src="posts/2021/02/terrainr/terrainr_files/figure-html5/unnamed-chunk-4-1.png"/>
-</div>
-<div class="description">
-<h2>terrainr 0.3.0 is out today</h2>
-<p>New version, who this?</p>
-</div>
-</a>
-<a href="posts/2021/01/model-averaging/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R","Data science"]}</script>
-<div class="metadata">
-<div class="publishedDate">Jan. 18, 2021</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2021/01/model-averaging/model_avg.jpg"/>
-</div>
-<div class="description">
-<h2>Model averaging methods: how and why to build ensemble models</h2>
-<p>Averaging predictions for fun and profit -- and for dealing with the uncertainty of model selection. With examples in R!</p>
-</div>
-</a>
-<a href="posts/2020/10/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R","Twitter","phd","terrainr","beaver"]}</script>
-<div class="metadata">
-<div class="publishedDate">Oct. 16, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2020/10/terrainr.jpg"/>
-</div>
-<div class="description">
-<h2>Some Updates</h2>
-<p>Where Do We Come From? What Are We? Where Are We Going?</p>
-</div>
-</a>
-<a href="posts/2020/06/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R","Twitter","ecology_tweets"]}</script>
-<div class="metadata">
-<div class="publishedDate">June 20, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Make a Retweet Bot in R</h2>
-<p>Y'know. If you wanna.</p>
-</div>
-</a>
-<a href="posts/2020/05/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["Raspberry Pi","Tutorials","Data Visualization","Monitoring","Telegraf","InfluxDB","Grafana"]}</script>
-<div class="metadata">
-<div class="publishedDate">May 3, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Installing the TIG stack on Raspberry Pi</h2>
-<p>A guide to installing InfluxDB, Telegraf, and Grafana on a Raspberry Pi 4 running Raspbian Buster. Unlike every other guide like this on the internet, this one works.</p>
-</div>
-</a>
-<a href="posts/2020/04/corona-viz/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R"]}</script>
-<div class="metadata">
-<div class="publishedDate">April 27, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2020/04/corona-viz/covid.png"/>
-</div>
-<div class="description">
-<h2>A minimalist visualization of Coronavirus rates</h2>
-<p>Made with Shiny and R</p>
-</div>
-</a>
-<a href="posts/2020/04/making-excellent-viz/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["Data Visualization","Tutorials"]}</script>
-<div class="metadata">
-<div class="publishedDate">April 22, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Making Excellent Visualizations</h2>
-<p>Part 3 in the data visualization series</p>
-</div>
-</a>
-<a href="posts/2020/04/mechanics-of-viz/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["Data Visualization","Tutorials"]}</script>
-<div class="metadata">
-<div class="publishedDate">April 21, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2020/04/mechanics-of-viz/unnamed-chunk-2-1.png"/>
-</div>
-<div class="description">
-<h2>Mechanics of Data Visualizations</h2>
-<p>Part 2 in the data visualization series</p>
-</div>
-</a>
-<a href="posts/2020/04/theory-of-data-viz/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["Data Visualization","Tutorials"]}</script>
-<div class="metadata">
-<div class="publishedDate">April 20, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img data-src="posts/2020/04/theory-of-data-viz/theory2.png"/>
-</div>
-<div class="description">
-<h2>Theory of Data Visualizations</h2>
-<p>Part 1 in the data visualization series</p>
-</div>
-</a>
-<a href="posts/2020/03/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R","R Packages","maps","spacey","geospatial data"]}</script>
-<div class="metadata">
-<div class="publishedDate">March 24, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Announcing {spacey}, now on CRAN!</h2>
-<p>USGS data access and rayshader maps, done cheap.</p>
-</div>
-</a>
-<a href="posts/2020/01/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["R","R Packages","R Markdown"]}</script>
-<div class="metadata">
-<div class="publishedDate">Jan. 23, 2020</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Announcing {heddlr}, now on CRAN!</h2>
-<p>Write less boilerplate, get more done.</p>
-</div>
-</a>
-<a href="posts/2019/03/" class="post-preview">
-<script class="post-metadata" type="text/json">{"categories":["Publications","Beaver"]}</script>
-<div class="metadata">
-<div class="publishedDate">March 27, 2019</div>
-<div class="dt-authors">
-<div class="dt-author">Mike Mahoney</div>
-</div>
-</div>
-<div class="thumbnail">
-<img/>
-</div>
-<div class="description">
-<h2>Thesis Now Available in ESF Digital Commons</h2>
-<p>It's a real humdinger.</p>
-</div>
-</a>
-</div>
-<div class="posts-more">
-<a href="#">More articles &raquo;</a>
-</div>
-</div>
-<!--/radix_placeholder_article_listing-->
 
 <div class="d-title">
-<h1>Mike Mahoney</h1>
+<h1>Automated {drat} uploads with GitHub Actions</h1>
 <!--radix_placeholder_categories-->
+<div class="dt-tags">
+<div class="dt=tag">R</div>
+<div class="dt=tag">Tutorials</div>
+<div class="dt=tag">CI</div>
+<div class="dt=tag">CD</div>
+<div class="dt=tag">GitHub Actions</div>
+</div>
 <!--/radix_placeholder_categories-->
-
+<p><p>Continuously deploy your code to personal CRAN-like repos, automatically and for free!</p></p>
 </div>
 
+<div class="d-byline">
+  Mike Mahoney true 
+  
+<br/>09-23-2021
+</div>
 
 <div class="d-article">
-<div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<div class="d-contents d-contents-float">
+<nav class="l-text toc figcaption" id="TOC">
+<h3>Contents</h3>
+<ul>
+<li><a href="#what-are-we-doing">What are we doing?</a></li>
+<li><a href="#why-are-we-doing-it">Why are we doing it?</a></li>
+<li><a href="#how-did-we-do-it">How did we do it?</a>
+<ul>
+<li><a href="#running-the-job">Running the job</a></li>
+<li><a href="#configuring-the-action">Configuring the action</a></li>
+</ul></li>
+</ul>
+</nav>
+</div>
+<p>This is a quick walkthrough of how to use GitHub actions to automatically upload packages to personal <a href="https://github.com/eddelbuettel/drat">{drat}</a> repos.</p>
+<p>If you just want the good stuff, <a href="https://github.com/mikemahoney218/upload-to-drat-repo/">here’s the link to the GitHub action I’m using</a> as well as <a href="https://github.com/ropensci/terrainr/blob/main/.github/workflows/drat.yml">the GitHub workflow that uploads terrainr to my own drat repo</a>.</p>
+<h2 id="what-are-we-doing">What are we doing?</h2>
+<p><a href="https://github.com/eddelbuettel/drat">{drat}</a> is an R package that helps you set up CRAN-like repositories, hosted (primarily) on GitHub Pages. <a href="https://github.com/features/actions">GitHub Actions</a> is a continuous integration/continuous deployment service<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, also hosted by GitHub, which lets you trigger compute workloads based on a CRON schedule, activity on a hosted repository, or manually.</p>
+<p>This post walks through setting up a GitHub Actions CD workflow<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> to automatically build and upload an R package to a drat repo based on a schedule or repository activity.</p>
+<h2 id="why-are-we-doing-it">Why are we doing it?</h2>
+<p>My lab has a number of internal packages we use for our day-to-day work which handle things like downloading data from our central server and producing standardized model assessment outputs. All of these packages live on GitHub in our central organization, and for a long time our workflow for installing these packages has been to clone the repository and then <code>devtools::install</code> the package.</p>
+<p>Recently, though, we’ve had to share one of our packages with a number of outside collaborators who we aren’t going to be adding to the organization. We’ve also started working with a number of people who are less familiar with git and GitHub, both externally and within the lab, which means we need to provide a bit more instruction than simply saying “clone the repo and install that”<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. This also means that solutions like “use <code>remotes::install_github</code> with a PAT” aren’t feasible; we want people to be able to get the packages they need without needing to know anything about GitHub itself. Therefore, we needed a simpler method to actually distribute our code, both to people we’d happily give repo access and people we wouldn’t want to.</p>
+<p>For public repositories and organizations, I think the easiest solution to this problem is to set up your own <a href="https://r-universe.dev/organizations/">R Universe</a>, which rOpenSci has written <a href="https://ropensci.org/blog/2021/06/22/setup-runiverse/">fantastic instructions for getting started with</a>; this offloads your responsibility for managing CI to the rOpenSci team. For this project, however, we wanted a separate and mostly hidden repository page, which made {drat} a perfect candidate. The only problem was how to make sure we were always publishing the newest versions of our package. We’re a small team doing a lot of different things, so being able to automate away any repetitive task (like publishing patch releases to a {drat} repo) can really help reduce the cognitive load and number of mistakes associated with updating our shared codebase.</p>
+<h2 id="how-did-we-do-it">How did we do it?</h2>
+<p>Because the original version of this workflow is on a private repo, I’ll walk through <a href="https://github.com/ropensci/terrainr/blob/main/.github/workflows/drat.yml">the workflow</a> that uploads <a href="https://github.com/ropensci/terrainr">terrainr</a> to <a href="https://github.com/mikemahoney218/drat">my own personal drat repo</a>. The YAML file that runs the workflow looks like this:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">push</span><span class="kw">:</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">branches</span><span class="kw">:</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">&#39;main&#39;</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">paths</span><span class="kw">:</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">&#39;DESCRIPTION&#39;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">workflow_dispatch</span><span class="kw">:</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">drat-upload</span><span class="kw">:</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-20.04</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Drat Upload</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> mikemahoney218/upload-to-drat-repo@v0.1</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">drat_repo</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;mikemahoney218/drat&#39;</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">token</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;${{ secrets.DRAT_TOKEN }}&quot;</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">commit_message</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;Automated update (add terrainr)&quot;</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">commit_email</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;mike.mahoney.218@gmail.com&quot;</span></span></code></pre></div>
+<p>This script has two main components to it: running the job and configuring the action itself.</p>
+<h3 id="running-the-job">Running the job</h3>
+<p>At the top of terrainr’s drat workflow script is the following chunk:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">push</span><span class="kw">:</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">branches</span><span class="kw">:</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">&#39;main&#39;</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">paths</span><span class="kw">:</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">&#39;DESCRIPTION&#39;</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">workflow_dispatch</span><span class="kw">:</span></span></code></pre></div>
+<p>This sets up two different ways to trigger the workflow. First off, any <code>push</code> commit to the <code>main</code> branch that touches the <code>DESCRIPTION</code> file will automatically build the package and push it to my drat repo. Because terrainr is published on CRAN and has a handful of users, I do my best to update version numbers whenever I make changes – even during development, I try and bump development versions whenever there’s a fix or update worth mentioning. Since the version number is stored in <code>DESCRIPTION</code>, this means I’ll only push updated package versions when I’ve actually updated something in the package; my small edits to the CI files, for instance, won’t create a new release.</p>
+<p>If you want to be freer about updating your repo, you can drop any of these restrictions. For instance, our internal packages have workflow triggers that look like this:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">push</span><span class="kw">:</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">branches</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;main&#39;</span></span></code></pre></div>
+<p>In this case, we push an update any time we push <em>any</em> commit to the main branch. This can cause problems – for instance, if we don’t update version numbers then <code>update.packages</code> won’t recognize that local installations are out of date – but makes more sense for our small team and small group of users.</p>
+<p>The second method this workflow uses to upload a new version is the <code>workflow_dispatch:</code> option, which lets me manually trigger the workflow from the GitHub UI. This is super helpful in case I accidentally mess up my drat repo, or make a small edit without changing the version number in the <code>DESCRIPTION</code>; without this line I’d have to rebuild the package on my laptop and update the drat repo from my local copy.</p>
+<p>There’s a lot of other ways you can set to trigger workflows – <a href="https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#on">see the full list here</a> – but the other one I want to highlight is that you can also set the workflow to trigger on a schedule using a crontab. This snippet for instance will release daily builds every day at 0:00 UTC:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">schedule</span><span class="kw">:</span><span class="at"> </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="kw">-</span><span class="at"> </span><span class="fu">cron</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;0 0 * * *&#39;</span></span></code></pre></div>
+<p>You can use this syntax to create incredibly complex schedules; I personally always use <a href="https://crontab.guru/" class="uri">https://crontab.guru/</a> to make sure my crontabs are right when I’m trying to schedule jobs.</p>
+<h3 id="configuring-the-action">Configuring the action</h3>
+<p>The second half of the workflow script actually calls the action to build the package and upload it to your drat repo:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">jobs</span><span class="kw">:</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">drat-upload</span><span class="kw">:</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runs-on</span><span class="kw">:</span><span class="at"> ubuntu-20.04</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">name</span><span class="kw">:</span><span class="at"> Drat Upload</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">steps</span><span class="kw">:</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="fu">uses</span><span class="kw">:</span><span class="at"> mikemahoney218/upload-to-drat-repo@v0.1</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="at">        </span><span class="fu">with</span><span class="kw">:</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">drat_repo</span><span class="kw">:</span><span class="at"> </span><span class="st">&#39;mikemahoney218/drat&#39;</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">token</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;${{ secrets.DRAT_TOKEN }}&quot;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">commit_message</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;Automated update (add terrainr)&quot;</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a><span class="at">          </span><span class="fu">commit_email</span><span class="kw">:</span><span class="at"> </span><span class="st">&quot;mike.mahoney.218@gmail.com&quot;</span></span></code></pre></div>
+<p>This will, by default, spin up an Ubuntu 20.04 runner and run v0.1 of <a href="https://github.com/mikemahoney218/upload-to-drat-repo/">the upload action</a>, which is the current version. This action will automatically check out the repo the workflow is called from, build and install the R package in that repo, then insert it into a drat repo.</p>
+<p>There’s a few input values for this workflow which you <em>must</em> specify, which are under the “with” step:</p>
+<ul>
+<li><code>drat_repo</code>: The GitHub repository for the drat repo you’re trying to push your package to. If you don’t have a drat repo yet, you can create one locally using <code>drat::initRepo</code>, and then push the created directory up to GitHub.</li>
+<li><code>commit_email</code>: The author to write the drat repo commit as; used to set <code>git config user.email</code>. You must provide a value here.</li>
+<li><code>token</code>: A <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token">personal access token (PAT)</a>. The action will use this PAT to clone your package and drat repo, as well as to push your drat repo, so make sure to authorize the PAT to do so. It’s a good idea to use a service account with the fewest permissions possible for this job.</li>
+</ul>
+<p>You can also customize the job further with a few additional inputs:</p>
+<ul>
+<li><code>commit_message</code>: The message to use when committing to <code>drat_repo</code>.</li>
+<li><code>commit_author</code>: The author to write the commit as; used to set <code>git config user.name</code>.</li>
+<li><code>package</code>: The GitHub repository for the package you want to upload. Defaults to the repository the action is running in, but this can be used to run your workflow elsewhere (for instance, if you want to have all your upload jobs scheduled in the drat repo itself).</li>
+</ul>
+<p>And for most use cases, this should be enough to automatically deploy your package whenever you desire! So far, I’ve tested this workflow on a handful of my own packages (terrainr and then our internal packages), and things are working well so far – if you find any problems or have any suggestions, <a href="https://github.com/mikemahoney218/upload-to-drat-repo/issues">feel free to open an issue on the action repo here.</a></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<section class="footnotes" role="doc-endnotes">
+<hr />
+<ol>
+<li id="fn1" role="doc-endnote"><p>Kinda. It’s probably more accurate to say GitHub Actions provides hosted compute which is typically used for CI/CD workflows, but can also be applied to other things; I use it to <a href="https://twitter.com/proc_tweets">make art and post to Twitter, for instance.</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2" role="doc-endnote"><p>Workflows are explicit, repository-specific jobs, while actions are generic scripts which can be included inside of workflows.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3" role="doc-endnote"><p>I had completely forgotten how complex getting started with GitHub can be as a novice until recently, teaching a Carpentries workshop, I realized that teaching the initial account set-up <a href="https://swcarpentry.github.io/git-novice/07-github/index.html">requires a full 45 minute lesson</a>.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->
 </div>
@@ -2500,17 +1598,10 @@ fixes some bugs.</p>
 <!--radix_placeholder_site_after_body-->
 <!--/radix_placeholder_site_after_body-->
 <!--radix_placeholder_appendices-->
-<div class="appendix-bottom">
-<h3 id="updates-and-corrections">Corrections</h3>
-<p>If you see mistakes or want to suggest changes, please <a href="https://github.com/mikemahoney218/mm218.dev/issues/new">create an issue</a> on the source repository.</p>
-</div>
+<div class="appendix-bottom"></div>
 <!--/radix_placeholder_appendices-->
 <!--radix_placeholder_navigation_after_body-->
-<div class="distill-site-nav distill-site-footer">
-<p>© Copyright 2020 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</p>
-</div>
 <!--/radix_placeholder_navigation_after_body-->
-
 
 </body>
 

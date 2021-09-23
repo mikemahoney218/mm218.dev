@@ -6,7 +6,20 @@
     <atom:link href="https://www.mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
     <description>Technology and the Environment</description>
     <generator>Distill</generator>
-    <lastBuildDate>Mon, 14 Jun 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 23 Sep 2021 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>Automated {drat} uploads with GitHub Actions</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2021-09-22-automated-drat-uploads-with-github-actions</link>
+      <description>Continuously deploy your code to personal CRAN-like repos, automatically and for free!</description>
+      <category>R</category>
+      <category>Tutorials</category>
+      <category>CI</category>
+      <category>CD</category>
+      <category>GitHub Actions</category>
+      <guid>https://www.mm218.dev/posts/2021-09-22-automated-drat-uploads-with-github-actions</guid>
+      <pubDate>Thu, 23 Sep 2021 00:00:00 +0000</pubDate>
+    </item>
     <item>
       <title>Interactive landscape simulations for visual resource assessment</title>
       <dc:creator>Mike Mahoney</dc:creator>

@@ -4,6 +4,12 @@ output:
   tufte::tufte_html: default
 ---
 
+<hr id = "poorman">
+
+Dependencies are an open invitation for other people to break your code.
+
+--- Nathan Eastwood: useR 2021 talk on poorman
+
 <hr id = "UweThinking">
 
 RAM is cheap and thinking hurts.
