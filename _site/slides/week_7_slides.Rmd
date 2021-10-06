@@ -816,7 +816,7 @@ predict(first_rf, training) |>
 While matrices can be a little hard to work with, we can pipe this directly 
 into `cbind` to add these predictions to our data frame:
 
-```{r}
+```{r, message=FALSE}
 library(dplyr)
 predict(first_rf, training) |> 
   predictions() |> 
@@ -967,7 +967,7 @@ Cross-entropy loss is also not a silver bullet for imbalanced classification
 problems. 
 
 For instance, the next slide will have the confusion matrix for the
-best model selected by our grid search. While our specificity is higher than
+best model selected by our grid search. While our sensitivity is higher than
 we've seen in the past, it's still not _great_ -- we'd probably want to weight
 our classes while tuning to get better results overall.
 

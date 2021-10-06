@@ -931,26 +931,6 @@ into `cbind` to add these predictions to our data frame:
 
 ```r
 library(dplyr)
-```
-
-```
-## 
-## Attaching package: 'dplyr'
-```
-
-```
-## The following objects are masked from 'package:stats':
-## 
-##     filter, lag
-```
-
-```
-## The following objects are masked from 'package:base':
-## 
-##     intersect, setdiff, setequal, union
-```
-
-```r
 predict(first_rf, training) |&gt; 
   predictions() |&gt; 
   cbind(training) |&gt; 
@@ -1148,7 +1128,7 @@ Cross-entropy loss is also not a silver bullet for imbalanced classification
 problems. 
 
 For instance, the next slide will have the confusion matrix for the
-best model selected by our grid search. While our specificity is higher than
+best model selected by our grid search. While our sensitivity is higher than
 we've seen in the past, it's still not _great_ -- we'd probably want to weight
 our classes while tuning to get better results overall.
 
