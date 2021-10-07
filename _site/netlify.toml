@@ -93,3 +93,15 @@
 [[redirects]]
   from = "/talks"
   to = "/presentations"
+
+[[redirects]]
+  from = "/vrs2021"
+  to = "https://mikemahoney218.github.io/2021-10-21-vrs/vrs.html#2"
+
+[[redirects]]
+  from = "/vrs2021_workshop"
+  to = "https://mikemahoney218.github.io/2021-10-19-vrs-workshop/2021-10-19-vrs-workshop.html"
+
+[[redirects]]
+  from = "/agu2021"
+  to = "https://www.mm218.dev/papers/ground_filtering/"
