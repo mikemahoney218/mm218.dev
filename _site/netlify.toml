@@ -89,3 +89,7 @@
 [[redirects]]
   from = "/esip2021"
   to = "https://mikemahoney218.github.io/2021-09-08_esip/esip.html#2"
+
+[[redirects]]
+  from = "/talks"
+  to = "/presentations"

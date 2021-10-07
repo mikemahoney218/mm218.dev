@@ -8,8 +8,8 @@ navbar:
       href: index.html
     - text: "Papers"
       href: papers
-    - text: "Talks"
-      href: talks
+    - text: "Presentations"
+      href: presentations
     - text: "Blog"
       href: blog.html
     - icon: fab fa-github
