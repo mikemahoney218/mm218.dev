@@ -97,14 +97,11 @@
 [[redirects]]
   from = "/vrs2021"
   to = "https://mikemahoney218.github.io/2021-10-21-vrs/vrs.html#2"
-  force = true
 
 [[redirects]]
   from = "/vrs2021_workshop"
   to = "https://mikemahoney218.github.io/2021-10-19-vrs-workshop/2021-10-19-vrs-workshop.html"
-  force = true
 
 [[redirects]]
   from = "/agu2021"
   to = "https://www.mm218.dev/papers/ground_filtering/"
-  force = true
