@@ -89,6 +89,17 @@ readings from these books.
 1. Bradley Boehmke and Brandon Greenwell. (2020). Hands on Machine Learning with R. CRC Press. Available online at https://bradleyboehmke.github.io/HOML/ .
 2. Bradley Efron and Trevor Hastie. (2016). Computer Age Statistical Inference. Cambridge University Press. Available online at https://web.stanford.edu/~hastie/CASI_files/PDF/casi.pdf .
 
+Students will need to have access to a computer they are able to install R 
+packages on.
+
+While not used in the class, students looking for a better grasp on the R 
+programming language may benefit from the following textbooks (all freely 
+available online):
+
+1. Hadley Wickham and Garrett Grolemund. (2017). [R for Data Science](https://r4ds.had.co.nz/). O'Reilly Media, Inc. Available online at https://r4ds.had.co.nz/ .
+2. Hadley Wickham. (2019). [Advanced R](https://adv-r.hadley.nz/). CRC Press. Available online at https://adv-r.hadley.nz/ .
+3. Hadley Wickham and Jenny Bryan. (2021). [R Packages](https://r-pkgs.org/). O'Reilly Media, Inc. Available online at https://r-pkgs.org/
+
 In addition, I highly recommend the book An Introduction to Statistical Learning.
 While not used directly in this course, this book is potentially "the" ML
 textbook, and provides a comprehensible introduction to ML methods. This book is
@@ -98,8 +109,6 @@ Gareth James, Daniela Witten, Trevor Hastie, and Robert Tibshirani. (2021).
 An Introduction to Statistical Learning with Applications in R. Springer Texts,
 second edition. Available online at https://www.statlearning.com/
 
-Students will need to have access to a computer they are able to install R 
-packages on.
 
 ## Grading
 

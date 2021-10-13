@@ -1,0 +1,64 @@
+---
+title: How MLCA is Structured
+output: html_document
+---
+
+```{r message=FALSE, echo = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE)
+```
+
+
+```{r}
+library(dplyr)
+library(ggplot2)
+
+tribble(
+  ~ year, ~ thing, ~ week, ~ y,
+  1805, "Linear regression", 2, -0.5,
+  1838, "Logistic regression", 3, 0.5,
+  1941, "ROC Curves", 3, 0.75, 
+  1951, "K-nearest neighbors", 10, -0.5,
+  1960, "Decision trees", 5, 0.5,
+  1970, "Cross validation", 7, -0.25,
+  1992, "Support vector machines", 11, 0.25,
+  1992, "Stacked ensembles", 9, -0.75,
+  1994, "Bagged decision trees", 6, 1,
+  2001, "Random forests", 6, -1,
+  2001, "Gradient boosting machines", 8, 1.5,
+  2002, "Stochastic GBMs", 9, -1.5
+) |> 
+  ggplot(aes(year, y)) +
+  geom_segment(aes(xend = year, yend = 0)) + 
+  geom_point(size = 0.75, aes(y = 0)) + 
+  geom_label(aes(label = thing)) + 
+  scale_x_continuous(expand = expansion(c(0.15, 0.2))) + 
+  annotate("segment", x = -Inf, xend = Inf, y = 0, yend = 0) + 
+  theme_minimal() %+replace%
+  theme(panel.grid = element_blank(),
+        axis.text.y = element_blank()) + 
+  labs(x = "Year", y = "")
+```
+```{r}
+tribble(
+  ~ year, ~ thing, ~ week, ~ y,
+  1951, "K-nearest neighbors", 10, -0.5,
+  1960, "Decision trees", 5, 0.5,
+  1992, "Support vector machines", 11, 0.25,
+  1994, "Bootstrap-aggregated decision trees", 6, 1,
+  2001, "Random forests", 6, -1,
+  2001, "Gradient boosting machines", 8, 1.5,
+  2002, "Stochastic gradient boosting machines", 9, -1.5
+) |> 
+  ggplot(aes(year, y)) +
+  geom_segment(aes(xend = year, yend = 0)) + 
+  geom_label(aes(label = thing)) + 
+  scale_x_continuous(expand = expansion(c(0.2, 0.3)), breaks = seq(1950, 2005, 5)) + 
+  annotate("segment", x = -Inf, xend = Inf, y = 0, yend = 0) + 
+  theme_minimal() %+replace%
+  theme(panel.grid = element_blank(),
+        axis.text.y = element_blank()) + 
+  labs(x = "Year", y = "")
+```
+
+![](casi_epi.png)
+

@@ -39,4 +39,8 @@ navbar:
           href: slides/week_10_slides.html
         - text: "Week 11 (2021-11-10)"
           href: slides/week_11_slides.html
+    - text: "Extras"
+      menu:
+        - text: "Week 7 (2021-10-13)"
+          href: misc/hyperparameter_followup.html
 output: distill::distill_article
