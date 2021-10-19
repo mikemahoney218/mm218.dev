@@ -43,4 +43,6 @@ navbar:
       menu:
         - text: "Week 7 (2021-10-13)"
           href: misc/hyperparameter_followup.html
+        - text: "Week 8 (2021-10-20)"
+          href: misc/week_8_followup.html
 output: distill::distill_article

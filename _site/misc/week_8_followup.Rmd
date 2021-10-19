@@ -1,0 +1,191 @@
+---
+title: "MLCA Week 8:"
+subtitle: "GBM Followup"  
+author: 
+  - "Mike Mahoney"
+date: "2021-10-20"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(ggplot2)
+knitr::opts_chunk$set(fig.showtext = TRUE, echo = FALSE, message = FALSE)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+style_mono_light(base_color = "#23395b")
+theme_set(theme_xaringan())
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+```{r xaringanExtra-search, echo=FALSE}
+xaringanExtra::use_search(show_icon = TRUE)
+```
+
+```{r xaringan-tachyons, echo=FALSE}
+xaringanExtra::use_tachyons()
+```
+
+```{r xaringan-extra-styles, echo = FALSE}
+xaringanExtra::use_extra_styles(
+  hover_code_line = TRUE,         #<<
+  mute_unhighlighted_code = TRUE  #<<
+)
+```
+
+```{r xaringan-tile-view, echo=FALSE}
+xaringanExtra::use_tile_view()
+```
+
+class: middle
+
+# Project FAQ
+
+---
+
+# How much data do I need?
+
+--
+
+<div style="font-size: 150%">
+
+Enough -- but not too much.
+
+</div>
+
+<br />
+
+--
+
+<div style="font-size: 150%">
+
+Actually though: enough that your training data and test data both look like
+the overall population; not so much that CV takes forever.
+
+</div>
+
+<br />
+
+--
+
+<div style="font-size: 150%">
+
+Fine: for this class, more than 100 rows, less than 20,000 rows. In the real 
+world, tune your model on a subsample of your data then fit the final model on
+the full data set (and prepare to run your computer for a few days).
+
+</div>
+
+---
+
+# Do I need to use hand-coded bagged/boosted trees?
+
+<div style="font-size: 150%">
+
+No.
+
+</div>
+
+<br />
+
+<div style="font-size: 150%">
+
+If you're using random forests: just use ranger. If you're using GBM, just
+use lightgbm (next week). If you're using SVM, just use kernlab (week 11).
+
+</div>
+
+<br />
+
+<div style="font-size: 150%">
+
+We're coding through example implementations to try and explain concepts, but
+there's no reason to ever use those again.
+
+</div>
+
+---
+class: middle
+
+<div style="font-size: 150%">
+
+After next week, you could be 100% done with the project.
+
+</div>
+
+<br />
+
+<div style="font-size: 150%">
+
+Remember: if you want confirmation you checked all the boxes, I'm willing to grade each project <i>twice</i>.
+
+</div>
+
+<br />
+
+<div style="font-size: 150%">
+
+To submit: email me (mike.mahoney.218@gmail.com) data & code with subject line "FOR796 Course Project". 
+
+</div>
+
+<br />
+
+<div style="font-size: 150%">
+
+Remember: your code needs to run on my computer immediately, without needing me to edit things. Use "here" and R Studio projects.
+
+</div>
+
+---
+
+# What's left?
+
+## • Week 9: Stochastic GBMs & Stacked Ensembles (long)
+
+## • Week 10: K-Nearest Neighbors (normal-length)
+
+## • Week 11: Support Vector Machines (normal-length, mathy)
+
+## • Week 12 & 13: Project Work (optional)
+
+---
+
+# Presentations
+
+<div style="font-size: 150%">
+
+Week 14 (2021-12-08).
+
+</div>
+
+<br />
+
+<div style="font-size: 150%">
+
+Rubric: "Presentation included objectives, methods, results, and reflection."
+
+</div>
+
+<br />
+
+<div style="font-size: 150%">
+
+Goal is to practice doing ML and talk about doing ML. Not meant to be high-stakes!
+
+</div>
+
+<br />
+

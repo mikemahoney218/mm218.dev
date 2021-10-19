@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>MLCA Week 8:</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Mahoney" />
+    <meta name="date" content="2021-10-20" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/mark.js/mark.min.js"></script>
+    <link href="libs/xaringanExtra-search/search.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-search/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":true,"autoSearch":true}) })</script>
+    <link href="libs/tachyons/tachyons.min.css" rel="stylesheet" />
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# MLCA Week 8:
+## GBM Followup
+### Mike Mahoney
+### 2021-10-20
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: middle
+
+# Project FAQ
+
+---
+
+# How much data do I need?
+
+--
+
+&lt;div style="font-size: 150%"&gt;
+
+Enough -- but not too much.
+
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+--
+
+&lt;div style="font-size: 150%"&gt;
+
+Actually though: enough that your training data and test data both look like
+the overall population; not so much that CV takes forever.
+
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+--
+
+&lt;div style="font-size: 150%"&gt;
+
+Fine: for this class, more than 100 rows, less than 20,000 rows. In the real 
+world, tune your model on a subsample of your data then fit the final model on
+the full data set (and prepare to run your computer for a few days).
+
+&lt;/div&gt;
+
+---
+
+# Do I need to use hand-coded bagged/boosted trees?
+
+&lt;div style="font-size: 150%"&gt;
+
+No.
+
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+&lt;div style="font-size: 150%"&gt;
+
+If you're using random forests: just use ranger. If you're using GBM, just
+use lightgbm (next week). If you're using SVM, just use kernlab (week 11).
+
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+&lt;div style="font-size: 150%"&gt;
+
+We're coding through example implementations to try and explain concepts, but
+there's no reason to ever use those again.
+
+&lt;/div&gt;
+
+---
+class: middle
+
+&lt;div style="font-size: 150%"&gt;
+
+After next week, you could be 100% done with the project.
+
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+&lt;div style="font-size: 150%"&gt;
+
+Remember: if you want confirmation you checked all the boxes, I'm willing to grade each project &lt;i&gt;twice&lt;/i&gt;.
+
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+&lt;div style="font-size: 150%"&gt;
+
+To submit: email me (mike.mahoney.218@gmail.com) data &amp; code with subject line "FOR796 Course Project". 
+
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+&lt;div style="font-size: 150%"&gt;
+
+Remember: your code needs to run on my computer immediately, without needing me to edit things. Use "here" and R Studio projects.
+
+&lt;/div&gt;
+
+---
+
+# What's left?
+
+## • Week 9: Stochastic GBMs &amp; Stacked Ensembles (long)
+
+## • Week 10: K-Nearest Neighbors (normal-length)
+
+## • Week 11: Support Vector Machines (normal-length, mathy)
+
+## • Week 12 &amp; 13: Project Work (optional)
+
+---
+
+# Presentations
+
+&lt;div style="font-size: 150%"&gt;
+
+Week 14 (2021-12-08).
+
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+&lt;div style="font-size: 150%"&gt;
+
+Rubric: "Presentation included objectives, methods, results, and reflection."
+
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+&lt;div style="font-size: 150%"&gt;
+
+Goal is to practice doing ML and talk about doing ML. Not meant to be high-stakes!
+
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
