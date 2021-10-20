@@ -434,7 +434,7 @@ We can then see which of our learning rates best balances accuracy and time:
 arrange(tuning_grid, rmse)
 ```
 
-In this case, we'll go ahead and run with a learning rate of 0.1 for the rest of 
+In this case, we'll go ahead and run with a learning rate of 0.01 for the rest of 
 our tuning.
 
 ---
