@@ -112,7 +112,9 @@ now:
 
 
 ```r
-install.packages("lightgbm")
+install.packages(
+  "lightgbm", 
+  repos = "https://cran.microsoft.com/snapshot/2021-10-24/")
 ```
 
 ---
@@ -371,7 +373,7 @@ sqrt(mean((lgb_predictions - testing$Sale_Price)^2))
 ```
 
 ```
-## [1] 36751.29
+## [1] 20717.75
 ```
 
 And all in all, this seems like a lot of work for a really crappy model.

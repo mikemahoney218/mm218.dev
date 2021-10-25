@@ -118,7 +118,9 @@ We're going to use `lightGBM`, because I like it the most. Go ahead and install 
 now:
 
 ```{r, eval = FALSE}
-install.packages("lightgbm")
+install.packages(
+  "lightgbm", 
+  repos = "https://cran.microsoft.com/snapshot/2021-10-24/")
 ```
 
 ---
