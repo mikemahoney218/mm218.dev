@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>MLCA Week 9:</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Mahoney" />
+    <meta name="date" content="2021-10-20" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/mark.js/mark.min.js"></script>
+    <link href="libs/xaringanExtra-search/search.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-search/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":true,"autoSearch":true}) })</script>
+    <link href="libs/tachyons/tachyons.min.css" rel="stylesheet" />
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# MLCA Week 9:
+## Followup
+### Mike Mahoney
+### 2021-10-20
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: middle
+
+# The Saga of LightGBM
+
+---
+
+# August 25: I finish writing this lecture
+
+![](aug25.png)
+
+---
+
+# September 10: LightGBM team starts releasing 3.3.0
+
+![](sep10.png)
+
+---
+
+# October 9: LightGBM 3.3.0 gets to CRAN
+
+![](oct9.png)
+
+---
+
+# October 12: Issues are noticed
+
+![](oct12.png)
+
+---
+
+# October 25: LightGBM removed from CRAN
+
+![](oct25.png)
+
+---
+
+class: middle
+
+# And as such, we had to make a few changes.
+
+## • Different installation method
+## • Different model fitting approach
+
+---
+
+## Different installation method:
+
+&lt;div style="font-size: 150%"&gt;
+https://cran.microsoft.com/snapshot/2021-10-24/
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+&lt;div style="font-size: 150%"&gt;
+Daily CRAN snapshots, hosted by Microsoft.
+&lt;/div&gt;
+
+---
+
+## Different model fitting approach
+
+&lt;div style="font-size: 150%"&gt;
+LightGBM 3.3.0: No more ... https://github.com/microsoft/LightGBM/issues/4226
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+&lt;div style="font-size: 150%"&gt;
+So everything but nrounds gets passed to param now.
+&lt;/div&gt;
+
+---
+
+
+```r
+k_fold_cv &lt;- function(data, k, ...) {
+  per_fold &lt;- floor(nrow(data) / k)
+  fold_order &lt;- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows &lt;- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test &lt;- data[fold_idx, ]
+      fold_train &lt;- data[-fold_idx, ]
+      
+      xtrain &lt;- as.matrix(fold_train[setdiff(names(fold_train), 
+                                             "Sale_Price")])
+      ytrain &lt;- fold_train[["Sale_Price"]]
+      
+      fold_lgb &lt;- lightgbm(
+        data = xtrain,
+        label = ytrain,
+        verbose = -1L,
+        obj = "regression",
+        ... # How it was
+      )
+      calc_rmse(fold_lgb, fold_test)
+    },
+    numeric(1)
+  ) |&gt; 
+    mean()
+}
+```
+
+
+---
+
+
+```r
+k_fold_cv &lt;- function(data, k, nrounds = 10L, ...) {
+  per_fold &lt;- floor(nrow(data) / k)
+  fold_order &lt;- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows &lt;- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test &lt;- data[fold_idx, ]
+      fold_train &lt;- data[-fold_idx, ]
+      
+      xtrain &lt;- as.matrix(fold_train[setdiff(names(fold_train), 
+                                             "Sale_Price")])
+      ytrain &lt;- fold_train[["Sale_Price"]]
+      
+      fold_lgb &lt;- lightgbm(
+        data = xtrain,
+        label = ytrain,
+        verbose = -1L,
+        obj = "regression",
+        nrounds = nrounds, # Now its own parameter
+        params = ... # How it now is
+      )
+      calc_rmse(fold_lgb, fold_test)
+    },
+    numeric(1)
+  ) |&gt; 
+    mean()
+}
+```
+
+---
+class: middle
+
+# Project FAQ
+
+---
+
+## Can I do X to my data?
+
+&lt;div style="font-size: 150%"&gt;
+Yes.
+&lt;/div&gt;
+
+## Do I need to do it for each of the models?
+
+&lt;div style="font-size: 150%"&gt;
+It depends (but I won't make you).
+&lt;/div&gt;
+
+## I get different results each time I run my grid
+
+&lt;div style="font-size: 150%"&gt;
+Put a set.seed call right above the grid. Run it every time.
+&lt;/div&gt;
+
+---
+
+## My GBM learning rate seems too low.
+
+&lt;div style="font-size: 150%"&gt;
+No such thing. Lower is usually more accurate (or at least equivalent), just 
+takes more time (and rounds). Your goal is to find "good enough".
+&lt;/div&gt;
+
+## My top hyperparameter combinations are really variable.
+
+&lt;div style="font-size: 150%"&gt;
+Those hyperparameters don't matter that much. Especially common with random 
+forests.
+&lt;/div&gt;
+
+---
+class: center 
+
+&lt;img src="https://objects-us-east-1.dream.io/secrettoeverybody/images/secret.png" width="80%" /&gt;
+
+Change the .html to .Rmd to download the code &amp; text used in the slides.
+
+---
+class: middle
+
+# Reproducibility Methods
+
+---
+
+## Sometimes package updates break things
+
+## Sometimes CRAN delists packages
+
+## Sometimes both of these things happen!
+
+## What do?
+
+---
+
+## Option 1: Use as little package code as possible
+
+&lt;div style="font-size: 150%"&gt;
+R is pathologically opposed to change.
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+&lt;div style="font-size: 150%"&gt;
+Major releases through the years:
+&lt;/div&gt;
+
+&lt;div style="font-size: 150%"&gt;
+1.0: Feb 29, 2000
+&lt;/div&gt;
+
+&lt;div style="font-size: 150%"&gt;
+2.0: Oct 04, 2004
+&lt;/div&gt;
+
+&lt;div style="font-size: 150%"&gt;
+3.0: Apr 03, 2013
+&lt;/div&gt;
+
+&lt;div style="font-size: 150%"&gt;
+4.0: Feb 29, 2020
+&lt;/div&gt;
+
+---
+
+![](https://pbs.twimg.com/media/E5jK2CIWUAIKgf_?format=jpg&amp;name=large)
+
+&lt;div style="font-size: 150%"&gt;
+(Nathan Eastman: poorman talk, useR! 2021)
+&lt;/div&gt;
+
+---
+
+## Option 2: Freeze your dependencies
+
+&lt;div style="font-size: 150%"&gt;
+Two main approaches. First one: choose a point in time and stick to it.
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+&lt;div style="font-size: 150%"&gt;
+MRAN daily snapshots: https://cran.microsoft.com/snapshot/2021-10-24/
+&lt;/div&gt;
+
+&lt;br /&gt;
+
+&lt;div style="font-size: 150%"&gt;
+Not super flexible -- if you need to update a dependency, you need to update them all.
+&lt;/div&gt;
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
