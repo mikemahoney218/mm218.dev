@@ -1,0 +1,73 @@
+
+```{r}
+k_fold_cv <- function(data, k, ...) {
+  per_fold <- floor(nrow(data) / k)
+  fold_order <- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows <- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test <- data[fold_idx, ]
+      fold_train <- data[-fold_idx, ]
+      
+      xtrain <- as.matrix(fold_train[setdiff(names(fold_train), 
+                                             "Sale_Price")])
+      ytrain <- fold_train[["Sale_Price"]]
+      
+      fold_lgb <- lightgbm(
+        data = xtrain,
+        label = ytrain,
+        verbose = -1L,
+        obj = "regression",
+        ... # How it was
+      )
+      calc_rmse(fold_lgb, fold_test)
+    },
+    numeric(1)
+  ) |> 
+    mean()
+}
+```
+
+
+---
+
+```{r}
+k_fold_cv <- function(data, k, nrounds = 10L, ...) {
+  per_fold <- floor(nrow(data) / k)
+  fold_order <- sample(seq_len(nrow(data)), 
+                       size = per_fold * k)
+  fold_rows <- split(
+    fold_order,
+    rep(1:k, each = per_fold)
+  )
+  vapply(
+    fold_rows,
+    \(fold_idx) {
+      fold_test <- data[fold_idx, ]
+      fold_train <- data[-fold_idx, ]
+      
+      xtrain <- as.matrix(fold_train[setdiff(names(fold_train), 
+                                             "Sale_Price")])
+      ytrain <- fold_train[["Sale_Price"]]
+      
+      fold_lgb <- lightgbm(
+        data = xtrain,
+        label = ytrain,
+        verbose = -1L,
+        obj = "regression",
+        nrounds = nrounds, # Now its own parameter
+        params = ... # How it should be
+      )
+      calc_rmse(fold_lgb, fold_test)
+    },
+    numeric(1)
+  ) |> 
+    mean()
+}
+```
+

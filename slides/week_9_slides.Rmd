@@ -341,7 +341,7 @@ itself.
 ---
 
 ```{r}
-k_fold_cv <- function(data, k, ...) {
+k_fold_cv <- function(data, k, nrounds = 10L, ...) {
   per_fold <- floor(nrow(data) / k)
   fold_order <- sample(seq_len(nrow(data)), 
                        size = per_fold * k)
@@ -364,7 +364,8 @@ k_fold_cv <- function(data, k, ...) {
         label = ytrain,
         verbose = -1L,
         obj = "regression",
-        ...
+        nrounds = nrounds,
+        params = ...
       )
       calc_rmse(fold_lgb, fold_test)
     },
@@ -530,13 +531,15 @@ final_lgb <- lightgbm(
   label = ytrain,
   verbose = -1L,
   obj = "regression",
-  learning_rate = 0.1,
   nrounds = 1000,
-  max_depth = 2,
-  min_data_in_bin = 18,
-  bagging_freq = 5,
-  bagging_fraction = 0.9,
-  feature_fraction = 0.6
+  params = list(
+    learning_rate = 0.1,
+    max_depth = 2,
+    min_data_in_bin = 18,
+    bagging_freq = 5,
+    bagging_fraction = 0.9,
+    feature_fraction = 0.6
+  )
 )
 
 calc_rmse(final_lgb, testing)
@@ -730,13 +733,15 @@ fit_lgb <- function(training, testing) {
   label = ytrain,
   verbose = -1L,
   obj = "regression",
-  learning_rate = 0.1,
   nrounds = 1000,
-  max_depth = 2,
-  min_data_in_bin = 18,
-  bagging_freq = 5,
-  bagging_fraction = 0.9,
-  feature_fraction = 0.6
+  params = list(
+    learning_rate = 0.1,
+    max_depth = 2,
+    min_data_in_bin = 18,
+    bagging_freq = 5,
+    bagging_fraction = 0.9,
+    feature_fraction = 0.6
+  )
 )
   preds <- predict(cv_model, xtest)
   sqrt(mean((preds - testing$Sale_Price)^2))
@@ -878,13 +883,15 @@ validation_lgb <- lightgbm(
   label = ytrain,
   verbose = -1L,
   obj = "regression",
-  learning_rate = 0.1,
   nrounds = 1000,
-  max_depth = 2,
-  min_data_in_bin = 18,
-  bagging_freq = 5,
-  bagging_fraction = 0.9,
-  feature_fraction = 0.6
+  params = list(
+    learning_rate = 0.1,
+    max_depth = 2,
+    min_data_in_bin = 18,
+    bagging_freq = 5,
+    bagging_fraction = 0.9,
+    feature_fraction = 0.6
+  )
 )
 ```
 
