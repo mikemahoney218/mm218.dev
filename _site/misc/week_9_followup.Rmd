@@ -301,7 +301,7 @@ Changes through the years:
 
 ---
 
-![](https://pbs.twimg.com/media/E5jK2CIWUAIKgf_?format=jpg&name=large)
+![](poorman.jpeg)
 
 <div style="font-size: 150%">
 (Nathan Eastman: poorman talk, useR! 2021)
