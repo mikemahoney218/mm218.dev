@@ -213,10 +213,19 @@ Yes.
 It depends (but I won't make you).
 </div>
 
-## I get different results each time I run my grid
+---
+
+## I get different results when I re-run my grid
 
 <div style="font-size: 150%">
 Put a set.seed call right above the grid. Run it every time.
+</div>
+
+## My top hyperparameter combinations are really variable.
+
+<div style="font-size: 150%">
+Those hyperparameters don't matter that much. Especially common with random 
+forests.
 </div>
 
 ---
@@ -226,13 +235,6 @@ Put a set.seed call right above the grid. Run it every time.
 <div style="font-size: 150%">
 No such thing. Lower is usually more accurate (or at least equivalent), just 
 takes more time (and rounds). Your goal is to find "good enough".
-</div>
-
-## My top hyperparameter combinations are really variable.
-
-<div style="font-size: 150%">
-Those hyperparameters don't matter that much. Especially common with random 
-forests.
 </div>
 
 ---
@@ -289,6 +291,14 @@ Major releases through the years:
 4.0: Feb 29, 2020
 </div>
 
+<br />
+
+<div style="font-size: 150%">
+Changes through the years:
+</div>
+
+[https://cran.r-project.org/doc/manuals/r-release/NEWS.html](https://cran.r-project.org/doc/manuals/r-release/NEWS.html)
+
 ---
 
 ![](https://pbs.twimg.com/media/E5jK2CIWUAIKgf_?format=jpg&name=large)
@@ -308,8 +318,10 @@ Two main approaches. First one: choose a point in time and stick to it.
 <br />
 
 <div style="font-size: 150%">
-MRAN daily snapshots: [https://cran.microsoft.com/snapshot/2021-10-24/](https://cran.microsoft.com/snapshot/2021-10-24/)
+MRAN daily snapshots: 
 </div>
+
+[https://cran.microsoft.com/snapshot/2021-10-24/](https://cran.microsoft.com/snapshot/2021-10-24/)
 
 <br />
 
@@ -326,8 +338,10 @@ Better option: freeze the version of each dependency separately.
 <br />
 
 <div style="font-size: 150%">
-Best tool for this: renv [https://rstudio.github.io/renv/articles/renv.html](https://rstudio.github.io/renv/articles/renv.html)
+Best tool for this: renv 
 </div>
+
+[https://rstudio.github.io/renv/articles/renv.html](https://rstudio.github.io/renv/articles/renv.html)
 
 <br />
 
@@ -347,11 +361,48 @@ Docker lets you run things in "containers" -- separate all your code and depende
 
 <div style="font-size: 150%">
 Using Docker with R usually takes advantage of 
-[https://github.com/rocker-org/rocker](https://github.com/rocker-org/rocker)
 </div>
+
+[https://github.com/rocker-org/rocker](https://github.com/rocker-org/rocker)
 
 <br />
 
 <div style="font-size: 150%">
 Likely best option for long term reproducibility. Most technical.
+</div>
+
+---
+
+## Why care?
+
+<div style="font-size: 150%">
+82% of wildlife biology papers cannot be reproduced.
+</div>
+[https://wildlife.onlinelibrary.wiley.com/doi/full/10.1002/jwmg.21855](https://wildlife.onlinelibrary.wiley.com/doi/full/10.1002/jwmg.21855)
+
+<br />
+
+<div style="font-size: 150%">
+30% of genomics papers with published data and code cannot be reproduced. 
+</div>
+[https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1365-294X.2012.05754.x](https://onlinelibrary.wiley.com/doi/pdf/10.1111/j.1365-294X.2012.05754.x)
+
+---
+
+## Why care?
+
+<div style="font-size: 150%">
+The chance a person attempts to reproduce your results or reuse your code is very low.
+</div>
+
+<br />
+
+<div style="font-size: 150%">
+Odds are, that person (should they exist) will be you.
+</div>
+
+<br />
+
+<div style="font-size: 150%">
+As the line goes, "Your closest collaborator is you six months ago, but you don't reply to email." Reproducibility makes your own life easier.
 </div>
