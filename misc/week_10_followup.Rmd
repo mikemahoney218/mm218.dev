@@ -112,6 +112,42 @@ knitr::include_graphics("working_working.png")
 
 ---
 
+## Standard citations:
+
+```{r}
+citation()
+```
+
+---
+
+## Other standard cites
+
+```{r eval = FALSE}
+citation("ranger") # RF
+citation("lightgbm") # GBM
+citation("kernlab") # SVM
+citation("caret") # KNN
+citation("rpart") # Decision trees
+```
+
+Breiman, L., 2001. Random Forests. Machine Learning 45, 5–32. https://doi.org/10.1023/A:1010933404324
+
+Friedman, J. H., 2002. Stochastic Gradient Boosting. Computational Statistics & Data Analysis 38(4), 367-378. https://doi.org/10.1016/S0167-9473(01)00065-2
+
+Cortes, C., Vapnik, V. Support-vector networks. Machine Learning 20, 273–297 (1995). https://doi.org/10.1007/BF00994018
+
+---
+
+# Other notes:
+
+### Don't force-install packages (it's rude)
+
+### Don't cite LM, GLM
+
+### Pay attention to the rubric (if it isn't there, it isn't worth points)
+
+---
+
 # Project re-submit
 
 ### Optional!
