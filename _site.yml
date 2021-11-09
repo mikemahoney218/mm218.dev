@@ -49,4 +49,6 @@ navbar:
           href: misc/week_9_followup.html
         - text: "Week 10 (2021-11-02)"
           href: misc/week_10_followup.html
+        - text: "Week 11 (2021-11-09)"
+          href: misc/week_11_followup.html
 output: distill::distill_article
