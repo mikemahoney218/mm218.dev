@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>MLCA Week 3:</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Mahoney" />
+    <meta name="date" content="2021-09-15" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"xd1bcc5dea0748c6a900b8d05e46af6a","expires":1}</script>
+    <script src="libs/himalaya/himalaya.js"></script>
+    <script src="libs/js-cookie/js.cookie.js"></script>
+    <link href="libs/editable/editable.css" rel="stylesheet" />
+    <script src="libs/editable/editable.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/mark.js/mark.min.js"></script>
+    <link href="libs/xaringanExtra-search/search.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-search/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":true,"autoSearch":true}) })</script>
+    <link href="libs/tachyons/tachyons.min.css" rel="stylesheet" />
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# MLCA Week 3:
+## Classification
+### Mike Mahoney
+### 2021-09-15
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: center, middle
+
+# Classification
+
+---
+class: middle
+
+# Many prediction problems involve predicting non-continuous outcomes.
+
+For instance, we might want to predict:
+
+* Whether or not an individual has a specific disease,
+* Which tree stems a beaver is going to harvest, or
+* If a species will be present at a given site.
+
+---
+class: middle
+
+# We can predict categorical outcomes like these using classification models.
+
+This is in contrast to regression models, like what we talked about last week,
+where we care about the numeric output of a model rather than a categorical 
+classification.
+
+Classification models might still return numeric results -- today we'll use 
+models that return numeric probabilities -- but those numbers are intended to
+be converted into one of a finite number of classes.
+
+---
+class: middle
+
+Today we're going to focus specifically on **binary classification** -- all of 
+our outcomes will belong to 1 of 2 categories. 
+
+&lt;br /&gt;
+
+Most of our examples will focus
+on predicting employee attrition (that is, predicting which employees quit or 
+get fired); either an employee is still employed or they aren't, there's no 
+third option.
+
+&lt;br /&gt;
+
+We're focusing on this because it's easier, and because the methods we talk 
+about today can't easily handle more than two categories. 
+
+&lt;br /&gt;
+
+But of course, there 
+are plenty of times you have more than 2 categories (known as 
+**multiclass problems**) -- we'll talk about methods that can handle those 
+starting week 5.
+
+---
+
+So let's walk through a classification example.
+
+First things first, let's load our data. We'll be using the `attrition` data set
+from the `modeldata` package. Our first step is to install `modeldata` if needed:
+
+
+```r
+install.packages("modeldata")
+```
+
+We then need to load the package using `library`:
+
+
+```r
+library(modeldata)
+```
+
+And finally, we load the data into our R session using the `data`
+function:
+
+
+```r
+data(attrition)
+```
+
+If all goes well, your data frame should have dimensions like this:
+
+
+```r
+ncol(attrition)
+```
+
+```
+## [1] 31
+```
+
+```r
+nrow(attrition)
+```
+
+```
+## [1] 1470
+```
+
+---
+class: middle
+
+This data set contains information about 1,470 employees in the IBM Watson 
+Analytics lab -- what their job is, how much they made, whether they traveled, 
+and, most importantly, whether or not they still work for IBM. 
+
+&lt;br /&gt; 
+
+That last variable is stored in the `Attrition` column, where `Yes` means the
+employee left IBM and `No` means they're still there. This is what we're going 
+to focus on predicting.
+
+&lt;br /&gt; 
+
+We could try to model attrition as a function of an employee's age:
+
+
+```r
+attrition_model &lt;- lm(Attrition ~ Age, attrition)
+```
+
+```
+## Warning in model.response(mf, "numeric"): using type = "numeric" with a factor
+## response will be ignored
+```
+
+```
+## Warning in Ops.factor(y, z$residuals): '-' not meaningful for factors
+```
+
+&lt;br /&gt; 
+
+But we get two warnings!
+
+---
+class: middle
+
+Our warnings both mention `factors`, so let's try just converting every factor
+column in our dataframe to characters:
+
+
+```r
+library(dplyr)
+attrition_cleaned &lt;- attrition |&gt;
+  mutate(across(where(is.factor), as.character))
+
+try(attrition_model &lt;- lm(Attrition ~ Age, attrition_cleaned))
+```
+
+```
+## Warning in storage.mode(v) &lt;- "double": NAs introduced by coercion
+```
+
+```
+## Error in lm.fit(x, y, offset = offset, singular.ok = singular.ok, ...) : 
+##   NA/NaN/Inf in 'y'
+```
+
+Alright, this time we got an error! Progress!
+
+---
+class: middle
+
+The problem here is that our `Attrition` column -- our outcome/response/dependent
+variable -- is stored as a character, while `lm` is expecting a number. 
+
+We should go ahead and create a dummy variable to replace it! Because we only
+have two values (Yes and No), we can use `recode` from `dplyr` to encode our
+variable faster than we could with `pivot_wider` last week.
+
+Let's do that and try refitting our model:
+
+
+```r
+attrition_cleaned &lt;- attrition_cleaned |&gt; 
+  mutate(Attrition = recode(Attrition, "Yes" = 1, "No" = 0))
+
+attrition_model &lt;- lm(Attrition ~ Age, attrition_cleaned)
+```
+
+No warnings, no errors, we've got ourselves a model!
+
+---
+
+But what are we actually modeling? Let's look at it on a graph:
+
+
+```r
+library(ggplot2)
+ggplot(attrition_cleaned, aes(Age, Attrition)) + 
+  geom_jitter(height = 0) + 
+  geom_smooth(method = "lm", formula = "y ~ x")
+```
+
+![](week_3_slides_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+
+This is not exactly an intuitive graph to look at.
+
+---
+
+We recoded our Attrition variable so that "Yes" (employees who quit)
+were transformed to "1", and "No" was transformed to "0". So the dots at the top
+are employees who quit at a given age, and the dots at the bottom are employees
+who stayed on.
+
+So this graph suggests that employees who quit were generally pretty young -- 
+look at how the points at 1 thin out towards the older ages -- while employees
+who stayed were maybe a bit older. 
+
+The slope of our model seems to agree -- the
+line gets closer to 0 (that is, "not quitting") as employees get older.
+
+
+```r
+ggplot(attrition_cleaned, aes(Age, Attrition)) + 
+  geom_jitter(height = 0) + 
+  geom_smooth(method = "lm", formula = "y ~ x")
+```
+
+![](week_3_slides_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+---
+
+We can see this same relationship in the outputs of `summary`: 
+
+
+```r
+summary(attrition_model)
+```
+
+```
+## 
+## Call:
+## lm(formula = Attrition ~ Age, data = attrition_cleaned)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -0.28254 -0.19279 -0.14791 -0.07739  0.97389 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.397938   0.039466  10.083  &lt; 2e-16 ***
+## Age         -0.006411   0.001038  -6.179 8.36e-10 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.3633 on 1468 degrees of freedom
+## Multiple R-squared:  0.02535,	Adjusted R-squared:  0.02468 
+## F-statistic: 38.18 on 1 and 1468 DF,  p-value: 8.356e-10
+```
+
+Age has a negative coefficient ("estimate"), which means that as Age goes up, the 
+predicted value for Attrition goes down (by 0.006411).
+
+But what does it mean for Attrition to go down by 0.006411? What does the actual
+number being predicted by `lm` mean?
+
+---
+
+The short answer is **nothing**, it means nothing.
+
+Importantly, it is _not_ the probability of attrition; linear classifiers 
+_do not calculate probability_. 
+
+Imagine for example what this model would predict
+for a 75 year old employee (more common at IBM than you'd think) -- what would a 
+negative probability even mean?
+
+
+```r
+ggplot(attrition_cleaned, aes(Age, Attrition)) + 
+  scale_x_continuous(limits = c(10, 90)) + 
+  geom_jitter(height = 0) + 
+  stat_smooth(method = "lm", formula = "y ~ x", fullrange = TRUE)
+```
+
+![](week_3_slides_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+
+---
+class: middle
+
+I want to stress this here, because this is a common mistake (particularly in 
+economics): a linear model built to predict a binary variable does not give you 
+probabilities for that binary variable.
+
+&lt;br /&gt;
+
+This makes linear models really poor choices for classification problems. 
+
+&lt;br /&gt;
+
+So what should we do instead?
+
+&lt;br /&gt;
+
+Rather than using linear classifiers, it's a better idea to use what are known 
+as **logistic models** for classification problems. 
+
+---
+class: middle
+
+Logistic models are a transformation of linear models which actually predict 
+probability. This transformation creates a characteristic prediction surface --
+for example, here's a linear model and logistic model both fit to the same 
+(dummy) data:
+
+
+.pull-left[
+
+![](week_3_slides_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+
+]
+
+.pull-right[
+
+![](week_3_slides_files/figure-html/unnamed-chunk-13-1.png)&lt;!-- --&gt;
+
+]
+
+You'll notice two important differences between the graphs. First off, because
+logistic regression is predicting probabilities, it's bounded between 0 and 1.
+
+Secondly, the rate of change in probabilities is _not standard_ for logistic 
+regression. Unlike with linear models, an increase in X of 1 doesn't always 
+result in a standard increase of Y.
+
+This makes interpreting coefficients very complicated; while we
+won't get into it in this course, I recommend [the resource at this link](https://stats.idre.ucla.edu/other/mult-pkg/faq/general/faq-how-do-i-interpret-odds-ratios-in-logistic-regression/)
+if you are interested in learning more.
+
+---
+class: middle
+
+As a transformed linear model, logistic regression requires the same assumptions
+about your data as linear regression. To repeat from last week:
+
+* Linearity: Your outcome (the variable being modeled, in our example sale price) 
+  must be linearly associated with each of your predictor variables.
+* Normality: The sample means of your outcome must be normally distributed for
+  linear regression to produce a good fit. 
+* Multicollinearity: Your predictor variables must be independent from each other; 
+  they should not be correlated with one another.
+
+---
+class: middle
+
+Let's go ahead and walk through using logistic regressions in R.
+
+&lt;br /&gt;
+
+Before we get started, we should probably go ahead and create separate test and 
+train data sets now, using the same code from last week:
+
+
+```r
+set.seed(123)
+row_idx &lt;- sample(seq_len(nrow(attrition_cleaned)), nrow(attrition_cleaned))
+training &lt;- attrition_cleaned[row_idx &lt; nrow(attrition_cleaned) * 0.8, ]
+testing &lt;- attrition_cleaned[row_idx &gt;= nrow(attrition_cleaned) * 0.8, ]
+```
+
+Logistic models, as a transformation of the standard linear model, are part of
+a group known as the generalized linear models. 
+
+&lt;br /&gt;
+
+As a result, rather than use the
+`lm` function, we'll need to use `glm` to fit our model. To specify _which_ glm
+we want to fit, we also need to pass the argument `family = "binomial"`:
+
+
+```r
+attrition_model &lt;- glm(Attrition ~ Age, training, family = "binomial")
+```
+
+---
+
+Just as with linear models, we can investigate our model using `summary`:
+
+
+```r
+summary(attrition_model)
+```
+
+```
+## 
+## Call:
+## glm(formula = Attrition ~ Age, family = "binomial", data = training)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.9044  -0.6698  -0.5715  -0.4264   2.3422  
+## 
+## Coefficients:
+##              Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)  0.214483   0.325838   0.658     0.51    
+## Age         -0.049843   0.009214  -5.409 6.32e-08 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1084.7  on 1174  degrees of freedom
+## Residual deviance: 1052.9  on 1173  degrees of freedom
+## AIC: 1056.9
+## 
+## Number of Fisher Scoring iterations: 4
+```
+
+---
+
+Just like with `lm`, though, we won't be paying too much attention to the 
+outputs from `summary`. Instead, we want to know our model's _accuracy_.
+
+We might expect that `predict` would give us either predicted classifications 
+(so, 1s and 0s, did an employee stay or did they go) or probabilities. But if
+you try using `predict` like we did with `lm`, you'll notice the predictions 
+are... odd:
+
+
+```r
+qplot(predict(attrition_model, training))
+```
+
+![](week_3_slides_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+
+---
+
+To get probabilities, we need to add the argument `type = "response"` to our
+`predict` call:
+
+
+```r
+qplot(predict(attrition_model, training, type = "response"))
+```
+
+![](week_3_slides_files/figure-html/unnamed-chunk-18-1.png)&lt;!-- --&gt;
+
+I wanted to call this out because I mess this up a lot. If you're getting 
+impossible probabilities from a logistic model, make sure you've set the `type`
+argument.
+
+You can see that, once we've set that argument, all of our predicted 
+probabilities fall between 0 and roughly 0.35.
+
+---
+
+To calculate accuracy, we'll first need the probability of each 
+employee quitting:
+
+
+```r
+testing$prediction &lt;- predict(attrition_model, testing, type = "response")
+```
+
+Now we need to convert those probabilities into predictions.
+
+The easiest method is to trust the probabilities -- if an employee has
+an over 50% chance of quitting, we'll say they quit, and if their chance is 
+under 50% we'll say they didn't. 
+
+Mechanically, this is really easy to implement: we just round our predictions so
+we get 1s and 0s from the decimal probabilities:
+
+
+```r
+testing$prediction &lt;- round(testing$prediction)
+```
+
+Our overall accuracy then is just the percentage of predictions we got right:
+
+
+```r
+sum(testing$prediction == testing$Attrition) / length(testing$Attrition)
+```
+
+```
+## [1] 0.8881356
+```
+
+89% accuracy! We did _great_!
+
+---
+class: middle
+
+You might already see the issue with this way of assessing accuracy. 
+
+&lt;br /&gt;
+
+Our histogram of probabilities topped out at about 0.35 -- there wasn't a single 
+employee our model gave more than a 30ish percent chance of quitting.
+
+&lt;br /&gt;
+
+We can show this by replacing our predictions in the accuracy calculation with
+0 -- effectively, assuming no employee would ever quit our fantastic company:
+
+
+```r
+sum(0 == testing$Attrition) / length(testing$Attrition)
+```
+
+```
+## [1] 0.8881356
+```
+
+That makes our accuracy much less impressive!
+
+---
+class: middle
+
+So we can see that we need more than just overall accuracy to judge our models.
+
+&lt;br /&gt;
+
+Let's look at a few other metrics.
+
+&lt;br /&gt;
+
+The `caret` package provides tools for assessing our model. Let's go ahead and
+install it now:
+
+
+```r
+install.packages("caret")
+```
+
+And then load it via `library`:
+
+
+```r
+library(caret)
+```
+
+```
+## Loading required package: lattice
+```
+
+
+---
+
+The only `caret` function we'll use today is `confusionMatrix`. This function
+calculates a lot of accuracy metrics for our model; we'll spend the next few
+slides walking through it.
+
+This function takes three main arguments. The first argument should be our 
+predicted classes, and the second our "true" class values; we need to convert
+both of these to factors for the function to work.
+
+Finally, we also need a value indicating which of our classes is the "positive" 
+result. 
+
+Generally we call the rarer class the "positive" -- think of it like in 
+medicine, where a "positive test result" means the test found a disease. We 
+also sometimes call these "hits".
+
+Because we're looking to figure out which employees will quit, we'll call 
+"Yes" values (which we've coded as 1) "positive" here:
+
+
+```r
+attrition_confusion &lt;- confusionMatrix(
+  # Predictions go first, "true" values second:
+  data = factor(testing$prediction, levels = 0:1),
+  reference = factor(testing$Attrition, levels = 0:1),
+  # Specify what level is your "hit" or "positive" value
+  positive = "1"
+  )
+```
+
+---
+
+This function creates a _lot_ of output for us to walk through:
+
+
+```r
+attrition_confusion
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0 262  33
+##          1   0   0
+##                                           
+##                Accuracy : 0.8881          
+##                  95% CI : (0.8465, 0.9217)
+##     No Information Rate : 0.8881          
+##     P-Value [Acc &gt; NIR] : 0.5462          
+##                                           
+##                   Kappa : 0               
+##                                           
+##  Mcnemar's Test P-Value : 2.54e-08        
+##                                           
+##             Sensitivity : 0.0000          
+##             Specificity : 1.0000          
+##          Pos Pred Value :    NaN          
+##          Neg Pred Value : 0.8881          
+##              Prevalence : 0.1119          
+##          Detection Rate : 0.0000          
+##    Detection Prevalence : 0.0000          
+##       Balanced Accuracy : 0.5000          
+##                                           
+##        'Positive' Class : 1               
+## 
+```
+
+---
+class: middle 
+
+We'll go through a few of the most important parts of the output now.
+
+&lt;br /&gt;
+
+Starting at the top, we have a table called a **confusion matrix** (where the
+function gets its name)!
+
+
+```r
+attrition_confusion$table
+```
+
+```
+##           Reference
+## Prediction   0   1
+##          0 262  33
+##          1   0   0
+```
+
+The rows in this table represent what our model _predicted_ (either 0 or 1), 
+while the columns represent what it _should_ have guessed. 
+
+&lt;br /&gt;
+
+Since we've called our 1s our "positives", we can see that we predicted:
+
++ 262 "true negatives" (prediction 0, reference 0)
++ 33 "false negatives" (prediction 0, reference 1)
++ 0 "false positives" (prediction 1, reference 0)
++ 0 "true positives" (prediction 1, reference 1)
+
+
+---
+class: middle
+
+Up next, we have a whole slew of accuracy metrics:
+
+
+```r
+round(attrition_confusion$overall, 4)
+```
+
+```
+##       Accuracy          Kappa  AccuracyLower  AccuracyUpper   AccuracyNull 
+##         0.8881         0.0000         0.8465         0.9217         0.8881 
+## AccuracyPValue  McnemarPValue 
+##         0.5462         0.0000
+```
+
+You can see "Accuracy" here represents our overall accuracy (across both classes).
+
+&lt;br /&gt;
+
+Also listed is the accuracy we'd get just by guessing the more common class for all of our
+predictions ("AccuracyNull" -- here the same as our overall accuracy). 
+
+---
+class: middle
+
+The next section has a lot of things worth talking about:
+
+
+```r
+round(attrition_confusion$byClass, 3)
+```
+
+```
+##          Sensitivity          Specificity       Pos Pred Value 
+##                0.000                1.000                  NaN 
+##       Neg Pred Value            Precision               Recall 
+##                0.888                   NA                0.000 
+##                   F1           Prevalence       Detection Rate 
+##                   NA                0.112                0.000 
+## Detection Prevalence    Balanced Accuracy 
+##                0.000                0.500
+```
+
+&lt;br /&gt;
+
+The first two interesting values are the **positive and negative predictive values**
+(Pos/Neg Pred Value). 
+
+&lt;br /&gt;
+
+These represent the probabilities that a positive or 
+negative prediction is a _true_ positive or negative prediction -- so 88.8% of 
+the negatives we predict are _true_ negatives, for instance.
+
+---
+class: middle
+
+We calculate these by dividing our "true" values in the confusion matrix by the
+sum of their rows:
+
+
+```r
+attrition_confusion$table
+```
+
+```
+##           Reference
+## Prediction   0   1
+##          0 262  33
+##          1   0   0
+```
+
+
+For example, to calculate our negative predictive power, we'd divide true 
+negatives by the total number of predicted negatives:
+
+&lt;br /&gt;
+
+$$\frac{262 \operatorname{true negatives}}{262 \operatorname{true negatives} + 33\operatorname{false negatives}} = \frac{262 \operatorname{true negatives}}{295 \operatorname{negatives}} = 0.888 $$
+
+&lt;br /&gt;
+
+Since we don't have any positive predictions, we can't actually tell how 
+accurate our positive predictions are -- 0 / (0 + 0) is undefined. 
+
+---
+class: middle 
+
+Similar to predictive value are the concepts of **sensitivity** and 
+**specificity**. 
+
+While our predictive values tell us how likely a given _prediction_ is to be 
+correct, sensitivity and specificity tell us how likely a given observation
+is to be correctly predicted.
+
+To be specific, specificity tells us what proportion of negatives will be 
+classified as negative (the "true negative rate"). 
+
+Sensitivity, meanwhile, tells us what proportion of positives will be 
+correctly classified as positive (the "true positive rate").
+
+
+```r
+round(attrition_confusion$byClass, 3)
+```
+
+```
+##          Sensitivity          Specificity       Pos Pred Value 
+##                0.000                1.000                  NaN 
+##       Neg Pred Value            Precision               Recall 
+##                0.888                   NA                0.000 
+##                   F1           Prevalence       Detection Rate 
+##                   NA                0.112                0.000 
+## Detection Prevalence    Balanced Accuracy 
+##                0.000                0.500
+```
+
+---
+class: middle
+
+To calculate these, we add up the _columns_ of our confusion matrix rather than
+the rows.
+
+
+```r
+attrition_confusion$table
+```
+
+```
+##           Reference
+## Prediction   0   1
+##          0 262  33
+##          1   0   0
+```
+
+&lt;br /&gt;
+
+To calculate sensitivity, we want to divide our number of true positives 
+(predicted 1, reference 1) by the total number of positives in the data set 
+(reference 1)
+
+&lt;br /&gt;
+
+Our sensitivity calculation is therefore:
+
+`$$\frac{0 \operatorname{true positives}}{0 \operatorname{true positives} + 33 \operatorname{false negatives}} = \\ \frac{0 \operatorname{true positives}}{33\operatorname{things that should have been positive}} = 0$$`
+---
+
+Specificity is similar, but instead we're dividing our number of true negatives
+(predicted 0, reference 0) by the total number of negatives (reference 0).
+
+
+```r
+attrition_confusion$table
+```
+
+```
+##           Reference
+## Prediction   0   1
+##          0 262  33
+##          1   0   0
+```
+
+&lt;br /&gt;
+
+That makes our specificity equation:
+
+`$$\frac{262 \operatorname{true negatives}}{262 \operatorname{true negatives} + 0 \operatorname{false positives}} = \\ \frac{262 \operatorname{true negatives}}{262\operatorname{things that should have been negative}} = 1$$`
+
+&lt;br /&gt;
+
+Both of these values go from 0 to 1; our model has the worst possible 
+sensitivity and best possible specificity.
+
+---
+class: middle
+
+Sensitivity and specificity are naturally opposed. 
+
+&lt;br /&gt;
+
+For instance, if you set a probability threshold so that you class everything as 
+a negative (like we've done here, using a probability threshold of 50%), you'll 
+get maximum specificity (no false positives).
+
+&lt;br /&gt;
+
+Similarly, if you set a threshold that classes everything as positive (for 
+instance, a threshold of `\(\geq\)` 0) you could get maximum sensitivity.
+
+&lt;br /&gt;
+
+We can imagine that using different probability thresholds would give us 
+different sensitivity and specificity values somewhere between the two extremes.
+
+---
+
+To look at this closer, we're going to use another new package called `pROC`. 
+Install it now if you haven't before:
+
+
+```r
+install.packages("pROC")
+```
+
+And then load it with `library`:
+
+
+```r
+library(pROC)
+```
+
+```
+## Type 'citation("pROC")' for a citation.
+```
+
+```
+## 
+## Attaching package: 'pROC'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     cov, smooth, var
+```
+
+---
+class: middle
+
+`pROC` helps us calculate what are known as ROC curves for our models. 
+
+&lt;br /&gt;
+
+ROC stands for "Receiver Operating Characteristic", which is a legacy
+name from when they were invented to analyze radar during World War II. Everyone
+just calls them ROC curves, but you'll sometimes see the full name in papers.
+
+&lt;br /&gt;
+
+ROC curves let us see how using different thresholds for our model would impact
+sensitivity and specificity. To see this in action, we need to create a 
+`roc` object with the `roc` function. 
+
+&lt;br /&gt;
+
+This function takes our "true" classes (Attrition in the data frame) and our 
+predicted probabilities as arguments:
+
+
+```r
+attrition_roc &lt;- roc(
+  testing$Attrition,
+  predict(attrition_model, testing, type = "response")
+)
+```
+
+```
+## Setting levels: control = 0, case = 1
+```
+
+```
+## Setting direction: controls &lt; cases
+```
+
+---
+
+We can then use `plot` to see how our model trades off between sensitivity and 
+specificity:
+
+.center[
+
+```r
+plot(attrition_roc)
+```
+
+![](week_3_slides_files/figure-html/unnamed-chunk-37-1.png)&lt;!-- --&gt;
+]
+
+Each point on the black line represents the sensitivity and specificity 
+associated with a different probability threshold -- so while we used a cutoff 
+of 0.5 earlier, 
+we could use other values to get different values of specificity and sensitivity.
+
+---
+
+Note that sensitivity runs the direction we normally expect -- so higher values
+on the y-axis have more true positives - but specificity is backwards; values
+on the left have more _true negatives_. 
+
+This is a little confusing, so people often graph _false positives_ 
+(1 - specificity) on the x-axis instead; the output graph is the exact same 
+either way:
+
+.pull-left[
+![](week_3_slides_files/figure-html/unnamed-chunk-38-1.png)&lt;!-- --&gt;
+]
+
+.pull-right[
+![](week_3_slides_files/figure-html/unnamed-chunk-39-1.png)&lt;!-- --&gt;
+]
+
+---
+class: middle
+
+So what do we do with this information?
+
+Well, it depends. 
+
+We could use this to figure out what probability threshold to use. Since the top left corner represents 100% accuracy, we might want to pick whatever threshold gets us the 
+closest to that point:
+
+.center[
+
+```r
+plot(attrition_roc)
+```
+
+![](week_3_slides_files/figure-html/unnamed-chunk-40-1.png)&lt;!-- --&gt;
+]
+
+---
+class: middle
+
+We can use the `coords` function from pROC to find the "best" threshold this
+way:
+
+
+```r
+coords(attrition_roc, "best")
+```
+
+```
+##   threshold specificity sensitivity
+## 1   0.20499   0.7366412   0.6363636
+```
+
+&lt;br /&gt;
+
+Note that we'd normally do this using the _validation_ set, not the test set --
+I'm skipping the intermediate step here to make these notes a little shorter.
+
+---
+
+We can test that threshold value to see how our accuracy changes:
+
+
+```r
+testing$prediction &lt;- predict(attrition_model, testing, type = "response")
+testing$prediction &lt;- as.numeric(testing$prediction &gt; 0.20499)
+
+confusionMatrix(factor(testing$prediction), 
+                factor(testing$Attrition), 
+                positive = "1")
+```
+
+```
+## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction   0   1
+##          0 193  12
+##          1  69  21
+##                                           
+##                Accuracy : 0.7254          
+##                  95% CI : (0.6707, 0.7756)
+##     No Information Rate : 0.8881          
+##     P-Value [Acc &gt; NIR] : 1               
+##                                           
+##                   Kappa : 0.2126          
+##                                           
+##  Mcnemar's Test P-Value : 4.902e-10       
+##                                           
+##             Sensitivity : 0.63636         
+##             Specificity : 0.73664         
+##          Pos Pred Value : 0.23333         
+##          Neg Pred Value : 0.94146         
+##              Prevalence : 0.11186         
+##          Detection Rate : 0.07119         
+##    Detection Prevalence : 0.30508         
+##       Balanced Accuracy : 0.68650         
+##                                           
+##        'Positive' Class : 1               
+## 
+```
+
+---
+class: middle
+
+Our overall accuracy got a good bit worse, but we're now doing a _better_ job of
+predicting positive values! So is that the threshold we should use?
+
+&lt;br /&gt;
+
+Maybe. There's no rule for what an acceptable false positive/false negative rate
+"should" be; it depends on your application. 
+
+&lt;br /&gt;
+
+You might imagine that medical tests are pretty comfortable with false positives 
+(at which point they'll test the patient again) if it means fewer false negatives. 
+
+&lt;br /&gt;
+
+Conversely, if you're trying to predict where a species lives to prioritize 
+field work, you might be willing to have more false negatives to ensure that you 
+aren't wasting a bunch of time driving out to false positive sites.
+
+---
+
+This is where ROC curves really shine -- they give you a sense of what levels of
+sensitivity and specificity you can get at the same time with your current 
+model. 
+
+If you've looked at the graph and decided what levels of false positives
+and false negatives are acceptable for your current application, you can get all
+the thresholds plotted on the ROC curve using `coords`:
+
+
+```r
+coords(attrition_roc)
+```
+
+```
+##     threshold specificity sensitivity
+## 1        -Inf 0.000000000  1.00000000
+## 2  0.06003516 0.007633588  1.00000000
+## 3  0.06291020 0.011450382  1.00000000
+## 4  0.06591327 0.019083969  1.00000000
+## 5  0.06904913 0.022900763  1.00000000
+## 6  0.07232262 0.026717557  0.96969697
+## 7  0.07573866 0.034351145  0.96969697
+## 8  0.07930226 0.041984733  0.96969697
+## 9  0.08301846 0.061068702  0.96969697
+## 10 0.08689237 0.068702290  0.93939394
+## 11 0.09092911 0.087786260  0.90909091
+## 12 0.09513384 0.099236641  0.90909091
+## 13 0.09951171 0.118320611  0.87878788
+## 14 0.10406785 0.129770992  0.87878788
+## 15 0.10880739 0.141221374  0.84848485
+## 16 0.11373536 0.160305344  0.84848485
+## 17 0.11885675 0.198473282  0.84848485
+## 18 0.12417642 0.217557252  0.81818182
+## 19 0.12969912 0.251908397  0.81818182
+## 20 0.13542945 0.286259542  0.78787879
+## 21 0.14137182 0.320610687  0.78787879
+## 22 0.14753041 0.358778626  0.75757576
+## 23 0.15390918 0.381679389  0.75757576
+## 24 0.16051180 0.431297710  0.75757576
+## 25 0.16734163 0.465648855  0.75757576
+## 26 0.17440167 0.507633588  0.75757576
+## 27 0.18169456 0.568702290  0.69696970
+## 28 0.18922249 0.641221374  0.66666667
+## 29 0.19698722 0.690839695  0.63636364
+## 30 0.20498998 0.736641221  0.63636364
+## 31 0.21323151 0.793893130  0.54545455
+## 32 0.22171195 0.828244275  0.45454545
+## 33 0.23043086 0.874045802  0.36363636
+## 34 0.23938716 0.900763359  0.24242424
+## 35 0.24857910 0.927480916  0.21212121
+## 36 0.25800423 0.942748092  0.15151515
+## 37 0.26765941 0.950381679  0.12121212
+## 38 0.27754073 0.984732824  0.09090909
+## 39 0.28764353 0.992366412  0.09090909
+## 40 0.29796239 0.996183206  0.09090909
+## 41 0.30849108 1.000000000  0.09090909
+## 42        Inf 1.000000000  0.00000000
+```
+
+---
+class: middle
+
+There's one other useful thing we can get from our ROC curve:
+
+.center[
+
+```r
+plot(attrition_roc)
+```
+
+![](week_3_slides_files/figure-html/unnamed-chunk-44-1.png)&lt;!-- --&gt;
+]
+
+That grey line cutting the graph in half is the ROC curve for a completely 
+random model -- that is, a model that's no better than random guessing.
+
+Our model ROC curve shows us how much better our model is than randomly guessing
+at _each_ combination of sensitivity and specificity. 
+
+If we want very high sensitivity (almost all true positives), for instance, this 
+model isn't much better than just guessing.
+
+---
+
+We can use this to calculate another accuracy metric -- the 
+**area under the curve (AUC)** for our model. 
+
+This metric is exactly what it sounds like -- it's the proportion of the graph 
+located under our model ROC curve:
+
+.center[
+
+```r
+plot(attrition_roc, auc.polygon = TRUE)
+```
+
+![](week_3_slides_files/figure-html/unnamed-chunk-45-1.png)&lt;!-- --&gt;
+]
+
+---
+
+Since the random model cuts the graph exactly in half, we'd expect the random 
+model would have an AUC of 0.5. If the entire graph was under our curve, we'd
+have an AUC of 1.0. 
+
+So the closer our AUC is to 1, the closer to "perfect" our model; the further 
+our AUC is from 0.5, the better our model is than the random model.
+
+.center[
+
+```r
+plot(attrition_roc, auc.polygon = TRUE)
+```
+
+![](week_3_slides_files/figure-html/unnamed-chunk-46-1.png)&lt;!-- --&gt;
+]
+
+---
+class: middle
+
+We can use the `auc` function to get the actual AUC value for our model:
+
+
+```r
+auc(attrition_roc)
+```
+
+```
+## Area under the curve: 0.6699
+```
+
+The most common rule-of-thumb for AUC says:
+
++ If AUC == 0.5, then our model is no better than flipping a coin
++ If 0.5 `\(\lt\)` AUC `\(\lt\)` 0.7, the model is a "poor" classifier
++ If 0.7 `\(\leq\)` AUC `\(\lt\)` 0.8, the model is "acceptable"
++ If 0.8 `\(\leq\)` AUC `\(\lt\)` 0.9, the model is "excellent"
++ If 0.9 `\(\leq\)` AUC, the model is "outstanding"
+
+In general, we can assume that higher numbers are always better.
+
+So we'd call this model pretty poor at predicting attrition -- which we knew 
+already.
+
+---
+class: middle
+
+That's it for this week.
+
+Next week, we'll talk about other ways to deal with classification when you have
+a lot more of one class than the other.
+
+---
+
+# References
+
+---
+
+Titles link to references:
+
++ [HOML](https://bradleyboehmke.github.io/HOML/logistic-regression.html), 
+  specifically section 2.6 (model accuracy) and chapter 5 (logistic regression)
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

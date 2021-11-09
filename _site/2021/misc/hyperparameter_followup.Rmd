@@ -1,0 +1,253 @@
+---
+title: "MLCA Week 7:"
+subtitle: "Hyperparameter Followup"  
+author: 
+  - "Mike Mahoney"
+date: "2021-10-13"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(ggplot2)
+knitr::opts_chunk$set(fig.showtext = TRUE, echo = FALSE, message = FALSE)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+style_mono_light(base_color = "#23395b")
+theme_set(theme_xaringan())
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+```{r xaringanExtra-search, echo=FALSE}
+xaringanExtra::use_search(show_icon = TRUE)
+```
+
+```{r xaringan-tachyons, echo=FALSE}
+xaringanExtra::use_tachyons()
+```
+
+```{r xaringan-extra-styles, echo = FALSE}
+xaringanExtra::use_extra_styles(
+  hover_code_line = TRUE,         #<<
+  mute_unhighlighted_code = TRUE  #<<
+)
+```
+
+```{r xaringan-tile-view, echo=FALSE}
+xaringanExtra::use_tile_view()
+```
+
+class: middle
+
+# What are we doing here?
+
+---
+
+.bg-washed-green.b--dark-green.ba.bw2.br3.shadow-5.ph4.mt5[
+Some of the topics discussed fit within traditional statistics but others seem 
+to have escaped, heading south, perhaps in the direction of computer science.  
+
+The escapees were the large-scale prediction algorithms: neural nets, deep 
+learning, boosting, random forests, and support-vector machines. Notably missing 
+from their development were parametric probability models, the building blocks 
+of classical inference. Prediction algorithms are the media stars of the 
+big-data era. 
+]
+
+---
+
+.bg-washed-green.b--dark-green.ba.bw2.br3.shadow-5.ph4.mt5[
+Statistics is a branch of applied mathematics, and is ultimately judged by how 
+well it serves the world of applications. Mathematical logic, a la Fisher, 
+has been the traditional vehicle for the development and understanding of 
+statistical methods. Computation, slow and difficult before the 1950s, was only 
+a bottleneck, but now has emerged as a competitor to (or perhaps an enabler of) 
+mathematical analysis.
+]
+
+---
+
+.bg-washed-green.b--dark-green.ba.bw2.br3.shadow-5.ph4.mt5[
+A cohesive inferential theory was forged in the first half of the twentieth 
+century, but unity came at the price of an inwardly focused discipline, of 
+reduced practical utility. In the century’s second half, electronic computation 
+unleashed a vast expansion of useful—and much used—statistical methodology. 
+
+Expansion accelerated at the turn of the millennium, further increasing the 
+reach of statistical thinking, but now at the price of intellectual cohesion.
+]
+
+
+---
+class: middle center
+
+![](casi_epi.png)
+
+---
+class: middle center
+
+```{r, out.width='100%', fig.height = 6}
+library(dplyr)
+library(ggplot2)
+
+tribble(
+  ~ year, ~ thing, ~ week, ~ y,
+  1805, "Linear regression", 2, -0.5,
+  1838, "Logistic regression", 3, 0.5,
+  1941, "ROC Curves", 3, 0.75, 
+  1951, "K-nearest neighbors", 10, -0.5,
+  1960, "Decision trees", 5, 0.5,
+  1970, "Cross validation", 7, -0.25,
+  1992, "Support vector machines", 11, 0.25,
+  1992, "Stacked ensembles", 9, -0.75,
+  1994, "Bagged decision trees", 6, 1,
+  2001, "Random forests", 6, -1,
+  2001, "Gradient boosting machines", 8, 1.5,
+  2002, "Stochastic GBMs", 9, -1.5
+) |> 
+  ggplot(aes(year, y)) +
+  geom_segment(aes(xend = year, yend = 0)) + 
+  geom_point(size = 0.75, aes(y = 0)) + 
+  geom_label(aes(label = thing), size = 5) + 
+  scale_x_continuous(expand = expansion(c(0.225, 0.35)), breaks = seq(1800, 2025, 25)) + 
+  annotate("segment", x = -Inf, xend = Inf, y = 0, yend = 0) + 
+  theme_minimal() %+replace%
+  theme(panel.grid = element_blank(),
+        axis.text.y = element_blank(),
+        axis.text.x = element_text(size = 16),
+        axis.ticks.x = element_line()) + 
+  labs(x = "", y = "")
+```
+
+---
+
+class: middle
+
+<div style="font-size: 200%">
+
+<blockquote>
+This course attempts to guide students through several of the most common machine learning approaches at a conceptual level with a focus on applications in R.
+</blockquote>
+
+</div>
+
+<div style="font-size: 110%">
+(From https://mlca.mm218.dev/#course-description)
+</div>
+
+---
+
+# Part 1: Prediction
+
+```{r, message=FALSE, echo = FALSE}
+library(dplyr)
+
+tribble(
+  ~ Week, ~ Topic, 
+  "1", "Prediction, Estimation, and Attribution", 
+  "2", "Regression",
+  "3", "Classification",
+  "4", "Classification with imbalanced classes"
+) %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+---
+
+# Part 2: Machine Learning
+
+```{r echo=FALSE}
+tribble(
+  ~ Week, ~ Topic, 
+  "5", "Decision Trees",
+  "6", "Random Forests",
+  "7", "Hyperparameters and Model Tuning",
+  "8", "Gradient Boosting Machines",
+  "9", "Stochastic GBMs and Stacked Ensembles",
+  "10", "k-Nearest Neighbors",
+  "11", "Support Vector Machines (as time allows)"
+) %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+---
+
+# Part 2: Machine Learning
+
+```{r echo=FALSE}
+tribble(
+  ~ Week, ~ Topic, 
+  "5", "Decision Trees",
+  "6", "Random Forests",
+  "7", "Hyperparameters and Model Tuning",
+  "8", "Gradient Boosting Machines",
+  "9", "Stochastic GBMs and Stacked Ensembles",
+  "10", "k-Nearest Neighbors",
+  "11", "Support Vector Machines (as time allows)"
+) %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover")) |> 
+  kableExtra::row_spec(c(1, 3:4, 6), color = "grey") |> 
+  kableExtra::row_spec(c(2, 5, 7), bold = T)
+```
+
+---
+
+# Part 3: Doing The Thing
+
+```{r echo=FALSE}
+tribble(
+  ~ Week, ~ Topic, 
+  "12-13", "Project Work",
+  "14", "Presentations"
+) %>% 
+  kableExtra::kable() %>% 
+  kableExtra::kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+---
+
+.bg-washed-green.b--dark-green.ba.bw2.br3.shadow-5.ph4.mt5[
+A great amount of ingenuity and experimentation has gone into the development of 
+modern prediction algorithms, with statisticians playing an important but not 
+dominant role. There is no shortage of impressive success stories. In the 
+absence of optimality criteria, either frequentist or Bayesian, the prediction 
+community grades algorithmic excellence on performance within a catalog of 
+often-visited examples.
+]
+
+---
+
+.bg-washed-green.b--dark-green.ba.bw2.br3.shadow-5.ph4.mt5[
+“Optimal” is the key word here. Before Fisher, statisticians didn’t really 
+understand estimation. The same can be said now about prediction. Despite their 
+impressive performance on a raft of test problems, it might still be possible 
+to do much better than neural nets, deep learning, random forests, and boosting 
+— or perhaps they are coming close to some as-yet unknown theoretical minimum.
+]
+
+---
+
+## • There is no way to know what model will be best without trying it out*
+
+## • There is no way to know what hyperparameters will be available without choosing a package*
+
+## • There is no way to know what hyperparameter values will be best without fitting models*
+
+<div style="font-size: 150%">
+*Though with practice you can make better guesses
+</div>

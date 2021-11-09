@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>MLCA Week 3:</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Mike Mahoney" />
+    <meta name="date" content="2021-05-25" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <script type="application/json" id="xaringanExtra-editable-docid">{"id":"x2de2e1f492849fd9282d6ec6bd054d3","expires":1}</script>
+    <script src="libs/himalaya/himalaya.js"></script>
+    <script src="libs/js-cookie/js.cookie.js"></script>
+    <link href="libs/editable/editable.css" rel="stylesheet" />
+    <script src="libs/editable/editable.js"></script>
+    <link href="libs/panelset/panelset.css" rel="stylesheet" />
+    <script src="libs/panelset/panelset.js"></script>
+    <script src="libs/mark.js/mark.min.js"></script>
+    <link href="libs/xaringanExtra-search/search.css" rel="stylesheet" />
+    <script src="libs/xaringanExtra-search/search.js"></script>
+    <script>window.addEventListener('load', function() { window.xeSearch = new RemarkSearch({"position":"bottom-left","caseSensitive":false,"showIcon":true,"autoSearch":true}) })</script>
+    <link href="libs/tachyons/tachyons.min.css" rel="stylesheet" />
+    <link href="libs/xaringanExtra-extra-styles/xaringanExtra-extra-styles.css" rel="stylesheet" />
+    <link href="libs/tile-view/tile-view.css" rel="stylesheet" />
+    <script src="libs/tile-view/tile-view.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# MLCA Week 3:
+## Classification: Clippings
+### Mike Mahoney
+### 2021-05-25
+
+---
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class: middle center title-slide
+
+# Clippings
+
+---
+
+These last few slides have things that didn't quite fit into this handout and 
+are probably _just_ outside the scope of what we can cover in a 1-credit course.
+
+I'm including them here for completeness; you can skip them entirely and still 
+be perfectly fine for the rest of this course.
+
+---
+
+# Categorical loss functions
+
+We talked about a large number of accuracy metrics earlier, from accuracy to 
+predictive value to sensitivity and specificity. These are all loss functions,
+just like RMSE or MAE -- numeric metrics of model performance that you can 
+choose to optimize.
+
+But these metrics are different from RMSE in an important way. Most regression
+models minimize RMSE by default; the actual formula of the algorithm is written
+to minimize the metric you're paying attention to.
+
+Classification algorithms don't minimize any of the values we discussed. Instead,
+they try to minimize what's known as *log loss* or *binary cross-entropy loss*
+(the terms are equivalent for our purposes). This loss penalizes models based on
+their _confidence_ in predictions, while all of our metrics look at the 
+predictions themselves.
+
+We won't go too far into the details here, but log loss penalizes low 
+probabilities for correct predictions (and high probabilities for wrong 
+predictions) much more heavily. This makes sense -- a wrong prediction the model
+was 100% confident in _should be_ penalized more than wrong predictions the 
+model was only 51% behind -- but is hard for humans to interpret, so we 
+generally stick with our other metrics for reporting our models.
+
+---
+
+These are graphs of how much loss is added for different probabilities
+of predictions (remembering that here lower values are better) -- you can see 
+how much "confident but wrong" predictions get penalized!
+
+![](week_3_clippings_files/figure-html/unnamed-chunk-1-1.png)&lt;!-- --&gt;
+
+![](week_3_clippings_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+
+---
+
+# AUC Cut-points
+
+Our discussion of AUC included a list of thresholds, to classify models from 
+"poor" to "outstanding"
+
+These thresholds come from [Applied Logistic Regression](https://www.wiley.com/en-us/Applied+Logistic+Regression%2C+3rd+Edition-p-9780470582473) by David Hosmer, Stanley Lemeshow, and Rodney Sturdivant. Frustratingly, 
+they are not particularly well explained in that text; instead, they're given as
+magic numbers to guide interpretation. 
+
+These thresholds are very commonly used in the literature, often citing back to
+this textbook for explanation. If it appears that the thresholds just appear 
+from nowhere in this handout, that's because that's how they appear to me in the
+literature. 
+
+---
+
+# AIC
+
+While we don't touch on it here because of our focus on accuracy metrics, I want
+to mention that AIC is also a pretty good way to assess and compare models. 
+AIC -- which stands for Akaike Information Criterion -- is a way of estimating 
+prediction accuracy; in effect, it represents the amount of "information" 
+(defined in a very specific, very mathy way) wasted by a given model. 
+
+Models with lower AIC waste less information and are therefore better predictors;
+if one model has an AIC that's at least 4 or more below another's, we say the 
+first model is "better". Models with AIC within 4 of each other are assumed to 
+be equivalent.
+
+The tricky thing is that you can't compare AIC between different types of model 
+-- so for instance we could use AIC to compare multiple logistic models, but not
+to compare logistic models against the decision trees we'll talk about next week.
+Also, AIC is a unitless value, so the actual AIC of a model doesn't give you any
+information; you only really care about how a model's AIC compares to all your 
+other models.
+
+That said, AIC is still extremely common for comparing predictive models, 
+especially in academia (BIC is more common for estimation models, and accuracy 
+is more common in industry). If you need more information about the use of AIC,
+I highly recommend Burnham and Anderson's 2004 article: [at this link](https://doi.org/10.1177%2F0049124104268644).
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

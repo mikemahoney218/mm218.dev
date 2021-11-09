@@ -1,0 +1,540 @@
+---
+title: "MLCA Week 8:"
+subtitle: "Gradient Boosting Machines"  
+author: 
+  - "Mike Mahoney"
+date: "2021-10-20"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(ggplot2)
+knitr::opts_chunk$set(fig.showtext = TRUE)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+style_mono_light(base_color = "#23395b")
+theme_set(theme_xaringan())
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+```{r xaringanExtra-search, echo=FALSE}
+xaringanExtra::use_search(show_icon = TRUE)
+```
+
+```{r xaringan-tachyons, echo=FALSE}
+xaringanExtra::use_tachyons()
+```
+
+```{r xaringan-extra-styles, echo = FALSE}
+xaringanExtra::use_extra_styles(
+  hover_code_line = TRUE,         #<<
+  mute_unhighlighted_code = TRUE  #<<
+)
+```
+
+```{r xaringan-tile-view, echo=FALSE}
+xaringanExtra::use_tile_view()
+```
+
+class: center, middle
+
+# Gradient Boosting Machines
+
+---
+class: middle
+
+We're going to move on this week to talk about **gradient boosting machines** (GBMs). 
+Like random forests, GBMs aggregate decision trees in order to reduce model 
+variance, resulting in more accurate predictions. 
+
+However, unlike random forests, trees in a GBM are not grown all at once to 
+predict the same outcome. Instead, trees are grown in sequence, and each tree
+predicts the residuals of the trees grown before it.
+
+GBMs are computationally intensive and a downright bear to tune, but done right 
+GBMs are often the best predictive model for a given task, and have
+a long history of winning competitive machine learning challenges.
+
+---
+
+But before we get to all that, let's talk about **boosting** -- the "B" in GBM.
+
+Boosting is the process of sequentially adding models to a 
+base model in order to reduce errors and refine the predictions of the initial
+model.
+
+Let's walk through an example, using our Ames data. First off, we'll create our
+training and testing splits as usual:
+
+```{r}
+set.seed(123)
+ames <- AmesHousing::make_ames()
+row_idx <- sample(seq_len(nrow(ames)), nrow(ames))
+training <- ames[row_idx < nrow(ames) * 0.8, ]
+testing <- ames[row_idx >= nrow(ames) * 0.8, ]
+```
+
+---
+
+The first step in creating a boosted model is to fit a "base" model. While we 
+can use any model for this -- it's not uncommon to see boosted linear models, 
+for instance -- most often we'll use decision trees.
+
+To keep things simple, we'll go ahead and fit our default decision tree:
+
+```{r}
+library(rpart)
+first_tree <- rpart(Sale_Price ~ ., training)
+```
+
+As we've seen before, this decision tree is a weak learner which doesn't do 
+great at predicting sale prices:
+
+```{r}
+training$first_prediction <- predict(first_tree, training)
+sqrt(mean((training$first_prediction - training$Sale_Price)^2))
+```
+
+(We'll look at test-set accuracy in a minute.)
+
+---
+
+So we now have our base model, and we want to improve its accuracy through 
+boosting. In order to do that, we're going to fit a new model to predict the
+_errors_ of our base model.
+
+First, we need to calculate the residuals from our model:
+
+```{r}
+training$residual <- training$Sale_Price - training$first_prediction
+```
+
+We'll then go ahead and create a new training data frame, without our original
+sale price or prediction columns (since we don't want to include those in the
+model):
+
+```{r, message=FALSE}
+library(dplyr)
+new_training <- select(training, -Sale_Price, -first_prediction)
+```
+
+And finally, we'll fit another decision tree to try and predict the _residuals_
+from our first tree:
+
+```{r}
+second_tree <- rpart(residual ~ ., new_training)
+```
+
+---
+
+We now have two separate models -- one that predicts sale prices, and one that
+predicts the error of that prediction.
+
+To get a single, combined predicted sale price from those models, we can just 
+add the two predictions together:
+
+```{r}
+training$second_prediction <- predict(second_tree, training)
+
+training$adjusted_prediction <- 
+  training$first_prediction + training$second_prediction
+```
+
+Now we can compare the RMSE of this combined model against our original decision 
+tree:
+
+```{r}
+sqrt(mean((training$first_prediction - training$Sale_Price)^2))
+
+sqrt(mean((training$adjusted_prediction - training$Sale_Price)^2))
+```
+
+And it looks like the boosted model does dramatically better than the single tree!
+
+---
+
+Of course, this is the training set error. We already know that decision trees
+can be notorious overfitters, with much lower errors on the test set than the
+training set. 
+
+With that in mind, let's look at how our boosted model does on the test set:
+
+```{r}
+testing$first_prediction <- predict(first_tree, testing)
+testing$second_prediction <- predict(second_tree, testing)
+
+testing$adjusted_prediction <- 
+  testing$first_prediction + testing$second_prediction
+
+sqrt(mean((testing$first_prediction - testing$Sale_Price)^2))
+sqrt(mean((testing$adjusted_prediction - testing$Sale_Price)^2))
+```
+
+Looking at these RMSEs, it does seem that the boosted model improves the single 
+decision tree -- but by much less than when we looked at training RMSE. 
+
+This looks like classic overfitting -- our model is becoming far too confident
+when predicting the training set, so it makes extreme predictions which don't 
+work when predicting new data.
+
+What can we do about that?
+
+---
+
+Well, what if we made our model less confident? 
+
+For instance, what if instead of believing that our second model perfectly 
+corrects the base prediction, we viewed it as being a weak indicator of how
+far off the base prediction was? 
+
+When we think about our second model in that way, it might make sense for us to
+not add the entire residual predicted by the model. Instead, we might try
+nudging our initial prediction by, say, half the correction factor:
+
+```{r}
+testing$adjusted_prediction <- 
+  testing$first_prediction + (testing$second_prediction * 0.5)
+```
+
+We can then evaluate this new adjustment method:
+
+```{r}
+sqrt(mean((testing$first_prediction - testing$Sale_Price)^2))
+sqrt(mean((testing$adjusted_prediction - testing$Sale_Price)^2))
+```
+
+Though it's still not as good as we did on the training data,
+we can see that this weaker nudge actually out-performs our first attempt.
+
+---
+
+We can think of that 0.5 multiplier as being a "learning rate" for our model.
+Conceptually, the learning rate represents how fast we want our model to 
+incorporate corrections into its predictions. 
+
+For instance, we could go on to add a third tree to this model, using a learning
+rate of 0.5. To do so, we'd first want to calculate the residuals from our 
+second tree:
+
+```{r}
+training$adjusted_prediction <- 
+  training$first_prediction + (training$second_prediction * 0.5)
+
+training$residual <- training$Sale_Price - training$adjusted_prediction
+```
+
+Then we'll recreate a data frame without our predictions, and fit a new tree:
+
+```{r}
+new_training <- select(training, 
+                       -Sale_Price, 
+                       -first_prediction, 
+                       -second_prediction, 
+                       -adjusted_prediction)
+
+third_tree <- rpart(residual ~ ., new_training)
+```
+
+---
+
+And then we can add that third tree to our model, just like we did with the
+second one:
+
+```{r}
+testing$third_prediction <- predict(third_tree, testing)
+
+testing$final_prediction <- 
+  testing$adjusted_prediction + (testing$third_prediction * 0.5)
+
+sqrt(mean((testing$first_prediction - testing$Sale_Price)^2))
+sqrt(mean((testing$adjusted_prediction - testing$Sale_Price)^2))
+sqrt(mean((testing$final_prediction - testing$Sale_Price)^2))
+```
+
+Our third tree improves our prediction accuracy even further!
+
+This is how boosting works, at its core. Most of the time we'll be working with
+many more trees, but the essential process of
+building trees to predict the residuals of past predictions is the same.
+
+---
+
+The other big way that boosting algorithms reduce overfitting is by using weaker
+learners. 
+
+For instance, when boosting decision trees, you might wind up fitting a bunch
+of trees with only one split, sometimes referred to as **decision stumps**. 
+
+These stumps will have _extremely_ low predictive accuracy, but not 0
+accuracy altogether. If you add enough of them together, you might be able to 
+aggregate all those non-0 accuracies together into a solid final prediction.
+
+We won't walk through the process of using decision stumps manually, because it
+takes _many_ trees to see real improvements over the base learner. But it's 
+worth highlighting that usually when we talk about boosting algorithms, we're 
+purposefully using extremely weak versions of our component models to 
+avoid overfitting.
+
+---
+
+Of course, when we want to use more trees and smaller learning rates, we usually
+won't fit all the trees ourselves. Gradient boosting machines provide a way to 
+fit all the trees automatically. 
+
+We'll use the `gbm` package to fit our GBMs today -- go ahead and install it if
+you need to:
+
+```{r, eval=FALSE}
+install.packages("gbm")
+```
+
+We've also made a mess of our training and testing sets, so let's use our 
+original `ames` data and `row_idx` vector to recreate those:
+
+```{r}
+training <- ames[row_idx < nrow(ames) * 0.8, ]
+testing <- ames[row_idx >= nrow(ames) * 0.8, ]
+```
+
+---
+
+Fitting a simple GBM works just like every other type of model we've seen so 
+far -- we'll load the `gbm` package and then fit a model using `gbm`:
+
+```{r}
+library(gbm)
+
+first_gbm <- gbm(Sale_Price ~ ., data = training)
+```
+
+Note that the second argument to `gbm` is `distribution`, not `data`, so we need
+to specify our data explicitly.
+
+The `gbm` package will walk through the same steps as we did, fitting sequential
+trees to our data to try and reduce prediction error. 
+
+However, `gbm` will fit
+a lot more trees than we did -- by default, 100, but we'll usually use more than
+that -- and will also fit those trees on a different random subsample of the
+training data each time. 
+
+The theory here is similar to random forests -- we want to increase the variance
+between our trees, so that the aggregated prediction is better. We'll talk more
+about this next week.
+
+---
+class: middle
+
+With our model fit, we can then evaluate our test-set RMSE:
+
+```{r}
+sqrt(mean((predict(first_gbm, testing) - testing$Sale_Price)^2))
+```
+
+Out-of-the-box, GBM does an _alright_ job predicting sale price. It's better than
+linear regression, but worse than random forests.
+
+---
+class: middle
+
+But, much like random forests, GBMs have a number of hyperparameters for us to 
+tune. The main ones in `gbm` include:
+
++ `shrinkage`: The learning rate for the model. 
+
++ `n.trees`: How many trees to grow. Unlike random forests, GBMs can wind up
+  overfitting if they're grown with too many trees, so it's important to tune
+  this value with the other hyperparameters.
+
++ `interaction.depth`: The maximum depth of each tree (how many splits). Tends 
+  to be from 3-8, though older papers often use 1 to make decision stumps.
+
++ `n.minobsinnode`: The minimum number of observations per leaf node in each 
+  tree (like `min.node.size` in ranger).
+
+GBMs are incredibly sensitive to hyperparameter values, and tend to need more
+careful tuning than random forests to predict effectively.
+
+---
+
+We can tune these hyperparameters using grid searches, just like last week. 
+However, because GBMs need to grow their trees sequentially (unlike random 
+forests, which can grow all their trees at the same time), grid searches for 
+GBMs can take quite a bit of time.
+
+As such, we tend to tune GBM in multiple stages. 
+
+We're going to start off by tuning the learning rate for our GBM. Smaller 
+learning rates tend to produce better models, but require more trees to be 
+effective and so take a long time to run. Higher learning rates are faster, but
+might not be as effective. 
+
+For this reason, we're going to try a range of learning rates and choose the 
+value that balances accuracy and training time, which we'll measure using 
+`system.time`. 
+
+One very nice thing about `gbm` is that we can implement k-fold CV just by 
+using the `cv.folds` argument; we don't need to write our own function this 
+time.
+
+---
+
+As a result, our grid to choose a learning rate looks like this. 
+
+Fair warning, this takes about 6 minutes to run:
+
+```{r, cache=TRUE}
+tuning_grid <- expand.grid(
+  learning_rate = c(0.3, 0.1, 0.05, 0.01, 0.005),
+  rmse = NA,
+  trees = NA,
+  time = NA
+)
+
+for(i in seq_len(nrow(tuning_grid))) {
+  train_time <- system.time({
+    m <- gbm(
+      formula = Sale_Price ~ .,
+      # Optional -- silences a warning:
+      distribution = "gaussian",
+      data = training,
+      n.trees = 6000, 
+      shrinkage = tuning_grid$learning_rate[i], 
+      interaction.depth = 3, 
+      n.minobsinnode = 10,
+      cv.folds = 5 
+   )
+  })
+  
+  tuning_grid$rmse[i]  <- sqrt(min(m$cv.error))
+  tuning_grid$trees[i] <- which.min(m$cv.error)
+  tuning_grid$time[i]  <- train_time[["elapsed"]]
+
+}
+```
+
+---
+
+We can then see which of our learning rates best balances accuracy and time:
+
+```{r}
+arrange(tuning_grid, rmse)
+```
+
+In this case, we'll go ahead and run with a learning rate of 0.01 for the rest of 
+our tuning.
+
+---
+
+With a learning rate chosen, we'll go ahead and tune our tree-specific 
+parameters (namely, interaction depth and observations per node) using a new 
+grid. 
+
+This one took about 15 minutes to complete:
+
+```{r, cache = TRUE}
+tuning_grid <- expand.grid(
+  learning_rate = 0.01,
+  interaction.depth = c(3, 5, 7),
+  n.minobsinnode = c(5, 10, 15),
+  trees = NA,
+  rmse = NA
+)
+
+for(i in seq_len(nrow(tuning_grid))) {
+    m <- gbm(
+      formula = Sale_Price ~ .,
+      distribution = "gaussian",
+      data = training,
+      n.trees = 6000, 
+      shrinkage = tuning_grid$learning_rate[i], 
+      interaction.depth = tuning_grid$interaction.depth[i], 
+      n.minobsinnode = tuning_grid$n.minobsinnode[i],
+      cv.folds = 5 
+   )
+  
+  tuning_grid$trees[i] <- which.min(m$cv.error)
+  tuning_grid$rmse[i]  <- sqrt(min(m$cv.error))
+
+}
+```
+
+---
+
+And just as before, we'll look to see which of our hyperparameter combinations
+produced the best models:
+
+```{r}
+head(arrange(tuning_grid, rmse))
+```
+
+
+As with random forests, we could continue tuning with narrower and narrower 
+ranges until we were confident we arrived at the absolute best hyperparameters.
+We'd also experiment with smaller and smaller shrinkages, to see if they 
+improved fit at all.
+
+---
+
+However, even the values we've landed at from two rounds of tuning produce a 
+pretty good model:
+
+```{r}
+final_gbm <- gbm(
+  Sale_Price ~ .,
+  data = training,
+  n.trees = 6000,
+  shrinkage = 0.01,
+  interaction.depth = 5,
+  n.minobsinnode = 5
+)
+
+sqrt(mean((predict(final_gbm, testing) - testing$Sale_Price)^2))
+```
+
+This is dramatically better than our fully tuned random forest!
+
+---
+class: middle
+
+GBMs are incredibly effective predictive models. With proper tuning, they're 
+often one of the best tools for any predictive task.
+
+However, GBMs aren't without their drawbacks. These models can be incredibly 
+computationally intensive to train and tune, especially compared to random 
+forests. Unlike random forests, they also rarely work well "out of the box" -- 
+GBMs almost always require tuning before they're effective predictors.
+Lastly, GBMs also do a good job of reducing bias, but are worse at removing 
+error from variance than random forests.
+
+Next week we'll talk about a variation of GBMs designed to fix most of these issues.
+
+---
+class: middle
+
+# References
+
+---
+
+Titles are links:
+
++ [HOML Chapter 12](https://bradleyboehmke.github.io/HOML/gbm.html)
+
+A few papers 
+
++ [Additive logistic regression: a statistical view of boosting](https://projecteuclid.org/journals/annals-of-statistics/volume-28/issue-2/Additive-logistic-regression--a-statistical-view-of-boosting-With/10.1214/aos/1016218223.full)
++ [Greedy function approximation: A gradient boosting machine.](https://projecteuclid.org/journals/annals-of-statistics/volume-29/issue-5/Greedy-function-approximation-A-gradient-boostingmachine/10.1214/aos/1013203451.full)
++ [Stochastic gradient boosting](https://www.sciencedirect.com/science/article/pii/S0167947301000652)

@@ -1,0 +1,9 @@
+base
+ggplot2
+dplyr
+xaringanthemer
+modeldata
+recipes
+lattice
+caret
+pROC

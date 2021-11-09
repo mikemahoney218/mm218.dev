@@ -1,0 +1,169 @@
+---
+title: "MLCA Week 10:"
+subtitle: "Followup"  
+author: 
+  - "Mike Mahoney"
+date: "2021-11-02"
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: xaringan-themer.css
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include=FALSE}
+options(htmltools.dir.version = FALSE)
+library(ggplot2)
+knitr::opts_chunk$set(fig.showtext = TRUE, echo = TRUE, message = FALSE)
+```
+
+```{r xaringan-themer, include=FALSE, warning=FALSE}
+library(xaringanthemer)
+style_mono_light(base_color = "#23395b")
+theme_set(theme_xaringan())
+```
+
+```{r xaringan-panelset, echo=FALSE}
+xaringanExtra::use_panelset()
+```
+
+```{r xaringanExtra-search, echo=FALSE}
+xaringanExtra::use_search(show_icon = TRUE)
+```
+
+```{r xaringan-tachyons, echo=FALSE}
+xaringanExtra::use_tachyons()
+```
+
+```{r xaringan-extra-styles, echo = FALSE}
+xaringanExtra::use_extra_styles(
+  hover_code_line = TRUE,         #<<
+  mute_unhighlighted_code = TRUE  #<<
+)
+```
+
+```{r xaringan-tile-view, echo=FALSE}
+xaringanExtra::use_tile_view()
+```
+
+class: middle
+
+# Project FAQ
+
+---
+
+### Cross-entropy (from week 7 - tuning RF):
+
+```{r}
+calc_cross_entropy <- function(rf_model, data) {
+  data <- predict(rf_model, data) |> 
+  predictions() |> 
+  cbind(data) |> 
+  mutate(prediction = ifelse(Attrition == "Yes", Yes, No),
+         # Force prediction to not be exactly 0 or 1
+         prediction = max(1e-15, min(1 - 1e-15, prediction)),
+         loss = -log(prediction))
+  sum(-log(data$prediction))
+}
+```
+
+### Cross-entropy: negative log of the probability of _the correct classification_
+
+### `ranger`: provides predictions of both classes
+
+### `lightgbm`: provides predictions of _the positive class_
+
+---
+
+### So alteration needed:
+
+```{r}
+calc_cross_entropy <- function(lgb_model, data) {
+  data <- data |>
+    mutate(predict(lgb_model, data),
+           # If the correct answer is No, invert the prediction:
+           prediction = ifelse(Attrition == "Yes", 
+                               prediction, 
+                               1 - prediction),
+         # Force prediction to not be exactly 0 or 1
+         prediction = max(1e-15, min(1 - 1e-15, prediction)),
+         loss = -log(prediction))
+  sum(-log(data$prediction))
+}
+```
+
+---
+
+### Just because it _worked_ doesn't mean it's _working_
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics("working_not_working.png")
+```
+
+
+--
+
+```{r echo=FALSE, out.width='75%'}
+knitr::include_graphics("working_working.png")
+```
+
+---
+
+## Standard citations:
+
+```{r}
+citation()
+```
+
+---
+
+## Other standard cites
+
+```{r eval = FALSE}
+citation("ranger") # RF
+citation("lightgbm") # GBM
+citation("kernlab") # SVM
+citation("caret") # KNN
+citation("rpart") # Decision trees
+```
+
+Breiman, L., 2001. Random Forests. Machine Learning 45, 5–32. https://doi.org/10.1023/A:1010933404324
+
+Friedman, J. H., 2002. Stochastic Gradient Boosting. Computational Statistics & Data Analysis 38(4), 367-378. https://doi.org/10.1016/S0167-9473(01)00065-2
+
+Cortes, C., Vapnik, V. Support-vector networks. Machine Learning 20, 273–297 (1995). https://doi.org/10.1007/BF00994018
+
+---
+
+# Other notes:
+
+### Don't force-install packages (it's rude)
+
+### Don't cite LM, GLM
+
+### Pay attention to the rubric (if it isn't there, it isn't worth points)
+
+---
+
+# Project re-submit
+
+### Optional!
+
+### I make no promises about turnaround time (but measured in days, not hours.)
+
+### No resubmission after 2021-12-08.
+
+### First project has been finished!
+
+---
+
+# Status Update
+
+### One more week of content (SVM)
+
+### Three "work weeks" (bring questions)
+
+### Presentations 2021-12-08

@@ -1,0 +1,479 @@
+# Assignment 1: R Refresher
+
+This assignment is due by the start of the second class. 
+
+Please submit this assignment via email to:
+
+mike.mahoney.218@gmail.com
+
+With "FOR 796" in the subject line (so it goes to my inbox).
+
+## R Markdown
+
+This is an R Markdown document, a type of text file that lets us mix text and 
+code within a single document. All of the assignments for the semester will be
+distributed in this format, though you can feel free to submit your code in any
+format that R Studio recognizes & runs R code in (.Rmd, .Rd, .R, and probably 
+others).
+
+In R Markdown documents, we can create _code chunks_ that contain code separate
+from our plain text. Those chunks look like this:
+
+```{r}
+plot(Orange)
+```
+
+Note that our code is inside a "code fence" of backtick (`) marks. If you're 
+using R Studio, when your cursor is inside that fence you can press 
+Control + Enter to run a single line of code, or Control + Shift + Enter to run
+the entire chunk. 
+
+You can also run all the chunks _above_ your cursor by pressing 
+Control + Shift + Alt + P (whew), and run _all_ chunks via Control + Alt + R.
+
+If you want to know more about R Markdown, I recommend this section of the R for
+Data Science book: <https://r4ds.had.co.nz/r-markdown.html>
+
+## Assignments
+
+Assignments in this course are intended to be short expansions on the handout, 
+making sure you're able to implement the concepts we're going over that week.
+Generally you won't need to write a lot of new code; instead, I'll ask you to
+"fill in the blanks" so that a code chunk gives a specific output.
+
+Once you've finished the assignment, you should always be able to hit 
+Control + Alt + R to run all your code -- the entire document should run without
+error.
+
+Things for you to fill out will always be prefaced with "#### Exercise" so you
+can Ctrl+F to find them. For instance:
+
+#### Exercise
+
+Edit this chunk (replacing the 🌞) so that it prints out the 
+_first two_ rows of the `Orange` data frame:
+
+```{r}
+🌞(Orange, 🌞)
+```
+
+(Run `?head` in the console for a hint).
+
+This week's assignment will focus on reviewing how to manipulate data frames 
+using the tidyverse, and more specifically dplyr. After this week, assignments
+will mostly focus on fitting models and assessing performance.
+
+## Definitions
+
+To start off, let's go over the 
+
+* The basic object type in R is the **vector**, created by `c()`. A vector is a 
+  set of values, each of the same data type --  a single vector can store 
+  character values, or numeric values, or logical values, but only one of these
+  at a time.
+* A **data frame** is a combination of multiple vectors. The vectors can be of
+  different types, but they _must_ all be the same length.
+
+In this class, we're going to focus almost entirely on working with data frames,
+and specifically with "tidy data". Tidy data follows three rules:
+
+* Every column is a _variable_, with a standard definition and measurement.
+* Every row is an _observation_, so that each value in the row is measuring the 
+  same "thing".
+* Every cell is a _value_.
+
+(If the below doesn't display as an image, shift+click the URL to see the 
+graphic.)
+
+![](https://r4ds.had.co.nz/images/tidy-1.png)
+
+Frankly, having your data organized this way at the start of a project, without
+needing to wrangle it yourself, is pretty rare. But this is a one credit class,
+so we can only cover so much ground.
+
+Starting off with tidy data lets us use a set of tools known as the "tidyverse",
+specifically designed for working with data in this format. Go ahead and install
+the tidyverse now if you haven't before:
+
+```{r, eval = FALSE}
+install.packages("tidyverse")
+```
+
+This assignment is going to focus on a specific package from the tidyverse, 
+named "dplyr". This is meant to be a rapid introduction for people with some R 
+experience already, or a quick review for people who have used the tidyverse
+before. If you're not in either category, I might recommend working through
+<https://r4ds.had.co.nz/>.
+
+## dplyr 101
+
+Let's go ahead and load dplyr now:
+
+```{r}
+library(dplyr)
+```
+
+dplyr has become incredibly popular within the R community because it offers a
+standard way for interacting with and manipulating data frames. dplyr organizes
+itself around a standard set of "verbs", which are functions with descriptive 
+names.
+
+### Select
+
+Each verb takes a data frame as its first argument and returns a data frame. 
+For instance, the verb `select` lets us "select" a subset of columns from a 
+data frame by providing a data frame and then the names of the columns we want
+to keep.
+
+For instance, if we want to select just the column "Tree" from the Orange data
+frame, we could do the following:
+
+```{r}
+select(Orange, Tree)
+```
+
+We can also use a minus sign (-) with `select` to drop columns -- for example, 
+this will _remove_ the Tree column from our table but preserve our other 
+variables:
+
+```{r}
+select(Orange, -Tree)
+```
+
+
+`select` returns columns in the order you named them. We can use this to 
+re-order columns within a data frame -- for instance, if we just want to move
+"circumference" to the front of the table:
+
+```{r}
+select(Orange, circumference, Tree, age)
+```
+
+A faster way to do this (particularly for larger tables) is to combine this with
+the `everything` function from dplyr. `everything` selects all our 
+variables at once, so putting it at the end of a `select` call returns the 
+column names we typed out _before_ everything else:
+
+```{r}
+select(Orange, circumference, everything())
+```
+
+#### Exercise 
+
+How would you edit this command so that Tree was at the _end_ of the data frame?
+
+```{r}
+🌞(Orange, 🌞, Tree)
+```
+
+
+### Filter
+
+If we want to select _rows_, rather than columns, we'll use the `filter` 
+function. `filter` also takes a data frame as its first argument, takes any 
+number of conditions as further arguments, and then returns a data frame with 
+only the rows where all conditions were `TRUE`.
+
+For instance, if we only want the data for Tree 3, we might filter like so:
+
+```{r}
+filter(Orange, Tree == 3)
+```
+
+Just like base R, we can use `|` to mean "or" -- so this function gives us every
+row where Tree is 3 OR Tree is 4:
+
+```{r}
+filter(Orange, Tree == 3 | Tree == 4)
+```
+
+Similarly we can use `&` to mean "and", for instance to return only the row 
+where Tree is 3 and age is 1582:
+
+```{r}
+filter(Orange, Tree == 3 & age == 1582)
+```
+
+In addition, you can use functions inside `filter` to filter on more complex 
+conditions:
+
+```{r}
+filter(Orange, age == min(Orange$age))
+```
+
+
+Because dplyr verbs return data frames, and dplyr verbs take data frames as 
+their first argument, it's often convenient to combine multiple verbs:
+
+```{r}
+select(
+  filter(Orange, Tree == 3),
+  age
+)
+```
+
+#### Exercise
+
+How would you edit this chunk to return the tree with the largest circumference?
+
+```{r}
+🌞(Orange, 🌞 == 🌞(Orange$🌞))
+```
+
+### Pipes
+
+Combining functions like we did above, with `filter` contained inside of 
+`select`, is pretty clunky. Luckily, there's a shorter way. As of R 4.1.0
+(released May 20, 2021), R has a "pipe" operator (`|>`) which lets us chain 
+together multiple function calls in a "pipeline".
+
+Note that this course is designed for people using R 4.1.0 and up, and as a 
+result uses "|>" almost exclusively. If you're using earlier versions of R, this
+course has not been tested for your version of R, and I recommend you upgrade.
+If that's not possible, you can usually replace |> with the old pipe function
+`%>%` from dplyr; the two are almost identical. 
+
+At its most basic, the pipe takes whatever is on its left-hand side and uses it
+as the first argument to the right-hand side:
+
+```{r}
+# The exact same as above
+Orange |> head(2)
+```
+
+This is where dplyr's standard interface comes in handy. For instance, we can 
+replace our filter-inside-select from earlier with a pipeline, which makes it
+clear there are two separate steps here:
+
+```{r}
+Orange |> filter(Tree == 3) |> select(age)
+```
+
+After a few steps, this starts to take up a lot of space. For that reason, the
+standard is to hit "enter" after each pipe:
+
+```{r}
+Orange |> 
+  filter(Tree == 3) |> 
+  select(age)
+```
+
+#### Exercise
+
+Turn this nested function into a properly-formatted pipeline:
+
+```{r}
+select(
+  filter(
+    select(Orange, circumference, everything()),
+    age < 1000
+  ),
+  -age
+)
+```
+
+### Mutate
+
+If we need to manipulate our data frame, we'll usually turn to the function 
+`mutate`. `mutate` can be used to create and modify columns in our data frame.
+Specifically, `mutate` edits the _vectors_ (columns) of the data frame; since 
+the vectors in a data frame need to all be the same length, that means `mutate`
+creates a new value for every observation in our data.
+
+For instance, to create a new column with our tree age in years (rather than 
+days), we could call mutate like this:
+
+```{r}
+Orange |> 
+  mutate(age_years = age / 365)
+```
+
+Notice that age_years was calculated _for each observation_. 
+
+We could also use mutate to overwrite the original age column this way:
+
+```{r}
+Orange |> 
+  mutate(age = age / 365)
+```
+
+Or to create columns out of thin air:
+
+```{r}
+Orange |>
+  mutate(new_col = 23)
+```
+
+Note that you can do multiple mutations inside a single function call. If you do
+this, know that `mutate` goes in order from your first command to the last one --
+commands defined "higher up" in the function go first:
+
+```{r}
+Orange |>
+  mutate(new_col = 23,
+         age = age * new_col,
+         age_year = age / 365)
+```
+
+#### Exercise
+
+Edit this pipeline so that it:
+
++ Creates a new column equal to age times circumference
++ Filters to only the rows where the new column is greater than (>) 10,000
++ Selects only the new column
+
+```{r}
+🌞 |> 
+  🌞(🌞 = 🌞 * 🌞) |> 
+  🌞(🌞 > 10000) |> 
+  🌞(🌞)
+```
+
+### Summarise
+
+If we're looking to get aggregate information about our data frame, we'll want
+to use the `summarise` function. We can use this function to, for instance, 
+calculate the mean values of our variables. The syntax to do so looks a lot like 
+`mutate`:
+
+```{r}
+Orange |> 
+  summarise(mean_circ = mean(circumference))
+```
+
+By default, `summarise` is calculating the mean age of our entire data frame. 
+If we wanted to get group statistics instead -- for instance, the mean 
+circumference of each tree -- we'd need to use the `group_by` function to define 
+groups:
+
+```{r}
+Orange |> 
+  group_by(Tree) |> 
+  summarise(mean_circ = mean(circumference))
+```
+
+Now we've got mean values for each level of our grouping variable -- that is, 
+the mean value for all rows where Tree == 1, for all rows where Tree == 2, and
+so on. 
+
+Notice that we could do something similar with `mutate`:
+
+```{r}
+Orange |> 
+  group_by(Tree) |> 
+  mutate(mean_circ = mean(circumference))
+```
+
+The thing to know here is that that `mutate` returns one value per 
+_observation_, while summarise returns one value per _group_.
+
+#### Exercise
+
+Edit this pipeline to find the mean circumference per age group.
+
+```{r}
+🌞 |> 
+  🌞(🌞) |> 
+  🌞(🌞 = mean(🌞))
+```
+
+### Across
+
+The five verbs we've discussed (select, filter, mutate, summarise, group_by) 
+will let us do the bulk of data manipulation necessary for this class.
+
+The last function we'll talk about is a _modifier_ function. Sometimes we want 
+to do the same thing to multiple columns; for instance, let's say we want to 
+find the mean age and circumference at the same time.
+
+We could do this through two `summarise` steps:
+
+```{r}
+Orange |> 
+  summarise(
+    age = mean(age),
+    circumference = mean(circumference)
+  )
+```
+
+But this becomes verbose if we have more than just two columns, and is a pain to
+update -- if we realize for instance that we actually wanted the _median_, we 
+need to make sure we change every step of the `summarise` call individually. This
+is a very common source of human errors in analysis code.
+
+What we can do instead is use the `across` function inside `summarise`. 
+`across` takes two main arguments: first, the columns to apply a function to, 
+and second, the function to apply.
+
+So for instance, we could replace our `summarise` call above as follows:
+
+```{r}
+Orange |>
+  summarise(
+    across(
+      c(age, circumference), 
+      mean
+      )
+    )
+```
+
+This is much better -- now we only need to update `mean` in one place. However,
+typing all our column names can become a pain if we have a large number of 
+columns.
+
+Instead of providing individual column names, we can instead provide rules about
+which columns we want to apply functions to. For instance, our example above was
+taking the mean of every numeric column in our data frame ("Tree" is a factor).
+What if we specify "take the mean of every numeric column" instead of "take the
+mean of these two columns"?
+
+That's exactly what the `where` function lets us do. By replacing our column 
+names with `where(is.numeric)`, we're telling `summarise` to take the mean _where_
+our columns are numeric:
+
+```{r}
+Orange |>
+  summarise(
+    across(
+      where(is.numeric), 
+      mean
+      )
+    )
+```
+
+Both `across` and `where` work with all the dplyr verbs we've gone over. For 
+instance, we could use `where` to `select` only numeric columns:
+
+```{r}
+Orange |> 
+  select(where(is.numeric))
+```
+
+Or use `across` inside a `mutate` call to mutate multiple columns:
+
+```{r}
+Orange |> 
+  mutate(across(where(is.numeric), sqrt))
+```
+
+
+#### Examples
+
+Edit the following chunk so it finds the average age and circumference for the
+first 500 days of growth of each tree.
+
+```{r}
+Orange |> 
+  🌞(age < 500) |> 
+  🌞(Tree) |> 
+  🌞(
+    🌞(🌞(is.numeric), mean)
+  )
+```
+
+Please submit this assignment via email to:
+
+mike.mahoney.218@gmail.com
+
+With "FOR 796" in the subject line (so it goes to my inbox).

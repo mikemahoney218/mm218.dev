@@ -1,0 +1,18 @@
+Hi everyone, and welcome to FOR 796: Machine Learning Concepts and Applications! I'm excited to see everyone Wednesday, 2:15-3:10, in Bray 300.
+
+* The course website can be found at https://mlca.mm218.dev/ . Everything related to this course -- syllabus, schedule, slides, the final project rubric (once it's posted) -- will be on this website. I'm not intending to upload anything to Blackboard.
+* Each week, you'll have a handout that walks through the code and concepts we're focusing on for that class. Our Wednesday classes are going to be dedicated to answering any questions and solving any issues from the handouts, so please make sure to read through the handout before class. 
+  This week's handout can be found at https://mlca.mm218.dev/slides/week_1_slides.html.
+* The main project in this course is going to have you applying machine learning techniques to predict some data set of your own choosing. We'll talk about this more in class, but start thinking about what data you might want to use for this project. If you don't have any datasets of your own, interesting data can be found many places online, including at (roughly ranked in order of user-friendliness):
+  * https://www.kaggle.com/datasets
+  * https://archive.ics.uci.edu/ml/index.php
+  * https://www.kdnuggets.com/datasets/index.html  
+  * https://www.data.gov/
+  * https://datadryad.org/stash
+  * https://environmentaldatainitiative.org/
+
+Please feel free to email me with any questions or concerns, and I'll see you Wednesday.
+
+Thanks,
+
+-Mike
