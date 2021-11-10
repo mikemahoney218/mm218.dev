@@ -947,6 +947,7 @@ for (i in seq_len(nrow(tuning_grid))) {
 We can look at how accuracy changes as we try different values of C:
 
 ```{r, fig.width=10, fig.height=4}
+library(ggplot2)
 ggplot(tuning_grid, aes(C, loss)) + 
   geom_point() + 
   geom_line() 
@@ -1066,7 +1067,7 @@ k_fold_cv <- function(data, k, ...) {
 
 ---
 
-And now we'll set up our tuning grid! We're going to test the same values for C
+And now we'll set up our tuning grid! We're going to test similar values for C
 as we did with classification. $\epsilon$, meanwhile, tends to be a very small
 positive number, so we'll focus on testing possible values under 1:
 
