@@ -756,7 +756,7 @@ need to scale and center your data in order to make sure all your variables
 
 This also means that, to an SVM, categorical variables (which are encoded to be
 either 0 or 1) have lower variance than continuous variables, and so tend to 
-contribute less to the final prediction. If your data contains many continuous
+contribute less to the final prediction. If your data contains many categorical
 variables, SVM may make worse predictions than other methods.
 
 ---
