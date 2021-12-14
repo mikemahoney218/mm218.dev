@@ -7,7 +7,7 @@ output: html_document
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-### **[Read the paper!](ground_noise_filtering.pdf)**
+### **[Read the paper!](https://eartharxiv.org/repository/view/2940/)**
 
 ### **[See the poster!](poster.pdf)**
 
