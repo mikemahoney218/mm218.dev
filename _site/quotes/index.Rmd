@@ -4,6 +4,14 @@ output:
   tufte::tufte_html: default
 ---
 
+<hr id = "GelmanInvite">
+
+There was some discussion in the comments thread here about axis labels and zero. Sometimes zero has no particular meaning (for example when graphing degrees Fahrenheit), but usually it has a clear interpretation, in which case it can be pleasant to include it on the graph. On the other hand, if you’re plotting something that varies from, say 184 to 197, it would typically be a bad idea to extend the axis all the way to zero, as this would destroy your visual resolution.
+
+The advice we usually give is: If zero is in the neighborhood, invite it in. 
+
+--- [Andrew Gelman: Graphing advice](https://statmodeling.stat.columbia.edu/2021/12/17/graphing-advice-if-zero-is-in-the-neighborhood-invite-it-in/)
+
 <hr id = "VonNeumannUnderstand">
 
 Young man, in mathematics you don't understand things. You just get used to them.
