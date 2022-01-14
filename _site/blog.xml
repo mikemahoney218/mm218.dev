@@ -6,7 +6,16 @@
     <atom:link href="https://www.mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
     <description>Technology and the Environment</description>
     <generator>Distill</generator>
-    <lastBuildDate>Thu, 23 Sep 2021 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 14 Jan 2022 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>terrainr: An R package for creating immersive virtual environments</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments</link>
+      <description>New open-access paper published in the Journal of Open Source Science.</description>
+      <guid>https://www.mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments</guid>
+      <pubDate>Fri, 14 Jan 2022 00:00:00 +0000</pubDate>
+      <media:content url="https://www.mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/fig1.png" medium="image" type="image/png" width="3142" height="1110"/>
+    </item>
     <item>
       <title>Automated {drat} uploads with GitHub Actions</title>
       <dc:creator>Mike Mahoney</dc:creator>

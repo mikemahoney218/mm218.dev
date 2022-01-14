@@ -1,5 +1,24 @@
 [
   {
+    "path": "posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/",
+    "title": "terrainr: An R package for creating immersive virtual environments",
+    "description": "New open-access paper published in the Journal of Open Source Science.",
+    "author": [
+      {
+        "name": "Mike Mahoney",
+        "url": {}
+      }
+    ],
+    "date": "2022-01-14",
+    "categories": [],
+    "contents": "\nI’ve got a new paper out at the Journal of Open Source Science, documenting the “terrainr” package I’ve been developing since late 2020. JOSS is a fantastic journal and is entirely open-source, so that first link should work for everyone.\n\n\n\nFigure 1: Left: Where typical geodata-to-IVE workflows leave you. Right: Where terrainr gets you.\n\n\n\nThe JOSS workflow is absolutely fascinating. I made a git branch in the terrainr repo with the files needed to generate the paper, then (through a web form) opened a pre-review issue on GitHub. The editors used that issue to assign a handling editor, then moved things over to a review issue, where the paper was processed and prepared for submission via an automatically generated PR. The whole thing was incredibly efficient, and also entirely transparent – the logs of the paper processing workflow will be available until GitHub finally shuts down, a refreshing change compared to standard peer review.\nThe paper itself is a general overview of the terrainr package, trying to be a new enough contribution that it’s not just repeating the package documentation but not adding enough to spin off into an entirely separate research project. It’s also very short – a nice feature of JOSS papers – so rather than summarize here I’ll just suggest you read it yourself.\n\n\n\n\n",
+    "preview": "posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/fig1.png",
+    "last_modified": "2022-01-13T23:23:45-05:00",
+    "input_file": {},
+    "preview_width": 3142,
+    "preview_height": 1110
+  },
+  {
     "path": "posts/2021-09-22-automated-drat-uploads-with-github-actions/",
     "title": "Automated {drat} uploads with GitHub Actions",
     "description": "Continuously deploy your code to personal CRAN-like repos, automatically and for free!",
