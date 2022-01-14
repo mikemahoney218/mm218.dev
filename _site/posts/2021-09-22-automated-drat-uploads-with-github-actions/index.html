@@ -56,7 +56,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }
 code span.al { color: #ad0000; } /* Alert */
 code span.an { color: #5e5e5e; } /* Annotation */
-code span.at { color: #20794d; } /* Attribute */
+code span.at { } /* Attribute */
 code span.bn { color: #ad0000; } /* BaseN */
 code span.bu { } /* BuiltIn */
 code span.cf { color: #007ba5; } /* ControlFlow */
@@ -77,13 +77,14 @@ code span.kw { color: #007ba5; } /* Keyword */
 code span.op { color: #5e5e5e; } /* Operator */
 code span.ot { color: #007ba5; } /* Other */
 code span.pp { color: #ad0000; } /* Preprocessor */
-code span.sc { color: #20794d; } /* SpecialChar */
+code span.sc { color: #5e5e5e; } /* SpecialChar */
 code span.ss { color: #20794d; } /* SpecialString */
 code span.st { color: #20794d; } /* String */
 code span.va { color: #111111; } /* Variable */
 code span.vs { color: #20794d; } /* VerbatimString */
 code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
+
 
   <!--radix_placeholder_meta_tags-->
 <title>Mike Mahoney: Automated {drat} uploads with GitHub Actions</title>
@@ -2053,8 +2054,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!--/radix_placeholder_distill-->
-  <script src="../../site_libs/header-attrs-2.10/header-attrs.js"></script>
-  <script src="../../site_libs/jquery-1.11.3/jquery.min.js"></script>
+  <script src="../../site_libs/header-attrs-2.11/header-attrs.js"></script>
+  <script src="../../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
   <script src="../../site_libs/popper-2.6.0/popper.min.js"></script>
   <link href="../../site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
   <link href="../../site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
@@ -2147,7 +2148,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <h2 id="why-are-we-doing-it">Why are we doing it?</h2>
 <p>My lab has a number of internal packages we use for our day-to-day work which handle things like downloading data from our central server and producing standardized model assessment outputs. All of these packages live on GitHub in our central organization, and for a long time our workflow for installing these packages has been to clone the repository and then <code>devtools::install</code> the package.</p>
 <p>Recently, though, we’ve had to share one of our packages with a number of outside collaborators who we aren’t going to be adding to the organization. We’ve also started working with a number of people who are less familiar with git and GitHub, both externally and within the lab, which means we need to provide a bit more instruction than simply saying “clone the repo and install that”<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. This also means that solutions like “use <code>remotes::install_github</code> with a PAT” aren’t feasible; we want people to be able to get the packages they need without needing to know anything about GitHub itself. Therefore, we needed a simpler method to actually distribute our code, both to people we’d happily give repo access and people we wouldn’t want to.</p>
-<p>For public repositories and organizations, I think the easiest solution to this problem is to set up your own <a href="https://r-universe.dev/organizations/">R Universe</a>, which rOpenSci has written <a href="https://ropensci.org/blog/2021/06/22/setup-runiverse/">fantastic instructions for getting started with</a>; this offloads your responsibility for managing CI to the rOpenSci team. For this project, however, we wanted a separate and mostly hidden repository page, which made {drat} a perfect candidate. The only problem was how to make sure we were always publishing the newest versions of our package. We’re a small team doing a lot of different things, so being able to automate away any repetitive task (like publishing patch releases to a {drat} repo) can really help reduce the cognitive load and number of mistakes associated with updating our shared codebase.</p>
+<p>For public repositories and organizations, I think the easiest solution to this problem is to set up your own <a href="https://r-universe.dev/organizations/">R Universe</a>, which rOpenSci has written <a href="https://ropensci.org/blog/2021/06/22/setup-runiverse/">fantastic instructions for getting started with</a>; this offloads your responsibility for managing CI to the rOpenSci team. For this project, however, we wanted a separate and mostly hidden repository page, which made {drat} a perfect candidate.</p>
+<p>The only problem was how to make sure we were always publishing the newest versions of our package. We’re a small team doing a lot of different things, so being able to automate away any repetitive task (like publishing patch releases to a {drat} repo) can really help reduce the cognitive load and number of mistakes associated with updating our shared codebase.</p>
 <h2 id="how-did-we-do-it">How did we do it?</h2>
 <p>Because the original version of this workflow is on a private repo, I’ll walk through <a href="https://github.com/ropensci/terrainr/blob/main/.github/workflows/drat.yml">the workflow</a> that uploads <a href="https://github.com/ropensci/terrainr">terrainr</a> to <a href="https://github.com/mikemahoney218/drat">my own personal drat repo</a>. The YAML file that runs the workflow looks like this:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
@@ -2179,7 +2181,8 @@ document.addEventListener('DOMContentLoaded', function() {
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">paths</span><span class="kw">:</span></span>
 <span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="at">      </span><span class="kw">-</span><span class="at"> </span><span class="st">&#39;DESCRIPTION&#39;</span></span>
 <span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">workflow_dispatch</span><span class="kw">:</span></span></code></pre></div>
-<p>This sets up two different ways to trigger the workflow. First off, any <code>push</code> commit to the <code>main</code> branch that touches the <code>DESCRIPTION</code> file will automatically build the package and push it to my drat repo. Because terrainr is published on CRAN and has a handful of users, I do my best to update version numbers whenever I make changes – even during development, I try and bump development versions whenever there’s a fix or update worth mentioning. Since the version number is stored in <code>DESCRIPTION</code>, this means I’ll only push updated package versions when I’ve actually updated something in the package; my small edits to the CI files, for instance, won’t create a new release.</p>
+<p>This sets up two different ways to trigger the workflow. First off, any <code>push</code> commit to the <code>main</code> branch that touches the <code>DESCRIPTION</code> file will automatically build the package and push it to my drat repo. Because terrainr is published on CRAN and has a handful of users, I do my best to update version numbers whenever I make changes – even during development, I try and bump development versions whenever there’s a fix or update worth mentioning.</p>
+<p>Since the version number is stored in <code>DESCRIPTION</code>, this means I’ll only push updated package versions when I’ve actually updated something in the package; my small edits to the CI files, for instance, won’t create a new release.</p>
 <p>If you want to be freer about updating your repo, you can drop any of these restrictions. For instance, our internal packages have workflow triggers that look like this:</p>
 <div class="sourceCode" id="cb3"><pre class="sourceCode yaml"><code class="sourceCode yaml"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">on</span><span class="kw">:</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">push</span><span class="kw">:</span></span>
@@ -2218,6 +2221,15 @@ document.addEventListener('DOMContentLoaded', function() {
 <li><code>package</code>: The GitHub repository for the package you want to upload. Defaults to the repository the action is running in, but this can be used to run your workflow elsewhere (for instance, if you want to have all your upload jobs scheduled in the drat repo itself).</li>
 </ul>
 <p>And for most use cases, this should be enough to automatically deploy your package whenever you desire! So far, I’ve tested this workflow on a handful of my own packages (terrainr and then our internal packages), and things are working well so far – if you find any problems or have any suggestions, <a href="https://github.com/mikemahoney218/upload-to-drat-repo/issues">feel free to open an issue on the action repo here.</a></p>
+<hr>
+<script src="https://utteranc.es/client.js"
+        repo="mikemahoney218/mm218.dev"
+        issue-term="url"
+        label="comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
 <div class="sourceCode" id="cb6"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <section class="footnotes" role="doc-endnotes">
 <hr />
