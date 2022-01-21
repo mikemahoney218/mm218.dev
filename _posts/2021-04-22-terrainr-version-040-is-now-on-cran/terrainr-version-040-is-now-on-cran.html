@@ -23,6 +23,7 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -55,7 +56,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }
 code span.al { color: #ad0000; } /* Alert */
 code span.an { color: #5e5e5e; } /* Annotation */
-code span.at { color: #20794d; } /* Attribute */
+code span.at { } /* Attribute */
 code span.bn { color: #ad0000; } /* BaseN */
 code span.bu { } /* BuiltIn */
 code span.cf { color: #007ba5; } /* ControlFlow */
@@ -76,13 +77,14 @@ code span.kw { color: #007ba5; } /* Keyword */
 code span.op { color: #5e5e5e; } /* Operator */
 code span.ot { color: #007ba5; } /* Other */
 code span.pp { color: #ad0000; } /* Preprocessor */
-code span.sc { color: #20794d; } /* SpecialChar */
+code span.sc { color: #5e5e5e; } /* SpecialChar */
 code span.ss { color: #20794d; } /* SpecialString */
 code span.st { color: #20794d; } /* String */
 code span.va { color: #111111; } /* Variable */
 code span.vs { color: #20794d; } /* VerbatimString */
 code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
+
 
   <!--radix_placeholder_meta_tags-->
   <title>What's new in terrainr 0.4.0?</title>
@@ -1262,7 +1264,10 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
       // hoverable references
       $('span.citation[data-cites]').each(function() {
-        var refHtml = $('#ref-' + $(this).attr('data-cites')).html();
+        var refs = $(this).attr('data-cites').split(" ");
+        var refHtml = refs.map(function(ref) {
+          return "<p>" + $('#ref-' + ref).html() + "</p>";
+        }).join("\n");
         window.tippy(this, {
           allowHTML: true,
           content: refHtml,
@@ -1433,8 +1438,8 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </script>
 
   <!--/radix_placeholder_distill-->
-  <script src="terrainr-version-040-is-now-on-cran_files/header-attrs-2.7/header-attrs.js"></script>
-  <script src="terrainr-version-040-is-now-on-cran_files/jquery-1.11.3/jquery.min.js"></script>
+  <script src="terrainr-version-040-is-now-on-cran_files/header-attrs-2.11/header-attrs.js"></script>
+  <script src="terrainr-version-040-is-now-on-cran_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
   <script src="terrainr-version-040-is-now-on-cran_files/popper-2.6.0/popper.min.js"></script>
   <link href="terrainr-version-040-is-now-on-cran_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
   <link href="terrainr-version-040-is-now-on-cran_files/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
@@ -1504,6 +1509,15 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 <p>First, another new behavior with <code>get_tiles</code> is that rather than assuming the provided data and downloaded image should both be using the WGS84 CRS (EPSG 4326), <code>get_tiles</code> will now infer the EPSG CRS from any provided <code>sf</code> or <code>Raster</code> object. If the numeric code is missing, this function will still assume 4326.</p>
 <p>Similarly, rather than specifying <code>target_crs</code> in <code>vector_to_overlay</code>, this function will now return an overlay projected to match <code>reference_raster</code>’s CRS. Missing CRS are handled slightly differently here – if the <code>error_crs</code> argument is <code>NULL</code>, this function will warn; if <code>FALSE</code> it will assume 4326, and if <code>TRUE</code> it will interrupt the function with an error.</p>
 <p>Those are the major changes to this iteration! On top of these there are some minor changes to the package internals, slowly removing dead code paths and simplifying things behind the scenes. If you have any problems (bugs or missing features) with the package, feel free to <a href="https://github.com/ropensci/terrainr/issues">open an issue!</a></p>
+<hr>
+<script src="https://utteranc.es/client.js"
+        repo="mikemahoney218/mm218.dev"
+        issue-term="url"
+        label="comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <!--/radix_placeholder_article_footer-->

@@ -56,7 +56,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }
 code span.al { color: #ad0000; } /* Alert */
 code span.an { color: #5e5e5e; } /* Annotation */
-code span.at { color: #20794d; } /* Attribute */
+code span.at { } /* Attribute */
 code span.bn { color: #ad0000; } /* BaseN */
 code span.bu { } /* BuiltIn */
 code span.cf { color: #007ba5; } /* ControlFlow */
@@ -77,13 +77,14 @@ code span.kw { color: #007ba5; } /* Keyword */
 code span.op { color: #5e5e5e; } /* Operator */
 code span.ot { color: #007ba5; } /* Other */
 code span.pp { color: #ad0000; } /* Preprocessor */
-code span.sc { color: #20794d; } /* SpecialChar */
+code span.sc { color: #5e5e5e; } /* SpecialChar */
 code span.ss { color: #20794d; } /* SpecialString */
 code span.st { color: #20794d; } /* String */
 code span.va { color: #111111; } /* Variable */
 code span.vs { color: #20794d; } /* VerbatimString */
 code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 </style>
+
 
   <!--radix_placeholder_meta_tags-->
 <title>Mike Mahoney: Interactive landscape simulations for visual resource assessment</title>
@@ -2056,8 +2057,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!--/radix_placeholder_distill-->
-  <script src="../../site_libs/header-attrs-2.9/header-attrs.js"></script>
-  <script src="../../site_libs/jquery-1.11.3/jquery.min.js"></script>
+  <script src="../../site_libs/header-attrs-2.11/header-attrs.js"></script>
+  <script src="../../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
   <script src="../../site_libs/popper-2.6.0/popper.min.js"></script>
   <link href="../../site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
   <link href="../../site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
@@ -2123,7 +2124,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <div class="d-article">
 <p>I’ll be speaking at the <a href="https://sites.google.com/usu.edu/vrsconf03/">2021 Visual Resources Stewardship Conference</a>, presenting a paper (“Interactive landscape simulations for visual resource assessment”, with Colin Beier and Aidan Ackerman) talking about how the use of game engines for spatial visualization can help in visual resource assessment projects.</p>
 <div class="layout-chunk" data-layout="l-body">
-<div class="figure"><span id="fig:unnamed-chunk-1"></span>
+<div class="figure"><span style="display:block;" id="fig:unnamed-chunk-1"></span>
 <img src="closer.jpg" alt="Everything the light touches can see &amp; be seen by the red dot. Users can interactively walk around the landscape to see for themselves if the viewshed algorithm gets things exactly right." width="886" />
 <p class="caption">
 Figure 1: Everything the light touches can see &amp; be seen by the red dot. Users can interactively walk around the landscape to see for themselves if the viewshed algorithm gets things exactly right.
@@ -2132,6 +2133,15 @@ Figure 1: Everything the light touches can see &amp; be seen by the red dot. Use
 </div>
 <p>This was a really fun project, forcing me to push these visualizations in a new direction. The conference itself is in October, and I’ve posted a preprint of the paper <a href="https://www.mm218.dev/papers/vrs_2021.pdf">at this link</a>.</p>
 <p>[Update - 2021-06-24] And the code and manuscript used for this paper are now on <a href="https://github.com/mikemahoney218/vrs2021">Github at this link</a>.</p>
+<hr>
+<script src="https://utteranc.es/client.js"
+        repo="mikemahoney218/mm218.dev"
+        issue-term="url"
+        label="comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
 <div class="article-footer">
@@ -2178,7 +2188,7 @@ Figure 1: Everything the light touches can see &amp; be seen by the red dot. Use
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <!--radix_placeholder_navigation_after_body--><html><body>
 <div class="distill-site-nav distill-site-footer">
-<p>Â© Copyright 2020 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</p>
+<p>Â© Copyright 2022 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</p>
 </div>
 <!--/radix_placeholder_navigation_after_body-->
 </body></html>

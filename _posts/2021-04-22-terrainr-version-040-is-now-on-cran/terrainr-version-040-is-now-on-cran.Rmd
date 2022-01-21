@@ -92,3 +92,17 @@ Those are the major changes to this iteration! On top of these there are some
 minor changes to the package internals, slowly removing dead code paths and 
 simplifying things behind the scenes. If you have any problems (bugs or missing
 features) with the package, feel free to [open an issue!](https://github.com/ropensci/terrainr/issues)
+
+
+
+<hr>
+
+<script src="https://utteranc.es/client.js"
+        repo="mikemahoney218/mm218.dev"
+        issue-term="url"
+        label="comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
+

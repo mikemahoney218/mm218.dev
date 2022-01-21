@@ -26,3 +26,15 @@ a rough script for the talk) are online at
 https://github.com/mikemahoney218/user2021 . My favorite line from the script
 is "R is where our users are" -- I didn't quite realize I had any Boston accent
 left until I tripped over that sentence a few times.
+
+
+<hr>
+
+<script src="https://utteranc.es/client.js"
+        repo="mikemahoney218/mm218.dev"
+        issue-term="url"
+        label="comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>

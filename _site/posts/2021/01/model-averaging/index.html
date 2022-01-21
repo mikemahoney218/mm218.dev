@@ -23,6 +23,7 @@
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
@@ -55,7 +56,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 }
 code span.al { color: #ad0000; } /* Alert */
 code span.an { color: #5e5e5e; } /* Annotation */
-code span.at { color: #20794d; } /* Attribute */
+code span.at { } /* Attribute */
 code span.bn { color: #ad0000; } /* BaseN */
 code span.bu { } /* BuiltIn */
 code span.cf { color: #007ba5; } /* ControlFlow */
@@ -76,12 +77,34 @@ code span.kw { color: #007ba5; } /* Keyword */
 code span.op { color: #5e5e5e; } /* Operator */
 code span.ot { color: #007ba5; } /* Other */
 code span.pp { color: #ad0000; } /* Preprocessor */
-code span.sc { color: #20794d; } /* SpecialChar */
+code span.sc { color: #5e5e5e; } /* SpecialChar */
 code span.ss { color: #20794d; } /* SpecialString */
 code span.st { color: #20794d; } /* String */
 code span.va { color: #111111; } /* Variable */
 code span.vs { color: #20794d; } /* VerbatimString */
 code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+</style>
+
+<style>
+  div.csl-bib-body { }
+  div.csl-entry {
+    clear: both;
+    }
+  .hanging div.csl-entry {
+    margin-left:2em;
+    text-indent:-2em;
+  }
+  div.csl-left-margin {
+    min-width:2em;
+    float:left;
+  }
+  div.csl-right-inline {
+    margin-left:2em;
+    padding-left:1em;
+  }
+  div.csl-indent {
+    margin-left: 2em;
+  }
 </style>
 
   <!--radix_placeholder_meta_tags-->
@@ -2057,8 +2080,8 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!--/radix_placeholder_distill-->
-  <script src="../../../../site_libs/header-attrs-2.6/header-attrs.js"></script>
-  <script src="../../../../site_libs/jquery-1.11.3/jquery.min.js"></script>
+  <script src="../../../../site_libs/header-attrs-2.11/header-attrs.js"></script>
+  <script src="../../../../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
   <script src="../../../../site_libs/popper-2.6.0/popper.min.js"></script>
   <link href="../../../../site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
   <link href="../../../../site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
@@ -2166,9 +2189,9 @@ Cartoon components are CC-BY 4.0 Allison Horst (<a href="https://twitter.com/all
 <p>We’ll be using the following libraries for data manipulation and visualization:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://dplyr.tidyverse.org'>dplyr</a></span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://tidyr.tidyverse.org'>tidyr</a></span><span class='op'>)</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://ggplot2.tidyverse.org'>ggplot2</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://ggplot2.tidyverse.org'>ggplot2</a></span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://yihui.org/knitr/'>knitr</a></span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -2176,7 +2199,7 @@ Cartoon components are CC-BY 4.0 Allison Horst (<a href="https://twitter.com/all
 <p>Additionally, we’ll be using both <code>ranger</code> and <code>lightgbm</code> to develop component models:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/imbs-hl/ranger'>ranger</a></span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/imbs-hl/ranger'>ranger</a></span><span class='op'>)</span>
 <span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/Microsoft/LightGBM'>lightgbm</a></span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -2184,22 +2207,22 @@ Cartoon components are CC-BY 4.0 Allison Horst (<a href="https://twitter.com/all
 <p>And finally, we need the actual data we’re modeling. For this example, we’ll build models predicting the arrival delay of the flights included in the <code>nycflights13</code> package using both flight details and weather data. This next chunk of code will preprocess our data into a model-ready format:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>flights</span> <span class='op'>&lt;-</span> <span class='fu'>nycflights13</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/nycflights13/man/flights.html'>flights</a></span>
-<span class='va'>weather</span> <span class='op'>&lt;-</span> <span class='fu'>nycflights13</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/nycflights13/man/weather.html'>weather</a></span> <span class='op'>%&gt;%</span> 
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>flights</span> <span class='op'>&lt;-</span> <span class='fu'>nycflights13</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/nycflights13/man/flights.html'>flights</a></span>
+<span class='va'>weather</span> <span class='op'>&lt;-</span> <span class='fu'>nycflights13</span><span class='fu'>::</span><span class='va'><a href='https://rdrr.io/pkg/nycflights13/man/weather.html'>weather</a></span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>wind_gust</span><span class='op'>)</span> <span class='co'># About 80% missing values, so we'll drop this column</span>
 
 <span class='co'># combine the two data frames into one complete set</span>
-<span class='va'>flight_data</span> <span class='op'>&lt;-</span> <span class='va'>flights</span> <span class='op'>%&gt;%</span> 
+<span class='va'>flight_data</span> <span class='op'>&lt;-</span> <span class='va'>flights</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='va'>weather</span>,
-            by <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"year"</span>, <span class='st'>"month"</span>, <span class='st'>"day"</span>, <span class='st'>"origin"</span>, <span class='st'>"hour"</span>, <span class='st'>"time_hour"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+            by <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"year"</span>, <span class='st'>"month"</span>, <span class='st'>"day"</span>, <span class='st'>"origin"</span>, <span class='st'>"hour"</span>, <span class='st'>"time_hour"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://tidyr.tidyverse.org/reference/drop_na.html'>drop_na</a></span><span class='op'>(</span><span class='op'>)</span>
 
-<span class='va'>flight_data</span> <span class='op'>&lt;-</span> <span class='va'>flight_data</span> <span class='op'>%&gt;%</span> 
+<span class='va'>flight_data</span> <span class='op'>&lt;-</span> <span class='va'>flight_data</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='co'># Drop 37 pretty dramatic outliers</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>arr_delay</span> <span class='op'>&lt;=</span> <span class='fl'>500</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>arr_delay</span> <span class='op'>&lt;=</span> <span class='fl'>500</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='co'># Get rid of useless predictors -- </span>
   <span class='co'># these each cause problems with at least one of our regressions</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>year</span>, <span class='op'>-</span><span class='va'>time_hour</span>, <span class='op'>-</span><span class='va'>minute</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>year</span>, <span class='op'>-</span><span class='va'>time_hour</span>, <span class='op'>-</span><span class='va'>minute</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='co'># Skip the work of encoding non-numeric values, to save my poor laptop</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select_all.html'>select_if</a></span><span class='op'>(</span><span class='va'>is.numeric</span><span class='op'>)</span>
 </code></pre>
@@ -2208,7 +2231,7 @@ Cartoon components are CC-BY 4.0 Allison Horst (<a href="https://twitter.com/all
 <p>And for one final pre-processing step, we’ll split our data into training, validation, and testing sets (sticking 20% into both validation and testing and dumping the rest into training). We’ll be using model performance against the validation set to determine weights for our averages.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/Random.html'>set.seed</a></span><span class='op'>(</span><span class='fl'>123</span><span class='op'>)</span>
 <span class='co'># Generate a random sequence to subset our data into train/validate/test splits</span>
 <span class='va'>row_index</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/sample.html'>sample</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>flight_data</span><span class='op'>)</span>, <span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>flight_data</span><span class='op'>)</span><span class='op'>)</span>
 
@@ -2237,7 +2260,7 @@ Cartoon components are CC-BY 4.0 Allison Horst (<a href="https://twitter.com/all
 <p>Let’s start off with a simple linear regression model, using all of our predictors in the flight dataset to try and estimate arrival delays:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>linear_model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>arr_delay</span> <span class='op'>~</span> <span class='va'>.</span>, <span class='va'>flight_training</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>linear_model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>arr_delay</span> <span class='op'>~</span> <span class='va'>.</span>, <span class='va'>flight_training</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/summary.html'>summary</a></span><span class='op'>(</span><span class='va'>linear_model</span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -2250,27 +2273,48 @@ Residuals:
 -58.895  -9.133  -1.538   7.076 159.388 
 
 Coefficients:
-                 Estimate Std. Error  t value Pr(&gt;|t|)    
-(Intercept)    -4.613e+00  5.992e+00   -0.770 0.441394    
-month           3.825e-02  1.117e-02    3.424 0.000618 ***
-day             2.220e-02  4.109e-03    5.404 6.51e-08 ***
-dep_time        9.509e-05  2.795e-04    0.340 0.733722    
-sched_dep_time -3.492e-03  1.894e-03   -1.844 0.065257 .  
-dep_delay       1.013e+00  1.068e-03  948.332  &lt; 2e-16 ***
-arr_time        8.816e-04  1.182e-04    7.460 8.68e-14 ***
-sched_arr_time -4.713e-03  1.478e-04  -31.884  &lt; 2e-16 ***
-flight         -4.692e-05  2.541e-05   -1.846 0.064863 .  
-air_time        7.563e-01  3.074e-03  246.006  &lt; 2e-16 ***
-distance       -9.792e-02  3.925e-04 -249.500  &lt; 2e-16 ***
-hour            6.000e-01  1.871e-01    3.207 0.001341 ** 
-temp            1.173e-01  2.232e-02    5.254 1.49e-07 ***
-dewp            3.632e-02  2.405e-02    1.510 0.130928    
-humid           1.860e-02  1.229e-02    1.514 0.130053    
-wind_dir       -6.076e-03  4.009e-04  -15.158  &lt; 2e-16 ***
-wind_speed      1.920e-01  7.538e-03   25.471  &lt; 2e-16 ***
-precip          2.688e+01  3.014e+00    8.920  &lt; 2e-16 ***
-pressure       -1.634e-02  5.619e-03   -2.909 0.003631 ** 
-visib          -4.603e-01  3.239e-02  -14.212  &lt; 2e-16 ***
+                  Estimate  Std. Error  t value           Pr(&gt;|t|)
+(Intercept)    -4.61324673  5.99244467   -0.770           0.441394
+month           0.03825040  0.01117238    3.424           0.000618
+day             0.02220492  0.00410860    5.404 0.0000000650770797
+dep_time        0.00009509  0.00027953    0.340           0.733722
+sched_dep_time -0.00349249  0.00189448   -1.844           0.065257
+dep_delay       1.01251264  0.00106768  948.332            &lt; 2e-16
+arr_time        0.00088164  0.00011818    7.460 0.0000000000000868
+sched_arr_time -0.00471343  0.00014783  -31.884            &lt; 2e-16
+flight         -0.00004692  0.00002541   -1.846           0.064863
+air_time        0.75629859  0.00307431  246.006            &lt; 2e-16
+distance       -0.09791613  0.00039245 -249.500            &lt; 2e-16
+hour            0.59997173  0.18707035    3.207           0.001341
+temp            0.11726625  0.02231781    5.254 0.0000001487014873
+dewp            0.03632142  0.02404661    1.510           0.130928
+humid           0.01860018  0.01228626    1.514           0.130053
+wind_dir       -0.00607627  0.00040085  -15.158            &lt; 2e-16
+wind_speed      0.19198999  0.00753768   25.471            &lt; 2e-16
+precip         26.88470146  3.01386317    8.920            &lt; 2e-16
+pressure       -0.01634187  0.00561852   -2.909           0.003631
+visib          -0.46031686  0.03238825  -14.212            &lt; 2e-16
+                  
+(Intercept)       
+month          ***
+day            ***
+dep_time          
+sched_dep_time .  
+dep_delay      ***
+arr_time       ***
+sched_arr_time ***
+flight         .  
+air_time       ***
+distance       ***
+hour           ** 
+temp           ***
+dewp              
+humid             
+wind_dir       ***
+wind_speed     ***
+precip         ***
+pressure       ** 
+visib          ***
 ---
 Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 
@@ -2282,7 +2326,7 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Of course, we want to make sure this model can generalize outside of the data it was trained with – let’s use it to make predictions against our validation set, too:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>flight_validation</span><span class='op'>$</span><span class='va'>lm_pred</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>flight_validation</span><span class='op'>$</span><span class='va'>lm_pred</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
   <span class='va'>linear_model</span>,
   newdata <span class='op'>=</span> <span class='va'>flight_validation</span>
 <span class='op'>)</span>
@@ -2301,7 +2345,7 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>So we have our first model sorted, but we need more than that to take an average! While we could average out a number of linear models with different parameters, it feels more interesting to combine a few different algorithms as component models. So let’s use <a href="https://github.com/imbs-hl/ranger">ranger</a> to implement a random forest to represent our data – fair warning, this one takes a little while to train!</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>ranger_model</span> <span class='op'>&lt;-</span> <span class='fu'>ranger</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/ranger/man/ranger.html'>ranger</a></span><span class='op'>(</span><span class='va'>arr_delay</span> <span class='op'>~</span> <span class='va'>.</span>, data <span class='op'>=</span> <span class='va'>flight_training</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>ranger_model</span> <span class='op'>&lt;-</span> <span class='fu'>ranger</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/ranger/man/ranger.html'>ranger</a></span><span class='op'>(</span><span class='va'>arr_delay</span> <span class='op'>~</span> <span class='va'>.</span>, data <span class='op'>=</span> <span class='va'>flight_training</span><span class='op'>)</span>
 <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='va'>ranger_model</span><span class='op'>$</span><span class='va'>prediction.error</span><span class='op'>)</span>
 <span class='va'>ranger_model</span><span class='op'>$</span><span class='va'>r.squared</span>
 </code></pre>
@@ -2314,7 +2358,7 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>So this model has an RMSE of 11.09 and an R^2 of 0.93 – an improvement over our linear model! While we could eke out some improvements with careful tuning, it looks like this version is a good enough fit to use as an example in our ensemble. As before, we want to check out how well this model generalizes by using it to generate predictions for our validation set:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>ranger_predictions</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>ranger_predictions</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
     <span class='va'>ranger_model</span>,
     data <span class='op'>=</span> <span class='va'>flight_validation</span>
   <span class='op'>)</span>
@@ -2335,7 +2379,7 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>So that’s two models sorted! For completeness sake, let’s implement a third and final component model, this time using the <a href="https://github.com/microsoft/LightGBM/tree/master/R-package">LightGBM</a> package to fit a gradient boosting machine. Similar to the last two, we won’t do a ton to parameterize this model – the only change I’ll make to the model fit defaults is to use 100 rounds, to let the boosting algorithm get into the same performance range as our other two models.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>lightgbm_model</span> <span class='op'>&lt;-</span> <span class='fu'>lightgbm</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/lightgbm/man/lightgbm.html'>lightgbm</a></span><span class='op'>(</span><span class='va'>xtrain</span>, 
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>lightgbm_model</span> <span class='op'>&lt;-</span> <span class='fu'>lightgbm</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/lightgbm/man/lightgbm.html'>lightgbm</a></span><span class='op'>(</span><span class='va'>xtrain</span>, 
                                      <span class='va'>ytrain</span>, 
                                      nrounds <span class='op'>=</span> <span class='fl'>100</span>, 
                                      obj <span class='op'>=</span> <span class='st'>"regression"</span>, 
@@ -2349,7 +2393,7 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>The <code>lightgbm_model</code> doesn’t have the same easy method for evaluating in-bag performance as our linear model and random forests did. We’ll skip right to the validation set instead:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>flight_validation</span><span class='op'>$</span><span class='va'>lightgbm_pred</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>flight_validation</span><span class='op'>$</span><span class='va'>lightgbm_pred</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
   <span class='va'>lightgbm_model</span>,
   <span class='va'>xvalid</span>
 <span class='op'>)</span>
@@ -2366,20 +2410,20 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>So it looks like LightGBM model performs about as well (if not marginally better than) our random forest! For reference, here are the RMSE values from each of our candidate models:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>prediction_values</span> <span class='op'>&lt;-</span> <span class='va'>flight_validation</span> <span class='op'>%&gt;%</span> 
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prediction_values</span> <span class='op'>&lt;-</span> <span class='va'>flight_validation</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='co'># Only select our y and y-hat columns</span>
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='fu'><a href='https://tidyselect.r-lib.org/reference/starts_with.html'>ends_with</a></span><span class='op'>(</span><span class='st'>"pred"</span><span class='op'>)</span>, <span class='fu'><a href='https://tidyselect.r-lib.org/reference/starts_with.html'>matches</a></span><span class='op'>(</span><span class='st'>"arr_delay"</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='va'>prediction_plots</span> <span class='op'>&lt;-</span> <span class='va'>prediction_values</span> <span class='op'>%&gt;%</span> 
-  <span class='fu'><a href='https://tidyr.tidyverse.org/reference/pivot_longer.html'>pivot_longer</a></span><span class='op'>(</span>cols <span class='op'>=</span> <span class='op'>-</span><span class='va'>arr_delay</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+<span class='va'>prediction_plots</span> <span class='op'>&lt;-</span> <span class='va'>prediction_values</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://tidyr.tidyverse.org/reference/pivot_longer.html'>pivot_longer</a></span><span class='op'>(</span>cols <span class='op'>=</span> <span class='op'>-</span><span class='va'>arr_delay</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>name <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/regmatches.html'>regmatches</a></span><span class='op'>(</span><span class='va'>name</span>, <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>regexpr</a></span><span class='op'>(</span><span class='st'>".*(?=_pred)"</span>, <span class='va'>name</span>, perl <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>,
          resid <span class='op'>=</span> <span class='va'>value</span> <span class='op'>-</span> <span class='va'>arr_delay</span>,
          name <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>name</span>, levels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lightgbm"</span>, <span class='st'>"ranger"</span>, <span class='st'>"lm"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='va'>prediction_plots</span> <span class='op'>%&gt;%</span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span>Model <span class='op'>=</span> <span class='va'>name</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>RMSE <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>resid</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>, .groups <span class='op'>=</span> <span class='st'>"drop"</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>RMSE</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+<span class='va'>prediction_plots</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span>Model <span class='op'>=</span> <span class='va'>name</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>RMSE <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>resid</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>, .groups <span class='op'>=</span> <span class='st'>"drop"</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>RMSE</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -2409,7 +2453,7 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Of course, individual metrics don’t tell the whole story – it can be helpful to look at diagnostic plots of our predictions to try and understand patterns in how our predictions match the data. For instance, “linear models are about four minutes worse on average” is all well and good in the abstract, but graphics like the one below can help us see that – for instance – linear models tend to do a bit worse around 0 minute delays (where most of the data is clustered) while our random forest performs worse on higher extremes:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>prediction_plots</span> <span class='op'>%&gt;%</span> 
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prediction_plots</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span><span class='va'>value</span>, <span class='va'>arr_delay</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> 
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span><span class='op'>(</span>alpha <span class='op'>=</span> <span class='fl'>0.05</span><span class='op'>)</span> <span class='op'>+</span>
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_abline.html'>geom_abline</a></span><span class='op'>(</span>slope <span class='op'>=</span> <span class='fl'>1</span>, intercept <span class='op'>=</span> <span class='fl'>0</span>, color <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span> <span class='op'>+</span> 
@@ -2428,7 +2472,7 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>A benefit of this method, though, is that implementation takes no time at all:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>prediction_values</span> <span class='op'>&lt;-</span> <span class='va'>prediction_values</span> <span class='op'>%&gt;%</span> 
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prediction_values</span> <span class='op'>&lt;-</span> <span class='va'>prediction_values</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>equal_weight_pred <span class='op'>=</span> <span class='op'>(</span><span class='va'>lm_pred</span> <span class='op'>+</span> <span class='va'>ranger_pred</span> <span class='op'>+</span> <span class='va'>lightgbm_pred</span><span class='op'>)</span> <span class='op'>/</span> <span class='fl'>3</span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -2438,7 +2482,7 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Weighting models based on fit statistics is also relatively easy in the grand scheme of data science. First, calculate the fit statistic for each of your models:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>model_rmse</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>vapply</a></span><span class='op'>(</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>model_rmse</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/lapply.html'>vapply</a></span><span class='op'>(</span>
   <span class='va'>prediction_values</span>,
   <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='op'>(</span><span class='va'>x</span> <span class='op'>-</span> <span class='va'>prediction_values</span><span class='op'>$</span><span class='va'>arr_delay</span><span class='op'>)</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>,
   <span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>numeric</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>)</span>
@@ -2452,14 +2496,14 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Then, depending on your statistic, you may need to take the reciprocal of each value – as lower RMSEs are better, we need to do so here:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>rmse_weights</span> <span class='op'>&lt;-</span> <span class='op'>(</span><span class='fl'>1</span> <span class='op'>/</span> <span class='op'>(</span><span class='va'>model_rmse</span><span class='op'>)</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>rmse_weights</span> <span class='op'>&lt;-</span> <span class='op'>(</span><span class='fl'>1</span> <span class='op'>/</span> <span class='op'>(</span><span class='va'>model_rmse</span><span class='op'>)</span><span class='op'>)</span>
 </code></pre>
 </div>
 </div>
 <p>Lastly, calculate your weights as proportion of the whole set of – you can view these values as the proportion of the ensemble prediction contributed by each component:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>rmse_weights</span> <span class='op'>&lt;-</span> <span class='va'>rmse_weights</span> <span class='op'>/</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>rmse_weights</span><span class='op'>)</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>rmse_weights</span> <span class='op'>&lt;-</span> <span class='va'>rmse_weights</span> <span class='op'>/</span> <span class='fu'><a href='https://rdrr.io/r/base/sum.html'>sum</a></span><span class='op'>(</span><span class='va'>rmse_weights</span><span class='op'>)</span>
 <span class='va'>rmse_weights</span>
 </code></pre>
 </div>
@@ -2469,7 +2513,7 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Making predictions with the ensemble is then relatively easy – just multiply each of your predicted values by their proportion and sum the results:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>prediction_values</span> <span class='op'>&lt;-</span> <span class='va'>prediction_values</span> <span class='op'>%&gt;%</span> 
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prediction_values</span> <span class='op'>&lt;-</span> <span class='va'>prediction_values</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>fit_based_pred <span class='op'>=</span> <span class='op'>(</span><span class='op'>(</span><span class='va'>lm_pred</span> <span class='op'>*</span> <span class='va'>rmse_weights</span><span class='op'>[</span><span class='st'>"lm_pred"</span><span class='op'>]</span><span class='op'>)</span> <span class='op'>+</span> 
                              <span class='op'>(</span><span class='va'>ranger_pred</span> <span class='op'>*</span> <span class='va'>rmse_weights</span><span class='op'>[</span><span class='st'>"ranger_pred"</span><span class='op'>]</span><span class='op'>)</span> <span class='op'>+</span> 
                              <span class='op'>(</span><span class='va'>lightgbm_pred</span> <span class='op'>*</span> <span class='va'>rmse_weights</span><span class='op'>[</span><span class='st'>"lightgbm_pred"</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
@@ -2486,7 +2530,7 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>From this plot, we can guess that a linear model combining our component predictions as features will be a good fit<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> for averaging these models. To do so, we simply need to build a linear model:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>predictions_model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>arr_delay</span> <span class='op'>~</span> <span class='va'>lm_pred</span> <span class='op'>*</span> <span class='va'>ranger_pred</span> <span class='op'>*</span> <span class='va'>lightgbm_pred</span>, 
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>predictions_model</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/lm.html'>lm</a></span><span class='op'>(</span><span class='va'>arr_delay</span> <span class='op'>~</span> <span class='va'>lm_pred</span> <span class='op'>*</span> <span class='va'>ranger_pred</span> <span class='op'>*</span> <span class='va'>lightgbm_pred</span>, 
                         data <span class='op'>=</span> <span class='va'>prediction_values</span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -2494,7 +2538,7 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>And then use it to generate predictions just like our original component linear model:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>prediction_values</span><span class='op'>$</span><span class='va'>model_based_pred</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prediction_values</span><span class='op'>$</span><span class='va'>model_based_pred</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
   <span class='va'>predictions_model</span>,
   newdata <span class='op'>=</span> <span class='va'>prediction_values</span>
 <span class='op'>)</span>
@@ -2507,7 +2551,7 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>The first step is to generate predictions for the test set using our component models:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>flight_testing</span><span class='op'>$</span><span class='va'>lm_pred</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>flight_testing</span><span class='op'>$</span><span class='va'>lm_pred</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/stats/predict.html'>predict</a></span><span class='op'>(</span>
   <span class='va'>linear_model</span>,
   newdata <span class='op'>=</span> <span class='va'>flight_testing</span>
 <span class='op'>)</span>
@@ -2529,10 +2573,10 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>We can use those predictions to generate our ensemble predictions. Note that we’re still using the weights and models calibrated on the validation data – we (theoretically) shouldn’t know the “true” values for the test set, so we can’t re-weight our averages now!</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>flight_testing</span> <span class='op'>&lt;-</span> <span class='va'>flight_testing</span> <span class='op'>%&gt;%</span> 
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>flight_testing</span> <span class='op'>&lt;-</span> <span class='va'>flight_testing</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>equal_weight_pred <span class='op'>=</span> <span class='op'>(</span><span class='va'>lm_pred</span> <span class='op'>+</span> <span class='va'>ranger_pred</span> <span class='op'>+</span> <span class='va'>lightgbm_pred</span><span class='op'>)</span> <span class='op'>/</span> <span class='fl'>3</span><span class='op'>)</span>
 
-<span class='va'>flight_testing</span> <span class='op'>&lt;-</span> <span class='va'>flight_testing</span> <span class='op'>%&gt;%</span> 
+<span class='va'>flight_testing</span> <span class='op'>&lt;-</span> <span class='va'>flight_testing</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>fit_based_pred <span class='op'>=</span> <span class='op'>(</span><span class='op'>(</span><span class='va'>lm_pred</span> <span class='op'>*</span> <span class='va'>rmse_weights</span><span class='op'>[</span><span class='st'>"lm_pred"</span><span class='op'>]</span><span class='op'>)</span> <span class='op'>+</span> 
                              <span class='op'>(</span><span class='va'>ranger_pred</span> <span class='op'>*</span> <span class='va'>rmse_weights</span><span class='op'>[</span><span class='st'>"ranger_pred"</span><span class='op'>]</span><span class='op'>)</span> <span class='op'>+</span> 
                              <span class='op'>(</span><span class='va'>lightgbm_pred</span> <span class='op'>*</span> <span class='va'>rmse_weights</span><span class='op'>[</span><span class='st'>"lightgbm_pred"</span><span class='op'>]</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
@@ -2550,21 +2594,21 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>So how’d we do? Let’s check out the RMSE for each of our models:</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>prediction_values</span> <span class='op'>&lt;-</span> <span class='va'>flight_testing</span> <span class='op'>%&gt;%</span> 
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prediction_values</span> <span class='op'>&lt;-</span> <span class='va'>flight_testing</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='fu'><a href='https://tidyselect.r-lib.org/reference/starts_with.html'>ends_with</a></span><span class='op'>(</span><span class='st'>"pred"</span><span class='op'>)</span>, <span class='fu'><a href='https://tidyselect.r-lib.org/reference/starts_with.html'>matches</a></span><span class='op'>(</span><span class='st'>"arr_delay"</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='va'>prediction_plots</span> <span class='op'>&lt;-</span> <span class='va'>prediction_values</span> <span class='op'>%&gt;%</span> 
-  <span class='fu'><a href='https://tidyr.tidyverse.org/reference/pivot_longer.html'>pivot_longer</a></span><span class='op'>(</span>cols <span class='op'>=</span> <span class='op'>-</span><span class='va'>arr_delay</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+<span class='va'>prediction_plots</span> <span class='op'>&lt;-</span> <span class='va'>prediction_values</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://tidyr.tidyverse.org/reference/pivot_longer.html'>pivot_longer</a></span><span class='op'>(</span>cols <span class='op'>=</span> <span class='op'>-</span><span class='va'>arr_delay</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>name <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/regmatches.html'>regmatches</a></span><span class='op'>(</span><span class='va'>name</span>, <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>regexpr</a></span><span class='op'>(</span><span class='st'>".*(?=_pred)"</span>, <span class='va'>name</span>, perl <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span><span class='op'>)</span>,
          resid <span class='op'>=</span> <span class='va'>value</span> <span class='op'>-</span> <span class='va'>arr_delay</span>,
          name <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span><span class='va'>name</span>, 
                        levels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"lightgbm"</span>, <span class='st'>"ranger"</span>, <span class='st'>"lm"</span>,
                                   <span class='st'>"model_based"</span>, <span class='st'>"fit_based"</span>, <span class='st'>"equal_weight"</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span>
 
-<span class='va'>prediction_plots</span> <span class='op'>%&gt;%</span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span>Model <span class='op'>=</span> <span class='va'>name</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>RMSE <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>resid</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>, .groups <span class='op'>=</span> <span class='st'>"drop"</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>RMSE</span><span class='op'>)</span> <span class='op'>%&gt;%</span> 
+<span class='va'>prediction_plots</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span>Model <span class='op'>=</span> <span class='va'>name</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>RMSE <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/MathFun.html'>sqrt</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>resid</span><span class='op'>^</span><span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span>, .groups <span class='op'>=</span> <span class='st'>"drop"</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>RMSE</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'>knitr</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/knitr/man/kable.html'>kable</a></span><span class='op'>(</span><span class='op'>)</span>
 </code></pre>
 </div>
@@ -2605,7 +2649,7 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre><code><span class='va'>prediction_plots</span> <span class='op'>%&gt;%</span> 
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>prediction_plots</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span><span class='va'>value</span>, <span class='va'>arr_delay</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span> 
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span><span class='op'>(</span>alpha <span class='op'>=</span> <span class='fl'>0.05</span><span class='op'>)</span> <span class='op'>+</span>
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_abline.html'>geom_abline</a></span><span class='op'>(</span>slope <span class='op'>=</span> <span class='fl'>1</span>, intercept <span class='op'>=</span> <span class='fl'>0</span>, color <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span> <span class='op'>+</span> 
@@ -2620,6 +2664,15 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>Cool – our model-based ensemble actually performed better than any of the components! While the equal weight and fit-based averages were pretty middle-of-the-road, in other settings these methods can also help to reduce bias in predictions and produce estimates with less variance than any of the component models.</p>
 <h2 id="conclusion">Conclusion</h2>
 <p>Model averaging can be a powerful tool for reducing model bias and addressing the implicit uncertainty in attempting to pick the “best” model for a situation. While plenty of complex and computationally expensive approaches to averaging exist – and can greatly improve model performance – simpler ensemble methods can provide the same benefits without necessarily incurring the same costs.</p>
+<hr>
+<script src="https://utteranc.es/client.js"
+        repo="mikemahoney218/mm218.dev"
+        issue-term="url"
+        label="comment"
+        theme="github-light"
+        crossorigin="anonymous"
+        async>
+</script>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
 <div id="ref-Dormann" class="csl-entry" role="doc-biblioentry">
@@ -2694,7 +2747,7 @@ Wintle, B. A., M. A. McCarthy, C. T. Volinsky, and R. P. Kavanagh. 2003. <span>�
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html40/loose.dtd">
 <!--radix_placeholder_navigation_after_body--><html><body>
 <div class="distill-site-nav distill-site-footer">
-<p>Â© Copyright 2020 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</p>
+<p>Â© Copyright 2022 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</p>
 </div>
 <!--/radix_placeholder_navigation_after_body-->
 </body></html>
