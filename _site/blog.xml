@@ -6,7 +6,16 @@
     <atom:link href="https://www.mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
     <description>Technology and the Environment</description>
     <generator>Distill</generator>
-    <lastBuildDate>Fri, 14 Jan 2022 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 18 Feb 2022 00:00:00 +0000</lastBuildDate>
+    <item>
+      <title>Progress, Purpose, Process</title>
+      <dc:creator>Mike Mahoney</dc:creator>
+      <link>https://www.mm218.dev/posts/2022-02-18-progress-purpose-process</link>
+      <description>Reflecting on another year.</description>
+      <guid>https://www.mm218.dev/posts/2022-02-18-progress-purpose-process</guid>
+      <pubDate>Fri, 18 Feb 2022 00:00:00 +0000</pubDate>
+      <media:content url="https://www.mm218.dev/posts/2022-02-18-progress-purpose-process/pano.jpg" medium="image" type="image/jpeg"/>
+    </item>
     <item>
       <title>terrainr: An R package for creating immersive virtual environments</title>
       <dc:creator>Mike Mahoney</dc:creator>
