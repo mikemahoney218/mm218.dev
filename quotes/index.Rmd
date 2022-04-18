@@ -4,6 +4,11 @@ output:
   tufte::tufte_html: default
 ---
 
+<hr id = "MorrisRules">
+
+The three golden rules to ensure computer security are: do not own a computer; do not power it on; and do not use it.
+
+--- Robert Morris
 
 <hr id = "GelmanMethods">
 
