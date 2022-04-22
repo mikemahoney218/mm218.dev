@@ -4,6 +4,18 @@ output:
   tufte::tufte_html: default
 ---
 
+<hr id = "DemingWithout">
+
+Without data, you’re just another person with an opinion
+
+--- W. Edwards Deming
+
+<hr id = "KozyrkovWithout">
+
+Without data, you’re just another person with an opinion. [...] With data, you’re still just another person with an opinion. Expert analysts understand this in their very bones.
+
+--- Cassie Kozyrkov
+
 <hr id = "MorrisRules">
 
 The three golden rules to ensure computer security are: do not own a computer; do not power it on; and do not use it.
