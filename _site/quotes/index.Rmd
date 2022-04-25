@@ -4,6 +4,12 @@ output:
   tufte::tufte_html: default
 ---
 
+<hr id = "BrandGods">
+
+We are as gods. We may as well get good at it.
+
+--- Stewart Brand
+
 <hr id = "DemingWithout">
 
 Without data, you’re just another person with an opinion
