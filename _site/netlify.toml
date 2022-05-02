@@ -72,7 +72,7 @@
 
 [[redirects]]
   from = "/terrainr"
-  to = "https://mikemahoney218.github.io/terrainr/"
+  to = "https://docs.ropensci.org/terrainr/"
 
 [[redirects]]
   from = "/proceduralnames"
@@ -85,7 +85,7 @@
 [[redirects]]
   from = "/workshop"
   to = "https://docs.google.com/spreadsheets/d/1Nu0RFNixHfQvZcxdLe0WROPEw51TAa_9mg0CxNswAcY/edit?usp=sharing"
-  
+
 [[redirects]]
   from = "/esip2021"
   to = "https://mikemahoney218.github.io/2021-09-08_esip/esip.html#2"
@@ -105,3 +105,8 @@
 [[redirects]]
   from = "/agu2021"
   to = "https://www.mm218.dev/papers/ground_filtering/"
+
+[[redirects]]
+  from = "/unifir"
+  to = "https://docs.ropensci.org/unifir/"
+
