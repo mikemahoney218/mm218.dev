@@ -51,6 +51,8 @@ B.S. in Forest Ecosystem Science | August 2015 - December 2018
 
 #### Publications
 
+**unifir: A Unifying API for Interacting with Unity from R.** Mahoney, MJ, Beier, CM, and Ackerman, AC. 2022. Journal of Open Source Software 7(73): 4388. [https://doi.org/10.21105/joss.04388](https://doi.org/10.21105/joss.04388)
+
 **terrainr: An R package for creating immersive virtual environments.** Mahoney, MJ, Beier, CM, and Ackerman, AC. 2022. Journal of Open Source Software, 7(69): 4060. [https://doi.org/10.21105/joss.04060](https://doi.org/10.21105/joss.04060)
 
 **Stem size selectivity is stronger than species preferences for beaver, a central place forager.**  Mahoney, M. J. and Stella, J. C. 2020. Forest Ecology and Management, 475, 118331. [https://doi.org/10.1016/j.foreco.2020.118331](https://doi.org/10.1016/j.foreco.2020.118331).
