@@ -110,3 +110,15 @@
   from = "/unifir"
   to = "https://docs.ropensci.org/unifir/"
 
+[[redirects]]
+  from = "/NAFEW"
+  to = "https://doi.org/10.31223/X5HG99"
+
+[[redirects]]
+  from = "/NAFEW"
+  to = "https://doi.org/10.31223/X5HG99"
+
+[[redirects]]
+  from = "/ground_filtering"
+  to = "https://doi.org/10.31223/X5HG99"
+
