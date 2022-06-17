@@ -1,5 +1,24 @@
 [
   {
+    "path": "posts/2022-06-15-spatialsample-020/",
+    "title": "spatialsample v 0.2.0 is out today!",
+    "description": "A short description of the post.",
+    "author": [
+      {
+        "name": "Mike Mahoney",
+        "url": {}
+      }
+    ],
+    "date": "2022-06-15",
+    "categories": [],
+    "contents": "\n\n\nlibrary(ggplot2)\nlibrary(spatialsample)\n\nggplot(boston_canopy) + \n  geom_sf()\n\n\n\n\n\n\nset.seed(123)\nkmeans_clustering <- spatial_clustering_cv(boston_canopy, v = 5)\nkmeans_clustering\n\n\n#  5-fold spatial cross-validation \n# A tibble: 5 × 2\n  splits            id   \n  <list>            <chr>\n1 <split [524/158]> Fold1\n2 <split [493/189]> Fold2\n3 <split [517/165]> Fold3\n4 <split [605/77]>  Fold4\n5 <split [589/93]>  Fold5\n\n\n\nautoplot(kmeans_clustering) + labs(title = \"kmeans()\")\n\n\n\n\n\n\nset.seed(123)\nspatial_clustering_cv(\n  boston_canopy, \n  v = 5, \n  cluster_function = \"hclust\"\n) |> \n  autoplot() + \n  labs(title = \"hclust()\")\n\n\n\n\n\n\nset.seed(123)\n\ncustom_clusters <- function(dists, v, ...) {\n  rep(letters[1:v], length.out = nrow(boston_canopy))\n}\n\nspatial_clustering_cv(\n  boston_canopy, \n  v = 5, \n  cluster_function = custom_clusters\n) |> \n  autoplot() + \n  labs(title = \"custom_clusters()\")\n\n\n\n\n\n\nset.seed(123)\nspatial_block_cv(boston_canopy, v = 5) |> \n  autoplot()\n\n\n\n\n\n\nspatial_block_cv(boston_canopy, v = 5, method = \"continuous\") |> \n  autoplot()\n\n\n\n\n\n\nspatial_block_cv(boston_canopy, v = 5, method = \"snake\") |> \n  autoplot()\n\n\n\n\n\n\nspatial_block_cv(\n  boston_canopy, \n  v = 10, \n  method = \"continuous\", \n  relevant_only = FALSE\n) |> \n  autoplot()\n\n\n\n\n\n\ndata(ames, package = \"modeldata\")\n\names_sf <- sf::st_as_sf(ames, coords = c(\"Longitude\", \"Latitude\"), crs = 4326)\n\nset.seed(123)\nspatial_leave_location_out_cv(ames_sf, Neighborhood) |> \n  autoplot()\n\n\n\n\nBuffering\n\n\nset.seed(123)\nblocks <- spatial_buffer_vfold_cv(\n  boston_canopy, \n  v = 20,\n  buffer = 100,\n  radius = NULL\n)\n\nautoplot(blocks)\n\n\n\n\n\n\nblocks$splits |> \n  purrr::walk(function(x) print(autoplot(x)))\n\n\n\n\n\n\nset.seed(123)\nblocks <- spatial_buffer_vfold_cv(\n  boston_canopy, \n  v = 20,\n  buffer = 100,\n  radius = 100\n)\n\nblocks$splits |> \n  purrr::walk(function(x) print(autoplot(x)))\n\n\n\n\n…and more!\n\n\n\n",
+    "preview": "posts/2022-06-15-spatialsample-020/spatialsample-020_files/figure-html5/unnamed-chunk-1-1.png",
+    "last_modified": "2022-06-15T13:45:34-04:00",
+    "input_file": {},
+    "preview_width": 1344,
+    "preview_height": 960
+  },
+  {
     "path": "posts/2022-02-18-progress-purpose-process/",
     "title": "Progress, Purpose, Process",
     "description": "Reflecting on another year.",
