@@ -106,7 +106,7 @@ library(sf)
 
 invisible(sf_proj_network(TRUE))
 
-plot_measurements <- readr::read_csv("plot_measurements.csv") |> 
+plot_measurements <- readr::read_csv("https://www.mm218.dev/junkdrawer/riemann/plot_measurements.csv") |> 
   st_as_sf(coords = c("long", "lat"), crs = 4326) |> 
   st_transform(5070)
 ```
