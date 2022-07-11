@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-0.9.449">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mike Mahoney">
+<meta name="dcterms.date" content="2021-04-22">
+<meta name="description" content="The new CRAN release of terrainr improves consistency, CRS logic, and fixes some bugs.">
+
+<title>Mike Mahoney - What’s new in terrainr 0.4.0?</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link id="quarto-text-highlighting-styles" href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Mike Mahoney</span>
+  </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">Home</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../papers">Papers</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../presentations">Presentations</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html">Blog</a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../blog.xml"><i class="bi bi-rss" role="img">
+</i> 
+ </a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">What’s new in terrainr 0.4.0?</h1>
+                  <div>
+        <div class="description">
+          <p>The new CRAN release of terrainr improves consistency, CRS logic, and fixes some bugs.</p>
+        </div>
+      </div>
+                </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Mike Mahoney </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">April 22, 2021</p>
+      </div>
+    </div>
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>terrainr version 0.4.0 is now on CRAN! This version is a relatively minor update that shouldn’t impact most workflows, but makes some changes to improve the logic and consistency of the package. The rest of this post runs through the changes you can expect if you <code>update.packages()</code> any time soon!</p>
+<section id="whats-a-terrainr" class="level2">
+<h2 class="anchored" data-anchor-id="whats-a-terrainr">What’s a terrainr?</h2>
+<p><a href="https://docs.ropensci.org/terrainr/">terrainr</a> is an R package for the retrieval and visualization of spatial data. It provides functions to download elevation data and basemap tiles for points within the United States (using public domain data from the USGS National Map), visualize them in R via ggplot2, and process them for 3D visualization using the Unity 3D engine. You can see <a href="https://docs.ropensci.org/terrainr/">the GitHub repo here!</a></p>
+</section>
+<section id="merge_rasters-can-handle-tiles-with-different-numbers-of-bands" class="level2">
+<h2 class="anchored" data-anchor-id="merge_rasters-can-handle-tiles-with-different-numbers-of-bands"><code>merge_rasters</code> can handle tiles with different numbers of bands</h2>
+<p>The old implementation of <code>merge_rasters</code> was very bulky, read all your map tiles into memory at once, and was a bit of a mess to maintain thanks to the large number of paths you could theoretically take through the code. The commit (suggested via rOpenSci review!) replacing it with <code>gdalwarp</code> via <code>sf</code> is probably the single best code improvement I’ve made to this repo. Unfortunately, the old method could also handle merging rasters with differing numbers of bands, while the simple <code>gdalwarp</code> fix couldn’t.</p>
+<p>So the old implementation is back as an internal method while I look for a better solution to this problem. <code>merge_rasters</code> will now attempt to use <code>gdalwarp</code> to merge your input files and then fall back to (a massively simplified version of) the older version if <code>gdalwarp</code> fails.</p>
+<p>As for why you’d want to automatically merge rasters with different numbers of bands, well…</p>
+</section>
+<section id="get_tiles-doesnt-auto-download-transparency-values-for-naip" class="level2">
+<h2 class="anchored" data-anchor-id="get_tiles-doesnt-auto-download-transparency-values-for-naip"><code>get_tiles</code> doesn’t auto-download transparency values for NAIP</h2>
+<p>NAIP orthophotography provides fantastic continuous 1-meter images for the continental United States. When downloading these photos with the argument <code>transparency = true</code>, which used to be the default, <em>most</em> photos don’t have any transparent pixels to talk about and as such are returned and saved as 3 band rasters (RGB images). <em>Some</em> photos, however, do have such pixels and are returned with a 4th alpha band. This causes problems with <code>gdalwarp</code> as well as image editing software, and the majority of the time users are not better served by these pixels being transparent.</p>
+<p>As a result, this version changes the default <code>transparency</code> argument for <code>get_tiles</code> and <code>hit_national_map_api</code> to <code>false</code> when downloading NAIP images (no other data source is impacted). This is one of the reasons this version gets a 0.x.0 number – while it should be a small change, the same inputs to functions no longer returns the same outputs (though I doubt people would notice), so I’m counting this as a breaking change.</p>
+<p>There’s a slightly more impactful breaking change worth noting though:</p>
+</section>
+<section id="functions-pay-attention-to-the-provided-crs" class="level2">
+<h2 class="anchored" data-anchor-id="functions-pay-attention-to-the-provided-crs">Functions pay attention to the provided CRS</h2>
+<p>This header is actually about two distinct changes.</p>
+<p>First, another new behavior with <code>get_tiles</code> is that rather than assuming the provided data and downloaded image should both be using the WGS84 CRS (EPSG 4326), <code>get_tiles</code> will now infer the EPSG CRS from any provided <code>sf</code> or <code>Raster</code> object. If the numeric code is missing, this function will still assume 4326.</p>
+<p>Similarly, rather than specifying <code>target_crs</code> in <code>vector_to_overlay</code>, this function will now return an overlay projected to match <code>reference_raster</code>’s CRS. Missing CRS are handled slightly differently here – if the <code>error_crs</code> argument is <code>NULL</code>, this function will warn; if <code>FALSE</code> it will assume 4326, and if <code>TRUE</code> it will interrupt the function with an error.</p>
+<p>Those are the major changes to this iteration! On top of these there are some minor changes to the package internals, slowly removing dead code paths and simplifying things behind the scenes. If you have any problems (bugs or missing features) with the package, feel free to <a href="https://github.com/ropensci/terrainr/issues">open an issue!</a></p>
+<hr>
+<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
+</script>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">© Copyright 2022 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</div>   
+  </div>
+</footer>
+
+
+
+</body></html>

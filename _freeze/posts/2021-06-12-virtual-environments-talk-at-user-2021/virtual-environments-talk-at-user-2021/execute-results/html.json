@@ -1,0 +1,16 @@
+{
+  "hash": "40654b72ec6c74bcb4f8bee15f1e1353",
+  "result": {
+    "markdown": "---\ntitle: \"Virtual environments talk at useR! 2021\"\ndescription: |\n  With slides and a rough outline available on GitHub.\nauthor:\n  - name: Mike Mahoney\n    url: {}\ndate: 06-12-2021\noutput:\n  distill::distill_article:\n    self_contained: false\n---\n\n\n\n\nI'm thrilled to be giving a talk (with Colin Beier and Aidan Ackerman) at useR \n2021! We're calling the talk \"Virtual Environments: Using R as a Frontend for 3D \nRendering of Digital Landscapes\" -- generally speaking, I'm talking about the \nidea of using R to create visualizations inside game engines, and specifically \nabout how we do so using terrainr.\n\nThe video should go up on YouTube after the conference, and the slides (and \na rough script for the talk) are online at \nhttps://github.com/mikemahoney218/user2021 . My favorite line from the script\nis \"R is where our users are\" -- I didn't quite realize I had any Boston accent\nleft until I tripped over that sentence a few times.\n\n\n<hr>\n\n<script src=\"https://utteranc.es/client.js\"\n        repo=\"mikemahoney218/mm218.dev\"\n        issue-term=\"url\"\n        label=\"comment\"\n        theme=\"github-light\"\n        crossorigin=\"anonymous\"\n        async>\n</script>\n",
+    "supporting": [
+      "virtual-environments-talk-at-user-2021_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": null
+  }
+}
