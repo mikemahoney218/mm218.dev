@@ -36,7 +36,9 @@ citation:
 date: "2022-07-14"
 nocite: |
   @Hosking1990, @Pflugmacher2012, @Brown2020
-df-print: paged
+format:
+  html:
+    df-print: paged
 ---
 
 ```{r echo = FALSE}
@@ -641,6 +643,7 @@ $\Delta$ RMSE (@tbl-patchiness).
 
 ```{r tbl-patchiness}
 #| tbl-cap: Correlation (Spearman's $rho$) between $Delta$ RMSE (%) and landscape structural metrics at various filtering thresholds. $Delta$ RMSE (%) represents the difference between RMSE (%) for the filtered scenario compared to RMSE (%) without filtering; positive correlations represent increasing relative error (i.e, difference in RMSE % versus the unfiltered case) as the landscape metric increases. Note that negative correlations indicate lessened impact from ground filtering, but not improved models; filtering almost always results in higher RMSE values.
+
 read.csv(
   here::here("tables", "fragstats_correlation_table.csv")
 ) |> 
