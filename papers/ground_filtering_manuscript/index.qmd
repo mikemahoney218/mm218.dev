@@ -38,7 +38,8 @@ nocite: |
   @Hosking1990, @Pflugmacher2012, @Brown2020
 format:
   html:
-    df-print: paged
+    toc: true
+    toc-title: " "
 ---
 
 ```{r echo = FALSE}
