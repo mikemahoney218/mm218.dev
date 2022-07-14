@@ -646,14 +646,3 @@ I personally think heatmaps are less effective – partially because by
 using the color aesthetic to encode this value, you can’t use it for
 anything else – but they’re often easier to make with the resources at
 hand.
-
-<hr>
-
-<script src="https://utteranc.es/client.js"
-        repo="mikemahoney218/mm218.dev"
-        issue-term="url"
-        label="comment"
-        theme="github-light"
-        crossorigin="anonymous"
-        async>
-</script>

@@ -28,14 +28,3 @@ knitr::include_graphics("covid.png")
 [The app lives at this link](https://mm218.shinyapps.io/corona_data_explore/).
 Thanks to R Studio, who are providing free hosting for coronavirus apps through
 the pandemic.
-
-<hr>
-
-<script src="https://utteranc.es/client.js"
-        repo="mikemahoney218/mm218.dev"
-        issue-term="url"
-        label="comment"
-        theme="github-light"
-        crossorigin="anonymous"
-        async>
-</script>

@@ -29,14 +29,3 @@ So when 24 came and it was time to change my theme, I decided to make it the yea
 Now it's 25, and it's time for a new theme. I think my plan is for the year of Process: I like where I am with my life right now, and I like how I spend my time. But I could be better and more careful about how I approach both of those things. I'm going to try to get better with details, to improve my memory around small things. 
 
 I told you this would be indulgent. I know this sounds froofy. But it's worked for me for two years now and I'm betting on round three. And I'm looking forward to seeing where this year takes me.
-
-<hr>
-
-<script src="https://utteranc.es/client.js"
-        repo="mikemahoney218/mm218.dev"
-        issue-term="url"
-        label="comment"
-        theme="github-light"
-        crossorigin="anonymous"
-        async>
-</script>

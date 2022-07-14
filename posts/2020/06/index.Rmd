@@ -27,13 +27,3 @@ have gotten to what I believe is a respectable place with my filtration. So I've
 (without the specific values I use to filter) for anyone else who might be 
 interested in setting up their own automated retweet app.
 
-<hr>
-
-<script src="https://utteranc.es/client.js"
-        repo="mikemahoney218/mm218.dev"
-        issue-term="url"
-        label="comment"
-        theme="github-light"
-        crossorigin="anonymous"
-        async>
-</script>

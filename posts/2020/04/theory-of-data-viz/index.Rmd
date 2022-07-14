@@ -148,14 +148,3 @@ of data visualization in our next post – it should be your main
 consideration while deciding which elements you use\! We’ll keep
 returning to these ideas of explanatory and exploratory, as well as
 expressiveness and effectiveness, throughout the rest of this article.
-
-<hr>
-
-<script src="https://utteranc.es/client.js"
-        repo="mikemahoney218/mm218.dev"
-        issue-term="url"
-        label="comment"
-        theme="github-light"
-        crossorigin="anonymous"
-        async>
-</script>

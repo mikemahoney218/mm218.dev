@@ -139,14 +139,3 @@ You can also customize the job further with a few additional inputs:
 + `package`: The GitHub repository for the package you want to upload. Defaults to the repository the action is running in, but this can be used to run your workflow elsewhere (for instance, if you want to have all your upload jobs scheduled in the drat repo itself).
 
 And for most use cases, this should be enough to automatically deploy your package whenever you desire! So far, I've tested this workflow on a handful of my own packages (terrainr and then our internal packages), and things are working well so far -- if you find any problems or have any suggestions, [feel free to open an issue on the action repo here.](https://github.com/mikemahoney218/upload-to-drat-repo/issues)
-
-<hr>
-
-<script src="https://utteranc.es/client.js"
-        repo="mikemahoney218/mm218.dev"
-        issue-term="url"
-        label="comment"
-        theme="github-light"
-        crossorigin="anonymous"
-        async>
-</script>

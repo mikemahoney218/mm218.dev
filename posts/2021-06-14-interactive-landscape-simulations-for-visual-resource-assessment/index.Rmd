@@ -34,15 +34,3 @@ the paper [at this link](https://www.mm218.dev/papers/vrs_2021.pdf).
 
 [Update - 2021-06-24] And the code and manuscript used for this paper are now on
 [Github at this link](https://github.com/mikemahoney218/vrs2021).
-
-
-<hr>
-
-<script src="https://utteranc.es/client.js"
-        repo="mikemahoney218/mm218.dev"
-        issue-term="url"
-        label="comment"
-        theme="github-light"
-        crossorigin="anonymous"
-        async>
-</script>

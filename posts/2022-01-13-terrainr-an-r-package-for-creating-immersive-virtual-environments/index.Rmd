@@ -41,14 +41,3 @@ but not adding enough to spin off into
 [an entirely separate research project](https://www.mm218.dev/posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/).
 It's also very short -- a nice feature of JOSS papers -- so rather than summarize here I'll just
 suggest you [read it yourself](https://www.mm218.dev/papers/terrainr_2022.pdf).
-
-<hr>
-
-<script src="https://utteranc.es/client.js"
-        repo="mikemahoney218/mm218.dev"
-        issue-term="url"
-        label="comment"
-        theme="github-light"
-        crossorigin="anonymous"
-        async>
-</script>
