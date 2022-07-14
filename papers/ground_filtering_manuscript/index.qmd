@@ -30,7 +30,9 @@ filters:
 citation:
   type: article-journal
   container-title: "GIScience & Remote Sensing"
-  container-author: "Michael J Mahoney and Lucas K Johnson and Eddie Bevilacqua and Colin M Beier"
+  #page:  
+  #issue:
+  #number:
   #doi: 
   #url:
 date: "2022-07-14"
@@ -63,7 +65,7 @@ comb <- which(coverage_names == "Combined")
 ord <- c("Combined" = "Combined", coverage_names[-comb])
 ```
 
-# Introduction
+# Introduction {#sec-Introduction}
 
 Accurate assessment of forest carbon stocks for the purposes of greenhouse gas 
 accounting and climate change mitigation requires high-resolution maps of 
@@ -158,9 +160,9 @@ This study sought to inform current and future efforts looking to
 accurately predict forest AGB using models incorporating predictors derived from 
 airborne LiDAR data products.
 
-# Methods
+# Methods {#sec-Methods}
 
-## LiDAR Data Sets and Site Characteristics {#sec:sites}
+## LiDAR Data Sets and Site Characteristics {#sec-sites}
 
 In order to identify the impacts of ground filtering on predictive models of 
 forest AGB, we obtained sixteen separate leaf-off LiDAR data sets for areas within 
@@ -241,7 +243,7 @@ Forest AGB measurements were recorded in pounds,
 then converted and area-normalized 
 to units of megagrams per hectare ($\operatorname{Mg\ ha^{-1}}$).
 
-## LiDAR Pre-Processing
+## LiDAR Pre-Processing {#sec-preprocessing}
 
 A digital terrain model (DTM) was calculated for all sites using a 
 k-nearest-neighbors inverse-distance weighting imputation algorithm 
@@ -299,7 +301,7 @@ dplyr::tribble(
   kable()
 ```
 
-## Model Fitting
+## Model Fitting {#sec-modelfitting}
 
 Models were fit using the ranger R package's 
 implementation of the random forest algorithm [@Breiman2001; @Wright2017], a 
@@ -377,7 +379,7 @@ varied with differences in landscape structure.
 Landscape structure was quantified for each LiDAR region using temporally 
 matching land use/land cover classifications from USGS LCMAP [@Brown2020].
 We computed the proportion of 30 m pixels classified as forest (@eq-fc)
-and the topographic ruggeddness index (TRI, @eq-tri); @Riley1999) using the terra R package [@terra],
+and the topographic ruggeddness index (TRI, @eq-tri; @Riley1999) using the terra R package [@terra],
 as well as edge density (@eq-ed) in units of meter per hectare
 and patch density (@eq-pd) in units of number of patches per 100 hectares
 for each individual LiDAR region
@@ -452,9 +454,9 @@ due to ground noise filtering and each landscape structure metric
 (@sec-landscapemetrics)
 was measured using Spearman's correlation coefficient ($\rho$).
 
-# Results
+# Results {#sec-results}
 
-## Landscape Structure
+## Landscape Structure #{sec-structure}
 
 ```{r}
 source("code/make_names.R")
@@ -513,7 +515,7 @@ applying plot inclusion rules, for a total of 874 plots in the combined data set
 knitr::include_graphics("figures/landscape_metrics.png", dpi = 600)
 ```
 
-## Variable Distribution
+## Variable Distribution {#sec-variabledistribution}
 
 Filtering out ground noise resulted in shifts in predictor 
 distributions (@fig-distributions). 
@@ -542,7 +544,7 @@ knitr::include_graphics(here::here("figures", "distributions.jpg"))
 knitr::include_graphics(here::here("figures", "abs_cor.png"))
 ```
 
-## Model Performance
+## Model Performance {#sec-modelperformance}
 
 Models fit to the unfiltered set of predictors were almost always 
 equally or more accurate than those fit to 
@@ -655,7 +657,7 @@ read.csv(
   kable()
 ```
 
-# Discussion
+# Discussion {#sec-discussion}
 
 This study set out to evaluate empirical support for threshold-based 
 ground noise filtering for models of forest AGB.
@@ -670,7 +672,7 @@ and potential for decreased accuracy following filtering procedures
 should encourage future modeling studies to use 
 unfiltered point clouds when deriving variables for models of forest AGB.
 
-## Ground noise filtering produces inferior predictive models
+## Ground noise filtering produces inferior predictive models {#sec-inferior}
 
 Our study demonstrates that the ground noise filtering approaches commonly used 
 in preprocessing data for models of forest AGB systematically biases LiDAR-derived 
@@ -783,7 +785,7 @@ and that we cannot establish any causal linkages
 between forest cover, TRI, and the impacts of ground noise filtering
 in the current study.
 
-# Conclusion
+# Conclusion {#sec-conclusion}
 
 Our results and examination of the literature suggest that 
 ground noise filtering procedures are not well justified 
@@ -812,18 +814,18 @@ to benefit or be unharmed by the procedure.
 The best data preprocessing procedure will 
 necessarily depend on the purpose of the model [@Sambasivan2021].
 
-# Acknowledgements
+# Acknowledgements {#sec-acknowledgments}
 
 We would like to thank the US Forest Service Forest Inventory & Analysis program 
 for their data sharing and cooperation, the New York State GIS Program Office 
 for compiling LIDAR data, and the New York State Department of Environmental 
 Conservation, Office of Climate Change, for funding support. 
 
-# Conflict of Interest 
+# Conflict of Interest {#sec-coi}
 
 The authors declare that they have no conflicting interests.
 
-# Data Availability Statement
+# Data Availability Statement {#sec-das}
 
 Data for this study is available from Zenodo at https://doi.org/10.5281/zenodo.6391114 [@DataCitation].
 
