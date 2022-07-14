@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-0.9.449">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Michael J Mahoney, Lucas K Johnson, Eddie Bevilacqua, and Colin M Beier">
+<meta name="dcterms.date" content="2022-07-14">
+<meta name="keywords" content="<p>aboveground biomass; ground noise; LiDAR; machine learning; random forest</p>">
+
+<title>Mike Mahoney - Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass in heterogenous landscapes</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link id="quarto-text-highlighting-styles" href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+<script src="../../site_libs/kePrint-0.0.1/kePrint.js"></script>
+<link href="../../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Mike Mahoney</span>
+  </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">Home</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../papers">Papers</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../presentations">Presentations</a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html">Blog</a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../blog.xml"><i class="bi bi-rss" role="img">
+</i> 
+ </a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass in heterogenous landscapes</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Authors</div>
+    <div class="quarto-title-meta-contents">
+             <p>Michael J Mahoney </p>
+             <p>Lucas K Johnson </p>
+             <p>Eddie Bevilacqua </p>
+             <p>Colin M Beier </p>
+          </div>
+  </div>
+    
+    <div>
+    <div class="quarto-title-meta-heading">Published</div>
+    <div class="quarto-title-meta-contents">
+      <p class="date">July 14, 2022</p>
+    </div>
+  </div>
+    
+  </div>
+  
+<div>
+  <div class="abstract">
+    <div class="abstract-title">Abstract</div>
+    <p>Airborne LiDAR has become an essential data source for large-scale, high-resolution modeling of forest aboveground biomass and carbon stocks, enabling predictions with much higher resolution and accuracy than can be achieved using optical imagery alone. Ground noise filtering – that is, excluding returns from LiDAR point clouds based on simple height thresholds – is a common practice meant to improve the ‘signal’ content of LiDAR returns by preventing ground returns from masking useful information about tree size and condition contained within canopy returns. However, ground returns may be helpful for making accurate aboveground biomass predictions in heterogeneous landscapes that include a patchy mosaic of vegetation heights and land cover types.</p>
+    <p>In this paper, we applied several ground noise filtering thresholds while mapping forest AGB across New York State (USA), a heterogenous landscape composed of both contiguously forested and highly fragmented areas with mixed land cover types. We fit random forest models to predictor sets derived from each filtering intensity threshold and compared model accuracies, paying attention to how changes in accuracy correlated with landscape structure. We observed that removing ground noise via any height threshold systematically biases many of the LiDAR-derived variables used in AGB modeling, with mean correlation (Spearman’s <span class="math inline">\(\rho\)</span>) between variables increasing from 0.183 to 0.266. We found that that ground noise filtering yields models of forest AGB with lower accuracy than models trained using predictors derived from unfiltered point clouds, with RMSE increasing by up to 2.2 Mg ha<sup>-1</sup> statewide. Although we only modeled AGB for forest cover types, models fit to predictors derived from filtered point clouds performed worse as landscape heterogeneity (as measured by patch density and edge density) increased, suggesting ground returns are particularly useful when modeling edge forests. Our results suggest that ground filtering should be a carefully considered decision when mapping forest AGB, particularly when mapping heterogeneous and highly fragmented landscapes, as ground returns are more likely to represent useful ‘signal’ than extraneous ‘noise’ in these cases.</p>
+  </div>
+</div>
+
+</header>
+
+<p><sup>1</sup> Graduate Program in Environmental Science, State University of New York College of Environmental Science and Forestry, 1 Forestry Drive, Syracuse, NY, 13210<br>
+<sup>2</sup> Department of Sustainable Resources Management, State University of New York College of Environmental Science and Forestry, 1 Forestry Drive, Syracuse, NY, 13210</p>
+<div class="cell">
+
+</div>
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Accurate assessment of forest carbon stocks for the purposes of greenhouse gas accounting and climate change mitigation requires high-resolution maps of forest aboveground biomass (AGB) across large spatial extents. The production of these maps has been aided in recent years by the proliferation of publicly available LiDAR data, with initiatives such as the United States Geological Survey’s 3D Elevation Program releasing airborne LiDAR data publicly for 84% of the United States between 2016 and 2021 <span class="citation" data-cites="3DEP">(<a href="#ref-3DEP" role="doc-biblioref">U.S. Geological Survey, 2019</a>)</span>, and the Global Ecosystem Dynamics Investigation mission beginning to collect spaceborne LiDAR on a global scale beginning in 2018 <span class="citation" data-cites="GEDI">(<a href="#ref-GEDI" role="doc-biblioref">Dubayah et al., 2020</a>)</span>. These data sources allow researchers access to granular data representing the 3D profile of the earth’s surface at a landscape scale <span class="citation" data-cites="Dubayah2000">(<a href="#ref-Dubayah2000" role="doc-biblioref">Dubayah and Drake, 2000</a>)</span>. By aggregating returns to a pixel or object level and computing descriptive statistics characterizing the distributions of return heights, modelers are able to convert these point clouds into tabular data formats which may then be used to fit regression models for predicting forest AGB <span class="citation" data-cites="Hawbaker2010">(<a href="#ref-Hawbaker2010" role="doc-biblioref">Hawbaker et al., 2010</a>)</span>.</p>
+<p>However, there exists some disagreement about precisely which returns to aggregate when computing such statistics. While some LiDAR-based forest AGB models include all returns when calculating summary statistics <span class="citation" data-cites="Hudak2020">(<a href="#ref-Hudak2020" role="doc-biblioref">Hudak et al., 2020</a>)</span>, others first filter out returns below various height thresholds when calculating percentile heights <span class="citation" data-cites="Ma2018">(<a href="#ref-Ma2018" role="doc-biblioref">Ma et al., 2018</a>)</span>, density percentiles <span class="citation" data-cites="Huang2019">(<a href="#ref-Huang2019" role="doc-biblioref">Huang et al., 2019</a>)</span>, or their entire suite of predictors <span class="citation" data-cites="Garcia2010">(<a href="#ref-Garcia2010" role="doc-biblioref">García et al., 2010</a>)</span>. Filtering is typically described as being done to remove ground noise from return data, in order to avoid having “ground” returns mask any signal contained in the remaining “canopy” returns. The height threshold used in this process varies across studies, with examples ranging from 0.3m <span class="citation" data-cites="Garcia2010">(<a href="#ref-Garcia2010" role="doc-biblioref">García et al., 2010</a>)</span> to 1.3m <span class="citation" data-cites="Deo2017 Ma2018">(<a href="#ref-Deo2017" role="doc-biblioref">Deo et al., 2017</a>; <a href="#ref-Ma2018" role="doc-biblioref">Ma et al., 2018</a>)</span> to 2m <span class="citation" data-cites="Anderson2013">(<a href="#ref-Anderson2013" role="doc-biblioref">Anderson and Bolstad, 2013</a>)</span> to 2.5m <span class="citation" data-cites="Huang2019">(<a href="#ref-Huang2019" role="doc-biblioref">Huang et al., 2019</a>)</span>.</p>
+<p>This diversity of approaches demonstrates a lack of consensus about a preprocessing technique that produces systematically greater estimates of percentile heights and other computed predictors. The practice itself appears to have originated with Nilsson <span class="citation" data-cites="Nilsson1996">(<a href="#ref-Nilsson1996" role="doc-biblioref">1996</a>)</span>, whose early work with airborne LiDAR focused on calculating tree heights based on the maximum heights of returns, as well as stand volume as a function of the mean height of all returns. Nilsson does not appear to filter returns based on height thresholds; rather, they set the height values of all points below 2m to 0m, in effect reducing the resulting mean height values. Næsset <span class="citation" data-cites="Naesset1997">(<a href="#ref-Naesset1997" role="doc-biblioref">1997</a>)</span> published what may be the earliest rationale for ground noise filtering in a study calculating mean stand height from LiDAR returns, excluding returns below 2m in order to avoid interference from shrubs, rocks, and other understory features. In concert, these two studies have provided the justification for filtering out ground returns in a multitude of forest modeling studies <span class="citation" data-cites="Anderson2013 Magnussen1998 Wasser2013">(<a href="#ref-Anderson2013" role="doc-biblioref">Anderson and Bolstad, 2013</a>; <a href="#ref-Magnussen1998" role="doc-biblioref">Magnussen and Boudewyn, 1998</a>; <a href="#ref-Wasser2013" role="doc-biblioref">Wasser et al., 2013</a>)</span>, to the extent that it appears to now be such a commonly accepted practice as to not merit discussion or citation at all <span class="citation" data-cites="White2015 Hawbaker2010">(<a href="#ref-Hawbaker2010" role="doc-biblioref">Hawbaker et al., 2010</a>; e.g. <a href="#ref-White2015" role="doc-biblioref">White et al., 2015</a>)</span>.</p>
+<p>Yet this practice, initially justified so as to not include the height of stones in calculating the mean heights of trees <span class="citation" data-cites="Naesset1997">(<a href="#ref-Naesset1997" role="doc-biblioref">Næsset, 1997</a>)</span>, may not be necessary or desirable as modelers turn their attention to stand characteristics such as AGB. Increased density of ground returns may be associated with sparser stands, and as a result, the left-censoring of variables derived from LiDAR pulses by omitting ground noise may remove useful information about stand structure available for predictive models. This common practice may therefore result in inferior estimates of forest AGB. Filtering may particularly harm predictive accuracy in less contiguously forested and mixed-use landscapes, as we might expect filtering to exclude more returns in areas without tree canopies intercepting and reflecting pulses. As a result, these filtering procedures may adjust LiDAR-derived variables by greater amounts in these settings compared to contiguously forested regions, given their increased proportion of ground returns. It is likely that modeling such heterogeneous landscapes will be an increasing concern over time, as larger data sets and improved computing power enables modelers to map forest AGB over larger spatial scales; however, there has not been much discussion in the literature concerning any effects filtering may have on forest AGB predictions either in these landscapes or in more homogeneous settings.</p>
+<p>Such a discussion is particularly timely given the current focus on producing high-resolution maps of forest AGB. Numerous studies in recent years have produced such maps using a combination of publicly-available LiDAR and field measurements collected through the United States Forest Service Forest Inventory and Analysis (FIA) program <span class="citation" data-cites="Johnson2022 Huang2019 Hurtt2019 Chen2016">(<a href="#ref-Chen2016" role="doc-biblioref">Chen et al., 2016</a>; <a href="#ref-Huang2019" role="doc-biblioref">Huang et al., 2019</a>; <a href="#ref-Hurtt2019" role="doc-biblioref">Hurtt et al., 2019</a>; for instance, <a href="#ref-Johnson2022" role="doc-biblioref">Johnson et al., 2022</a>)</span>, and despite limitations in LiDAR density and FIA spatial measurement accuracy have produced admirable results. However, such studies may be limiting their success due to this common LiDAR preprocessing procedure.</p>
+<p>In this paper, we use publicly-available LiDAR data sets representing a range of contiguously forested and mixed-use landscapes to investigate the impacts of ground noise filtering on predictive models of forest AGB. We set out to first identify how filtering ground noise impacts the distribution of commonly used LiDAR-derived predictors, using multiple height thresholds as found throughout the literature. We then fit models to each of these predictor sets using the random forest algorithm <span class="citation" data-cites="Breiman2001">(<a href="#ref-Breiman2001" role="doc-biblioref">Breiman, 2001</a>)</span>, a tool commonly used in modeling forest AGB, to assess how the different predictor distributions afftected model performance. This study sought to inform current and future efforts looking to accurately predict forest AGB using models incorporating predictors derived from airborne LiDAR data products.</p>
+</section>
+<section id="methods" class="level1">
+<h1>Methods</h1>
+<section id="sec:sites" class="level2">
+<h2 class="anchored" data-anchor-id="sec:sites">LiDAR Data Sets and Site Characteristics</h2>
+<p>In order to identify the impacts of ground filtering on predictive models of forest AGB, we obtained sixteen separate leaf-off LiDAR data sets for areas within New York State (USA; <a href="#fig-plotloc">Figure&nbsp;1</a>). We refer to these data sets as representing different “regions”, though these LiDAR regions do not align with administrative or ecological boundaries. This data, collected as part of a number of cross-agency federal initiatives, resembles the relatively low-density and leaf-off LiDAR relied upon in similar forest AGB modeling work (see for instance <span class="citation" data-cites="Nilsson2017">Nilsson et al. (<a href="#ref-Nilsson2017" role="doc-biblioref">2017</a>)</span>, <span class="citation" data-cites="Huang2019">Huang et al. (<a href="#ref-Huang2019" role="doc-biblioref">2019</a>)</span>), and closely resembles the remote sensing data used in typical modeling practice. Data had pulse densities between 1.98 and 3.24 points per square meter. All LiDAR data had a vertical accuracy RMSE of <span class="math inline">\(\leq\)</span> 10 cm. While horizontal accuracy was not typically reported, expected horizontal RMSE for all data sets would be <span class="math inline">\(\leq\)</span> 68 cm based upon sensor altitude, GNSS positional error, and INS angular error <span class="citation" data-cites="ASPRS2014">(<a href="#ref-ASPRS2014" role="doc-biblioref">ASPRS, 2014</a>)</span>. Where regions overlapped (as shown by overlapping boundary lines in <a href="#fig-plotloc">Figure&nbsp;1</a>), data representing the most recent LiDAR collection was used. Additional information about individual LiDAR data sets is included as Supplementary Materials S1.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-plotloc" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/lidar_boundaries_index_map.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 1: Locations of LiDAR regions within New York State. Overlapping boundary lines represent overlapping data sets; in areas where LiDAR regions overlapped one another, the most recent LiDAR collection was used. More information about each region and LiDAR data set is included as Supplementary Materials S1.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="sec-field" class="level2">
+<h2 class="anchored" data-anchor-id="sec-field">Field Data</h2>
+<p>Field measurements of AGB for all trees measuring <span class="math inline">\(\geq\)</span> 12.7 cm (5 in) diameter at breast height were taken as part of the United States Department of Agriculture (USDA) Forest Inventory and Analysis (FIA) program <span class="citation" data-cites="Gray2012">(<a href="#ref-Gray2012" role="doc-biblioref">Gray et al., 2012</a>)</span>. The FIA provides data from a standardized forest inventory, with field plots on forested land being resampled on a rolling seven-year basis. FIA plots are composed of four identical circular subplots with radii of 7.32 m (24 ft), with one subplot centered at the center of the plot and the other three subplot centers located 36.6 m (120 ft) away at azimuths of 360<span class="math inline">\(^{\circ}\)</span>, 120<span class="math inline">\(^{\circ}\)</span>, and 240<span class="math inline">\(^{\circ}\)</span>. We obtained true plot centroid locations under agreement with the USDA, and used data aggregated from subplots to the plot level for all analyses and models. LiDAR data was clipped to only the measured subplot areas, with subplot locations estimated based upon the macroplot centroid, and then pooled prior to predictor derivation. Limitations of this data source include the exclusion of trees below 12.7 cm diameter, which likely results in underestimates of forest AGB, particularly in younger forests and more fragmented landscapes, and the relatively high positional inaccuracy of FIA plot locations (reported in 2005 to average approximately 5 m) <span class="citation" data-cites="Hoppus2005">(<a href="#ref-Hoppus2005" role="doc-biblioref">Hoppus and Lister, 2005</a>)</span>. These limitations make associating FIA field measurements of forest AGB with specific LiDAR data difficult, particularly given the high positional inaccuracy of FIA plot locations compared to LiDAR data collections <span class="citation" data-cites="ASPRS2014">(<a href="#ref-ASPRS2014" role="doc-biblioref">ASPRS, 2014</a>)</span>. Despite these limitations, however, the FIA remains an essential source for forest AGB modeling, and we follow the same procedures as the majority of USA-focused remote sensing forest AGB modeling studies <span class="citation" data-cites="Johnson2022 Huang2019 Hurtt2019 Chen2016">(<a href="#ref-Chen2016" role="doc-biblioref">Chen et al., 2016</a>; <a href="#ref-Huang2019" role="doc-biblioref">Huang et al., 2019</a>; <a href="#ref-Hurtt2019" role="doc-biblioref">Hurtt et al., 2019</a>; <a href="#ref-Johnson2022" role="doc-biblioref">Johnson et al., 2022</a>)</span>.</p>
+<p>Plots entirely classified as nonforest (which are not assigned AGB by the FIA) were excluded from the dataset. Only FIA plots sampled the same year as LiDAR flights, or FIA plots with measurements both before and after the LiDAR acquisition year with a difference in AGB <span class="math inline">\(\geq\)</span> -5% (to allow for forest growth or small-scale disturbance) were used for training and evaluating models. In situations where FIA year did not match LiDAR acquisition year, forest AGB was calculated by linearly interpolating between the values measured in the temporally closest FIA samples. Plots were additionally excluded if any subplots were marked as nonsampled, if FIA measurements indicated 0 <span class="math inline">\(\operatorname{Mg\ ha^{-1}}\)</span> of forest AGB but maximum LiDAR return heights at the plot exceeded 10 meters, or if the convex hull of all LiDAR returns for a subplot contained less than 90% of the subplot’s area. This methodology was chosen to closely resemble the existing literature on forest AGB mapping (see for instance <span class="citation" data-cites="Huang2019">Huang et al. (<a href="#ref-Huang2019" role="doc-biblioref">2019</a>)</span>). Forest AGB measurements were recorded in pounds, then converted and area-normalized to units of megagrams per hectare (<span class="math inline">\(\operatorname{Mg\ ha^{-1}}\)</span>).</p>
+</section>
+<section id="lidar-pre-processing" class="level2">
+<h2 class="anchored" data-anchor-id="lidar-pre-processing">LiDAR Pre-Processing</h2>
+<p>A digital terrain model (DTM) was calculated for all sites using a k-nearest-neighbors inverse-distance weighting imputation algorithm (using k = 5) as implemented in the lidR R package <span class="citation" data-cites="Roussel2020">(<a href="#ref-Roussel2020" role="doc-biblioref">Roussel et al., 2020</a>)</span>, fit using the points classified as “ground” within the raw LiDAR point cloud data set. The calculated terrain was then subtracted from each point’s z value to create a height-normalized point cloud. Ground noise filtering rules were then applied to create five separate points clouds for each site, each representing a different ground noise filtering approach: one point cloud containing all points in the original file (hereafter referred to as “unfiltered”), one removing all points classified as “ground” in the original metadata (“ground”, equivalent to a 0m threshold), and three removing all points with normalized z values below a 0.1, 1, or 2 meter threshold (“0.1m”, “1m”, and “2m”, respectively). This process is shown as a schematic in <a href="#fig-workflow">Figure&nbsp;2</a>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-workflow" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/workflow.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 2: A diagram representing the LiDAR pre-processing workflow.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Separate sets of 40 predictors, chosen due to their prevalence in published models of AGB and forest structure, were derived from each of these point clouds using the lidR R package (<a href="#tbl-predictors">Table&nbsp;1</a>) <span class="citation" data-cites="Hawbaker2010 Huang2019 Pflugmacher2012 Pflugmacher2014 Roussel2020">(<a href="#ref-Hawbaker2010" role="doc-biblioref">Hawbaker et al., 2010</a>; <a href="#ref-Huang2019" role="doc-biblioref">Huang et al., 2019</a>; <a href="#ref-Pflugmacher2014" role="doc-biblioref">Pflugmacher et al., 2014</a>, <a href="#ref-Pflugmacher2012" role="doc-biblioref">2012</a>; <a href="#ref-Roussel2020" role="doc-biblioref">Roussel et al., 2020</a>)</span>. Predictors computed for FIA plot locations were derived from only the pooled returns coincident with the sampled subplot locations, so as to not include any returns from the unsampled regions of the macroplot. For plots where ground noise filtering resulted in the removal of all points, variables were set to a default value of 0. As highly correlated predictor variables may provide the random forest model less information for forest AGB predictions, relationships between predictors were assessed using Spearmans’s correlation coefficient. Changes in predictor distributions under different filtering methodologies were assessed using Kolmogorov-Smirnov statistics <span class="citation" data-cites="Massey1951">(<a href="#ref-Massey1951" role="doc-biblioref">Massey, 1951</a>)</span>.</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-predictors" class="anchored">
+
+<table><caption>Table 1:  Definitions of LiDAR-derived predictors used for model fitting. </caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Predictor </th>
+   <th style="text-align:left;"> Definition </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> H0, H10, ... H100, H95, H99 </td>
+   <td style="text-align:left;"> Decile heights of returns, in meters, as well as 95th and 99th percentile return heights. </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> D10, D20... D90 </td>
+   <td style="text-align:left;"> Density of returns above a certain height, as a proportion. After return height is divided into 10 equal bins ranging from 0 to the maximum height of returns, this value reflects the proportion of returns at or above each breakpoint. </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> N </td>
+   <td style="text-align:left;"> Number of LiDAR returns clipped to the given FIA plot or map pixel </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ZMEAN, ZMEAN_C </td>
+   <td style="text-align:left;"> Mean height of all returns (ZMEAN) and all returns above 2.5m (ZMEAN_C) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Z_KURT, Z_SKEW </td>
+   <td style="text-align:left;"> Kurtosis and skewness of height of all returns </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> QUAD_MEAN, QUAD_MEAN_C </td>
+   <td style="text-align:left;"> Quadratic mean height of all returns (QUAD_MEAN) and all returns above 2.5m (QUAD_MEAN_C) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CV, CV_C </td>
+   <td style="text-align:left;"> Coefficient of variation for heights of all returns (CV) and all returns above 2.5m (CV_C) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> L2, L3, L4, L_CV, L_SKEW, L_KURT </td>
+   <td style="text-align:left;"> L-moments and their ratios as defined by Hosking (1990), calculated for heights of all returns </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> CANCOV </td>
+   <td style="text-align:left;"> Ratio of returns above 2.5m to all returns (Pflugmacher et al. 2012) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> HVOL </td>
+   <td style="text-align:left;"> CANCOV * ZMEAN (Pflugmacher et al. 2012) </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> RPC1 </td>
+   <td style="text-align:left;"> Ratio of first returns to all returns (Pflugmacher et al. 2012) </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="model-fitting" class="level2">
+<h2 class="anchored" data-anchor-id="model-fitting">Model Fitting</h2>
+<p>Models were fit using the ranger R package’s implementation of the random forest algorithm <span class="citation" data-cites="Breiman2001 Wright2017">(<a href="#ref-Breiman2001" role="doc-biblioref">Breiman, 2001</a>; <a href="#ref-Wright2017" role="doc-biblioref">Wright and Ziegler, 2017a</a>)</span>, a popular machine learning technique for predicting forest aboveground biomass across landscapes <span class="citation" data-cites="Huang2019 Hudak2020">(see for instance <a href="#ref-Huang2019" role="doc-biblioref">Huang et al., 2019</a>; <a href="#ref-Hudak2020" role="doc-biblioref">Hudak et al., 2020</a>)</span>. Separate models were fit on predictors calculated using each level of ground noise filtering (“unfiltered”, “ground”, “0.1m”, “1m”, and “2m” thresholds) for each LiDAR region and a combination of all LiDAR regions, for a total of 85 separate models. Each model used data representing all available FIA plots within the relevant LiDAR region (<a href="#sec-field">Section&nbsp;2.2</a>). Models were fit using only LiDAR derived predictors, as it was expected that including non-LiDAR derived variables might mediate and confound the impacts of ground noise filtering.</p>
+<p>Each of these models were tuned separately using a standard uniform grid search, with each model evaluated using the same 8,892 combinations of hyperparameters detailed in Supplementary Materials S2. Models from this set were ranked on the basis of mean root mean squared error (RMSE) from 5-fold cross validation <span class="citation" data-cites="Stone1974">(<a href="#ref-Stone1974" role="doc-biblioref">Stone, 1974</a>)</span> (<a href="#eq-rmse">Equation&nbsp;5</a>), with 5 folds chosen to reduce computational demands. In order to ensure the best model was chosen for each combination, the top 100 models as determined from 5-fold cross validation were then evaluated again using leave-one-out cross validation <span class="citation" data-cites="Lachenbruch1968">(<a href="#ref-Lachenbruch1968" role="doc-biblioref">Lachenbruch and Mickey, 1968</a>)</span>, with the final model fit using the hyperparameter set with the lowest RMSE. This method ensured that each random forest compared is the best version of the model that could be fit to these predictors, with the intention that any difference in model performance will be due to ground noise filtering and not stochastic differences between models or effort spent in tuning hyperparameters. Recent work has suggested cross validation assessments of model accuracy are likely overoptimistic compared to actual predictive accuracy <span class="citation" data-cites="Bates2021">(<a href="#ref-Bates2021" role="doc-biblioref">Bates et al., 2021</a>)</span>, which does not impact our aim of comparing ground noise filtering approaches within a single study, but should be kept in mind when assessing these models as forest AGB estimators in their own right.</p>
+<p>All modeling work was done using R version 4.0.5 <span class="citation" data-cites="R2021">(<a href="#ref-R2021" role="doc-biblioref">R Core Team, 2021</a>)</span>, using the dplyr <span class="citation" data-cites="dplyr">(<a href="#ref-dplyr" role="doc-biblioref">Wickham et al., 2022a</a>)</span>, landscapemetrics <span class="citation" data-cites="landscapemetrics fragstats">(<a href="#ref-landscapemetrics" role="doc-biblioref">Hesselbarth et al., 2019</a>; <a href="#ref-fragstats" role="doc-biblioref">McGarigal and Marks, 1995</a>)</span>, nlme <span class="citation" data-cites="nlme">(<a href="#ref-nlme" role="doc-biblioref">Pinheiro and Bates, 2000</a>)</span>, purrr <span class="citation" data-cites="purrr">(<a href="#ref-purrr" role="doc-biblioref">Henry and Wickham, 2020</a>)</span>, ranger <span class="citation" data-cites="ranger">(<a href="#ref-ranger" role="doc-biblioref">Wright and Ziegler, 2017b</a>)</span>, raster <span class="citation" data-cites="raster">(<a href="#ref-raster" role="doc-biblioref">Hijmans, 2022a</a>)</span>, readr <span class="citation" data-cites="readr">(<a href="#ref-readr" role="doc-biblioref">Wickham et al., 2022b</a>)</span>, terra <span class="citation" data-cites="terra">(<a href="#ref-terra" role="doc-biblioref">Hijmans, 2022b</a>)</span>, tibble <span class="citation" data-cites="tibble">(<a href="#ref-tibble" role="doc-biblioref">Müller and Wickham, 2022</a>)</span>, and tidyr <span class="citation" data-cites="tidyr">(<a href="#ref-tidyr" role="doc-biblioref">Wickham and Girlich, 2022</a>)</span> packages.</p>
+</section>
+<section id="sec-landscapemetrics" class="level2">
+<h2 class="anchored" data-anchor-id="sec-landscapemetrics">Landscape Metrics</h2>
+<p>The LiDAR regions included in this study represent a diversity of landscapes, including both highly developed regions and large swaths of contiguous forest (<a href="#fig-lulc">Figure&nbsp;3</a>). While all field data was collected at plots located entirely within forested areas, forest structure and composition is highly affected by the surrounding landscape matrix <span class="citation" data-cites="Reider2018 Kupfer2006">(<a href="#ref-Kupfer2006" role="doc-biblioref">Franklin, 2006</a>; <a href="#ref-Reider2018" role="doc-biblioref">Watling, 2018</a>)</span>. In particular, edge effects (the impacts of adjacent nonforest environments) influence forest structure and composition in a number of ways, typically increasing species richness, the abundance of non-native species, shrub and herbaceous cover, and understory stem and foliage density while additionally increasing tree mortality and decreasing canopy tree abundance and canopy cover <span class="citation" data-cites="Harper2005">(<a href="#ref-Harper2005" role="doc-biblioref">Harper et al., 2005</a>)</span>, with some of these effects remaining significant over 500 m from the edge itself <span class="citation" data-cites="Murcia1995">(<a href="#ref-Murcia1995" role="doc-biblioref">Murcia, 1995</a>)</span>. The net effect of these impacts is that forests near a forest edge are consistently characterized by more openings in the canopy and more biomass in the understory. As a result, it stands to reason that the impacts of ground noise filtering on model performance may be associated with landscape structure, and that in particular model accuracy would be most impacted in forests located closer to a forest edge, a more common occurrence in highly fragmented landscapes (as characterized by increased patch and edge density).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-lulc" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/lulc_boundaries.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 3: Land cover classifications across LiDAR regions, using land cover classifications from LCMAP (Brown et al., 2020). Lines represent LiDAR data set boundaries. In areas where LiDAR data sets overlapped, LCMAP matching the acquisition year of the newest LiDAR data was used.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<p>As such, we investigated how changes in model accuracy due to ground noise filtering varied with differences in landscape structure. Landscape structure was quantified for each LiDAR region using temporally matching land use/land cover classifications from USGS LCMAP <span class="citation" data-cites="Brown2020">(<a href="#ref-Brown2020" role="doc-biblioref">Brown et al., 2020</a>)</span>. We computed the proportion of 30 m pixels classified as forest (<a href="#eq-fc">Equation&nbsp;1</a>) and the topographic ruggeddness index (TRI, <a href="#eq-tri">Equation&nbsp;2</a>); <span class="citation" data-cites="Riley1999">DeGloria and Elliot (<a href="#ref-Riley1999" role="doc-biblioref">1999</a>)</span>) using the terra R package <span class="citation" data-cites="terra">(<a href="#ref-terra" role="doc-biblioref">Hijmans, 2022b</a>)</span>, as well as edge density (<a href="#eq-ed">Equation&nbsp;3</a>) in units of meter per hectare and patch density (<a href="#eq-pd">Equation&nbsp;4</a>) in units of number of patches per 100 hectares for each individual LiDAR region using the landscapemetrics R package <span class="citation" data-cites="landscapemetrics fragstats">(<a href="#ref-landscapemetrics" role="doc-biblioref">Hesselbarth et al., 2019</a>; <a href="#ref-fragstats" role="doc-biblioref">McGarigal and Marks, 1995</a>)</span>.</p>
+<p><span id="eq-fc"><span class="math display">\[
+\operatorname{Forest\ Cover\ \%} = \frac{F}{A}
+\tag{1}\]</span></span></p>
+<p><span id="eq-tri"><span class="math display">\[
+\operatorname{TRI} = \frac{\sum_{i=1}^{8}{\left|x - x_{i}\right|}}{8}
+\tag{2}\]</span></span></p>
+<p><span id="eq-ed"><span class="math display">\[
+\operatorname{Edge\ Density} = \frac{E}{A} \cdot 10000
+\tag{3}\]</span></span></p>
+<p><span id="eq-pd"><span class="math display">\[
+\operatorname{Patch\ Density} = \frac{N}{A} \cdot 10000 \cdot 100
+\tag{4}\]</span></span></p>
+<p>Where <span class="math inline">\(F\)</span> is the area classified as forest in square meters, <span class="math inline">\(A\)</span> the total landscape area in square meters, <span class="math inline">\(x\)</span> the elevation of a grid cell and <span class="math inline">\(x_{i}\)</span> the elevation of its eight neighbors, <span class="math inline">\(E\)</span> the total landscape edge in meters, and <span class="math inline">\(N\)</span> the number of patches in the region. For the purposes of this study, patches were defined as contiguous areas of 30m pixels assigned the same land cover classification by LCMAP <span class="citation" data-cites="Brown2020">(<a href="#ref-Brown2020" role="doc-biblioref">Brown et al., 2020</a>)</span>, and edges defined as the perimeters of these patches.</p>
+</section>
+<section id="sec-asst" class="level2">
+<h2 class="anchored" data-anchor-id="sec-asst">Model Assessment</h2>
+<p>Models were evaluated using multiple performance metrics in order to capture the variety of ways model performance can vary. Performance metrics calculated included mean absolute error (MAE, <a href="#eq-mae">Equation&nbsp;7</a>), which captures the mean magnitude of errors across all observations, root-mean-squared error in <span class="math inline">\(\operatorname{Mg\ ha^{-1}}\)</span> (RMSE, <a href="#eq-rmse">Equation&nbsp;5</a>), which weights larger errors more heavily than MAE, root-mean-squared error as a percentage of mean plot forest AGB (RMSE %, <a href="#eq-rmsecv">Equation&nbsp;6</a>),<br>
+which allows for direct comparison of RMSE across regions with differing AGB distributions, and the coefficient of determination (<span class="math inline">\(R^2\)</span>, <a href="#eq-r2">Equation&nbsp;8</a>), which measures the strength of the linear association between FIA measurements and model predictions (but does not directly reflect predictive accuracy). Given the scarcity of field data available for some LiDAR regions, metrics were calculated via leave-one-out cross validation <span class="citation" data-cites="Lachenbruch1968">(<a href="#ref-Lachenbruch1968" role="doc-biblioref">Lachenbruch and Mickey, 1968</a>)</span>.</p>
+<p><span id="eq-rmse"><span class="math display">\[
+\operatorname{RMSE} = \sqrt{(\frac{1}{n})\sum_{i=1}^{n}(y_{i} - \hat{y_{i}})^{2}}
+\tag{5}\]</span></span></p>
+<p><span id="eq-rmsecv"><span class="math display">\[
+\operatorname{RMSE\ \%} = 100 \cdot \frac{\operatorname{RMSE}}{\bar{y}}
+\tag{6}\]</span></span></p>
+<p><span id="eq-mae"><span class="math display">\[
+\operatorname{MAE} = (\frac{1}{n})\sum_{i=1}^{n}\left | y_{i} -\hat{y_{i}} \right |
+\tag{7}\]</span></span></p>
+<p><span id="eq-r2"><span class="math display">\[
+\operatorname{R^2} = 1 - \frac{\sum_{i=1}^{n}\left(y_{i}-\hat{y}_{i}\right)^2}{\sum_{i=1}^{n}\left(y_i - \bar{y}\right)^2}
+\tag{8}\]</span></span></p>
+<p>Where <span class="math inline">\(n\)</span> is the number of FIA plots included in the data set, <span class="math inline">\(\hat{y_i}\)</span> is the predicted value of forest AGB, <span class="math inline">\(y_{i}\)</span> the forest AGB value measured at the corresponding location, and <span class="math inline">\(\bar{y}\)</span> the mean forest AGB value from FIA field measurements. The difference in model performance across filtering thresholds was quantified through a linear mixed-effect model representing plot absolute error (<span class="math inline">\(|y_i - \hat{y}_i|\)</span>) as a function of filtering threshold as a fixed effect with LiDAR region as a random effect, fit using the nlme R package <span class="citation" data-cites="nlme">(<a href="#ref-nlme" role="doc-biblioref">Pinheiro and Bates, 2000</a>)</span>. Lastly, the relationship between changes in model accuracy due to ground noise filtering and each landscape structure metric (<a href="#sec-landscapemetrics">Section&nbsp;2.5</a>) was measured using Spearman’s correlation coefficient (<span class="math inline">\(\rho\)</span>).</p>
+</section>
+</section>
+<section id="results" class="level1">
+<h1>Results</h1>
+<section id="landscape-structure" class="level2">
+<h2 class="anchored" data-anchor-id="landscape-structure">Landscape Structure</h2>
+<div class="cell">
+
+</div>
+<p>Edge density ranged from 38.73 to 100.17 meters per hectare, patch density from 8.63 to 23.70 patches per 100 hectares, forest coverage from 15.38% to 83.29%, and TRI ranged from 0.33 to 3.34. of each LiDAR region (<a href="#fig-fragstats">Figure&nbsp;4</a>). Edge density and patch density were strongly positively correlated (Spearman’s <span class="math inline">\(\rho\)</span> = 0.953), as were forest coverage and TRI (Spearman’s <span class="math inline">\(\rho\)</span> = 0.741). LiDAR regions had between 9 and 126 FIA plots available for models after applying plot inclusion rules, for a total of 874 plots in the combined data set (<a href="#tbl-rmse">Table&nbsp;3</a>).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-fragstats" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/landscape_metrics.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 4: Landscape fragmentation metrics and forest cover percentage derived from LCMAP LULC classifications, and topographic ruggedness index (TRI) derived from a digital terrain model, for all LiDAR regions used in this project at year of LiDAR acquisition.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="variable-distribution" class="level2">
+<h2 class="anchored" data-anchor-id="variable-distribution">Variable Distribution</h2>
+<p>Filtering out ground noise resulted in shifts in predictor distributions (<a href="#fig-distributions">Figure&nbsp;5</a>). Filtering returns based upon z-thresholds or ground classifications resulted in systematically elevated height percentile and return density predictors (the H and D prefixed predictors in <a href="#tbl-predictors">Table&nbsp;1</a>; <a href="#fig-distributions">Figure&nbsp;5</a>), with differences persisting into the highest percentiles. Notable differences in distributions also existed for all L-moment based predictors, with increasing height thresholds associated with increased magnitude of difference. Mean predictor values for each ground noise filtering method, alongside Kolmogorov-Smirnov test statistic values comparing the distributions of filtered predictors to that of the unfiltered predictors, are presented in Supplementary Materials S3. Shifts in predictor distributions resulted in changes to covariance among variables, as measured via Spearman correlation coefficients. More aggressive filtering approaches were generally associated with stronger positive correlations and collinearity between all variables (<a href="#fig-cortab">Figure&nbsp;6</a>).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-distributions" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/distributions.jpg" class="img-fluid figure-img" style="width:100.0%"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 5: Selected LiDAR-derived predictor distributions for five ground noise filtering approaches, using all LiDAR regions combined. Each subplot is scaled independently so that the X-axis represents the full range of that predictor and the Y-axis represents the full range of the kernel density estimate of that predictor.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-cortab" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/abs_cor.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 6: Mean Spearman correlation coefficients between LiDAR-derived variables calculated from point clouds processed with five different ground noise filtering methodologies across the combined data set. Variables with standard deviations of 0 after filtering (such as when minimum return height at all plots became 0 due to ground noise filtering) were excluded from calculations.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="model-performance" class="level2">
+<h2 class="anchored" data-anchor-id="model-performance">Model Performance</h2>
+<p>Models fit to the unfiltered set of predictors were almost always equally or more accurate than those fit to predictors derived from filtered point clouds (<a href="#fig-accuracy">Figure&nbsp;7</a>, <a href="#tbl-holdout">Table&nbsp;2</a>, <a href="#tbl-rmse">Table&nbsp;3</a>). Model accuracy generally decreased as filtering thresholds increased, with RMSE % for models fit to all regions combined increasing from 37.18% when using the unfiltered data set to 39.06% when using a threshold of 2 meters (<a href="#fig-accuracy">Figure&nbsp;7</a>). An exception to this pattern was the Erie, Genesee, &amp; Livingston LiDAR region, which saw improvements in accuracy with filtering procedures; this is likely related to the small sample size available for this region (with only 9 FIA plots available for models) making this region highly susceptible to small changes in the predictor space or hyperparameter space. In the linear mixed model representing plot absolute error as a function of filtering thresholds, with LiDAR region as a random effect, all thresholds had positive coefficients, indicating an increase in the magnitude of errors at the plot level (<a href="#tbl-lme">Table&nbsp;4</a>).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-accuracy" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="figures/all_metrics.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<p></p><figcaption aria-hidden="true" class="figure-caption">Figure 7: Model accuracy metrics at each ground noise filtering height threshold. Red line indicates models fit to all LiDAR regions (874 FIA plots), while grey lines represent each individual LiDAR region model with more than 10 FIA plots. Metrics are defined in Section 2.5.</figcaption><p></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-holdout" class="anchored">
+
+<table><caption>Table 2:  Model accuracy metrics for the model fit to the combined data set at various ground filtering height thresholds. The complete set of model accuracy metrics for all LiDAR regions is included as Supplementary Materials S4. </caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:left;"> Unfiltered </th>
+   <th style="text-align:left;"> 0m </th>
+   <th style="text-align:left;"> 0.1m </th>
+   <th style="text-align:left;"> 1m </th>
+   <th style="text-align:left;"> 2m </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> RMSE </td>
+   <td style="text-align:left;"> 43.826 </td>
+   <td style="text-align:left;"> 45.608 </td>
+   <td style="text-align:left;"> 46.622 </td>
+   <td style="text-align:left;"> 45.734 </td>
+   <td style="text-align:left;"> 46.044 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> RMSE (%) </td>
+   <td style="text-align:left;"> 37.177 </td>
+   <td style="text-align:left;"> 38.689 </td>
+   <td style="text-align:left;"> 39.548 </td>
+   <td style="text-align:left;"> 38.795 </td>
+   <td style="text-align:left;"> 39.058 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> MAE </td>
+   <td style="text-align:left;"> 33.560 </td>
+   <td style="text-align:left;"> 35.048 </td>
+   <td style="text-align:left;"> 35.974 </td>
+   <td style="text-align:left;"> 35.271 </td>
+   <td style="text-align:left;"> 35.540 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> R2 </td>
+   <td style="text-align:left;"> 0.609 </td>
+   <td style="text-align:left;"> 0.577 </td>
+   <td style="text-align:left;"> 0.558 </td>
+   <td style="text-align:left;"> 0.574 </td>
+   <td style="text-align:left;"> 0.568 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-rmse" class="anchored">
+
+<table><caption>Table 3:  RMSE for each LiDAR region at various ground filtering height thresholds. The complete set of model accuracy metrics for all LiDAR regions is included as Supplementary Materials S4. </caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Region </th>
+   <th style="text-align:left;"> # Plots </th>
+   <th style="text-align:left;"> Unfiltered </th>
+   <th style="text-align:left;"> 0m </th>
+   <th style="text-align:left;"> 0.1m </th>
+   <th style="text-align:left;"> 1m </th>
+   <th style="text-align:left;"> 2m </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> All Regions </td>
+   <td style="text-align:left;"> 874 </td>
+   <td style="text-align:left;"> 43.826 </td>
+   <td style="text-align:left;"> 45.608 </td>
+   <td style="text-align:left;"> 46.622 </td>
+   <td style="text-align:left;"> 45.734 </td>
+   <td style="text-align:left;"> 46.044 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Allegany &amp; Steuben </td>
+   <td style="text-align:left;"> 38 </td>
+   <td style="text-align:left;"> 43.478 </td>
+   <td style="text-align:left;"> 43.102 </td>
+   <td style="text-align:left;"> 42.702 </td>
+   <td style="text-align:left;"> 44.589 </td>
+   <td style="text-align:left;"> 44.577 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 3 County </td>
+   <td style="text-align:left;"> 117 </td>
+   <td style="text-align:left;"> 49.238 </td>
+   <td style="text-align:left;"> 50.479 </td>
+   <td style="text-align:left;"> 53.164 </td>
+   <td style="text-align:left;"> 52.394 </td>
+   <td style="text-align:left;"> 53.238 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Cayuga &amp; Oswego </td>
+   <td style="text-align:left;"> 19 </td>
+   <td style="text-align:left;"> 23.873 </td>
+   <td style="text-align:left;"> 39.584 </td>
+   <td style="text-align:left;"> 34.126 </td>
+   <td style="text-align:left;"> 36.687 </td>
+   <td style="text-align:left;"> 39.947 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Clinton, Essex &amp; Franklin </td>
+   <td style="text-align:left;"> 126 </td>
+   <td style="text-align:left;"> 37.255 </td>
+   <td style="text-align:left;"> 39.742 </td>
+   <td style="text-align:left;"> 40.821 </td>
+   <td style="text-align:left;"> 39.135 </td>
+   <td style="text-align:left;"> 38.952 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Columbia &amp; Rensselaer </td>
+   <td style="text-align:left;"> 23 </td>
+   <td style="text-align:left;"> 42.689 </td>
+   <td style="text-align:left;"> 39.721 </td>
+   <td style="text-align:left;"> 43.885 </td>
+   <td style="text-align:left;"> 48.731 </td>
+   <td style="text-align:left;"> 51.126 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Erie, Genesee &amp; Livingston </td>
+   <td style="text-align:left;"> 9 </td>
+   <td style="text-align:left;"> 56.942 </td>
+   <td style="text-align:left;"> 51.461 </td>
+   <td style="text-align:left;"> 30.960 </td>
+   <td style="text-align:left;"> 32.279 </td>
+   <td style="text-align:left;"> 49.731 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Franklin &amp; St. Lawrence </td>
+   <td style="text-align:left;"> 113 </td>
+   <td style="text-align:left;"> 36.818 </td>
+   <td style="text-align:left;"> 37.411 </td>
+   <td style="text-align:left;"> 38.121 </td>
+   <td style="text-align:left;"> 38.538 </td>
+   <td style="text-align:left;"> 38.143 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Fulton, Saratoga, Herkimer &amp; Franklin </td>
+   <td style="text-align:left;"> 47 </td>
+   <td style="text-align:left;"> 37.840 </td>
+   <td style="text-align:left;"> 40.823 </td>
+   <td style="text-align:left;"> 39.105 </td>
+   <td style="text-align:left;"> 36.496 </td>
+   <td style="text-align:left;"> 37.610 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Great Lakes </td>
+   <td style="text-align:left;"> 64 </td>
+   <td style="text-align:left;"> 33.790 </td>
+   <td style="text-align:left;"> 36.419 </td>
+   <td style="text-align:left;"> 37.395 </td>
+   <td style="text-align:left;"> 35.569 </td>
+   <td style="text-align:left;"> 35.497 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Long Island </td>
+   <td style="text-align:left;"> 26 </td>
+   <td style="text-align:left;"> 38.047 </td>
+   <td style="text-align:left;"> 41.796 </td>
+   <td style="text-align:left;"> 49.667 </td>
+   <td style="text-align:left;"> 41.893 </td>
+   <td style="text-align:left;"> 42.107 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Madison &amp; Otsego </td>
+   <td style="text-align:left;"> 58 </td>
+   <td style="text-align:left;"> 39.014 </td>
+   <td style="text-align:left;"> 40.252 </td>
+   <td style="text-align:left;"> 41.412 </td>
+   <td style="text-align:left;"> 39.937 </td>
+   <td style="text-align:left;"> 40.072 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Oneida Subbasin </td>
+   <td style="text-align:left;"> 17 </td>
+   <td style="text-align:left;"> 40.490 </td>
+   <td style="text-align:left;"> 42.839 </td>
+   <td style="text-align:left;"> 43.741 </td>
+   <td style="text-align:left;"> 45.677 </td>
+   <td style="text-align:left;"> 42.455 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Schoharie </td>
+   <td style="text-align:left;"> 30 </td>
+   <td style="text-align:left;"> 52.186 </td>
+   <td style="text-align:left;"> 57.639 </td>
+   <td style="text-align:left;"> 55.185 </td>
+   <td style="text-align:left;"> 58.110 </td>
+   <td style="text-align:left;"> 56.344 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Southwest (spring) </td>
+   <td style="text-align:left;"> 37 </td>
+   <td style="text-align:left;"> 43.921 </td>
+   <td style="text-align:left;"> 47.921 </td>
+   <td style="text-align:left;"> 44.715 </td>
+   <td style="text-align:left;"> 45.297 </td>
+   <td style="text-align:left;"> 44.806 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Southwest (fall) </td>
+   <td style="text-align:left;"> 34 </td>
+   <td style="text-align:left;"> 57.744 </td>
+   <td style="text-align:left;"> 64.114 </td>
+   <td style="text-align:left;"> 66.464 </td>
+   <td style="text-align:left;"> 66.126 </td>
+   <td style="text-align:left;"> 61.060 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> Warren, Washington &amp; Essex </td>
+   <td style="text-align:left;"> 116 </td>
+   <td style="text-align:left;"> 41.072 </td>
+   <td style="text-align:left;"> 39.656 </td>
+   <td style="text-align:left;"> 40.816 </td>
+   <td style="text-align:left;"> 41.054 </td>
+   <td style="text-align:left;"> 41.678 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-lme" class="anchored">
+
+<table><caption>Table 4:  Results of a linear mixed model representing plot absolute error as a function of filtering threshold as a fixed effect, with LiDAR region as a random effect. </caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:right;"> Coefficient </th>
+   <th style="text-align:right;"> Standard error </th>
+   <th style="text-align:right;"> t </th>
+   <th style="text-align:right;"> p </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> Intercept </td>
+   <td style="text-align:right;"> 33.215 </td>
+   <td style="text-align:right;"> 1.563 </td>
+   <td style="text-align:right;"> 21.257 </td>
+   <td style="text-align:right;"> 0.000 </td>
+  </tr>
+  <tr grouplength="4"><td colspan="5" style="border-bottom: 1px solid;"><strong>Filtering threshold</strong></td></tr>
+<tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> 0m </td>
+   <td style="text-align:right;"> 1.370 </td>
+   <td style="text-align:right;"> 0.950 </td>
+   <td style="text-align:right;"> 1.442 </td>
+   <td style="text-align:right;"> 0.149 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> 0.1m </td>
+   <td style="text-align:right;"> 2.246 </td>
+   <td style="text-align:right;"> 0.950 </td>
+   <td style="text-align:right;"> 2.364 </td>
+   <td style="text-align:right;"> 0.018 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> 1m </td>
+   <td style="text-align:right;"> 1.779 </td>
+   <td style="text-align:right;"> 0.950 </td>
+   <td style="text-align:right;"> 1.872 </td>
+   <td style="text-align:right;"> 0.061 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;padding-left: 2em;" indentlevel="1"> 2m </td>
+   <td style="text-align:right;"> 1.941 </td>
+   <td style="text-align:right;"> 0.950 </td>
+   <td style="text-align:right;"> 2.043 </td>
+   <td style="text-align:right;"> 0.041 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Model accuracy was impacted most by filtering when the area mapped was highly fragmented or contained large tracts of non-forested land (<a href="#tbl-patchiness">Table&nbsp;5</a>). Increasing edge and patch densities were both positively correlated with <span class="math inline">\(\Delta\)</span> RMSE following ground noise filtering, indicating greater increases in RMSE after filtering in more heterogenous landscapes, while increasing forest cover and TRI were negatively correlated with <span class="math inline">\(\Delta\)</span> RMSE (<a href="#tbl-patchiness">Table&nbsp;5</a>).</p>
+<div class="cell">
+<div class="cell-output-display">
+<div id="tbl-patchiness" class="anchored">
+
+<table><caption>Table 5:  Correlation (Spearman’s rho) between Delta RMSE (%) and landscape structural metrics at various filtering thresholds. Delta RMSE (%) represents the difference between RMSE (%) for the filtered scenario compared to RMSE (%) without filtering; positive correlations represent increasing relative error (i.e, difference in RMSE % versus the unfiltered case) as the landscape metric increases. Note that negative correlations indicate lessened impact from ground filtering, but not improved models; filtering almost always results in higher RMSE values. </caption>
+ <thead>
+  <tr>
+   <th style="text-align:left;"> Filtering threshold </th>
+   <th style="text-align:left;"> Edge density </th>
+   <th style="text-align:left;"> Patch density </th>
+   <th style="text-align:left;"> % Forest cover </th>
+   <th style="text-align:left;"> TRI </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 0m </td>
+   <td style="text-align:left;"> 0.026 </td>
+   <td style="text-align:left;"> 0.056 </td>
+   <td style="text-align:left;"> -0.368 </td>
+   <td style="text-align:left;"> -0.438 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 0.1m </td>
+   <td style="text-align:left;"> 0.141 </td>
+   <td style="text-align:left;"> 0.218 </td>
+   <td style="text-align:left;"> -0.382 </td>
+   <td style="text-align:left;"> -0.426 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 1m </td>
+   <td style="text-align:left;"> 0.365 </td>
+   <td style="text-align:left;"> 0.332 </td>
+   <td style="text-align:left;"> -0.388 </td>
+   <td style="text-align:left;"> -0.194 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> 2m </td>
+   <td style="text-align:left;"> 0.321 </td>
+   <td style="text-align:left;"> 0.326 </td>
+   <td style="text-align:left;"> -0.388 </td>
+   <td style="text-align:left;"> -0.103 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="discussion" class="level1">
+<h1>Discussion</h1>
+<p>This study set out to evaluate empirical support for threshold-based ground noise filtering for models of forest AGB. We found that this common practice results in worse models of forest AGB, with lower predictive accuracy across multiple combinations of LiDAR regions and filtering thresholds representing a broad spectrum of landscape structures. While filtering had minimal impact on predictive accuracy in the most contiguously forested regions, the increasing research focus on large-scale “wall-to-wall” forest AGB mapping and potential for decreased accuracy following filtering procedures should encourage future modeling studies to use unfiltered point clouds when deriving variables for models of forest AGB.</p>
+<section id="ground-noise-filtering-produces-inferior-predictive-models" class="level2">
+<h2 class="anchored" data-anchor-id="ground-noise-filtering-produces-inferior-predictive-models">Ground noise filtering produces inferior predictive models</h2>
+<p>Our study demonstrates that the ground noise filtering approaches commonly used in preprocessing data for models of forest AGB systematically biases LiDAR-derived variables, with an end result being inferior models that produce less accurate predictions than models fit on unfiltered data sets (<a href="#fig-distributions">Figure&nbsp;5</a>, <a href="#fig-accuracy">Figure&nbsp;7</a>, <a href="#tbl-holdout">Table&nbsp;2</a>). Increasing intensity of ground noise filtering was generally, but not universally, associated with worse model performance (<a href="#tbl-holdout">Table&nbsp;2</a>, <a href="#tbl-rmse">Table&nbsp;3</a>). These patterns were generally stronger as landscape fragmentation increased, with the correlation between model errors and landscape fragmentation increasing as filtering intensity increased.</p>
+<p>These results are intuitive when thinking about the actual stand characteristics that may lead to an abundance or lack of ground returns. Dense forest stands making full use of the available light should be expected to have fewer returns reaching below the uppermost branches, while regions with many gaps in the canopy will have more such returns. If we conceive of our returns as providing information about the height structure of the stand as a whole, rather than about individual trees, it stands to reason that variables calculated using all returns are more informative about stand metrics such as forest AGB than those using filtered point clouds which may sacrifice information about stand openness. This could explain the impact of ground noise filtering seen in this study using leaf-off LiDAR; we might expect this impact to be even more pronounced were we to use leaf-on LiDAR in its place.</p>
+<p>Our results also make sense mechanistically given the properties of the random forest algorithm used to construct forest AGB models in this study. Random forests excel at predicting outcomes based upon the consensus of weak learners <span class="citation" data-cites="Breiman2001">(<a href="#ref-Breiman2001" role="doc-biblioref">Breiman, 2001</a>)</span>, individual decision trees which themselves rely upon small and ephemeral correlations between predictor variables and the outcome of interest. As shown in <a href="#fig-cortab">Figure&nbsp;6</a>, ground noise filtering approaches increase positive correlations between predictor variables, with the resulting increased collinearities shrinking the number and magnitude of possible weak correlations between individual variables and forest AGB <span class="citation" data-cites="Langford2001">(<a href="#ref-Langford2001" role="doc-biblioref">Langford et al., 2001</a>)</span>. While the decision trees comprising the random forest may be able to take advantage of the correlations between predictor variables and the outcome to achieve similar accuracy as when trained on unfiltered data sets, we would not expect that a process that uniformly increases the positive linear correlation between variables would be associated with improved predictions.</p>
+<p>In the cases where models improved post ground noise filtering, the improvement in RMSE was generally minimal and restricted to the 0 and 0.1 m thresholds (<a href="#tbl-rmse">Table&nbsp;3</a>). These regions were generally the most contiguously forested (Supplementary Materials S1), which may imply fewer gaps in the canopy and therefore the filtered points contain less information on stand structure (<a href="#sec-land">Section&nbsp;4.2</a>). The only two regions with notable improvements in RMSE had particularly little field data available (Erie, Genessee &amp; Livingston having 9 field plots or approximately 1% of all field data, and Columbia &amp; Rensselaer having 23 or approximately 2.5%), resulting in models with many more predictors available than observations. This makes it challenging to generalize from these models, particularly when compared to similar landscapes with more field data available which did not see the same improvements. It may be the case that these landscapes, or others not represented by the data available to this study, would benefit from some measure of LiDAR filtering. However, based upon our combined, wall-to-wall statewide model we suggest that ground noise filtering produces inferior models of forest aboveground biomass; when mapping smaller regions with less variety in landscape characteristics, modelers may wish to investigate the impacts of ground filtering for themselves.</p>
+<p>Insights drawn from these results may not be limited to only machine learning based models. Anderson and Bolstad <span class="citation" data-cites="Anderson2013">(<a href="#ref-Anderson2013" role="doc-biblioref">2013</a>)</span> briefly note that, when fitting linear models to predict forest AGB, models based on unfiltered point clouds always provided better results than those fit to predictors calculated using only returns above 2 meters. However, few other forest AGB modeling studies have performed similar investigations, necessitating our current study. Our conclusions may not apply to AGB models of non-forest systems; investigations of ground noise filtering as a preprocessing step for models of corn AGB found improvements in predictive accuracy with relatively low height thresholds <span class="citation" data-cites="Luo2016">(<a href="#ref-Luo2016" role="doc-biblioref">Luo et al., 2016</a>)</span>, emphasizing that commonly accepted data processing practices cannot be assumed to transfer across systems or domains to new questions of interest.</p>
+</section>
+<section id="sec-land" class="level2">
+<h2 class="anchored" data-anchor-id="sec-land">Filtering thresholds and landscape characteristics</h2>
+<p>Although we found models fit using predictors derived from unfiltered point clouds to be the most consistently accurate, the degree to which ground noise filtering damaged predictive accuracy and the relationship between filtering intensity and accuracy varied between regions. More fragmented landscapes tended to have model accuracy be more impacted by ground noise filtering, with model error increasing the most in landscapes with greater patch and edge densities (<a href="#tbl-patchiness">Table&nbsp;5</a>). Given that our field measurements (and therefore accuracy assessment) only include areas delineated as forest by the FIA, this relationship is likely driven by the dramatic impacts of edge effects on forest structure and composition <span class="citation" data-cites="Harper2005">(<a href="#ref-Harper2005" role="doc-biblioref">Harper et al., 2005</a>)</span>. Higher patch and edge density reflect landscapes with large amounts of marginal forestland, which likely have stands with more gaps in the canopy and therefore more LiDAR returns at the lower heights investigated by this study. Areas with greater forest cover and TRI were among the least impacted by ground filtering, though the correlation between these variables makes interpreting this result difficult. It is possible that a contiguous forest permits fewer LiDAR returns to the near-ground level, meaning that less information is removed through filtering procedures; this could explain why the correlation between forest coverage and <span class="math inline">\(\Delta\)</span> RMSE % is stable across filtering thresholds. Alternatively, it is possible that rougher landscapes (associated with a higher TRI) result in more vertical scattering among low-level returns, with the result that a point which might be accurately labeled (and filtered) at 0.1 meters in a smooth landscape is inaccurately assigned a higher elevation and not captured in the filtering procedure, retaining more information for the model. This may explain why the magnitude of correlation between TRI and <span class="math inline">\(\Delta\)</span> RMSE % decreases monotonically with increasing filtering thresholds. We stress that these are conjectures, however, and that we cannot establish any causal linkages between forest cover, TRI, and the impacts of ground noise filtering in the current study.</p>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>Our results and examination of the literature suggest that ground noise filtering procedures are not well justified as a generic pre-processing procedure for studies modeling forest AGB, given both the potential information lost about stand density and structure, and the empirical inferiority of models fit using predictors derived from filtered point clouds. This impact is particularly notable within mixed-use and otherwise heterogeneous landscapes, given the increased proportion of ground returns recorded when mapping these areas compared to contiguously forested regions. Although well-justified in its original context of modeling mean stand heights, the persistence of ground noise filtering in large-scale wall-to-wall LiDAR-based forest AGB modeling appears to produce less accurate predictions than could be achieved using currently available data. We make no such claim about researchers modeling other variables using LiDAR-derived predictors. For instance, the procedure likely makes sense when modeling mean tree heights similar to Næsset’s <span class="citation" data-cites="Naesset1997">(<a href="#ref-Naesset1997" role="doc-biblioref">1997</a>)</span> study which originated the practice of ground noise filtering. Additionally, while we provide evidence that ground noise filtering is harmful for models of forest AGB across large heterogenous landscapes, it may be possible for models of smaller regions and more homogeneous landscapes to benefit or be unharmed by the procedure. The best data preprocessing procedure will necessarily depend on the purpose of the model <span class="citation" data-cites="Sambasivan2021">(<a href="#ref-Sambasivan2021" role="doc-biblioref">Sambasivan et al., 2021</a>)</span>.</p>
+</section>
+<section id="acknowledgements" class="level1">
+<h1>Acknowledgements</h1>
+<p>We would like to thank the US Forest Service Forest Inventory &amp; Analysis program for their data sharing and cooperation, the New York State GIS Program Office for compiling LIDAR data, and the New York State Department of Environmental Conservation, Office of Climate Change, for funding support.</p>
+</section>
+<section id="conflict-of-interest" class="level1">
+<h1>Conflict of Interest</h1>
+<p>The authors declare that they have no conflicting interests.</p>
+</section>
+<section id="data-availability-statement" class="level1">
+<h1>Data Availability Statement</h1>
+<p>Data for this study is available from Zenodo at https://doi.org/10.5281/zenodo.6391114 <span class="citation" data-cites="DataCitation">(<a href="#ref-DataCitation" role="doc-biblioref">Mahoney et al., 2022</a>)</span>.</p>
+<div style="page-break-after: always;"></div>
+</section>
+<section id="references" class="level1 unnumbered">
+
+
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-Anderson2013" class="csl-entry" role="doc-biblioentry">
+Anderson, R.S., Bolstad, P.V., 2013. <span class="nocase">Estimating Aboveground Biomass and Average Annual Wood Biomass Increment with Airborne Leaf-on and Leaf-off LiDAR in Great Lakes Forest Types</span>. Northern Journal of Applied Forestry 30, 16–22. <a href="https://doi.org/10.5849/njaf.12-015">https://doi.org/10.5849/njaf.12-015</a>
+</div>
+<div id="ref-ASPRS2014" class="csl-entry" role="doc-biblioentry">
+ASPRS, 2014. ASPRS positional accuracy standards for digital geospatial data. Photogrammetric Engineering and Remote Sensing 81, 53. <a href="https://doi.org/10.14358/PERS.81.3.A1-A26">https://doi.org/10.14358/PERS.81.3.A1-A26</a>
+</div>
+<div id="ref-Bates2021" class="csl-entry" role="doc-biblioentry">
+Bates, S., Hastie, T., Tibshirani, R., 2021. <a href="https://arxiv.org/abs/2104.00673">Cross-validation: What does it estimate and how well does it do it? arXiv:2104.00673v2 [stat.ME]</a>.
+</div>
+<div id="ref-Breiman2001" class="csl-entry" role="doc-biblioentry">
+Breiman, L., 2001. <span>Random Forests</span>. Machine Learning 45, 5–32. <a href="https://doi.org/10.1023/A:1010933404324">https://doi.org/10.1023/A:1010933404324</a>
+</div>
+<div id="ref-Brown2020" class="csl-entry" role="doc-biblioentry">
+Brown, J.F., Tollerud, H.J., Barber, C.P., Zhou, Q., Dwyer, J.L., Vogelmann, J.E., Loveland, T.R., Woodcock, C.E., Stehman, S.V., Zhu, Z., Pengra, B.W., Smith, K., Horton, J.A., Xian, G., Auch, R.F., Sohl, T.L., Sayler, K.L., Gallant, A.L., Zelenak, D., Reker, R.R., Rover, J., 2020. Lessons learned implementing an operational continuous united states national land change monitoring capability: The land change monitoring, assessment, and projection (LCMAP) approach. Remote Sensing of Environment 238, 111356. <a href="https://doi.org/10.1016/j.rse.2019.111356">https://doi.org/10.1016/j.rse.2019.111356</a>
+</div>
+<div id="ref-Chen2016" class="csl-entry" role="doc-biblioentry">
+Chen, Q., McRoberts, R.E., Wang, C., Radtke, P.J., 2016. Forest aboveground biomass mapping and estimation across multiple spatial scales using model-based inference. Remote Sensing of Environment 184, 350–360. https://doi.org/<a href="https://doi.org/10.1016/j.rse.2016.07.023">https://doi.org/10.1016/j.rse.2016.07.023</a>
+</div>
+<div id="ref-Riley1999" class="csl-entry" role="doc-biblioentry">
+DeGloria, S.J.R.A.S.D., Elliot, R., 1999. A terrain ruggedness index that quantifies topographic heterogeneity. Intermountain Journal of Sciences 5, 23–27.
+</div>
+<div id="ref-Deo2017" class="csl-entry" role="doc-biblioentry">
+Deo, R.K., Russell, M.B., Domke, G.M., Andersen, H.-E., Cohen, W.B., Woodall, C.W., 2017. Evaluating site-specific and generic spatial models of aboveground forest biomass based on landsat time-series and LiDAR strip samples in the eastern USA. Remote Sensing 9. <a href="https://doi.org/10.3390/rs9060598">https://doi.org/10.3390/rs9060598</a>
+</div>
+<div id="ref-Dubayah2000" class="csl-entry" role="doc-biblioentry">
+Dubayah, R.O., Drake, J.B., 2000. Lidar remote sensing for forestry. Journal of Forestry 98, 44–46. <a href="https://doi.org/10.1093/jof/98.6.44">https://doi.org/10.1093/jof/98.6.44</a>
+</div>
+<div id="ref-GEDI" class="csl-entry" role="doc-biblioentry">
+Dubayah, R., Tang, H., Armston, J., Luthcke, S., Hofton, M., Blair, J., 2020. GEDI L2B canopy cover and vertical profile metrics data global footprint level V001.
+</div>
+<div id="ref-Kupfer2006" class="csl-entry" role="doc-biblioentry">
+Franklin, J.A.K.A.G.P.M.A.S.B., 2006. Not seeing the ocean for the islands: The mediating influence of matrix-based processes on forest fragmentation effects. Global Ecology and Biogeography 15, 8–20. <a href="https://doi.org/10.1111/j.1466-822X.2006.00204.x">https://doi.org/10.1111/j.1466-822X.2006.00204.x</a>
+</div>
+<div id="ref-Garcia2010" class="csl-entry" role="doc-biblioentry">
+García, M., Riaño, D., Chuvieco, E., Danson, F.M., 2010. Estimating biomass carbon stocks for a mediterranean forest in central spain using LiDAR height and intensity data. Remote Sensing of Environment 114, 816–830. <a href="https://doi.org/10.1016/j.rse.2009.11.021">https://doi.org/10.1016/j.rse.2009.11.021</a>
+</div>
+<div id="ref-Gray2012" class="csl-entry" role="doc-biblioentry">
+Gray, A.N., Brandeis, T.J., Shaw, J.D., McWilliams, W.H., Miles, P., 2012. Forest inventory and analysis database of the <span class="nocase">United States of America</span> (FIA). Biodiversity and Ecology 4, 225–231. <a href="https://doi.org/10.7809/b-e.00079">https://doi.org/10.7809/b-e.00079</a>
+</div>
+<div id="ref-Harper2005" class="csl-entry" role="doc-biblioentry">
+Harper, K.A., Macdonald, S.E., Burton, P.J., Chen, J., Brosofske, K.D., Saunders, S.C., Euskirchen, E.S., Roberts, D., Jaiteh, M.S., Esseen, P.-A., 2005. Edge influence on forest structure and composition in fragmented landscapes. Conservation Biology 19, 768–782. <a href="https://doi.org/10.1111/j.1523-1739.2005.00045.x">https://doi.org/10.1111/j.1523-1739.2005.00045.x</a>
+</div>
+<div id="ref-Hawbaker2010" class="csl-entry" role="doc-biblioentry">
+Hawbaker, T.J., Gobakken, T., Lesak, A., Trømborg, E., Contrucci, K., Radeloff, V., 2010. Light detection and ranging-based measures of mixed hardwood forest structure. Forest Science 56, 313–326. <a href="https://doi.org/10.1093/forestscience/56.3.313">https://doi.org/10.1093/forestscience/56.3.313</a>
+</div>
+<div id="ref-purrr" class="csl-entry" role="doc-biblioentry">
+Henry, L., Wickham, H., 2020. <a href="https://CRAN.R-project.org/package=purrr">Purrr: Functional programming tools</a>.
+</div>
+<div id="ref-landscapemetrics" class="csl-entry" role="doc-biblioentry">
+Hesselbarth, M.H.K., Sciaini, M., With, K.A., Wiegand, K., Nowosad, J., 2019. <span class="nocase">landscapemetrics</span>: An open-source <span>R</span> tool to calculate landscape metrics. Ecography 42, 1648–1657.
+</div>
+<div id="ref-terra" class="csl-entry" role="doc-biblioentry">
+Hijmans, R.J., 2022b. <a href="https://CRAN.R-project.org/package=terra">Terra: Spatial data analysis</a>.
+</div>
+<div id="ref-raster" class="csl-entry" role="doc-biblioentry">
+Hijmans, R.J., 2022a. <a href="https://CRAN.R-project.org/package=raster">Raster: Geographic data analysis and modeling</a>.
+</div>
+<div id="ref-Hoppus2005" class="csl-entry" role="doc-biblioentry">
+Hoppus, M., Lister, A., 2005. The status of accurately locating forest inventory and analysis plots using the global positioning system, in: Proceedings of the Seventh Annual Forest Inventory and Analysis Symposium.
+</div>
+<div id="ref-Hosking1990" class="csl-entry" role="doc-biblioentry">
+Hosking, J.R.M., 1990. <a href="http://www.jstor.org/stable/2345653">L-moments: Analysis and estimation of distributions using linear combinations of order statistics</a>. Journal of the Royal Statistical Society. Series B (Methodological) 52, 105–124.
+</div>
+<div id="ref-Huang2019" class="csl-entry" role="doc-biblioentry">
+Huang, W., Dolan, K., Swatantran, A., Johnson, K., Tang, H., O’Neil-Dunne, J., Dubayah, R., Hurtt, G., 2019. High-resolution mapping of aboveground biomass for forest carbon monitoring system in the <span>Tri-State</span> region of <span class="nocase">Maryland, Pennsylvania and Delaware, USA</span>. Environmental Research Letters 14, 095002. <a href="https://doi.org/10.1088/1748-9326/ab2917">https://doi.org/10.1088/1748-9326/ab2917</a>
+</div>
+<div id="ref-Hudak2020" class="csl-entry" role="doc-biblioentry">
+Hudak, A.T., Fekety, P.A., Kane, V.R., Kennedy, R.E., Filippelli, S.K., Falkowski, M.J., Tinkham, W.T., Smith, A.M.S., Crookston, N.L., Domke, G.M., Corrao, M.V., Bright, B.C., Churchill, D.J., Gould, P.J., McGaughey, R.J., Kane, J.T., Dong, J., 2020. A carbon monitoring system for mapping regional, annual aboveground biomass across the northwestern <span>USA</span>. Environmental Research Letters 15, 095003. <a href="https://doi.org/10.1088/1748-9326/ab93f9">https://doi.org/10.1088/1748-9326/ab93f9</a>
+</div>
+<div id="ref-Hurtt2019" class="csl-entry" role="doc-biblioentry">
+Hurtt, G., Zhao, M., Sahajpal, R., Armstrong, A., Birdsey, R., Campbell, E., Dolan, K., Dubayah, R., Fisk, J.P., Flanagan, S., Huang, C., Huang, W., Johnson, K., Lamb, R., Ma, L., Marks, R., O’Leary, D., O’Neil-Dunne, J., Swatantran, A., Tang, H., 2019. Beyond <span>MRV</span>: High-resolution forest carbon modeling for climate mitigation planning over maryland, <span>USA</span>. Environmental Research Letters 14, 045013. <a href="https://doi.org/10.1088/1748-9326/ab0bbe">https://doi.org/10.1088/1748-9326/ab0bbe</a>
+</div>
+<div id="ref-Johnson2022" class="csl-entry" role="doc-biblioentry">
+Johnson, L.K., Mahoney, M.J., Bevilacqua, E., Stehman, S.V., Domke, G., Beier, C.M., 2022. High-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages. <a href="https://doi.org/10.48550/ARXIV.2205.08530">https://doi.org/10.48550/ARXIV.2205.08530</a>
+</div>
+<div id="ref-Lachenbruch1968" class="csl-entry" role="doc-biblioentry">
+Lachenbruch, P.A., Mickey, M.R., 1968. Estimation of error rates in discriminant analysis. Technometrics 10, 1–11. <a href="https://doi.org/10.2307/1266219">https://doi.org/10.2307/1266219</a>
+</div>
+<div id="ref-Langford2001" class="csl-entry" role="doc-biblioentry">
+Langford, E., Schwertman, N., Owens, M., 2001. Is the property of being positively correlated transitive? The American Statistician 55, 322–325. <a href="https://doi.org/10.1198/000313001753272286">https://doi.org/10.1198/000313001753272286</a>
+</div>
+<div id="ref-Luo2016" class="csl-entry" role="doc-biblioentry">
+Luo, S., Chen, J.M., Wang, C., Xi, X., Zeng, H., Peng, D., Li, D., 2016. Effects of LiDAR point density, sampling size and height threshold on estimation accuracy of crop biophysical parameters. Opt. Express 24, 11578–11593. <a href="https://doi.org/10.1364/OE.24.011578">https://doi.org/10.1364/OE.24.011578</a>
+</div>
+<div id="ref-Ma2018" class="csl-entry" role="doc-biblioentry">
+Ma, W., Domke, G.M., D’Amato, A.W., Woodall, C.W., Walters, B.F., Deo, R.K., 2018. Using matrix models to estimate aboveground forest biomass dynamics in the eastern <span>USA</span> through various combinations of <span>LiDAR</span>, landsat, and forest inventory data. Environmental Research Letters 13, 125004. <a href="https://doi.org/10.1088/1748-9326/aaeaa3">https://doi.org/10.1088/1748-9326/aaeaa3</a>
+</div>
+<div id="ref-Magnussen1998" class="csl-entry" role="doc-biblioentry">
+Magnussen, S., Boudewyn, P., 1998. Derivations of stand heights from airborne laser scanner data with canopy-based quantile estimators. Canadian Journal of Forest Research 28, 1016–1031. <a href="https://doi.org/10.1139/x98-078">https://doi.org/10.1139/x98-078</a>
+</div>
+<div id="ref-DataCitation" class="csl-entry" role="doc-biblioentry">
+Mahoney, M.J., Johnson, L.K., Bevilacqua, E., Beier, C.M., 2022. Data from: Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass. <a href="https://doi.org/10.5281/zenodo.6391114">https://doi.org/10.5281/zenodo.6391114</a>
+</div>
+<div id="ref-Massey1951" class="csl-entry" role="doc-biblioentry">
+Massey, F.J., 1951. The <span>Kolmogorov-Smirnov</span> test for goodness of fit. Journal of the American Statistical Association 46, 68–78. <a href="https://doi.org/10.1080/01621459.1951.10500769">https://doi.org/10.1080/01621459.1951.10500769</a>
+</div>
+<div id="ref-fragstats" class="csl-entry" role="doc-biblioentry">
+McGarigal, K., Marks, B.J., 1995. FRAGSTATS: Spatial pattern analysis program for quantifying landscape structure. Gen. Tech. Rep. PNW-GTR-351. Portland, OR: US Department of Agriculture, Forest Service, Pacific Northwest Research Station. 122 p 351.
+</div>
+<div id="ref-tibble" class="csl-entry" role="doc-biblioentry">
+Müller, K., Wickham, H., 2022. <a href="https://CRAN.R-project.org/package=tibble">Tibble: Simple data frames</a>.
+</div>
+<div id="ref-Murcia1995" class="csl-entry" role="doc-biblioentry">
+Murcia, C., 1995. Edge effects in fragmented forests: Implications for conservation. Trends in Ecology and Evolution 10, 58–62. <a href="https://doi.org/10.1016/S0169-5347(00)88977-6">https://doi.org/10.1016/S0169-5347(00)88977-6</a>
+</div>
+<div id="ref-Naesset1997" class="csl-entry" role="doc-biblioentry">
+Næsset, E., 1997. Determination of mean tree height of forest stands using airborne laser scanner data. ISPRS Journal of Photogrammetry and Remote Sensing 52, 49–56. <a href="https://doi.org/10.1016/S0924-2716(97)83000-6">https://doi.org/10.1016/S0924-2716(97)83000-6</a>
+</div>
+<div id="ref-Nilsson1996" class="csl-entry" role="doc-biblioentry">
+Nilsson, M., 1996. Estimation of tree heights and stand volume using an airborne lidar system. Remote Sensing of Environment 56, 1–7. <a href="https://doi.org/10.1016/0034-4257(95)00224-3">https://doi.org/10.1016/0034-4257(95)00224-3</a>
+</div>
+<div id="ref-Nilsson2017" class="csl-entry" role="doc-biblioentry">
+Nilsson, M., Nordkvist, K., Jonzén, J., Lindgren, N., Axensten, P., Wallerman, J., Egberth, M., Larsson, S., Nilsson, L., Eriksson, J., Olsson, H., 2017. A nationwide forest attribute map of sweden predicted using airborne laser scanning data and field data from the national forest inventory. Remote Sensing of Environment 194, 447–454. <a href="https://doi.org/10.1016/j.rse.2016.10.022">https://doi.org/10.1016/j.rse.2016.10.022</a>
+</div>
+<div id="ref-Pflugmacher2012" class="csl-entry" role="doc-biblioentry">
+Pflugmacher, D., Cohen, W.B., Kennedy, R.E., 2012. Using landsat-derived disturbance history (1972–2010) to predict current forest structure. Remote Sensing of Environment 122, 146–165. <a href="https://doi.org/10.1016/j.rse.2011.09.025">https://doi.org/10.1016/j.rse.2011.09.025</a>
+</div>
+<div id="ref-Pflugmacher2014" class="csl-entry" role="doc-biblioentry">
+Pflugmacher, D., Cohen, W.B., Kennedy, R.E., Yang, Z., 2014. Using landsat-derived disturbance and recovery history and lidar to map forest biomass dynamics. Remote Sensing of Environment 151, 124–137. <a href="https://doi.org/10.1016/j.rse.2013.05.033">https://doi.org/10.1016/j.rse.2013.05.033</a>
+</div>
+<div id="ref-nlme" class="csl-entry" role="doc-biblioentry">
+Pinheiro, J.C., Bates, D.M., 2000. Mixed-effects models in s and s-PLUS. Springer, New York. <a href="https://doi.org/10.1007/b98882">https://doi.org/10.1007/b98882</a>
+</div>
+<div id="ref-R2021" class="csl-entry" role="doc-biblioentry">
+R Core Team, 2021. <a href="https://www.R-project.org/">R: A language and environment for statistical computing</a>. R Foundation for Statistical Computing, Vienna, Austria.
+</div>
+<div id="ref-Roussel2020" class="csl-entry" role="doc-biblioentry">
+Roussel, J.-R., Auty, D., Coops, N.C., Tompalski, P., Goodbody, T.R.H., Meador, A.S., Bourdon, J.-F., de Boissieu, F., Achim, A., 2020. lidR: An <span>R</span> package for analysis of airborne laser scanning (ALS) data. Remote Sensing of Environment 251, 112061. <a href="https://doi.org/10.1016/j.rse.2020.112061">https://doi.org/10.1016/j.rse.2020.112061</a>
+</div>
+<div id="ref-Sambasivan2021" class="csl-entry" role="doc-biblioentry">
+Sambasivan, N., Kapania, S., Highfill, H., Akrong, D., Paritosh, P., Aroyo, L., 2021. <span>“Everyone wants to do the model work, not the data work”</span>: Data cascades in high-stakes AI, in: Proceedings of CHI 2021.
+</div>
+<div id="ref-Stone1974" class="csl-entry" role="doc-biblioentry">
+Stone, M., 1974. <a href="http://www.jstor.org/stable/2984809">Cross-validatory choice and assessment of statistical predictions</a>. Journal of the Royal Statistical Society. Series B (Methodological) 36, 111–147.
+</div>
+<div id="ref-3DEP" class="csl-entry" role="doc-biblioentry">
+U.S. Geological Survey, 2019. <span>3D</span> elevation program 1-meter resolution digital elevation model.
+</div>
+<div id="ref-Wasser2013" class="csl-entry" role="doc-biblioentry">
+Wasser, L., Day, R., Chasmer, L., Taylor, A., 2013. Influence of vegetation structure on lidar-derived canopy height and fractional cover in forested riparian buffers during leaf-off and leaf-on conditions. PLOS ONE 8, 1–13. <a href="https://doi.org/10.1371/journal.pone.0054776">https://doi.org/10.1371/journal.pone.0054776</a>
+</div>
+<div id="ref-Reider2018" class="csl-entry" role="doc-biblioentry">
+Watling, I.J.R.A.M.A.D.A.J.I., 2018. The influence of matrix quality on species richness in remnant forest. Landscape Ecology 33, 1147–1157. <a href="https://doi.org/10.1007/s10980-018-0664-6">https://doi.org/10.1007/s10980-018-0664-6</a>
+</div>
+<div id="ref-White2015" class="csl-entry" role="doc-biblioentry">
+White, J.C., Arnett, J.T.T.R., Wulder, M.A., Tompalski, P., Coops, N.C., 2015. Evaluating the impact of leaf-on and leaf-off airborne laser scanning data on the estimation of forest inventory attributes with the area-based approach. Canadian Journal of Forest Research 45, 1498–1513. <a href="https://doi.org/10.1139/cjfr-2015-0192">https://doi.org/10.1139/cjfr-2015-0192</a>
+</div>
+<div id="ref-dplyr" class="csl-entry" role="doc-biblioentry">
+Wickham, H., François, R., Henry, L., Müller, K., 2022a. <a href="https://CRAN.R-project.org/package=dplyr">Dplyr: A grammar of data manipulation</a>.
+</div>
+<div id="ref-tidyr" class="csl-entry" role="doc-biblioentry">
+Wickham, H., Girlich, M., 2022. <a href="https://CRAN.R-project.org/package=tidyr">Tidyr: Tidy messy data</a>.
+</div>
+<div id="ref-readr" class="csl-entry" role="doc-biblioentry">
+Wickham, H., Hester, J., Bryan, J., 2022b. <a href="https://CRAN.R-project.org/package=readr">Readr: Read rectangular text data</a>.
+</div>
+<div id="ref-Wright2017" class="csl-entry" role="doc-biblioentry">
+Wright, M.N., Ziegler, A., 2017a. <span class="nocase">ranger</span>: A fast implementation of random forests for high dimensional data in <span>C++</span> and <span>R</span>. Journal of Statistical Software 77, 1–17. <a href="https://doi.org/10.18637/jss.v077.i01">https://doi.org/10.18637/jss.v077.i01</a>
+</div>
+<div id="ref-ranger" class="csl-entry" role="doc-biblioentry">
+Wright, M.N., Ziegler, A., 2017b. <span class="nocase">ranger</span>: A fast implementation of random forests for high dimensional data in <span>C++</span> and <span>R</span>. Journal of Statistical Software 77, 1–17. <a href="https://doi.org/10.18637/jss.v077.i01">https://doi.org/10.18637/jss.v077.i01</a>
+</div>
+</div></section><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@article{jmahoney2022,
+  author = {Michael J Mahoney and Lucas K Johnson and Eddie Bevilacqua
+    and Colin M Beier},
+  title = {Filtering Ground Noise from {LiDAR} Returns Produces Inferior
+    Models of Forest Aboveground Biomass in Heterogenous Landscapes},
+  journal = {GIScience \&amp; Remote Sensing},
+  date = {2022-07-14},
+  url = {https://mm218.dev/papers/ground_filtering_manuscript},
+  langid = {en},
+  abstract = {Airborne LiDAR has become an essential data source for
+    large-scale, high-resolution modeling of forest aboveground biomass
+    and carbon stocks, enabling predictions with much higher resolution
+    and accuracy than can be achieved using optical imagery alone.
+    Ground noise filtering -\/- that is, excluding returns from LiDAR
+    point clouds based on simple height thresholds -\/- is a common
+    practice meant to improve the “signal” content of LiDAR returns by
+    preventing ground returns from masking useful information about tree
+    size and condition contained within canopy returns. However, ground
+    returns may be helpful for making accurate aboveground biomass
+    predictions in heterogeneous landscapes that include a patchy mosaic
+    of vegetation heights and land cover types. In this paper, we
+    applied several ground noise filtering thresholds while mapping
+    forest AGB across New York State (USA), a heterogenous landscape
+    composed of both contiguously forested and highly fragmented areas
+    with mixed land cover types. We fit random forest models to
+    predictor sets derived from each filtering intensity threshold and
+    compared model accuracies, paying attention to how changes in
+    accuracy correlated with landscape structure. We observed that
+    removing ground noise via any height threshold systematically biases
+    many of the LiDAR-derived variables used in AGB modeling, with mean
+    correlation (Spearman’s \$\textbackslash rho\$) between variables
+    increasing from 0.183 to 0.266. We found that that ground noise
+    filtering yields models of forest AGB with lower accuracy than
+    models trained using predictors derived from unfiltered point
+    clouds, with RMSE increasing by up to 2.2 Mg ha\^{}-1\^{} statewide.
+    Although we only modeled AGB for forest cover types, models fit to
+    predictors derived from filtered point clouds performed worse as
+    landscape heterogeneity (as measured by patch density and edge
+    density) increased, suggesting ground returns are particularly
+    useful when modeling edge forests. Our results suggest that ground
+    filtering should be a carefully considered decision when mapping
+    forest AGB, particularly when mapping heterogeneous and highly
+    fragmented landscapes, as ground returns are more likely to
+    represent useful “signal” than extraneous “noise” in these cases.}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-jmahoney2022" class="csl-entry quarto-appendix-citeas" role="doc-biblioentry">
+Michael J Mahoney, Lucas K Johnson, Eddie Bevilacqua, Colin M Beier,
+2022. <a href="https://mm218.dev/papers/ground_filtering_manuscript">Filtering
+ground noise from LiDAR returns produces inferior models of forest
+aboveground biomass in heterogenous landscapes</a>. GIScience &amp;
+Remote Sensing.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">© Copyright 2022 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</div>   
+  </div>
+</footer>
+
+
+
+</body></html>
