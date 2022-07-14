@@ -3,6 +3,7 @@ project:
 
 website:
   title: "Mike Mahoney"
+  site-url: https://mm218.dev
   description: "Technology and the Environment"
   comments:
     utterances:
