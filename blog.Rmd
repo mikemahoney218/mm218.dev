@@ -1,4 +1,0 @@
----
-title: "Mike Mahoney"
-listing: posts # do this exactly
----

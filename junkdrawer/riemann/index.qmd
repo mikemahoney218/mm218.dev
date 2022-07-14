@@ -5,6 +5,8 @@ date: last-modified
 format: 
   html:
     code-link: true
+execute:
+  freeze: true
 ---
 
 ```{r include = FALSE}

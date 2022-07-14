@@ -1,0 +1,70 @@
+---
+title: "Mike Mahoney"
+image: avatar.jpg
+about:
+  template: trestles
+  links:
+    - text: LinkedIn
+      url: "https://linkedin.com/in/mikemahoney218"
+    - text: Twitter
+      icon: twitter
+      url: "https://twitter.com/mikemahoney218"
+    - text: GitHub
+      icon: github
+      url: "https://github.com/mikemahoney218"
+    - text: Email
+      url: "mailto:mike.mahoney.218+site@gmail.com"
+    - text: Blog
+      url: "blog.html"
+    - text: CV
+      url: "cv.pdf"
+
+---
+::: {.column-page}
+
+## Bio
+
+I’m a PhD candidate at SUNY-ESF, working on predictive modeling and 
+visualization with a focus on natural systems. 
+My current work focuses on using game engines as GIS to visualize large-scale 
+landscapes with a focus on forested systems as a method for scientific 
+communication and outreach. 
+Past projects have focused on landscape and community ecology, and have included 
+predictive models of forest biomass from remote sensing data
+and the landscape-level impacts of beaver within New York's Adirondack State Park.
+In all of these projects I've worked to apply data science techniques 
+to large-scale challenges, frequently serving as the statistical and technical 
+expert within my team.
+
+On this site I keep a list of [my publications](papers), [presentations](talks), 
+and [my CV](cv.pdf), as well as a [technical blog](blog.html).
+
+<p></p>
+
+## Education
+
+**State University of New York College of Environmental Science and Forestry**  
+Syracuse, NY
+
+Ph.D. in Environmental Science | August 2020 - Present (Expected 2024)  
+B.S. in Forest Ecosystem Science | August 2015 - December 2018
+
+<p></p>
+
+## Selected Projects
+
+#### Publications
+
+**unifir: A Unifying API for Interacting with Unity from R.** Mahoney, MJ, Beier, CM, and Ackerman, AC. 2022. Journal of Open Source Software 7(73): 4388. [https://doi.org/10.21105/joss.04388](https://doi.org/10.21105/joss.04388)
+
+**terrainr: An R package for creating immersive virtual environments.** Mahoney, MJ, Beier, CM, and Ackerman, AC. 2022. Journal of Open Source Software, 7(69): 4060. [https://doi.org/10.21105/joss.04060](https://doi.org/10.21105/joss.04060)
+
+**Stem size selectivity is stronger than species preferences for beaver, a central place forager.**  Mahoney, M. J. and Stella, J. C. 2020. Forest Ecology and Management, 475, 118331. [https://doi.org/10.1016/j.foreco.2020.118331](https://doi.org/10.1016/j.foreco.2020.118331).
+
+#### R Packages
+
+**[unifir](https://github.com/mikemahoney218/unifir)** | A Unifying API for Working with Unity in R | 2022  
+**[terrainr](https://github.com/ropensci/terrainr)** | Retrieve Data from the USGS National Map and Transform it for 3D Landscape Visualizations | 2021  
+**[heddlr](https://github.com/mikemahoney218/heddlr)** | Functional Programming Concepts for R Markdown Documents | 2020
+
+:::

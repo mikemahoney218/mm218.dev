@@ -1,0 +1,25 @@
+[
+  {
+    "listing": "/blog.html",
+    "items": [
+      "/posts/2022-02-18-progress-purpose-process/index.html",
+      "/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html",
+      "/posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html",
+      "/posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/index.html",
+      "/posts/2021-06-12-virtual-environments-talk-at-user-2021/index.html",
+      "/posts/2021-04-22-terrainr-version-040-is-now-on-cran/index.html",
+      "/posts/2021/02/terrainr/index.html",
+      "/posts/2021/01/model-averaging/index.html",
+      "/posts/2020/10/index.html",
+      "/posts/2020/06/index.html",
+      "/posts/2020/05/index.html",
+      "/posts/2020/04/corona-viz/index.html",
+      "/posts/2020/04/making-excellent-viz/index.html",
+      "/posts/2020/04/mechanics-of-viz/index.html",
+      "/posts/2020/04/theory-of-data-viz/index.html",
+      "/posts/2020/03/index.html",
+      "/posts/2020/01/index.html",
+      "/posts/2019/03/index.html"
+    ]
+  }
+]

@@ -1,0 +1,29 @@
+---
+title: "Virtual environments talk at useR! 2021"
+description: |
+  With slides and a rough outline available on GitHub.
+author:
+  - name: Mike Mahoney
+    url: {}
+date: 06-12-2021
+output:
+  distill::distill_article:
+    self_contained: false
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+I'm thrilled to be giving a talk (with Colin Beier and Aidan Ackerman) at useR 
+2021! We're calling the talk "Virtual Environments: Using R as a Frontend for 3D 
+Rendering of Digital Landscapes" -- generally speaking, I'm talking about the 
+idea of using R to create visualizations inside game engines, and specifically 
+about how we do so using terrainr.
+
+The video should go up on YouTube after the conference, and the slides (and 
+a rough script for the talk) are online at 
+https://github.com/mikemahoney218/user2021 . My favorite line from the script
+is "R is where our users are" -- I didn't quite realize I had any Boston accent
+left until I tripped over that sentence a few times.
+

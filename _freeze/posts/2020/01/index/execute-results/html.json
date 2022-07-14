@@ -1,0 +1,14 @@
+{
+  "hash": "66c0e946c192bd51acac4beab1034ad7",
+  "result": {
+    "markdown": "---\ntitle: \"Announcing {heddlr}, now on CRAN!\"\ncategories: [\"R\", \"R Packages\", \"R Markdown\"]\ndate: '2020-01-23'\nupdated: '2020-01-23'\ndescription: \"Write less boilerplate, get more done.\"\nauthor:\n  - name: Mike Mahoney\n    url: {}\noutput:\n  distill::distill_article:\n    self_contained: false\n---\n\n\nMy first package just got published to CRAN today! `heddlr` is a set of tools \nthat make it easier to write modular R Markdown documents by decomposing them \ninto a set of patterns which can be repeated and combined based on your input \ndata, letting you dynamically add and remove sections based on your data. I \nstarted this package to solve an issue I found myself running into when \nbuilding [flexdashboards](https://rmarkdown.rstudio.com/flexdashboard/), and \nhave since found out that there's all sorts of cool tricks you can do by \napplying this type of functional programming mindset to R Markdown documents.\n\nYou can find out more on heddlr's [documentation website](https://mikemahoney218.github.io/heddlr/),\nproudly made in R via [pkgdown](https://pkgdown.r-lib.org/). This first version \non CRAN is 0.5.0, with 0.1 -> 0.4 previously released on [GitHub](https://github.com/mikemahoney218/heddlr).\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": null
+  }
+}

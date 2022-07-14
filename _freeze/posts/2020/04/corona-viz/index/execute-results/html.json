@@ -1,0 +1,14 @@
+{
+  "hash": "ac9b3bde39f2f13dda4c6a6128b81640",
+  "result": {
+    "markdown": "---\ntitle: 'A minimalist visualization of Coronavirus rates'\ndescription: Made with Shiny and R\ncategories: [\"R\"]\ndate: '2020-04-27'\nauthor:\n  - name: Mike Mahoney\n    url: {}\noutput:\n  distill::distill_article:\n    self_contained: false\n---\n\n\nI had been getting frustrated with not being able to quickly find coronavirus\ndata for my area, and not being able to see recent trends without framing and\ninterpretation. So I grabbed down the John Hopkins CSSE data and made a quick\nShiny app to visualize case and death rates. \nI'm trying to not contribute to \nthe constant noise surrounding the ongoing pandemic, but having a \nway to see these numbers without an overwhelming amount of surrounding \neditorialization has made me feel like I understand the world a bit better.\n\n\n::: {.cell}\n\n```{.r .cell-code}\nknitr::include_graphics(\"covid.png\")\n```\n\n::: {.cell-output-display}\n![](covid.png){width=100%}\n:::\n:::\n\n\n\n[The app lives at this link](https://mm218.shinyapps.io/corona_data_explore/).\nThanks to R Studio, who are providing free hosting for coronavirus apps through\nthe pandemic.\n\n<hr>\n\n<script src=\"https://utteranc.es/client.js\"\n        repo=\"mikemahoney218/mm218.dev\"\n        issue-term=\"url\"\n        label=\"comment\"\n        theme=\"github-light\"\n        crossorigin=\"anonymous\"\n        async>\n</script>\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": null
+  }
+}
