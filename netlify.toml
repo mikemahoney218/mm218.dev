@@ -122,3 +122,10 @@
   from = "/user2022"
   to = "https://mikemahoney218.github.io/2022-06-22_user/slides.html"
 
+[[redirects]]
+  from = "/user2021"
+  to = "https://mikemahoney218.github.io/user2021/user2021_slides.html#2"
+
+[[redirects]]
+  from = "/slides/user2021"
+  to = "https://mikemahoney218.github.io/user2021/user2021_slides.html#2"
