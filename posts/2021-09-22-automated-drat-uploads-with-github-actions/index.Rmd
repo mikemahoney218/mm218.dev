@@ -6,6 +6,7 @@ categories: ["R", "Tutorials", "CI", "CD", "GitHub Actions"]
 author:
   - name: Mike Mahoney
     url: {}
+image: box.png
 date: 09-23-2021
 output:
   distill::distill_article:

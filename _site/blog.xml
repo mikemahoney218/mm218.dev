@@ -38,6 +38,7 @@
  ]]></description>
   <guid>https://mm218.dev/posts/2022-02-18-progress-purpose-process/index.html</guid>
   <pubDate>Fri, 18 Feb 2022 05:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2022-02-18-progress-purpose-process/pano.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>terrainr: An R package for creating immersive virtual environments</title>
@@ -70,6 +71,7 @@
  ]]></description>
   <guid>https://mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html</guid>
   <pubDate>Fri, 14 Jan 2022 05:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/fig1.png" medium="image" type="image/png" height="51" width="144"/>
 </item>
 <item>
   <title>Automated {drat} uploads with GitHub Actions</title>
@@ -169,9 +171,6 @@
 <li><code>package</code>: The GitHub repository for the package you want to upload. Defaults to the repository the action is running in, but this can be used to run your workflow elsewhere (for instance, if you want to have all your upload jobs scheduled in the drat repo itself).</li>
 </ul>
 <p>And for most use cases, this should be enough to automatically deploy your package whenever you desire! So far, I’ve tested this workflow on a handful of my own packages (terrainr and then our internal packages), and things are working well so far – if you find any problems or have any suggestions, <a href="https://github.com/mikemahoney218/upload-to-drat-repo/issues">feel free to open an issue on the action repo here.</a></p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 </section>
@@ -193,6 +192,7 @@
   <category>GitHub Actions</category>
   <guid>https://mm218.dev/posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html</guid>
   <pubDate>Thu, 23 Sep 2021 04:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2021-09-22-automated-drat-uploads-with-github-actions/box.png" medium="image" type="image/png" height="85" width="85"/>
 </item>
 <item>
   <title>Interactive landscape simulations for visual resource assessment</title>
@@ -225,6 +225,7 @@
  ]]></description>
   <guid>https://mm218.dev/posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/index.html</guid>
   <pubDate>Mon, 14 Jun 2021 04:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/closer.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Virtual environments talk at useR! 2021</title>
@@ -938,7 +939,7 @@ Wintle, B. A., M. A. McCarthy, C. T. Volinsky, and R. P. Kavanagh. 2003. <span>�
   <category>Data science</category>
   <guid>https://mm218.dev/posts/2021/01/model-averaging/index.html</guid>
   <pubDate>Mon, 18 Jan 2021 05:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2021/01/model-averaging/Inception-image.jpeg" medium="image" type="image/jpeg"/>
+  <media:content url="https://mm218.dev/posts/2021/01/model-averaging/model_avg.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Some Updates</title>
@@ -996,6 +997,7 @@ Wintle, B. A., M. A. McCarthy, C. T. Volinsky, and R. P. Kavanagh. 2003. <span>�
   <category>beaver</category>
   <guid>https://mm218.dev/posts/2020/10/index.html</guid>
   <pubDate>Fri, 16 Oct 2020 04:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2020/10/terrainr.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Make a Retweet Bot in R</title>
@@ -1247,9 +1249,6 @@ rm grafana_6.7.3_armhf.deb</code></pre>
 <p>And with that, you should have everything you need to start monitoring your Pi – and, with a little elbow grease, anything your Pi can touch! While it certainly feels a little like overkill, I’ve now got state-of-the art tracking and system metrics for my Pi, letting me confirm beyond a shadow of a doubt that… my Pi is running too hot. With all the time I spent on this, maybe I should have just bought a fan.</p>
 <p>But hey – would a fan look <em>this</em> good?</p>
 <p><img src="https://mm218.dev/posts/2020/05/full_grafana.webp" class="img-fluid"></p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 </section>

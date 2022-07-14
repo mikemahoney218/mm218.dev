@@ -6,6 +6,7 @@ author:
   - name: Mike Mahoney
     url: {}
 date: 2022-01-14
+image: fig1.png
 output:
   distill::distill_article:
     self_contained: false
