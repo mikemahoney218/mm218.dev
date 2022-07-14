@@ -11,5 +11,7 @@ listing:
 page-layout: full
 title-block-banner: true
 ---
+::: {.column-page}
 
+:::
 
