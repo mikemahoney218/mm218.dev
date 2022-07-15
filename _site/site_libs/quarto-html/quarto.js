@@ -22,17 +22,6 @@ window.document.addEventListener("DOMContentLoaded", function (_event) {
     }
   };
 
-  // fire slideEnter for bootstrap tab activations (for htmlwidget resize behavior)
-  function fireSlideEnter(e) {
-    const event = window.document.createEvent("Event");
-    event.initEvent("slideenter", true, true);
-    window.document.dispatchEvent(event);
-  }
-  const tabs = window.document.querySelectorAll('a[data-bs-toggle="tab"]');
-  tabs.forEach((tab) => {
-    tab.addEventListener("shown.bs.tab", fireSlideEnter);
-  });
-
   // Track scrolling and mark TOC links as active
   // get table of contents and sidebar (bail if we don't have at least one)
   const tocLinks = tocEl
@@ -157,13 +146,8 @@ window.document.addEventListener("DOMContentLoaded", function (_event) {
   function offsetAbsoluteUrl(url) {
     const offset = getMeta("quarto:offset");
     const baseUrl = new URL(offset, window.location);
-
     const projRelativeUrl = url.replace(baseUrl, "");
-    if (projRelativeUrl.startsWith("/")) {
-      return projRelativeUrl;
-    } else {
-      return "/" + projRelativeUrl;
-    }
+    return "/" + projRelativeUrl;
   }
 
   // read a meta tag value
@@ -178,7 +162,7 @@ window.document.addEventListener("DOMContentLoaded", function (_event) {
   }
 
   async function findAndActivateCategories() {
-    const currentPagePath = offsetAbsoluteUrl(window.location.href);
+    const thisPath = window.location.pathname;
     const response = await fetch(offsetRelativeUrl("listings.json"));
     if (response.status == 200) {
       return response.json().then(function (listingPaths) {
@@ -186,10 +170,7 @@ window.document.addEventListener("DOMContentLoaded", function (_event) {
         for (const listingPath of listingPaths) {
           const pathWithoutLeadingSlash = listingPath.listing.substring(1);
           for (const item of listingPath.items) {
-            if (
-              item === currentPagePath ||
-              item === currentPagePath + "index.html"
-            ) {
+            if (item === thisPath || item === thisPath + "index.html") {
               // Resolve this path against the offset to be sure
               // we already are using the correct path to the listing
               // (this adjusts the listing urls to be rooted against
@@ -275,7 +256,6 @@ window.document.addEventListener("DOMContentLoaded", function (_event) {
         const convertToMenu = () => {
           for (const child of el.children) {
             child.style.opacity = 0;
-            child.style.display = "none";
           }
 
           const toggleContainer = window.document.createElement("div");
@@ -313,7 +293,6 @@ window.document.addEventListener("DOMContentLoaded", function (_event) {
 
             const clone = child.cloneNode(true);
             clone.style.opacity = 1;
-            clone.style.display = null;
             toggleContents.append(clone);
           }
           toggleContents.style.height = "0px";
@@ -378,7 +357,6 @@ window.document.addEventListener("DOMContentLoaded", function (_event) {
         const convertToSidebar = () => {
           for (const child of el.children) {
             child.style.opacity = 1;
-            clone.style.display = null;
           }
 
           const placeholderEl = window.document.getElementById(
@@ -427,10 +405,7 @@ window.document.addEventListener("DOMContentLoaded", function (_event) {
       const margin = lastBottom - top;
       marginChild.style.marginTop = `${margin}px`;
     }
-    const styles = window.getComputedStyle(marginChild);
-    const marginTop = parseFloat(styles["marginTop"]);
-
-    lastBottom = top + marginChild.getBoundingClientRect().height + marginTop;
+    lastBottom = top + marginChild.getBoundingClientRect().height;
   }
 
   // Manage the visibility of the toc and the sidebar
