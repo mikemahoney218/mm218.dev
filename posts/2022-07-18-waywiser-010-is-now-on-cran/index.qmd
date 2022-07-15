@@ -6,6 +6,9 @@ description: |
 author:
   - name: Mike Mahoney
 date: 2022-07-18
+format:
+  html:
+    df-print: paged
 ---
 
 ![The waywiser hex sticker logo: a surveyor's wheel over the word "waywiser".](waywiser.svg)

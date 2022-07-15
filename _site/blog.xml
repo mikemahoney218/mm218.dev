@@ -40,52 +40,54 @@
 <span id="cb3-4"><span class="fu" style="color: #4758AB;">data</span>(guerry, <span class="at" style="color: #657422;">package =</span> <span class="st" style="color: #20794D;">"sfdep"</span>)</span>
 <span id="cb3-5"></span>
 <span id="cb3-6"><span class="fu" style="color: #4758AB;">ww_global_moran</span>(guerry, crime_pers, <span class="fu" style="color: #4758AB;">predict</span>(<span class="fu" style="color: #4758AB;">lm</span>(crime_pers <span class="sc" style="color: #5E5E5E;">~</span> literacy, guerry)))</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 4
-  .metric             .estimator .estimate                              geometry
-  &lt;chr&gt;               &lt;chr&gt;          &lt;dbl&gt;                        &lt;MULTIPOLYGON&gt;
-1 global_moran_i      standard    4.12e- 1 (((381847 1762775, 381116 1763059, 3…
-2 global_moran_pvalue standard    7.23e-10 (((381847 1762775, 381116 1763059, 3…</code></pre>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["geometry"],"name":[4],"type":["s_MULTIP"],"align":["right"]}],"data":[{"1":"global_moran_i","2":"standard","3":"0.4115651506187433","4":"<s_MULTIP>"},{"1":"global_moran_pvalue","2":"standard","3":"0.0000000007234758","4":"<s_MULTIP>"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
 </div>
 </div>
 <p>Under the hood, waywiser uses two functions (<code>ww_build_neighbors()</code> and <code>ww_build_weights()</code>) to build sensible, if likely non-ideal neighbor lists and spatial weights for your data. However, waywiser also lets you provide your own weights object to override the automatic calculations, or provide a function to calculate spatial weights based on the input data frame:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">weights <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="fu" style="color: #4758AB;">ww_build_weights</span>(guerry)</span>
-<span id="cb5-2"></span>
-<span id="cb5-3"><span class="fu" style="color: #4758AB;">ww_global_moran</span>(</span>
-<span id="cb5-4">  guerry, </span>
-<span id="cb5-5">  crime_pers, </span>
-<span id="cb5-6">  <span class="fu" style="color: #4758AB;">predict</span>(<span class="fu" style="color: #4758AB;">lm</span>(crime_pers <span class="sc" style="color: #5E5E5E;">~</span> literacy, guerry)),</span>
-<span id="cb5-7">  <span class="at" style="color: #657422;">wt =</span> weights</span>
-<span id="cb5-8">)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 4
-  .metric             .estimator .estimate                              geometry
-  &lt;chr&gt;               &lt;chr&gt;          &lt;dbl&gt;                        &lt;MULTIPOLYGON&gt;
-1 global_moran_i      standard    4.12e- 1 (((381847 1762775, 381116 1763059, 3…
-2 global_moran_pvalue standard    7.23e-10 (((381847 1762775, 381116 1763059, 3…</code></pre>
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">weights <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="fu" style="color: #4758AB;">ww_build_weights</span>(guerry)</span>
+<span id="cb4-2"></span>
+<span id="cb4-3"><span class="fu" style="color: #4758AB;">ww_global_moran</span>(</span>
+<span id="cb4-4">  guerry, </span>
+<span id="cb4-5">  crime_pers, </span>
+<span id="cb4-6">  <span class="fu" style="color: #4758AB;">predict</span>(<span class="fu" style="color: #4758AB;">lm</span>(crime_pers <span class="sc" style="color: #5E5E5E;">~</span> literacy, guerry)),</span>
+<span id="cb4-7">  <span class="at" style="color: #657422;">wt =</span> weights</span>
+<span id="cb4-8">)</span></code></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["geometry"],"name":[4],"type":["s_MULTIP"],"align":["right"]}],"data":[{"1":"global_moran_i","2":"standard","3":"0.4115651506187433","4":"<s_MULTIP>"},{"1":"global_moran_pvalue","2":"standard","3":"0.0000000007234758","4":"<s_MULTIP>"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
 </div>
 </div>
 <p>Providing our own weights is necessary in order to use the <code>_vec()</code> versions of waywiser functions, which can be helpful for use in dplyr functions:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="co" style="color: #5E5E5E;"># For the %&gt;% pipe and mutate:</span></span>
-<span id="cb7-2"><span class="fu" style="color: #4758AB;">library</span>(dplyr)</span>
-<span id="cb7-3"><span class="co" style="color: #5E5E5E;"># For visualization:</span></span>
-<span id="cb7-4"><span class="fu" style="color: #4758AB;">library</span>(ggplot2)</span>
-<span id="cb7-5"></span>
-<span id="cb7-6">guerry <span class="sc" style="color: #5E5E5E;">%&gt;%</span></span>
-<span id="cb7-7">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">pred =</span> <span class="fu" style="color: #4758AB;">predict</span>(<span class="fu" style="color: #4758AB;">lm</span>(crime_pers <span class="sc" style="color: #5E5E5E;">~</span> literacy, .)),</span>
-<span id="cb7-8">         <span class="at" style="color: #657422;">.estimate =</span> <span class="fu" style="color: #4758AB;">ww_local_moran_i_vec</span>(crime_pers, pred, weights)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb7-9">  sf<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">st_as_sf</span>() <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
-<span id="cb7-10">  <span class="fu" style="color: #4758AB;">ggplot</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">fill =</span> .estimate)) <span class="sc" style="color: #5E5E5E;">+</span></span>
-<span id="cb7-11">  <span class="fu" style="color: #4758AB;">geom_sf</span>() <span class="sc" style="color: #5E5E5E;">+</span> </span>
-<span id="cb7-12">  <span class="fu" style="color: #4758AB;">scale_fill_gradient2</span>(</span>
-<span id="cb7-13">    <span class="st" style="color: #20794D;">"Moran's I"</span>, </span>
-<span id="cb7-14">    <span class="at" style="color: #657422;">low =</span> <span class="st" style="color: #20794D;">"#018571"</span>, </span>
-<span id="cb7-15">    <span class="at" style="color: #657422;">mid =</span> <span class="st" style="color: #20794D;">"white"</span>, </span>
-<span id="cb7-16">    <span class="at" style="color: #657422;">high =</span> <span class="st" style="color: #20794D;">"#A6611A"</span></span>
-<span id="cb7-17">  ) <span class="sc" style="color: #5E5E5E;">+</span> </span>
-<span id="cb7-18">  <span class="fu" style="color: #4758AB;">theme_minimal</span>()</span></code></pre></div>
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="co" style="color: #5E5E5E;"># For the %&gt;% pipe and mutate:</span></span>
+<span id="cb5-2"><span class="fu" style="color: #4758AB;">library</span>(dplyr)</span>
+<span id="cb5-3"><span class="co" style="color: #5E5E5E;"># For visualization:</span></span>
+<span id="cb5-4"><span class="fu" style="color: #4758AB;">library</span>(ggplot2)</span>
+<span id="cb5-5"></span>
+<span id="cb5-6">guerry <span class="sc" style="color: #5E5E5E;">%&gt;%</span></span>
+<span id="cb5-7">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">pred =</span> <span class="fu" style="color: #4758AB;">predict</span>(<span class="fu" style="color: #4758AB;">lm</span>(crime_pers <span class="sc" style="color: #5E5E5E;">~</span> literacy, .)),</span>
+<span id="cb5-8">         <span class="at" style="color: #657422;">.estimate =</span> <span class="fu" style="color: #4758AB;">ww_local_moran_i_vec</span>(crime_pers, pred, weights)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb5-9">  sf<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">st_as_sf</span>() <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb5-10">  <span class="fu" style="color: #4758AB;">ggplot</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">fill =</span> .estimate)) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb5-11">  <span class="fu" style="color: #4758AB;">geom_sf</span>() <span class="sc" style="color: #5E5E5E;">+</span> </span>
+<span id="cb5-12">  <span class="fu" style="color: #4758AB;">scale_fill_gradient2</span>(</span>
+<span id="cb5-13">    <span class="st" style="color: #20794D;">"Moran's I"</span>, </span>
+<span id="cb5-14">    <span class="at" style="color: #657422;">low =</span> <span class="st" style="color: #20794D;">"#018571"</span>, </span>
+<span id="cb5-15">    <span class="at" style="color: #657422;">mid =</span> <span class="st" style="color: #20794D;">"white"</span>, </span>
+<span id="cb5-16">    <span class="at" style="color: #657422;">high =</span> <span class="st" style="color: #20794D;">"#A6611A"</span></span>
+<span id="cb5-17">  ) <span class="sc" style="color: #5E5E5E;">+</span> </span>
+<span id="cb5-18">  <span class="fu" style="color: #4758AB;">theme_minimal</span>()</span></code></pre></div>
 <div class="cell-output-display">
 <p><img src="https://mm218.dev/posts/2022-07-18-waywiser-010-is-now-on-cran/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
 </div>
