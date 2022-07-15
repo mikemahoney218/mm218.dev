@@ -163,9 +163,6 @@ ul.task-list{list-style: none;}
 <p>First, another new behavior with <code>get_tiles</code> is that rather than assuming the provided data and downloaded image should both be using the WGS84 CRS (EPSG 4326), <code>get_tiles</code> will now infer the EPSG CRS from any provided <code>sf</code> or <code>Raster</code> object. If the numeric code is missing, this function will still assume 4326.</p>
 <p>Similarly, rather than specifying <code>target_crs</code> in <code>vector_to_overlay</code>, this function will now return an overlay projected to match <code>reference_raster</code>’s CRS. Missing CRS are handled slightly differently here – if the <code>error_crs</code> argument is <code>NULL</code>, this function will warn; if <code>FALSE</code> it will assume 4326, and if <code>TRUE</code> it will interrupt the function with an error.</p>
 <p>Those are the major changes to this iteration! On top of these there are some minor changes to the package internals, slowly removing dead code paths and simplifying things behind the scenes. If you have any problems (bugs or missing features) with the package, feel free to <a href="https://github.com/ropensci/terrainr/issues">open an issue!</a></p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 </section>

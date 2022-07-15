@@ -62,9 +62,6 @@
 </div>
 <p>The JOSS workflow is absolutely fascinating. I made a <a href="https://github.com/ropensci/terrainr/tree/paper">git branch in the terrainr repo</a> with the files needed to generate the paper, then (through a web form) opened a <a href="https://github.com/openjournals/joss-reviews/issues/4055">pre-review issue on GitHub</a>. The editors used that issue to assign a handling editor, then moved things over to <a href="https://github.com/openjournals/joss-reviews/issues/4060">a review issue</a>, where the paper was processed and prepared for submission via an <a href="https://github.com/openjournals/joss-papers/pull/2885">automatically generated PR</a>. The whole thing was incredibly efficient, and also entirely transparent – the logs of the paper processing workflow will be available until GitHub finally shuts down, a refreshing change compared to standard peer review.</p>
 <p>The paper itself is a general overview of the terrainr package, trying to be a new enough contribution that it’s not just repeating the package documentation but not adding enough to spin off into <a href="https://www.mm218.dev/posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/">an entirely separate research project</a>. It’s also very short – a nice feature of JOSS papers – so rather than summarize here I’ll just suggest you <a href="https://www.mm218.dev/papers/terrainr_2022.pdf">read it yourself</a>.</p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 
@@ -215,9 +212,6 @@
 </div>
 <p>This was a really fun project, forcing me to push these visualizations in a new direction. The conference itself is in October, and I’ve posted a preprint of the paper <a href="https://www.mm218.dev/papers/vrs_2021.pdf">at this link</a>.</p>
 <p>[Update - 2021-06-24] And the code and manuscript used for this paper are now on <a href="https://github.com/mikemahoney218/vrs2021">Github at this link</a>.</p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 
@@ -237,9 +231,6 @@
 
 <p>I’m thrilled to be giving a talk (with Colin Beier and Aidan Ackerman) at useR 2021! We’re calling the talk “Virtual Environments: Using R as a Frontend for 3D Rendering of Digital Landscapes” – generally speaking, I’m talking about the idea of using R to create visualizations inside game engines, and specifically about how we do so using terrainr.</p>
 <p>The video should go up on YouTube after the conference, and the slides (and a rough script for the talk) are online at https://github.com/mikemahoney218/user2021 . My favorite line from the script is “R is where our users are” – I didn’t quite realize I had any Boston accent left until I tripped over that sentence a few times.</p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 
@@ -279,9 +270,6 @@
 <p>First, another new behavior with <code>get_tiles</code> is that rather than assuming the provided data and downloaded image should both be using the WGS84 CRS (EPSG 4326), <code>get_tiles</code> will now infer the EPSG CRS from any provided <code>sf</code> or <code>Raster</code> object. If the numeric code is missing, this function will still assume 4326.</p>
 <p>Similarly, rather than specifying <code>target_crs</code> in <code>vector_to_overlay</code>, this function will now return an overlay projected to match <code>reference_raster</code>’s CRS. Missing CRS are handled slightly differently here – if the <code>error_crs</code> argument is <code>NULL</code>, this function will warn; if <code>FALSE</code> it will assume 4326, and if <code>TRUE</code> it will interrupt the function with an error.</p>
 <p>Those are the major changes to this iteration! On top of these there are some minor changes to the package internals, slowly removing dead code paths and simplifying things behind the scenes. If you have any problems (bugs or missing features) with the package, feel free to <a href="https://github.com/ropensci/terrainr/issues">open an issue!</a></p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 </section>
@@ -911,9 +899,6 @@ F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
 <section id="conclusion" class="level2">
 <h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
 <p>Model averaging can be a powerful tool for reducing model bias and addressing the implicit uncertainty in attempting to pick the “best” model for a situation. While plenty of complex and computationally expensive approaches to averaging exist – and can greatly improve model performance – simpler ensemble methods can provide the same benefits without necessarily incurring the same costs.</p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 
@@ -981,9 +966,6 @@ Wintle, B. A., M. A. McCarthy, C. T. Volinsky, and R. P. Kavanagh. 2003. <span>�
 <section id="misc" class="level2">
 <h2 class="anchored" data-anchor-id="misc">Misc</h2>
 <p>I bought a <a href="https://www.instagram.com/p/CDJVN-JlB5R/">pen plotter.</a></p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 </section>
@@ -1009,9 +991,6 @@ Wintle, B. A., M. A. McCarthy, C. T. Volinsky, and R. P. Kavanagh. 2003. <span>�
 
 <p>A while back, I made a <a href="https://twitter.com/ecology_tweets">tweetbot</a> that retweets a set of ecology-related hashtags, in order to signal boost ecology content in a similar manner to <a href="https://twitter.com/statstwitbot">statsbot</a> or <a href="https://twitter.com/PlotterTweeter">Plotter Bot</a>. The code to do this is pretty simple – made almost trivial by the <a href="https://rtweet.info/">rtweet</a> package – but I found that environmental hashtags have a pretty low signal-to-noise ratio, driven down by various political and industry groups, as well as trolls.</p>
 <p>I didn’t want to get into the business of content filtering, so instead I started looking for other markers that a tweet was – or wasn’t – worth promoting, and have gotten to what I believe is a respectable place with my filtration. So I’ve <a href="https://github.com/mikemahoney218/retweet_bot/tree/master">open-sourced the code</a> (without the specific values I use to filter) for anyone else who might be interested in setting up their own automated retweet app.</p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 
@@ -1282,9 +1261,6 @@ rm grafana_6.7.3_armhf.deb</code></pre>
 </div>
 </div>
 <p><a href="https://mm218.shinyapps.io/corona_data_explore/">The app lives at this link</a>. Thanks to R Studio, who are providing free hosting for coronavirus apps through the pandemic.</p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 
@@ -1376,8 +1352,6 @@ rm grafana_6.7.3_armhf.deb</code></pre>
 </ul></li>
 </ul>
 <hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 </section>
@@ -1603,9 +1577,6 @@ rm grafana_6.7.3_armhf.deb</code></pre>
 <p>Even without a single number on this chart, its message is clear - we can tell how our diamonds are distributed with a single glance. A similar way to do this is to use a heatmap, where differently colored cells represent a range of values:</p>
 <p><img src="https://mm218.dev/posts/2020/04/mechanics-of-viz/unnamed-chunk-51-1.png" class="img-fluid"></p>
 <p>I personally think heatmaps are less effective – partially because by using the color aesthetic to encode this value, you can’t use it for anything else – but they’re often easier to make with the resources at hand.</p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 </section>
@@ -1679,9 +1650,6 @@ rm grafana_6.7.3_armhf.deb</code></pre>
 <li>Use encodings that people decode better (where better = faster and/or more accurate)</li>
 </ol>
 <p>Keep this concept in the back of your mind as we move into the mechanics of data visualization in our next post – it should be your main consideration while deciding which elements you use! We’ll keep returning to these ideas of explanatory and exploratory, as well as expressiveness and effectiveness, throughout the rest of this article.</p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
 
 
 </section>
