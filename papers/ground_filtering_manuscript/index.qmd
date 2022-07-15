@@ -33,7 +33,7 @@ citation:
   #page:  
   #issue:
   #number:
-  #doi: 
+  doi: 10.1080/15481603.2022.2103069
   #url:
 date: "2022-07-14"
 nocite: |
@@ -456,7 +456,7 @@ was measured using Spearman's correlation coefficient ($\rho$).
 
 # Results {#sec-results}
 
-## Landscape Structure #{sec-structure}
+## Landscape Structure {#sec-structure}
 
 ```{r}
 source("code/make_names.R")
