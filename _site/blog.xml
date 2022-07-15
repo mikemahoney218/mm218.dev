@@ -9,8 +9,98 @@
 <link>https://mm218.dev/blog.html</link>
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
-<generator>quarto-0.9.449</generator>
-<lastBuildDate>Fri, 18 Feb 2022 05:00:00 GMT</lastBuildDate>
+<generator>quarto-1.0.27</generator>
+<lastBuildDate>Mon, 18 Jul 2022 04:00:00 GMT</lastBuildDate>
+<item>
+  <title>Waywiser version 0.1.0 is now on CRAN!</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2022-07-18-waywiser-010-is-now-on-cran/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2022-07-18-waywiser-010-is-now-on-cran/waywiser.svg" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">The waywiser hex sticker logo: a surveyor’s wheel over the word “waywiser”.</figcaption><p></p>
+</figure>
+</div>
+<p>I’ve got a new package on CRAN! <a href="https://github.com/mikemahoney218/waywiser">waywiser</a> is a <a href="https://yardstick.tidymodels.org/">yardstick</a> extension package, providing functions for calculating spatial autocorrelation in model residuals in a way that cooperates with <em>most</em> (but not all, see below) of the tidymodels framework.</p>
+<p>You can install it from CRAN:</p>
+<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;">install.packages</span>(<span class="st" style="color: #20794D;">"waywiser"</span>)</span></code></pre></div>
+<p>Or the development version from <a href="https://github.com/mikemahoney218/waywiser">the package’s GitHub page</a>:</p>
+<div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="co" style="color: #5E5E5E;"># install.packages("remotes")</span></span>
+<span id="cb2-2">remotes<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">install_github</span>(<span class="st" style="color: #20794D;">"mikemahoney218/waywiser"</span>)</span></code></pre></div>
+<p>You can use the package to estimate the spatial autocorrelation in residuals from any model – just provide spatial data, a vector of your “true” measurements, and a vector of your predicted values:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;">library</span>(waywiser)</span>
+<span id="cb3-2"></span>
+<span id="cb3-3"><span class="co" style="color: #5E5E5E;"># Data on morality crimes in France:</span></span>
+<span id="cb3-4"><span class="fu" style="color: #4758AB;">data</span>(guerry, <span class="at" style="color: #657422;">package =</span> <span class="st" style="color: #20794D;">"sfdep"</span>)</span>
+<span id="cb3-5"></span>
+<span id="cb3-6"><span class="fu" style="color: #4758AB;">ww_global_moran</span>(guerry, crime_pers, <span class="fu" style="color: #4758AB;">predict</span>(<span class="fu" style="color: #4758AB;">lm</span>(crime_pers <span class="sc" style="color: #5E5E5E;">~</span> literacy, guerry)))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 4
+  .metric             .estimator .estimate                              geometry
+  &lt;chr&gt;               &lt;chr&gt;          &lt;dbl&gt;                        &lt;MULTIPOLYGON&gt;
+1 global_moran_i      standard    4.12e- 1 (((381847 1762775, 381116 1763059, 3…
+2 global_moran_pvalue standard    7.23e-10 (((381847 1762775, 381116 1763059, 3…</code></pre>
+</div>
+</div>
+<p>Under the hood, waywiser uses two functions (<code>ww_build_neighbors()</code> and <code>ww_build_weights()</code>) to build sensible, if likely non-ideal neighbor lists and spatial weights for your data. However, waywiser also lets you provide your own weights object to override the automatic calculations, or provide a function to calculate spatial weights based on the input data frame:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">weights <span class="ot" style="color: #003B4F;">&lt;-</span> <span class="fu" style="color: #4758AB;">ww_build_weights</span>(guerry)</span>
+<span id="cb5-2"></span>
+<span id="cb5-3"><span class="fu" style="color: #4758AB;">ww_global_moran</span>(</span>
+<span id="cb5-4">  guerry, </span>
+<span id="cb5-5">  crime_pers, </span>
+<span id="cb5-6">  <span class="fu" style="color: #4758AB;">predict</span>(<span class="fu" style="color: #4758AB;">lm</span>(crime_pers <span class="sc" style="color: #5E5E5E;">~</span> literacy, guerry)),</span>
+<span id="cb5-7">  <span class="at" style="color: #657422;">wt =</span> weights</span>
+<span id="cb5-8">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 4
+  .metric             .estimator .estimate                              geometry
+  &lt;chr&gt;               &lt;chr&gt;          &lt;dbl&gt;                        &lt;MULTIPOLYGON&gt;
+1 global_moran_i      standard    4.12e- 1 (((381847 1762775, 381116 1763059, 3…
+2 global_moran_pvalue standard    7.23e-10 (((381847 1762775, 381116 1763059, 3…</code></pre>
+</div>
+</div>
+<p>Providing our own weights is necessary in order to use the <code>_vec()</code> versions of waywiser functions, which can be helpful for use in dplyr functions:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="co" style="color: #5E5E5E;"># For the %&gt;% pipe and mutate:</span></span>
+<span id="cb7-2"><span class="fu" style="color: #4758AB;">library</span>(dplyr)</span>
+<span id="cb7-3"><span class="co" style="color: #5E5E5E;"># For visualization:</span></span>
+<span id="cb7-4"><span class="fu" style="color: #4758AB;">library</span>(ggplot2)</span>
+<span id="cb7-5"></span>
+<span id="cb7-6">guerry <span class="sc" style="color: #5E5E5E;">%&gt;%</span></span>
+<span id="cb7-7">  <span class="fu" style="color: #4758AB;">mutate</span>(<span class="at" style="color: #657422;">pred =</span> <span class="fu" style="color: #4758AB;">predict</span>(<span class="fu" style="color: #4758AB;">lm</span>(crime_pers <span class="sc" style="color: #5E5E5E;">~</span> literacy, .)),</span>
+<span id="cb7-8">         <span class="at" style="color: #657422;">.estimate =</span> <span class="fu" style="color: #4758AB;">ww_local_moran_i_vec</span>(crime_pers, pred, weights)) <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb7-9">  sf<span class="sc" style="color: #5E5E5E;">::</span><span class="fu" style="color: #4758AB;">st_as_sf</span>() <span class="sc" style="color: #5E5E5E;">%&gt;%</span> </span>
+<span id="cb7-10">  <span class="fu" style="color: #4758AB;">ggplot</span>(<span class="fu" style="color: #4758AB;">aes</span>(<span class="at" style="color: #657422;">fill =</span> .estimate)) <span class="sc" style="color: #5E5E5E;">+</span></span>
+<span id="cb7-11">  <span class="fu" style="color: #4758AB;">geom_sf</span>() <span class="sc" style="color: #5E5E5E;">+</span> </span>
+<span id="cb7-12">  <span class="fu" style="color: #4758AB;">scale_fill_gradient2</span>(</span>
+<span id="cb7-13">    <span class="st" style="color: #20794D;">"Moran's I"</span>, </span>
+<span id="cb7-14">    <span class="at" style="color: #657422;">low =</span> <span class="st" style="color: #20794D;">"#018571"</span>, </span>
+<span id="cb7-15">    <span class="at" style="color: #657422;">mid =</span> <span class="st" style="color: #20794D;">"white"</span>, </span>
+<span id="cb7-16">    <span class="at" style="color: #657422;">high =</span> <span class="st" style="color: #20794D;">"#A6611A"</span></span>
+<span id="cb7-17">  ) <span class="sc" style="color: #5E5E5E;">+</span> </span>
+<span id="cb7-18">  <span class="fu" style="color: #4758AB;">theme_minimal</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2022-07-18-waywiser-010-is-now-on-cran/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The package currently provides three main indices of autocorrelation – namely, Moran’s I and Geary’s C (both in global and local variants), as well as Getis-Ord’s G and G* (only the local variant).</p>
+<p>This first version of the package integrates well with the rest of the tidymodels framework, <em>except</em> for the tune package (due to some difficulty in exposing either the original spatial data or the weights object to waywiser function while tuning a model). As a result, this version doesn’t let you include these functions as metrics to calculate inside of a call to <code>fit_resamples()</code>.</p>
+<p>The full list of features and documentation can be found on <a href="https://mikemahoney218.github.io/waywiser/">the package’s website</a>. This has been a really fun package to work on; I’m excited to see it out in public, and will look forward to seeing if anyone else finds it useful!</p>
+
+
+
+ ]]></description>
+  <guid>https://mm218.dev/posts/2022-07-18-waywiser-010-is-now-on-cran/index.html</guid>
+  <pubDate>Mon, 18 Jul 2022 04:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2022-07-18-waywiser-010-is-now-on-cran/waywiser.svg" medium="image" type="image/svg+xml"/>
+</item>
 <item>
   <title>Progress, Purpose, Process</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -55,7 +145,7 @@
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/fig1.png" class="img-fluid figure-img" width="1571"></p>
-<p></p><p></p>
+<p></p><figcaption class="figure-caption">Left: Where typical geodata-to-IVE workflows leave you. Right: Where terrainr gets you.</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -208,7 +298,7 @@
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://mm218.dev/posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/closer.jpg" class="img-fluid figure-img" width="886"></p>
-<p></p><p></p>
+<p></p><figcaption class="figure-caption">Everything the light touches can see &amp; be seen by the red dot. Users can interactively walk around the landscape to see for themselves if the viewshed algorithm gets things exactly right.</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -971,7 +1061,7 @@ Wintle, B. A., M. A. McCarthy, C. T. Volinsky, and R. P. Kavanagh. 2003. <span>�
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://mm218.dev/posts/2020/10/terrainr.jpg" class="img-fluid figure-img" width="2126"></p>
-<p></p><p></p>
+<p></p><figcaption class="figure-caption">A 3D landscape visualization of the area southeast of Mt. Whitney, California, USA.</figcaption><p></p>
 </figure>
 </div>
 </div>
