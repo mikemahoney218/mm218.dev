@@ -9,7 +9,7 @@
 <link>https://mm218.dev/blog.html</link>
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
-<generator>quarto-0.9.449</generator>
+<generator>quarto-1.0.27</generator>
 <lastBuildDate>Fri, 18 Feb 2022 05:00:00 GMT</lastBuildDate>
 <item>
   <title>Progress, Purpose, Process</title>
@@ -55,7 +55,7 @@
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/fig1.png" class="img-fluid figure-img" width="1571"></p>
-<p></p><p></p>
+<p></p><figcaption class="figure-caption">Left: Where typical geodata-to-IVE workflows leave you. Right: Where terrainr gets you.</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -205,7 +205,7 @@
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://mm218.dev/posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/closer.jpg" class="img-fluid figure-img" width="886"></p>
-<p></p><p></p>
+<p></p><figcaption class="figure-caption">Everything the light touches can see &amp; be seen by the red dot. Users can interactively walk around the landscape to see for themselves if the viewshed algorithm gets things exactly right.</figcaption><p></p>
 </figure>
 </div>
 </div>
@@ -956,7 +956,7 @@ Wintle, B. A., M. A. McCarthy, C. T. Volinsky, and R. P. Kavanagh. 2003. <span>â
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://mm218.dev/posts/2020/10/terrainr.jpg" class="img-fluid figure-img" width="2126"></p>
-<p></p><p></p>
+<p></p><figcaption class="figure-caption">A 3D landscape visualization of the area southeast of Mt. Whitney, California, USA.</figcaption><p></p>
 </figure>
 </div>
 </div>
