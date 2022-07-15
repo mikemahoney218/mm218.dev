@@ -99,6 +99,11 @@
 
 
  ]]></description>
+  <category>R</category>
+  <category>waywiser</category>
+  <category>tidymodels</category>
+  <category>R packages</category>
+  <category>geospatial data</category>
   <guid>https://mm218.dev/posts/2022-07-18-waywiser-010-is-now-on-cran/index.html</guid>
   <pubDate>Mon, 18 Jul 2022 04:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2022-07-18-waywiser-010-is-now-on-cran/waywiser.svg" medium="image" type="image/svg+xml"/>

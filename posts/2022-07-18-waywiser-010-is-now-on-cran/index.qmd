@@ -9,6 +9,7 @@ date: 2022-07-18
 format:
   html:
     df-print: paged
+categories: [R, waywiser, tidymodels, R packages, geospatial data]
 ---
 
 ![The waywiser hex sticker logo: a surveyor's wheel over the word "waywiser".](waywiser.svg)
