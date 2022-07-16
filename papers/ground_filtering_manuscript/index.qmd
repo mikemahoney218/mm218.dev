@@ -582,7 +582,8 @@ acc |>
   setNames(
     c(" ", "Unfiltered", "0m", "0.1m", "1m", "2m")
   )|> 
-  kable()
+  kbl() |> 
+  kable_styling(full_width = T)
 ```
 
 ```{r tbl-rmse, echo = FALSE, message = FALSE, warning = FALSE}
@@ -620,7 +621,8 @@ accuracy_table |>
   setNames(
     c("Region", "# Plots", "Unfiltered", "0m", "0.1m", "1m", "2m")
   )|> 
-  kable()
+  kbl() |> 
+  kable_styling(full_width = T)
 ```
 
 ```{r tbl-lme}
@@ -630,8 +632,9 @@ lme_tab <- read.csv("tables/holdout_set_lme.csv")
 lme_tab |> 
   dplyr::select(-df) |> 
   setNames(c(" ", "Coefficient", "Standard error", "t", "p")) |> 
-  kable() |> 
-  kableExtra::pack_rows("Filtering threshold", 2, 5)
+  kbl() |> 
+  kableExtra::pack_rows("Filtering threshold", 2, 5) |> 
+  kable_styling(full_width = T)
 ```
 
 Model accuracy was impacted most by filtering 
@@ -654,7 +657,8 @@ read.csv(
     c("Filtering threshold", "Edge density", "Patch density", "% Forest cover", "TRI")
   ) |> 
   dplyr::mutate(dplyr::across(where(is.numeric), scales::number, accuracy = 0.001)) |> 
-  kable()
+  kbl() |> 
+  kable_styling(full_width = T)
 ```
 
 # Discussion {#sec-discussion}
