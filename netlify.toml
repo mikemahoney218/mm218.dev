@@ -129,3 +129,7 @@
 [[redirects]]
   from = "/slides/user2021"
   to = "https://mikemahoney218.github.io/user2021/user2021_slides.html#2"
+
+[[redirects]]
+  from = "esip2022"
+  to = "https://mikemahoney218.github.io/2022-07-22_esip/2022-07-22_esip.html"
