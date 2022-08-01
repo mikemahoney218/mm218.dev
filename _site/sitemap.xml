@@ -2,118 +2,118 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://mm218.dev/portfolio/index.html</loc>
-    <lastmod>2022-07-22T13:17:07.022Z</lastmod>
+    <lastmod>2022-08-01T23:43:23.812Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/presentations/index.html</loc>
-    <lastmod>2022-07-22T13:17:07.298Z</lastmod>
+    <lastmod>2022-08-01T23:43:24.148Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/junkdrawer/summer2021/index.html</loc>
-    <lastmod>2022-07-22T13:17:07.842Z</lastmod>
+    <lastmod>2022-08-01T23:43:24.724Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/junkdrawer/riemann/index.html</loc>
-    <lastmod>2022-07-22T13:17:11.614Z</lastmod>
+    <lastmod>2022-08-01T23:43:30.344Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/blog.html</loc>
-    <lastmod>2022-07-22T13:17:12.054Z</lastmod>
+    <lastmod>2022-08-01T23:43:30.788Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/vr/index.html</loc>
-    <lastmod>2022-07-22T13:17:12.558Z</lastmod>
+    <lastmod>2022-08-01T23:43:31.316Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/index.html</loc>
-    <lastmod>2022-07-22T13:17:12.738Z</lastmod>
+    <lastmod>2022-08-01T23:43:31.500Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/quotes/index.html</loc>
-    <lastmod>2022-07-22T13:17:13.722Z</lastmod>
+    <lastmod>2022-08-01T23:43:32.632Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/papers/index.html</loc>
-    <lastmod>2022-07-22T13:17:13.898Z</lastmod>
+    <lastmod>2022-08-01T23:43:32.832Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/papers/ground_filtering/index.html</loc>
-    <lastmod>2022-07-22T13:17:14.614Z</lastmod>
+    <lastmod>2022-08-01T23:43:33.620Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2022-02-18-progress-purpose-process/index.html</loc>
-    <lastmod>2022-07-22T13:17:14.822Z</lastmod>
+    <lastmod>2022-08-01T23:43:33.828Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html</loc>
-    <lastmod>2022-07-22T13:17:15.134Z</lastmod>
+    <lastmod>2022-08-01T23:43:34.208Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html</loc>
-    <lastmod>2022-07-22T13:17:15.322Z</lastmod>
+    <lastmod>2022-08-01T23:43:34.488Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/index.html</loc>
-    <lastmod>2022-07-22T13:17:15.506Z</lastmod>
+    <lastmod>2022-08-01T23:43:34.700Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2021/01/model-averaging/index.html</loc>
-    <lastmod>2022-07-22T13:17:16.010Z</lastmod>
+    <lastmod>2022-08-01T23:43:35.312Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2021/02/terrainr/index.html</loc>
-    <lastmod>2022-07-22T13:17:16.330Z</lastmod>
+    <lastmod>2022-08-01T23:43:35.668Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2019/03/index.html</loc>
-    <lastmod>2022-07-22T13:17:16.506Z</lastmod>
+    <lastmod>2022-08-01T23:43:35.852Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2020/05/index.html</loc>
-    <lastmod>2022-07-22T13:17:16.746Z</lastmod>
+    <lastmod>2022-08-01T23:43:36.100Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2020/01/index.html</loc>
-    <lastmod>2022-07-22T13:17:16.934Z</lastmod>
+    <lastmod>2022-08-01T23:43:36.292Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2020/04/mechanics-of-viz/index.html</loc>
-    <lastmod>2022-07-22T13:17:17.438Z</lastmod>
+    <lastmod>2022-08-01T23:43:36.864Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2020/04/theory-of-data-viz/index.html</loc>
-    <lastmod>2022-07-22T13:17:17.774Z</lastmod>
+    <lastmod>2022-08-01T23:43:37.204Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2020/04/making-excellent-viz/index.html</loc>
-    <lastmod>2022-07-22T13:17:18.014Z</lastmod>
+    <lastmod>2022-08-01T23:43:37.476Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2020/04/corona-viz/index.html</loc>
-    <lastmod>2022-07-22T13:17:18.282Z</lastmod>
+    <lastmod>2022-08-01T23:43:37.772Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2020/06/index.html</loc>
-    <lastmod>2022-07-22T13:17:18.458Z</lastmod>
+    <lastmod>2022-08-01T23:43:37.976Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2020/03/index.html</loc>
-    <lastmod>2022-07-22T13:17:18.622Z</lastmod>
+    <lastmod>2022-08-01T23:43:38.184Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2020/10/index.html</loc>
-    <lastmod>2022-07-22T13:17:18.818Z</lastmod>
+    <lastmod>2022-08-01T23:43:38.404Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2021-06-12-virtual-environments-talk-at-user-2021/index.html</loc>
-    <lastmod>2022-07-22T13:17:18.982Z</lastmod>
+    <lastmod>2022-08-01T23:43:38.624Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/posts/2021-04-22-terrainr-version-040-is-now-on-cran/index.html</loc>
-    <lastmod>2022-07-22T13:17:19.198Z</lastmod>
+    <lastmod>2022-08-01T23:43:38.928Z</lastmod>
   </url>
   <url>
     <loc>https://mm218.dev/cdi/index.html</loc>
-    <lastmod>2022-07-22T13:17:19.606Z</lastmod>
+    <lastmod>2022-08-01T23:43:39.409Z</lastmod>
   </url>
 </urlset>
