@@ -1,0 +1,61 @@
+---
+title: "Cool graphs about elevators"
+author: Mike Mahoney
+subtitle: "Last generated on: `r Sys.Date()`"
+date: today
+format: 
+  html: 
+    echo: false
+params: 
+  borough: "NA"
+---
+
+
+```{r}
+#| message: false
+library(elevators)
+
+if (!is.na(params$borough) && params$borough != "NA") {
+  elevators <- elevators[elevators$borough == params$borough, ]
+}
+if (nrow(elevators) == 0) {
+  stop("No elevators were selected. Did you misspell `borough`?")
+}
+
+library(ggplot2)
+theme_set(theme_minimal())
+```
+
+## Speed over time
+
+```{r}
+#| message: false
+#| warning: false
+elevators |> 
+  ggplot(aes(approval_date, speed_fpm)) + 
+  geom_point(alpha = 0.05) + 
+  geom_smooth() + 
+  scale_y_log10()
+```
+
+## Speed versus capacity
+
+```{r}
+#| message: false
+#| warning: false
+elevators |> 
+  ggplot(aes(capacity_lbs, speed_fpm)) + 
+  geom_point(alpha = 0.05) + 
+  geom_smooth() + 
+  scale_y_log10()
+```
+
+## Where in the world did all my elevators go
+
+```{r}
+elevators |> 
+  ggplot(aes(latitude, longitude)) + 
+  geom_point(alpha = 0.05) + 
+  coord_sf()
+```
+

@@ -1,0 +1,182 @@
+---
+title: "How to use Quarto for Parameterized Reporting"
+description: |
+  You know. If you wanna.
+author:
+  - name: Mike Mahoney
+    url: {}
+date: today
+categories: ["R", "Tutorials", "Quarto"]
+image: elevator.jpg
+format: 
+  html:
+    df-print: paged
+    toc: true
+engine: knitr
+---
+
+There's a lot of conversations around about [Quarto](https://quarto.org/) as a new system for technical communication. And that's well deserved! Quarto, the successor to the R Markdown system, extends and improves upon its predecessor and produces downright beautiful documents (including this very website).
+
+But as a recovering data analyst, the thing that I'm most excited about with Quarto is its ability to generate reports based on a document template and a handful of parameter values. A whole lot of my professional career has amounted to "report out the same handful of KPIs every day (or month, or quarter), aggregated to each relevant business unit and a handful of combined groups." R Markdown's parameterized reporting let me automate that boring stuff and spend my time on more fun (and higher impact) projects, and Quarto supports more or less the same style of templating. As such, this blog post walks through how you can use parameterization to automate your own reporting with Quarto.
+
+# A Simple Script
+
+Let's say that you have a colleague who's really into elevators (like, inexplicably interested in elevators). Because of this interest, and because you're already working on a blog post showing off how cool Quarto is, you decide to use data about elevators in a small example script you're working on to make them happy.
+
+Well, luckily enough, my colleague Emil Hvitfeldt has [a package on GitHub with data about elevators](https://github.com/EmilHvitfeldt/elevators/). Let's install it now:
+
+```{r}
+#| eval: false
+# install.packages("remotes")
+remotes::install_github("EmilHvitfeldt/elevators")
+```
+
+This package includes a tibble, `elevators`, which contains quite a few observations of quite a few variables describing the elevators throughout New York City:
+
+```{r}
+elevators::elevators
+```
+
+Because all you're doing is writing a small example script, you just grab a few variables at random and plot them in a pretty simple Quarto document. That `.qmd` looks like this:
+
+{{< include ./a-simple-script/include >}}
+
+(You can see what this looks like when rendered over at [this link](../../junkdrawer/a-simple-script/).)
+
+With your small example all set, you rush off to show it to friends and family before officially publishing it to the web.
+
+# Parameterized Reports
+
+Your colleague likes your report! However, as it goes when you show people a graph, they have _questions_. They want to know: what would these graphs look like for only Manhattan?
+
+This isn't your first time [giving a colleague some data](https://en.wikipedia.org/wiki/If_You_Give_a_Mouse_a_Cookie), and so you know better than to just scrape the data and email them a number. Instead, you edit your Quarto file so that it could filter to any borough, and make it easy to change the filter based on [Quarto parameters](https://quarto.org/docs/computations/parameters.html):
+
+{{< include ./parameterized-reports/include >}}
+
+Now, by default, this output looks [the same as the last time](../../junkdrawer/parameterized-reports/). However, when we run `quarto render` now, we can either pass parameters on the command line, for instance using:
+
+```bash
+quarto render elevators.qmd -P borough:Manhattan
+```
+
+Or, we can write a YAML file with our parameters (say, `params.yml`): 
+
+```yaml
+borough: Manhattan
+```
+
+And call `quarto render` via:
+
+```bash
+quarto render elevators.qmd --execute-params params.yml
+```
+
+(The results of this approach are at [this link](../../junkdrawer/parameterized-reports/manhattan).)
+
+This will make it easier to re-run your report every time your colleague comes to you with "one last" request.
+
+Or, heck, if they have R installed you can make them run it themselves. You spend an hour bashing out a Shiny app and save it in the same folder as `elevators.qmd`:
+
+```r
+required_packages <- c("shiny", "ggplot2", "quarto", "rmarkdown", "remotes")
+for (x in required_packages) {
+  if (!requireNamespace(x, quietly = TRUE)) install.packages(x)
+}
+if (!requireNamespace("elevators", quietly = TRUE)) {
+  remotes::install_github("EmilHvitfeldt/elevators")
+}
+
+library(shiny)
+elevators <- elevators::elevators
+
+ui <- fluidPage(
+
+    titlePanel("Self-Service Elevator Analytics"),
+
+    selectizeInput(
+        "borough",
+        "Borough:",
+        c("NA", unique(as.character(elevators$borough)))),
+
+    actionButton(
+        "render",
+        "Render!"
+    ),
+
+    textOutput("status")
+)
+
+server <- function(input, output) {
+
+    output$status <- renderText({
+        if (input$render) {
+            isolate(
+                quarto::quarto_render(
+                    "elevators.qmd",
+                    execute_params = list(borough = input$borough)
+                )
+            )
+            paste("Rendering complete at", Sys.time())
+        }
+    })
+
+}
+
+shinyApp(ui = ui, server = server)
+```
+
+Now your colleague just needs to open the file in RStudio, click the cute little "Run App" button, and then they can answer all elevator questions to their heart's content. If you set up your Quarto document to generate PDFs, they can even email their reports to other elevator enthusiasts.
+
+# More Complicated Logic
+
+Your app has been a hit with your colleague! In fact, possibly too much of a hit. After a recent [trip](https://github.com/rstudio/rstudio-conf-2022-program), they've collected a bunch more data reflecting elevators across Maryland, and are wondering if you'd be able to extend your report to support this new dataset as well.
+
+You have now become appropriately resigned to the fact that you are now "the elevator guy", and will have weird facts about elevator speeds stored in your brain until the end of time. So you start digging into the Maryland data:
+
+```{r}
+elevators::md_elevators
+```
+
+Now Maryland, being worse than New York, doesn't give you all the same information that you used for your original report. That means that only one of our graphs will actually render for both states.
+
+Luckily, Quarto lets us selectively render parts of the report using standard [chunk options](https://quarto.org/docs/computations/r.html#chunk-options). By making chunk evaluation conditional on the state being described, we can make our single report work for both states.
+
+With some tweaking, we can edit our `.qmd` so it works for both states:
+
+{{< include ./more-complicated-logic/include >}}
+
+Our New York report looks the same as ever, while the Maryland report [has a little less content](../../junkdrawer/more-complicated-logic/). As it deserves.
+
+# Parameterized SQL
+
+But why stop there? Everyone loves your report. You're crowned elevator king. You've made your peace with knowing you'll never do anything but elevators again.
+
+In order to make your life a little bit easier, you've loaded your elevator data into a database, so you don't need to keep track of the individual tables:
+
+```{r}
+#| eval: false
+library(DBI)
+library(RSQLite)
+con <- DBI::dbConnect(RSQLite::SQLite(), "elevators.db")
+DBI::dbWriteTable(
+  con, 
+  "ny_elevators", 
+  elevators::elevators, 
+  overwrite = TRUE
+)
+DBI::dbWriteTable(
+  con, 
+  "md_elevators", 
+  elevators::md_elevators, 
+  overwrite = TRUE
+)
+DBI::dbDisconnect(con)
+```
+
+This will make it easier to incorporate additional data into your report, as new elevators are constructed and your colleague visits new states. It's easy enough to change your report over so that it reads from the database:
+
+{{< include ./parameterized-sql/include >}}
+
+Note that I'm using `DBI::sqlInterpolate()` and `DBI::dbQuoteIdentifier()`, to make sure we're protecting our database from SQL injection attacks. And for this toy example, I'm hard-coding the database connection in. If your organization has a smart way to manage credentials, you'll probably want to plug into that system (and should _definitely_ not be storing passwords as plaintext in the file).
+
+And to step out of the bit for a minute, there's no reason that your Quarto document actually needs to generate a meaningful report. Sure, automatically updating a website (or emailing a PDF) is nice, but Quarto documents are able to run SQL queries, write out files, and do any other task you can do with any of the languages supported by knitr or jupyter. This makes it really easy to write powerful scripts that your colleagues can use to access and understand whatever data you're working with. 
