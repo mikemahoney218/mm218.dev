@@ -120,3 +120,4 @@ dist
 
 /.quarto/
 *.tif
+elevators.db
