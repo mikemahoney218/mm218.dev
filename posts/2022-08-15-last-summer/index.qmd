@@ -42,7 +42,7 @@ The main thrust (and originally, the entire scope) of the internship was writing
 
 ![The results of calling `autoplot()` on a spatial clustering CV object, for the city of Boston.](autoplot.png)
 
-That meant a pretty huge update to the package, and that version is [on CRAN now](https://www.tidyverse.org/blog/2022/06/spatialsample-0-2-0/). A small patch is coming in the next few weeks to speed up buffering, work better with simulated data, and make me the official package maintainer as Julia moves to focus more on ModelOps.
+That meant a pretty huge update to the package, and that version was released [on CRAN as version 0.2.0](https://www.tidyverse.org/blog/2022/06/spatialsample-0-2-0/). A small patch to speed up buffering, work better with simulated data, and make me the official package maintainer as Julia moves to focus more on ModelOps just hit CRAN last Friday.
 
 I also wrote [a package vignette](https://spatialsample.tidymodels.org/articles/buffering.html) on spatial buffering, and [an article for tidymodels.org](https://www.tidymodels.org/learn/work/multi-scale/) on how to use spatialsample for multi-scale model assessment.
 
