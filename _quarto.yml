@@ -9,7 +9,7 @@ website:
   title: "Mike Mahoney"
   site-url: https://mm218.dev
   description: "Technology and the Environment"
-  opengraph: true
+  open-graph: true
   twitter-card:
     creator: "@MikeMahoney218"
   comments:
