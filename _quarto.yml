@@ -10,7 +10,6 @@ website:
   site-url: https://mm218.dev
   description: "Technology and the Environment"
   open-graph:
-    image: "avatar.jpg"
     locale: en_US
   twitter-card:
     creator: "@MikeMahoney218"
