@@ -13,7 +13,7 @@ format:
 engine: knitr
 ---
 
-I'm wrapping up three months as an open-source intern with [Posit](https://posit.co/) (née [RStudio](https://www.rstudio.com/)). I wanted to write a small post talking a bit about what it was like and what we got done in that timespan. So, well, this is that post[^1].
+I'm wrapping up three months as an open-source intern with [Posit](https://posit.co/) (née [RStudio](https://www.rstudio.com/)). I wanted to write a small post talking a bit about what it was like and what we got done in that timespan. So, well, this post[^1].
 
 # The Job Itself
 
@@ -22,6 +22,10 @@ Let's not bury the lede: this internship was an absolute blast.
 I could not have asked to work with a better group than the tidymodels team, who are all consistently fantastic people. It's rare to find a group this consistently brilliant, and more importantly also this consistently friendly, inclusive, and welcoming. Working directly with Hannah Frick and Julia Silge was absolutely incredible; I highly recommend it for anyone if the opportunity comes up.
 
 The internship started off with an in-person work week (at the _beautiful_ Boston office[^2]), and then more or less wrapped up with the last ever[^3] RStudio::conf() (perhaps the best in-person conference experience I've had). This was a fantastic way to structure what was otherwise a fully remote position, and I'm extremely appreciative of getting to work with the team both in-person and remotely over the span of the internship.
+
+It was a great few months, I learned a lot -- about programming and design, sure, but also about technical communication, working in the open, interacting with an open source community, and more.
+
+And we did some really cool things! Speaking of which...
 
 # The Things We Did
 
