@@ -1,0 +1,16 @@
+{
+  "hash": "8c787c7dd6b388eec8cc13ca2bd963d3",
+  "result": {
+    "markdown": "---\ntitle: \"Cool graphs about elevators\"\nauthor: Mike Mahoney\nsubtitle: \"Last generated on: 2022-08-08\"\ndate: today\nexecute:\n  freeze: true\nformat: \n  html: \n    echo: false\nparams: \n  region: \"NA\"\n  state: \"MD\"\n---\n\n::: {.cell}\n\n:::\n\n::: {.cell}\n\n:::\n\n\n\n\n\n\n## Speed versus capacity\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](index_files/figure-html/unnamed-chunk-5-1.png){width=672}\n:::\n:::\n\n\n\n\n",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

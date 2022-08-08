@@ -4,7 +4,7 @@ description: "An RStudio internship retrospective"
 author:
   - name: Mike Mahoney
     url: {}
-date: today
+date: "2022-08-12"
 categories: ["R", "Internship", "Quarto"]
 image: autoplot.png
 format: 
@@ -63,7 +63,7 @@ After the spatialsample release, I had the opportunity to start poking around th
 
 I also added a new [overview vignette](https://rsample.tidymodels.org/dev/articles/Common_Patterns.html) covering some of the most commonly used functions in the package, which I think will be a good first point of entry for a lot of users.
 
-I'm particularly excited for the grouped resampling functions to hit CRAN, since I think those will solve a very common use-case for a lot of people working with repeated measures data.
+All of this hit CRAN as [rsample 1.1.0](https://cran.r-project.org/package=rsample) on Monday. I'm particularly excited for the grouped resampling functions to hit CRAN, since I think those will solve a very common use-case for a lot of people working with repeated measures data.
 
 ## waywiser
 
