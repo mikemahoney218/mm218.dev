@@ -15,6 +15,8 @@ format:
 engine: knitr
 ---
 
+![Selected LiDAR-derived predictor distributions for the unfiltered LiDAR data set, as well as four separate filtering thresholds. Each subplot is scaled independently so that the X-axis represents the full range of that predictor and the Y-axis represents the full range of the kernel density estimate of that predictor.](distributions.jpeg)
+
 I have a new open-access article, "[Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass in heterogenous landscapes](https://doi.org/10.1080/15481603.2022.2103069)", out today in GIScience & Remote Sensing. 
 
 A very common pre-processing step, when deriving predictors for machine learning models from LiDAR point clouds, is to filter out "ground returns" based on a simple height threshold (where all returns below a certain level are removed). This practice comes from the early days of LiDAR, where researchers were attempting to measure the heights of individual trees using LiDAR returns, and makes a lot of sense in that context; if a return didn't hit a tree, it probably can't tell you much about how tall that tree is. But the process stuck around as we moved from modeling trees to forests, and knowing that a return _could_ reach the ground -- that it was able to find a gap in the canopy to reach the ground through -- might reflect important characteristics of stand openness and therefore structure.
