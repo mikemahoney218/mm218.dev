@@ -1,0 +1,16 @@
+{
+  "hash": "130f4bf0eb582cb6b34bde357cc88e07",
+  "result": {
+    "markdown": "---\ntitle: \"Cool graphs about elevators\"\nauthor: Mike Mahoney\nsubtitle: \"Last generated on:\"\ndate: today\nformat: \n  html: \n    echo: false\n---\n\n::: {.cell}\n\n:::\n\n\n## Speed over time\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](index_files/figure-html/unnamed-chunk-2-1.png){width=672}\n:::\n:::\n\n\n## Speed versus capacity\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](index_files/figure-html/unnamed-chunk-3-1.png){width=672}\n:::\n:::\n\n\n## Where in the world did all my elevators go\n\n\n::: {.cell}\n::: {.cell-output-display}\n![](index_files/figure-html/unnamed-chunk-4-1.png){width=672}\n:::\n:::\n",
+    "supporting": [
+      "index_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "hash": "b4801a4ff29793d1a5602e22c722183b",
+  "result": {
+    "markdown": "\n## Speed over time\n\n\n::: {.cell}\n\n```{.r .cell-code}\ntry(\n  elevators |> \n    ggplot(aes(approval_date, speed_fpm)) + \n    geom_point(alpha = 0.05) + \n    geom_smooth() + \n    scale_y_log10()\n)\n```\n\n::: {.cell-output .cell-output-stdout}\n```\nError in ggplot(elevators, aes(approval_date, speed_fpm)) : \n  could not find function \"ggplot\"\n```\n:::\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

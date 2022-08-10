@@ -1,10 +1,17 @@
 project:
   type: website
+  resources:
+    - keybase.txt
+    - resume.pdf
+    - cv.pdf
 
 website:
   title: "Mike Mahoney"
   site-url: https://mm218.dev
   description: "Technology and the Environment"
+  open-graph: true
+  twitter-card:
+    creator: "@MikeMahoney218"
   comments:
     utterances:
       repo: mikemahoney218/mm218.dev

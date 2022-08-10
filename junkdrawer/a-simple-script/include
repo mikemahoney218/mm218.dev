@@ -1,0 +1,51 @@
+```` markdown
+---
+title: "Cool graphs about elevators"
+author: Mike Mahoney
+subtitle: "Last generated on:"
+date: today
+format:
+  html:
+    echo: false
+---
+
+```{{r}}
+#| message: false
+library(elevators)
+library(ggplot2)
+theme_set(theme_minimal())
+```
+
+## Speed over time
+
+```{{r}}
+#| message: false
+#| warning: false
+elevators |>
+  ggplot(aes(approval_date, speed_fpm)) +
+  geom_point(alpha = 0.05) +
+  geom_smooth() +
+  scale_y_log10()
+```
+
+## Speed versus capacity
+
+```{{r}}
+#| message: false
+#| warning: false
+elevators |>
+  ggplot(aes(capacity_lbs, speed_fpm)) +
+  geom_point(alpha = 0.05) +
+  geom_smooth() +
+  scale_y_log10()
+```
+
+## Where in the world did all my elevators go
+
+```{{r}}
+elevators |>
+  ggplot(aes(longitude, latitude)) + 
+  geom_point(alpha = 0.05) +
+  coord_sf()
+```
+````
