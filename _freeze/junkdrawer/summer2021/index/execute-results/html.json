@@ -1,0 +1,14 @@
+{
+  "hash": "3c460f176d84286710e8aeff8ed35814",
+  "result": {
+    "markdown": "---\ntitle: \"Summer 2021 Targets\"\noutput: distill::distill_article\n---\n\n\n## CAFRI\n\n### LiDAR-Year AGB\n\n+ Otherwise, unless we have more observations or are willing to compute more predictors, I think this is pretty well set\n\n### Historic AGB\n\n+ Historic AGB map accuracy pipeline\n+ I think it makes sense for me to start getting more involved with this end, & give historical models the attention I've given the LiDAR-year set. But I haven't been particularly involved before, I don't know what this entails beyond:\n\t+ Work with non-WWE sets\n\t+ Include more predictors\n\t+ Ensembling\n\n### Infrastructure\n\n+ Break up model building notebook into functions; probably its own package\n\n### Other\n\n+ Carbon Accounting Tool\n\n\n## Dissertation Research\n\n+ Write proposal\n+ terrain-into-Unity pipeline\n+ Place arbitrary object pipeline\n+ Stretch goal: chapter 1 (On Abstraction)\n+ Stretch goal: chapter 2 (survey of environmental visualization)\n\n\n## ML Course\n\n+ Write course handouts\n+ Write assignments\n\n\n## Personal\n\n+ No plans yet but going to try to disappear into the woods for a week if I can swing it\n\n## Completed\n\n### LiDAR-Year AGB\n\n+ Add in the missing 30ish plots\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
