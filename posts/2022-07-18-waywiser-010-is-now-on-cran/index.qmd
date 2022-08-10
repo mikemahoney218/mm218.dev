@@ -5,7 +5,7 @@ description: |
   in model residuals. 
 author:
   - name: Mike Mahoney
-date: 2022-07-18
+date: 2022-08-11
 format:
   html:
     df-print: paged
