@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/2022-08-15-last-summer/index.html",
       "/posts/2022-08-11-waywiser-010-is-now-on-cran/index.html",
       "/posts/2022-08-10-ground-filtering/index.html",
       "/posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html",
