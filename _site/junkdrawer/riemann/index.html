@@ -190,83 +190,83 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p>Because Riemann et al.&nbsp;were working with data from the US Forest Inventory and Analysis (FIA) program, we’re going to do the same. However, because our main goal is to show how spatialsample can support this type of analysis, we won’t spend a ton of time worrying about any of the quirks of FIA data<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> or on feature engineering. Instead, we’re going to use a simple linear model to see if we can predict how much aboveground biomass (“AGB”; all the non-root woody bits) there is in a forest based on how many trees there are. We’ll use all the FIA field data from New York State, USA.</p>
 <p>Because we’re mostly interested in assessing our models, I’m going to mostly ignore how exactly I downloaded and wrangled the FIA data for this post. If you’re curious, I’ve hidden the code below:</p>
 <div class="cell" data-hash="index_cache/html/unnamed-chunk-2_a9a1daa216dd073497bd1026dab2f7e9">
-<details><summary>Code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Download the FIA database for New York over the internet,</span></span>
-<span><span class="co"># and unzip it into our local directory</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co"># This updates annually, which means that this post likely won't</span></span>
-<span><span class="co"># generate the exact same results after 2022</span></span>
-<span><span class="fu">httr</span><span class="fu">::</span><span class="fu"><a href="https://httr.r-lib.org/reference/GET.html">GET</a></span><span class="op">(</span></span>
-<span>  <span class="st">"https://apps.fs.usda.gov/fia/datamart/Databases/SQLite_FIADB_NY.zip"</span>,</span>
-<span>  <span class="fu">httr</span><span class="fu">::</span><span class="fu"><a href="https://httr.r-lib.org/reference/write_disk.html">write_disk</a></span><span class="op">(</span><span class="st">"SQLite_FIADB_NY.zip"</span>, <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/unzip.html">unzip</a></span><span class="op">(</span><span class="st">"SQLite_FIADB_NY.zip"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># We're going to work with the database through dplyr's database connections</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co"># But first, we need to create a DBI connection to the database and</span></span>
-<span><span class="co"># load out tables:</span></span>
-<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, dbname <span class="op">=</span> <span class="st">"FIADB_NY.db"</span><span class="op">)</span></span>
-<span><span class="va">trees</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"TREE"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">plots</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"PLOT"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># The FIA database has every measurement ever collected by the program;</span></span>
-<span><span class="co"># we'll filter to only the most recent survey for each of the plots.</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co"># Plots are measured on a rolling 7 year basis, so we'll also cut out any</span></span>
-<span><span class="co"># plots which might not be remeasured anymore with a call to filter()</span></span>
-<span><span class="va">plots</span> <span class="op">&lt;-</span> <span class="va">plots</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">PLOT</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">INVYR</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">INVYR</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">INVYR</span> <span class="op">&gt;</span> <span class="fl">2009</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span><span class="op">(</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="va">plots</span>, <span class="st">"newest_plots"</span>, <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="va">newest_plots</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"newest_plots"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Now we'll use a filtering join to select only trees measured in the most</span></span>
-<span><span class="co"># recent sample at each plot</span></span>
-<span><span class="co">#</span></span>
-<span><span class="co"># We'll also count how many trees were at each plot,</span></span>
-<span><span class="co"># sum up their AGB, </span></span>
-<span><span class="co"># and save out a few other useful columns like latitude and longitude</span></span>
-<span><span class="va">plot_measurements</span> <span class="op">&lt;-</span> <span class="va">trees</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">right_join</a></span><span class="op">(</span><span class="va">newest_plots</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"INVYR"</span>, <span class="st">"PLOT"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">PLOT</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span></span>
-<span>    yr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">INVYR</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    plot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">PLOT</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">LAT</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    long <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">LON</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    n_trees <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
-<span>    agb <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">DRYBIO_AG</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
-<span>    <span class="co"># Because of how we joined, `n_trees` is always at least 1 -- </span></span>
-<span>    <span class="co"># even if there are 0 trees</span></span>
-<span>    n_trees <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">agb</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">n_trees</span> <span class="op">==</span> <span class="fl">1</span>, <span class="fl">0</span>, <span class="va">n_trees</span><span class="op">)</span>,</span>
-<span>    agb <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">agb</span><span class="op">)</span>, <span class="fl">0</span>, <span class="va">agb</span><span class="op">)</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/write_delim.html">write_csv</a></span><span class="op">(</span><span class="va">plot_measurements</span>, <span class="st">"plot_measurements.csv"</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<details><summary>Code</summary><div class="sourceCode" id="cb1"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+
+<span class="co"># Download the FIA database for New York over the internet,</span>
+<span class="co"># and unzip it into our local directory</span>
+<span class="co">#</span>
+<span class="co"># This updates annually, which means that this post likely won't</span>
+<span class="co"># generate the exact same results after 2022</span>
+<span class="fu">httr</span><span class="fu">::</span><span class="fu"><a href="https://httr.r-lib.org/reference/GET.html">GET</a></span><span class="op">(</span>
+  <span class="st">"https://apps.fs.usda.gov/fia/datamart/Databases/SQLite_FIADB_NY.zip"</span>,
+  <span class="fu">httr</span><span class="fu">::</span><span class="fu"><a href="https://httr.r-lib.org/reference/write_disk.html">write_disk</a></span><span class="op">(</span><span class="st">"SQLite_FIADB_NY.zip"</span>, <span class="cn">TRUE</span><span class="op">)</span>
+<span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/utils/unzip.html">unzip</a></span><span class="op">(</span><span class="st">"SQLite_FIADB_NY.zip"</span><span class="op">)</span>
+
+<span class="co"># We're going to work with the database through dplyr's database connections</span>
+<span class="co">#</span>
+<span class="co"># But first, we need to create a DBI connection to the database and</span>
+<span class="co"># load out tables:</span>
+<span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbConnect.html">dbConnect</a></span><span class="op">(</span><span class="fu">RSQLite</span><span class="fu">::</span><span class="fu"><a href="https://rsqlite.r-dbi.org/reference/SQLite.html">SQLite</a></span><span class="op">(</span><span class="op">)</span>, dbname <span class="op">=</span> <span class="st">"FIADB_NY.db"</span><span class="op">)</span>
+<span class="va">trees</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"TREE"</span><span class="op">)</span>
+
+<span class="va">plots</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"PLOT"</span><span class="op">)</span>
+
+<span class="co"># The FIA database has every measurement ever collected by the program;</span>
+<span class="co"># we'll filter to only the most recent survey for each of the plots.</span>
+<span class="co">#</span>
+<span class="co"># Plots are measured on a rolling 7 year basis, so we'll also cut out any</span>
+<span class="co"># plots which might not be remeasured anymore with a call to filter()</span>
+<span class="va">plots</span> <span class="op">&lt;-</span> <span class="va">plots</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">PLOT</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">INVYR</span> <span class="op">==</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html">max</a></span><span class="op">(</span><span class="va">INVYR</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">ungroup</a></span><span class="op">(</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">INVYR</span> <span class="op">&gt;</span> <span class="fl">2009</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span><span class="op">(</span><span class="op">)</span>
+
+<span class="fu"><a href="https://dplyr.tidyverse.org/reference/copy_to.html">copy_to</a></span><span class="op">(</span><span class="va">con</span>, <span class="va">plots</span>, <span class="st">"newest_plots"</span>, <span class="cn">TRUE</span><span class="op">)</span>
+<span class="va">newest_plots</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/tbl.html">tbl</a></span><span class="op">(</span><span class="va">con</span>, <span class="st">"newest_plots"</span><span class="op">)</span>
+
+<span class="co"># Now we'll use a filtering join to select only trees measured in the most</span>
+<span class="co"># recent sample at each plot</span>
+<span class="co">#</span>
+<span class="co"># We'll also count how many trees were at each plot,</span>
+<span class="co"># sum up their AGB, </span>
+<span class="co"># and save out a few other useful columns like latitude and longitude</span>
+<span class="va">plot_measurements</span> <span class="op">&lt;-</span> <span class="va">trees</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html">right_join</a></span><span class="op">(</span><span class="va">newest_plots</span>, by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"INVYR"</span>, <span class="st">"PLOT"</span><span class="op">)</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html">group_by</a></span><span class="op">(</span><span class="va">PLOT</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html">summarise</a></span><span class="op">(</span>
+    yr <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">INVYR</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,
+    plot <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">PLOT</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,
+    lat <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">LAT</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,
+    long <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/mean.html">mean</a></span><span class="op">(</span><span class="va">LON</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,
+    n_trees <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html">n</a></span><span class="op">(</span><span class="op">)</span>,
+    agb <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="va">DRYBIO_AG</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
+  <span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/compute.html">collect</a></span><span class="op">(</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>
+    <span class="co"># Because of how we joined, `n_trees` is always at least 1 -- </span>
+    <span class="co"># even if there are 0 trees</span>
+    n_trees <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">agb</span><span class="op">)</span> <span class="op">&amp;</span> <span class="va">n_trees</span> <span class="op">==</span> <span class="fl">1</span>, <span class="fl">0</span>, <span class="va">n_trees</span><span class="op">)</span>,
+    agb <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html">ifelse</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html">is.na</a></span><span class="op">(</span><span class="va">agb</span><span class="op">)</span>, <span class="fl">0</span>, <span class="va">agb</span><span class="op">)</span>
+  <span class="op">)</span>
+
+<span class="fu">DBI</span><span class="fu">::</span><span class="fu"><a href="https://dbi.r-dbi.org/reference/dbDisconnect.html">dbDisconnect</a></span><span class="op">(</span><span class="va">con</span><span class="op">)</span>
+
+<span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/write_delim.html">write_csv</a></span><span class="op">(</span><span class="va">plot_measurements</span>, <span class="st">"plot_measurements.csv"</span><span class="op">)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 </div>
 <p>With that pre-processing done, it’s time for us to load our data and turn it into an sf object. We’re going to reproject our data to use a coordinate reference system that the US government tends to use for national data products, like the FIA:</p>
 <div class="cell" data-hash="index_cache/html/unnamed-chunk-3_8d519cb783ecc24ab9ab71a89c72cfbd">
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/">sf</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html">invisible</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/proj_tools.html">sf_proj_network</a></span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">plot_measurements</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"https://www.mm218.dev/junkdrawer/riemann/plot_measurements.csv"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html">st_as_sf</a></span><span class="op">(</span>coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"long"</span>, <span class="st">"lat"</span><span class="op">)</span>, crs <span class="op">=</span> <span class="fl">4326</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html">st_transform</a></span><span class="op">(</span><span class="fl">5070</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://r-spatial.github.io/sf/">sf</a></span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/base/invisible.html">invisible</a></span><span class="op">(</span><span class="fu"><a href="https://r-spatial.github.io/sf/reference/proj_tools.html">sf_proj_network</a></span><span class="op">(</span><span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span>
+
+<span class="va">plot_measurements</span> <span class="op">&lt;-</span> <span class="fu">readr</span><span class="fu">::</span><span class="fu"><a href="https://readr.tidyverse.org/reference/read_delim.html">read_csv</a></span><span class="op">(</span><span class="st">"https://www.mm218.dev/junkdrawer/riemann/plot_measurements.csv"</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html">st_as_sf</a></span><span class="op">(</span>coords <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"long"</span>, <span class="st">"lat"</span><span class="op">)</span>, crs <span class="op">=</span> <span class="fl">4326</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_transform.html">st_transform</a></span><span class="op">(</span><span class="fl">5070</span><span class="op">)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>And this is what we’re going to go ahead and resample. We want to assess our model’s performance at multiple scales, following the approach in Riemann et al.&nbsp;That means we need to do the following:</p>
 <ol type="1">
@@ -276,92 +276,92 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </ol>
 <p>So to get started, we need to block our study area. We can do this using the <code><a href="https://spatialsample.tidymodels.org/reference/spatial_block_cv.html">spatial_block_cv()</a></code> function from spatialsample. We’ll generate ten different sets of hexagon tiles, using <code>cellsize</code> arguments of between 10,000 and 100,000 meters<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>. The code to do that, and to store all of our resamples in a single tibble, looks like this<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a>:</p>
 <div class="cell" data-hash="index_cache/html/unnamed-chunk-4_c9f6d59a5c9db207f44b23537327ee11">
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/spatialsample">spatialsample</a></span><span class="op">)</span></span>
-<span><span class="va">cellsize</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">10</span><span class="op">)</span> <span class="op">*</span> <span class="fl">1000</span></span>
-<span></span>
-<span><span class="va">riemann_resamples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span></span>
-<span>  resamples <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span></span>
-<span>    <span class="va">cellsize</span>, </span>
-<span>    \<span class="op">(</span><span class="va">cs</span><span class="op">)</span> <span class="op">{</span></span>
-<span>      <span class="fu"><a href="https://spatialsample.tidymodels.org/reference/spatial_block_cv.html">spatial_block_cv</a></span><span class="op">(</span></span>
-<span>        <span class="va">plot_measurements</span>,</span>
-<span>        v <span class="op">=</span> <span class="cn">Inf</span>,</span>
-<span>        cellsize <span class="op">=</span> <span class="va">cs</span>,</span>
-<span>        square <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">}</span></span>
-<span>  <span class="op">)</span>,</span>
-<span>  cellsize <span class="op">=</span> <span class="va">cellsize</span></span>
-<span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/Random.html">set.seed</a></span><span class="op">(</span><span class="fl">123</span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org">dplyr</a></span><span class="op">)</span>
+<span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/tidymodels/spatialsample">spatialsample</a></span><span class="op">)</span>
+<span class="va">cellsize</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html">seq</a></span><span class="op">(</span><span class="fl">10</span>, <span class="fl">100</span>, <span class="fl">10</span><span class="op">)</span> <span class="op">*</span> <span class="fl">1000</span>
+
+<span class="va">riemann_resamples</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html">tibble</a></span><span class="op">(</span>
+  resamples <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span>
+    <span class="va">cellsize</span>, 
+    \<span class="op">(</span><span class="va">cs</span><span class="op">)</span> <span class="op">{</span>
+      <span class="fu"><a href="https://spatialsample.tidymodels.org/reference/spatial_block_cv.html">spatial_block_cv</a></span><span class="op">(</span>
+        <span class="va">plot_measurements</span>,
+        v <span class="op">=</span> <span class="cn">Inf</span>,
+        cellsize <span class="op">=</span> <span class="va">cs</span>,
+        square <span class="op">=</span> <span class="cn">FALSE</span>
+      <span class="op">)</span>
+    <span class="op">}</span>
+  <span class="op">)</span>,
+  cellsize <span class="op">=</span> <span class="va">cellsize</span>
+<span class="op">)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>If we want, we can visualize one (or more) of our resamples, to get a sense of what our tiling looks like:</p>
 <div class="cell" data-hash="index_cache/html/unnamed-chunk-5_47927a616ab25100d9067fa78796ff2b">
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html">autoplot</a></span><span class="op">(</span><span class="va">riemann_resamples</span><span class="op">$</span><span class="va">resamples</span><span class="op">[[</span><span class="fl">10</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/autoplot.html">autoplot</a></span><span class="op">(</span><span class="va">riemann_resamples</span><span class="op">$</span><span class="va">resamples</span><span class="op">[[</span><span class="fl">10</span><span class="op">]</span><span class="op">]</span><span class="op">)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>And that’s step 1 of the process completed! Now we need to move on to step 2, and actually fit models to each of these resamples. I want to highlight that this is a <em>lot</em> of models, and so is going to take a while<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a>:</p>
 <div class="cell" data-hash="index_cache/html/unnamed-chunk-6_203f633130982a3e10be3bc1d02942f9">
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span><span class="op">(</span></span>
-<span>  <span class="va">riemann_resamples</span><span class="op">$</span><span class="va">resamples</span>,</span>
-<span>  <span class="va">nrow</span></span>
-<span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map_dbl</a></span><span class="op">(</span>
+  <span class="va">riemann_resamples</span><span class="op">$</span><span class="va">resamples</span>,
+  <span class="va">nrow</span>
+<span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://rdrr.io/r/base/sum.html">sum</a></span><span class="op">(</span><span class="op">)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 2600</code></pre>
 </div>
 </div>
 <p>With that said, actually fitting those few thousand models is a two part process. First, we’re going to load the rest of the tidymodels packages and use them to define a workflow (from the workflows package), specifying the formula and model that we want to fit to each resample:</p>
 <div class="cell" data-hash="index_cache/html/unnamed-chunk-7_3148976037a06bd519ff92691085eda6">
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidymodels.tidymodels.org">tidymodels</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">lm_workflow</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">add_model</span><span class="op">(</span><span class="fu">linear_reg</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">add_formula</span><span class="op">(</span><span class="va">agb</span> <span class="op">~</span> <span class="va">n_trees</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://tidymodels.tidymodels.org">tidymodels</a></span><span class="op">)</span>
+
+<span class="va">lm_workflow</span> <span class="op">&lt;-</span> <span class="fu">workflow</span><span class="op">(</span><span class="op">)</span> |&gt; 
+  <span class="fu">add_model</span><span class="op">(</span><span class="fu">linear_reg</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> |&gt; 
+  <span class="fu">add_formula</span><span class="op">(</span><span class="va">agb</span> <span class="op">~</span> <span class="va">n_trees</span><span class="op">)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Next, we’ll actually apply that workflow a few thousand times! We’ll calculate two metrics for each run of the model: the root-mean-squared error (RMSE) and the mean absolute error (MAE). We can add these metrics as a new column to our resamples using the following:</p>
 <div class="cell" data-hash="index_cache/html/unnamed-chunk-8_26e509d72d92c408fc0643fc6b3e489d">
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">riemann_resamples</span> <span class="op">&lt;-</span> <span class="va">riemann_resamples</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span></span>
-<span>    resampled_outputs <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span></span>
-<span>      <span class="va">resamples</span>, </span>
-<span>      <span class="va">fit_resamples</span>,</span>
-<span>      object <span class="op">=</span> <span class="va">lm_workflow</span>,</span>
-<span>      metrics <span class="op">=</span> <span class="fu">metric_set</span><span class="op">(</span></span>
-<span>        <span class="va">rmse</span>,</span>
-<span>        <span class="va">mae</span></span>
-<span>      <span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
-<span>  <span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span class="va">riemann_resamples</span> <span class="op">&lt;-</span> <span class="va">riemann_resamples</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>
+    resampled_outputs <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span>
+      <span class="va">resamples</span>, 
+      <span class="va">fit_resamples</span>,
+      object <span class="op">=</span> <span class="va">lm_workflow</span>,
+      metrics <span class="op">=</span> <span class="fu">metric_set</span><span class="op">(</span>
+        <span class="va">rmse</span>,
+        <span class="va">mae</span>
+      <span class="op">)</span>
+    <span class="op">)</span>
+  <span class="op">)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>The <code>riemann_resamples</code> object now includes both our original resamples as well as the accuracy metrics associated with each run of the model. A very cool thing about this approach is that we can now visualize our block-level accuracy metrics with a few lines of code.</p>
 <p>For instance, if we wanted to plot block-level RMSE for our largest assessment scale, we could use the following code to “unnest” our nested metric and resample columns:</p>
 <div class="cell" data-hash="index_cache/html/unnamed-chunk-9_a70aa73bfcb2b5ad1896982fe088d7d5">
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">riemann_resamples</span><span class="op">$</span><span class="va">resampled_outputs</span><span class="op">[[</span><span class="fl">10</span><span class="op">]</span><span class="op">]</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>splits <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">splits</span>, <span class="va">assessment</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">unnest</span><span class="op">(</span><span class="va">.metrics</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">.metric</span> <span class="op">==</span> <span class="st">"rmse"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">unnest</span><span class="op">(</span><span class="va">splits</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html">st_as_sf</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">.estimate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">geom_sf</span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span class="va">riemann_resamples</span><span class="op">$</span><span class="va">resampled_outputs</span><span class="op">[[</span><span class="fl">10</span><span class="op">]</span><span class="op">]</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">mutate</a></span><span class="op">(</span>splits <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">splits</span>, <span class="va">assessment</span><span class="op">)</span><span class="op">)</span> |&gt; 
+  <span class="fu">unnest</span><span class="op">(</span><span class="va">.metrics</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span><span class="op">(</span><span class="va">.metric</span> <span class="op">==</span> <span class="st">"rmse"</span><span class="op">)</span> |&gt; 
+  <span class="fu">unnest</span><span class="op">(</span><span class="va">splits</span><span class="op">)</span> |&gt; 
+  <span class="fu"><a href="https://r-spatial.github.io/sf/reference/st_as_sf.html">st_as_sf</a></span><span class="op">(</span><span class="op">)</span> |&gt; 
+  <span class="fu">ggplot</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="va">.estimate</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu">geom_sf</span><span class="op">(</span><span class="op">)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>We can also go on to the third step of our assessment process, and get our model accuracy metrics for each aggregation scale we investigated. We’ll create a new data frame with only our cellsize variable and the associated model metrics:</p>
 <div class="cell" data-hash="index_cache/html/unnamed-chunk-10_cc9d162150cef70d7dcc926bf5fa8fa7">
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">riemann_metrics</span> <span class="op">&lt;-</span> <span class="va">riemann_resamples</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">transmute</a></span><span class="op">(</span></span>
-<span>    cellsize <span class="op">=</span> <span class="va">cellsize</span>,</span>
-<span>    resampled_metrics <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">resampled_outputs</span>, <span class="va">collect_metrics</span><span class="op">)</span></span>
-<span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">unnest</span><span class="op">(</span><span class="va">resampled_metrics</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">riemann_metrics</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span class="va">riemann_metrics</span> <span class="op">&lt;-</span> <span class="va">riemann_resamples</span> |&gt; 
+  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">transmute</a></span><span class="op">(</span>
+    cellsize <span class="op">=</span> <span class="va">cellsize</span>,
+    resampled_metrics <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">resampled_outputs</span>, <span class="va">collect_metrics</span><span class="op">)</span>
+  <span class="op">)</span> |&gt; 
+  <span class="fu">unnest</span><span class="op">(</span><span class="va">resampled_metrics</span><span class="op">)</span>
+
+<span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">riemann_metrics</span><span class="op">)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 7
   cellsize .metric .estimator  mean     n std_err .config             
@@ -376,12 +376,12 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 <p>And just like that, we’ve got a multi-scale assessment of our model’s accuracy! We can then use this to investigate and report how well our model does at different levels of aggregation. For instance, by plotting RMSE against MAE at various scales, it appears that our RMSE increases with aggregation while MAE decreases. This hints that, as we aggregate our predictions to larger hexagons, more of our model’s overall error is driven by large outliers:</p>
 <div class="cell" data-hash="index_cache/html/unnamed-chunk-11_7192542fa5a721656761fee2bf2ffce1">
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">riemann_metrics</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">cellsize</span>, <span class="va">mean</span>, color <span class="op">=</span> <span class="va">.metric</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span class="kw"><a href="https://rdrr.io/r/base/library.html">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org">ggplot2</a></span><span class="op">)</span>
+
+<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span><span class="op">(</span><span class="va">riemann_metrics</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span><span class="op">(</span><span class="va">cellsize</span>, <span class="va">mean</span>, color <span class="op">=</span> <span class="va">.metric</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span>
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> 
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html">theme_minimal</a></span><span class="op">(</span><span class="op">)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="index_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
 </div>
