@@ -5,7 +5,7 @@ description: |
 author:
   - name: Mike Mahoney
     url: {}
-date: today
+date: "2022-08-10"
 categories: ["ecology", "papers", "remote sensing", "machine learning"]
 image: distributions.jpeg
 format: 
