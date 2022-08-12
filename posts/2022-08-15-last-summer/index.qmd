@@ -76,7 +76,7 @@ Version 0.1.0 is inching along to CRAN at the moment, as I clean off a few last 
 I also did a few other (less RStudio related) things over the past few months:
 
 * Made a [Quarto template](https://github.com/mikemahoney218/quarto-arxiv) that imitates the [rticles](https://pkgs.rstudio.com/rticles/) arXiv template.[^4]
-* Published ["Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass in heterogenous landscapes"](https://doi.org/10.1080/15481603.2022.2103069) in GIScience and Remote Sensing^[This link doesn't work at the time of publication, but will _eventually_ point to the article once the online version gets published.]. 
+* Published ["Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass in heterogenous landscapes"](https://doi.org/10.1080/15481603.2022.2103069) in GIScience and Remote Sensing. 
 * Wrote a book chapter ("AI for Shrubland Identification and Mapping") based on our [shrubland research](https://arxiv.org/abs/2205.05047) for a forthcoming book on AI in Earth science. I'll share more about that when it becomes more public.
 * Helped run the virtual side of the [ESIP 2022 July Meeting](https://2022esipjulymeeting.sched.com/info).
   * Also, helped organize a session entitled ["AI for All People: How to make AI useful for Earth science applications?"](https://2022esipjulymeeting.sched.com/event/12etz/ai-for-all-people-how-to-make-ai-useful-for-earth-science-applications) at the ESIP July meeting.
