@@ -1,0 +1,141 @@
+---
+title: "How rsample keeps memory usage low"
+description: "Copy-on-modify is pretty neat."
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2022-10-04"
+categories: ["R", "rsample"]
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+A few months back, I wrote two comments on [a GitHub issue](https://github.com/tidymodels/rsample/issues/335) explaining a bit of how [rsample](https://rsample.tidymodels.org/) works under the hood. Specifically, a user asked how rsample keeps the total amount of memory that its resamples use relatively low. I've sent this GitHub issue to a few people since then, so it felt like it might be useful enough to turn the issue into a blog.^[Plus, I've been writing my candidacy exam for two weeks now, and need an excuse to look at anything else for an hour.]
+
+## What's an rsample?
+
+In case you've never used it, [rsample](https://rsample.tidymodels.org/) is an R package for data resampling -- if you need bootstrap resampling, V-fold cross-validation, permutation sampling, and more, rsample is meant for you.^[For what it's worth, while I'm an author on rsample, I didn't write any of the rsample features mentioned in this blog post. I believe the rsample-specific details were all written by Max Kuhn. All the copy-on-modify semantics stuff, however, is just part of R and written over the past few decades by R Core.] The majority of these rsample functions return `rset` objects, which are just jazzed-up tibbles:
+
+```{r}
+set.seed(123)
+library(rsample)
+library(mlbench)
+data(LetterRecognition)
+
+boots <- bootstraps(LetterRecognition, times = 2)
+boots
+```
+
+Each of our individual resamples is stored as an `rsplit` object, each of which takes up a row in the `splits` column. Printing these objects tells us how many rows are in our analysis and assessment sets,^["Analysis" maps to "training" while "assessment" maps to "testing". "Analysis" and "assessment" are purposefully used to [avoid confusion over _which_ training and test set are being used](https://www.tmwr.org/resampling.html#resampling-methods).] but hides most of the actual structure of the `rsplit` object. If we use `str()` instead, we can see that there are three named elements in each `rsplit`: `data`, our original data frame; `in_id`, which has the indices for which observations are going to be held "in" our analysis set, and `out_id`, which sometimes^[We'll come back to this.] has the indices for which observations are going to be held "out" to make up our assessment set, but here is `NA`:
+
+```{r}
+boots$splits[[1]]
+
+str(
+  boots$splits[[1]]
+)
+```
+
+## The mystery of the missing MBs
+
+So, just looking at this structure, it seems like each `rsplit` contains a complete copy of our original data. But somehow, to borrow the example from the rsample README, creating a 50-times bootstrap sample doesn't require 50 times as much memory, but instead about 3x:
+
+```{r}
+lobstr::obj_size(LetterRecognition)
+
+set.seed(35222)
+boots <- bootstraps(LetterRecognition, times = 50)
+lobstr::obj_size(boots)
+```
+
+Even that top-line result is a little misleading, though, because rsample isn't copying the data to actually create `boots`. If we look at the object sizes for both the original data and the resamples together, we can see that `boots` is only contributing ~4 MB:
+
+```{r}
+lobstr::obj_size(LetterRecognition, boots)
+lobstr::obj_sizes(LetterRecognition, boots)
+```
+
+So: what? How?
+
+## Copying; modifying
+
+Well, R uses what's known as [copy-on-modify](https://adv-r.hadley.nz/names-values.html) semantics. That means that, when you assign the same data to multiple variables, each of those variables will actually point at the same address in RAM:
+
+```{r}
+LetterRecognition2 <- LetterRecognition
+
+lobstr::obj_addr(LetterRecognition)
+lobstr::obj_addr(LetterRecognition2)
+
+identical(
+  lobstr::obj_addr(LetterRecognition),
+  lobstr::obj_addr(LetterRecognition2)
+)
+```
+
+This also means that `LetterRecognition2` takes up literally 0 space in your RAM:
+
+```{r}
+lobstr::obj_size(LetterRecognition, LetterRecognition2)
+```
+
+And that will stay true up until we modify either of these objects. No copy is made, no additional RAM gets used, until one of the objects is modified.
+
+That also means that, right now, `LetterRecognition2` is another name for the data stored in each of our `rsplits`:
+
+```{r}
+identical(
+  lobstr::obj_addr(boots$splits[[1]]$data),
+  lobstr::obj_addr(LetterRecognition2)
+)
+```
+
+And if we get rid of `LetterRecognition`, which both `LetterRecognition2` and our bootstraps are based off of, those objects will _still_ point at the same address,^[As of [R 4.0](https://stat.ethz.ch/pipermail/r-announce/2020/000653.html), as I understand it.] and our `data` slot in `boots` still won't take up additional space:
+
+```{r}
+rm(LetterRecognition)
+gc()
+
+identical(
+  lobstr::obj_addr(boots$splits[[1]]$data),
+  lobstr::obj_addr(LetterRecognition2)
+)
+
+lobstr::obj_sizes(LetterRecognition2, boots$splits[[1]]$data)
+```
+
+So how does rsample keep its objects so small? By not making extra copies of your data where it doesn't have to. This is how the entire `boots` table winds up only adding ~1.5x the space of the original data:
+
+```{r}
+lobstr::obj_sizes(LetterRecognition2, boots)
+```
+
+And that's pretty close to as small as this object could get -- that's just the amount of space required to store the indices (in this case, 20,000 indices per repeat, 50 repeats):
+
+```{r}
+lobstr::obj_size(sample.int(20000 * 50))
+```
+
+(The 42kb difference is the attributes we've attached to each split -- things like its class and ID and so on -- but that's not going to be enough memory to be relevant for most applications.)
+
+This is also, as it happens, why `out_id` is set `NA` in our bootstrap resamples.^[Told ya we'd come back to it.] Because you can figure out which observations we want to "hold out" for the assessment set based on which ones we're keeping "in" for analysis, rsample doesn't store those indices for most of its resampling methods.^[Now the package I maintain, spatialsample, _does_ include `out_id` on its objects relatively often. Most of the time, this is because the objects were created with a non `NULL` buffer, and so our hold out set isn't simply "all of the data that's not in"; sometimes it's because I initially _always_ included `out_id`, and haven't fixed my code to be more efficient yet. PRs welcome!]
+
+And one last thought: if you modified `LetterRecognition2`, _then_ the data in our splits would no longer point at the same address space as the original table. That's entirely on purpose and desirable, because once you start messing with your original data, your resampling indices are no longer guaranteed to correspond to the original table you used to create them.
+
+```{r}
+LetterRecognition2 <- NA
+
+identical(
+  lobstr::obj_addr(boots$splits[[1]]$data),
+  lobstr::obj_addr(LetterRecognition2)
+)
+```
+
+But, as best as possible, rsample will keep the `rset` small.
+
+```{r}
+lobstr::obj_size(boots)
+```
+

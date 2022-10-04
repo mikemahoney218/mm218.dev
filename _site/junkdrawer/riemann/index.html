@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.0.38">
+<meta name="generator" content="quarto-1.1.189">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <meta name="author" content="Mike Mahoney">
 <meta name="dcterms.date" content="2022-07-13">
@@ -10,10 +10,15 @@
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
-span.underline{text-decoration: underline;}
-div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
 pre > code.sourceCode { white-space: pre; position: relative; }
 pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
@@ -52,7 +57,7 @@ code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
 code span.at { color: #7d9029; } /* Attribute */
 code span.bn { color: #40a070; } /* BaseN */
-code span.bu { } /* BuiltIn */
+code span.bu { color: #008000; } /* BuiltIn */
 code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
 code span.ch { color: #4070a0; } /* Char */
 code span.cn { color: #880000; } /* Constant */
@@ -65,7 +70,7 @@ code span.er { color: #ff0000; font-weight: bold; } /* Error */
 code span.ex { } /* Extension */
 code span.fl { color: #40a070; } /* Float */
 code span.fu { color: #06287e; } /* Function */
-code span.im { } /* Import */
+code span.im { color: #008000; font-weight: bold; } /* Import */
 code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
 code span.kw { color: #007020; font-weight: bold; } /* Keyword */
 code span.op { color: #666666; } /* Operator */
@@ -126,9 +131,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top"><nav class="navbar navbar-expand-lg navbar-dark "><div class="navbar-container container-fluid">
-      <a class="navbar-brand" href="../../index.html">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Mike Mahoney</span>
-  </a>
+    </a>
+  </div>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
   <span class="navbar-toggler-icon"></span>
 </button>
@@ -388,13 +395,13 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 </div>
 
 
-<div id="quarto-appendix" class="default"><section class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
 <ol>
-<li id="fn1" role="doc-endnote"><p>Riemann, R., Wilston, B. T., Lister, A., and Parks, S. 2010. An effective assessment protocol for continuous geospatial datasets of forest characteristics using USFS Forest Inventory and Analysis (FIA) data. Remote Sensing of Environment, 114, pp.&nbsp;2337-2353. doi: 10.1016/j.rse.2010.05.010.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2" role="doc-endnote"><p>Among them that only forested areas are measured, where “forested” means “principally used as forest” which excludes parks but includes recently clear-cut lands, and that plot locations are considered personally identifying information under the farm bill of 1985, and so as to not identify anyone the coordinates in public data are “fuzzed” by a few miles and approximately 20% of plot coordinates are swapped with other plots in the data set. Which is to say, consult your local forester or ecologist if you want to use FIA data to answer real questions in your own work.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3" role="doc-endnote"><p>This value is in meters because our coordinate reference system is in meters. It represents the length of the <a href="https://en.wikipedia.org/wiki/Apothem">apothem</a>, from the center of each polygon to the middle of the side. We’re using hexagons because Riemann et al.&nbsp;also used hexagons.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4" role="doc-endnote"><p><code>v</code> is <code>Inf</code> because we want to perform leave-one-block-out cross-validation, but we don’t know how many blocks there will be before they’re created. This is the supported way to do leave-one-X-out cross-validation in spatialsample &gt; 0.2.0 (another option is to set <code>v = NULL</code>).<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn5" role="doc-endnote"><p>Linear regression was invented in 1805, ish, long before the Analytical Engine was a twinkle in Babbage’s eye. Whenever I get frustrated at how long fitting multiple models like this takes, I like to take a step back and recognize that I am asking my poor overworked computer to fit roughly as many models as were used in the first ~100 years of the technique’s life.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn1"><p>Riemann, R., Wilston, B. T., Lister, A., and Parks, S. 2010. An effective assessment protocol for continuous geospatial datasets of forest characteristics using USFS Forest Inventory and Analysis (FIA) data. Remote Sensing of Environment, 114, pp.&nbsp;2337-2353. doi: 10.1016/j.rse.2010.05.010.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Among them that only forested areas are measured, where “forested” means “principally used as forest” which excludes parks but includes recently clear-cut lands, and that plot locations are considered personally identifying information under the farm bill of 1985, and so as to not identify anyone the coordinates in public data are “fuzzed” by a few miles and approximately 20% of plot coordinates are swapped with other plots in the data set. Which is to say, consult your local forester or ecologist if you want to use FIA data to answer real questions in your own work.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>This value is in meters because our coordinate reference system is in meters. It represents the length of the <a href="https://en.wikipedia.org/wiki/Apothem">apothem</a>, from the center of each polygon to the middle of the side. We’re using hexagons because Riemann et al.&nbsp;also used hexagons.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p><code>v</code> is <code>Inf</code> because we want to perform leave-one-block-out cross-validation, but we don’t know how many blocks there will be before they’re created. This is the supported way to do leave-one-X-out cross-validation in spatialsample &gt; 0.2.0 (another option is to set <code>v = NULL</code>).<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>Linear regression was invented in 1805, ish, long before the Analytical Engine was a twinkle in Babbage’s eye. Whenever I get frustrated at how long fitting multiple models like this takes, I like to take a step back and recognize that I am asking my poor overworked computer to fit roughly as many models as were used in the first ~100 years of the technique’s life.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
 </ol></section></div></main><!-- /main --><script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {
@@ -464,7 +471,8 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
   for (var i=0; i<noterefs.length; i++) {
     const ref = noterefs[i];
     tippyHover(ref, function() {
-      let href = ref.getAttribute('href');
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
