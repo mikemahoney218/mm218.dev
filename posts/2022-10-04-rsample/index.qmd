@@ -5,7 +5,8 @@ author:
   - name: Mike Mahoney
     url: {}
 date: "2022-10-04"
-categories: ["R", "rsample"]
+categories: ["R", "rsample", "tidymodels"]
+image: splash.jpg
 format: 
   html:
     toc: true

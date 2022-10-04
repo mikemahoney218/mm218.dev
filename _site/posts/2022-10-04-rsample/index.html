@@ -129,12 +129,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <link rel="stylesheet" href="../../styles.css">
 <meta property="og:title" content="Mike Mahoney - How rsample keeps memory usage low">
 <meta property="og:description" content="Copy-on-modify is pretty neat.">
+<meta property="og:image" content="https://mm218.dev/posts/2022-10-04-rsample/splash.jpg">
 <meta property="og:site-name" content="Mike Mahoney">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:title" content="Mike Mahoney - How rsample keeps memory usage low">
 <meta name="twitter:description" content="Copy-on-modify is pretty neat.">
+<meta name="twitter:image" content="https://mm218.dev/posts/2022-10-04-rsample/splash.jpg">
 <meta name="twitter:creator" content="@MikeMahoney218">
-<meta name="twitter:card" content="summary">
+<meta name="twitter:card" content="summary_large_image">
 </head>
 
 <body class="nav-fixed">
@@ -189,6 +191,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
                           <div class="quarto-categories">
                 <div class="quarto-category">R</div>
                 <div class="quarto-category">rsample</div>
+                <div class="quarto-category">tidymodels</div>
               </div>
                   </div>
   </div>
@@ -329,11 +332,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(LetterRecognition)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x55e4069e7bd0"</code></pre>
+<pre><code>[1] "0x5573114c93e0"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(LetterRecognition2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x55e4069e7bd0"</code></pre>
+<pre><code>[1] "0x5573114c93e0"</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(LetterRecognition),</span>
@@ -367,8 +370,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gc</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>          used (Mb) gc trigger (Mb) max used (Mb)
-Ncells  849733 45.4    1358672 72.6  1358672 72.6
-Vcells 2362812 18.1    8388608 64.0  8384708 64.0</code></pre>
+Ncells  849739 45.4    1358681 72.6  1358681 72.6
+Vcells 2362850 18.1    8388608 64.0  8384745 64.0</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">identical</span>(</span>
 <span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  lobstr<span class="sc">::</span><span class="fu">obj_addr</span>(boots<span class="sc">$</span>splits[[<span class="dv">1</span>]]<span class="sc">$</span>data),</span>
