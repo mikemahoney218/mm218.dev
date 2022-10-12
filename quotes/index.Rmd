@@ -4,6 +4,12 @@ output:
   tufte::tufte_html: default
 ---
 
+<hr id = "HerbertsonClimate">
+
+Climate is what on average we may expect; weather is what we actually get.
+
+--- Andrew John Herbertson, _Outlines of Physiography_ (1901)
+
 <hr id = "BrandGods">
 
 We are as gods. We may as well get good at it.
@@ -389,6 +395,42 @@ PHP is built to keep chugging along at all costs. When faced with either doing s
 <hr id="FlakeOffensiveCon">
 
 The joy in mathematics is often the receding of the pain.
+
+[...]
+
+Claim: You can't control the use of knowledge.
+
+The choice is not between “peaceful” and “warlike” science. For most of science, the only choice is “relevant” and “irrelevant”.
+
+The only way to make sure your scientific output will not be used by the military for war: Make sure it irrelevant, or wrong, or better: Both.
+
+Almost anything that will give one side an advantage will eventually be used in warfare.
+
+Nonetheless: The individual still has the responsibility to judge what they are working on. This is often not easy.
+
+[...]
+
+Are better weapons bad?
+
+People are inclined to believe that better weapons are (morally) bad.
+
+I visited Japan in early 2016 - both Hiroshima and Tanegashima. I will not talk about Hiroshima.... Tanegashima is an island in the south of Japan.
+
+1467: Japan’s Feudal system collapses. Sengoku period starts, permanent internal warfare. No side could get an upper hand.
+
+76 years later, the first Musket arrives in Japan (1543). Full adoption into the battle around 1570s; decisive in battle from 1575. 
+
+From 1615 onward: Japan unified, century of peace. 108 years of war, ended in 40 years.
+
+Prolonged warfare is terrible.
+
+Superior weaponry does not always mean more civilian casualties.
+
+Some people argue that the terrible power of nuclear weapons are what enabled the last 75 years without World Wars.
+
+Are better weapons bad?
+
+I do not have an answer. I think about the history of Tanegashima, with little result.
 
 [...]
 
