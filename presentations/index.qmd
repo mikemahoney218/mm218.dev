@@ -5,6 +5,11 @@
     As lead/presenting author:
     <h3>2022</h3>
     <p>
+        <div><strong>Building trust in AI outputs: Approaches from NY’s forest carbon monitoring program.</strong></div>
+        <div>Invited talk, Federation of Earth Science Information Partners (ESIP) July Meeting, Pittsburgh, PA, July 22 2022.</div>
+        <div>Slides available at <a href="https://mm218.dev/esip2022">https://mm218.dev/esip2022</a></div>
+    </p>
+    <p>
         <div><strong>Detecting regenerating forestland at a landscape level.</strong></div>
         <div>With <a href = "https://www.lucaskjohnson.com/">Lucas K. Johnson,</a> and <a href = 'https://www.esf.edu/faculty/beier/'>Colin M. Beier</a></div>
         <div>Regular talk, Ecological Society of America and Canadian Society for Ecology and Evolution Joint Annual Meeting, Montreal, Quebec, Canada, August 15 2022.</div>
@@ -88,6 +93,13 @@ York.</strong></div>
     </p>
     <hr>
     As co-/non-presenting author:
+    <h3>2022</h3>
+    <p>
+        <div><strong>Historical Time Series Biomass Modeling: To Train on Plots
+or Pixels?.</strong></div>
+        <div>With <a href = "https://www.lucaskjohnson.com/">Lucas K. Johnson (lead author),</a> and <a href = 'https://www.esf.edu/faculty/beier/'>Colin M. Beier</a></div>
+        <div>Regular talk, American Geophysical Union Fall Meeting, Chicago, IL, December 15 2022.</div>
+    </p>
     <h3>2021</h3>
     <p>
         <div><strong>Broad‑scale forest biomass mapping: generating contiguous high‑resolution predictions using a spatio‑temporal patchwork of LiDAR coverages across a mixed‑use landscape.</strong></div>
