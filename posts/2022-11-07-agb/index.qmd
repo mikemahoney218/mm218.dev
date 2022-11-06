@@ -1,0 +1,28 @@
+---
+title: "Fine-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages"
+description: |
+  New (open-access!) article out in International Journal of Applied Earth Observation and Geoinformation!
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2022-11-07"
+categories: ["ecology", "papers", "remote sensing", "machine learning", "earth science", "AGB"]
+image: map.jpg
+format: 
+  html:
+    df-print: paged
+    toc: true
+engine: knitr
+---
+
+I'm part of the team behind a new open-access article, "[Fine-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages](https://doi.org/10.1016/j.jag.2022.103059)", newly out in International Journal of Applied Earth Observation and Geoinformation.^[I've needed to google this journal name every time I go to post about the article. I've read papers from this journal before and generally like their output, but for some reason the acronym IJAEOG just refuses to stick in my mind.] The paper was lead by my incredible coworker [Lucas Johnson](https://www.lucaskjohnson.com/), and is his first first-author paper -- and what a powerful way to enter the field!
+
+![A map, showing the AGB prediction surfaces reflecting a temporal patchwork of conditions across the 17 component LiDAR coverages in the GPO-LiDAR area with New York State.](map.jpg)
+
+This paper is, plain and simple, the first public documentation we've released about how we're helping New York State track how much carbon is stored in its forests statewide. Using a patchwork of LiDAR collections and FIA field measurements, we use a stacked ensemble (a linear regression combining a random forest, LightGBM-based gradient boosting machine, and support vector machine) to estimate forest aboveground biomass (all the woody non-root bits of a tree, which^[To simplify quite a bit.] are made out of carbon pulled out of the atmosphere) at a 30 meter resolution across New York State. This data is already being used to identify high-priority areas across the state where the most carbon is currently stored and where a- and re-forestation might have the greatest impacts in the future.
+
+This is very exciting in and of itself, but I'm also extremely proud of the effort we put into validating our predictions, to make sure we're speaking only with exactly as much confidence as we deserve. We use the [area of applicability from Meyer and Pebesma (2021)](https://doi.org/10.1111/2041-210X.13650) to mask out areas where LiDAR data is too "different" from what our models were trained with, in order to make sure we aren't accidentally extrapolating into areas our models aren't prepared to handle. We implement the [Riemann et al. (2010) multi-scale assessment procedure](https://doi.org/10.1016/j.rse.2010.05.010) to make sure our predictions are useful when aggregated to other scales. We look at our error spatially and as a function of FIA-measured AGB to try and fully characterize where our models succeed and where they need a bit more work. The goal is for our maps to be useful, and not just ["pretty pictures"](https://doi.org/10.1016/j.rse.2010.10.013).
+
+![Plot-to-pixel residuals summarized at units spaced 50 km apart. Hexagons with only one reference plot were removed. (a) RMSE Mg ha−1; (b) MAE Mg ha−1; (c) ME Mg ha−1; (d) Mean FIA AGB value Mg ha−1; (e) Hex-level % RMSE as a function of mean reference value; (f) Hex-level % MAE as a function of mean reference value; (g) Hex-level ME as a function of mean reference value. 1 observation excluded from (e) and (f) where 0 FIA AGB makes % RMSE impossible to compute. Trend lines in (e) and (f) produced using logarithmic regression. Trend line in g produced using least-squares regression.](validation.jpg)
+
+In addition to [Lucas](https://www.lucaskjohnson.com/) (who, I cannot stress enough, did a _fantastic_ job leading this paper), I was lucky enough to get to work with [Eddie Bevilacqua](https://www.esf.edu/faculty/bevilacqua/), [Steve Stehman](https://www.esf.edu/faculty/stehman/), [Grant Domke](https://www.fs.usda.gov/research/about/people/gmdomke), and [Colin Beier](https://www.esf.edu/faculty/beier/) on this one. It's a great team and a great project, and I'm very excited for the things we've got coming down the pipeline next.
