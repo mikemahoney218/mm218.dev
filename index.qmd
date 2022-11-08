@@ -9,6 +9,9 @@ about:
     - text: Twitter
       icon: twitter
       url: "https://twitter.com/mikemahoney218"
+    - text: Mastodon
+      icon: mastodon
+      url: "https://fosstodon.org/@MikeMahoney218"
     - text: GitHub
       icon: github
       url: "https://github.com/mikemahoney218"
@@ -68,3 +71,5 @@ B.S. in Forest Ecosystem Science | August 2015 - December 2018
 **[heddlr](https://github.com/mikemahoney218/heddlr)** | Functional Programming Concepts for R Markdown Documents | 2020
 
 :::
+
+<link rel="me" href="https://fosstodon.org/@MikeMahoney218">
