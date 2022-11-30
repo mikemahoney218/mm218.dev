@@ -1,0 +1,91 @@
+---
+title: "How to include sf data in R packages"
+description: |
+  An extremely opinionated guide for an extremely common problem.
+author:
+  - name: Mike Mahoney
+    url: {}
+date: 2022-12-01
+categories: ["R", "Tutorials", "Spatial", "Data science"]
+image: sf.jpg
+format: 
+  html:
+    df-print: default
+    toc: true
+engine: knitr
+---
+
+## tl;dr
+
+Store your sf objects as [internal data](https://r-pkgs.org/data.html#sec-data-sysdata). Add a `.R` file to `data/` 
+(probably named `your_data.R`) containing the following:
+
+```r
+delayedAssign("your_data", local({
+  requireNamespace("sf", quietly = TRUE)
+  your_package:::your_data
+}))
+```
+
+[Document your data as usual](https://r-pkgs.org/data.html#sec-documenting-data). 
+
+## The Problem
+
+If you work with spatial data in R, you're familiar with [the sf package](https://r-spatial.github.io/sf/). If you write spatially-oriented packages for R, there's a good chance you think a lot about how to handle and work with sf objects. I think that's a good thing; sf makes data analysis with spatial data _miles_ easier, and I rely on it throughout my packages.
+
+![CC-BY 4.0 Artwork by Allison Horst.](sf.jpg){fig-alt="Three cute fuzzy monsters adding spatial geometries to an existing table of attributes using glue and tape, while one cuts out the spatial polygons. Title text reads \"sf: spatial data…simplified.\" and a caption at the bottom reads \"sticky geometries: for people who love their maps and sanity.\""}
+
+If you write spatially-oriented packages, there's a good chance your examples or tests could benefit from your package including some sf objects as demonstration data. But there's a few weird edge cases that crop up when including sf objects in package data.
+
+For instance, let's look at the `guerry` data from the [geodaData](https://spatialanalysis.github.io/geodaData/) package. On its own, this object seems to load and print perfectly fine:
+
+```{r}
+geodaData::guerry |> head(1)
+```
+
+But if we cast this object to a [tibble](https://tibble.tidyverse.org/), we get an error:
+
+```{r}
+try(tibble::as_tibble(geodaData::guerry))
+```
+
+This is [a known bug](https://github.com/r-lib/pillar/issues/552) that packages need to work around themselves, and can be a bit of a pain to figure out solutions for. It tends to crop up when data.frame objects are implicitly casted to tibbles, for instance by [dplyr](https://dplyr.tidyverse.org/) functions:
+
+```{r}
+try(dplyr::group_by(geodaData::guerry, CODE_DE))
+```
+
+But it doesn't _always_ happen; for instance, implicitly casting `guerry` to a tibble through `mutate()` will succeed. Even in this case, though, the printed output is uglier than we'd expect from a tibble:
+
+```{r}
+geodaData::guerry |> 
+  dplyr::mutate() |> # This does nothing, beside cast guerry to a tibble
+  head(1)
+```
+
+I haven't been able to figure out the logic behind when casting these objects succeeds and when it just mucks up the printing; but either way, packages currently need to implement their own workarounds for these problems when including sf objects as data.
+
+A final challenge with including sf objects in R packages is that some projected CRS include non-ASCII characters in their WKT, [causing an aggravating warning](https://github.com/r-spatial/sf/issues/1341) in R CMD check:  `Warning: found non-ASCII string`. Your package won't be accepted to CRAN with that warning, and as such, this needs to be fixed.^[Theoretically this _should_ be fixed by setting `Encoding: UTF8` in your package DESCRIPTION, but [that rarely seems to help](https://github.com/r-spatial/sf/issues/1341#issuecomment-609645514).]
+
+All three of these problems can be solved by the same approach, which I think is the best way to include sf objects in packages.
+
+## The Solution
+
+Rather than including sf objects directly as package data in the normal manner, you should store the sf object as internal data and then load it via `delayedAssign`. This is an approach inspired by [palmerpenguins](https://allisonhorst.github.io/palmerpenguins/) ([here's the relevant PR](https://github.com/allisonhorst/palmerpenguins/pull/36)), now in use in the [spatialsample](spatialsample.tidymodels.org/) and [waywiser](https://mikemahoney218.github.io/waywiser/) packages I maintain.
+
+To store [your sf objects as internal data](https://r-pkgs.org/data.html#sec-data-sysdata), save them into a file named `R/sysdata.rda`. If you use `usethis::use_data()`, set the argument `internal = TRUE` to make this happen automatically. This solves the third problem for us; something about not exporting the sf object directly means that R CMD check no longer checks the CRS for non-ASCII characters, and the warning is no longer triggered.
+
+You now need to somehow export this data, in order to let users actually use your newly-internal sf object. To do so, we're going to write a file in the `data/` folder, named something like `your_data.R`, taking advantage of the `delayedAssign()` function like so:^[Just in case it's not clear: make sure to change `your_data` and `your_package` below to, well, the name of your data and the name of your package.]
+
+```r
+delayedAssign("your_data", local({
+  requireNamespace("sf", quietly = TRUE)
+  your_package:::your_data
+}))
+```
+
+This function makes it so that, whenever a user calls your data object for the first time in a session, you quietly load the sf package before assigning your internal data to the exported object. [This doesn't _attach_ the sf package](https://adv-r.hadley.nz/environments.html#search-path), meaning that your users won't accidentally have the entire sf package dumped into their search path. Loading the sf package, however, is enough to fix both problems 1 and 2; your data will now play happily with tibbles, dplyr functions, and the broader R ecosystem.
+
+You then need to [document your data](https://r-pkgs.org/data.html#sec-documenting-data) in a file under `R/` the same way you always would. 
+
+And that's it! Your package will now be more user-friendly and CRAN-acceptable. I've been using this approach for months with no side effects^[Knock on wood for me, I've tempted the gods.] and am planning to keep using it going forward.
