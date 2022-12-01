@@ -29,6 +29,8 @@ delayedAssign("your_data", local({
 
 [Document your data as usual](https://r-pkgs.org/data.html#sec-documenting-data). 
 
+See the update at the bottom of this post for a bit more information.
+
 ## The Problem
 
 If you work with spatial data in R, you're familiar with [the sf package](https://r-spatial.github.io/sf/). If you write spatially-oriented packages for R, there's a good chance you think a lot about how to handle and work with sf objects. I think that's a good thing; sf makes data analysis with spatial data _miles_ easier, and I rely on it throughout my packages.
@@ -89,3 +91,24 @@ This function makes it so that, whenever a user calls your data object for the f
 You then need to [document your data](https://r-pkgs.org/data.html#sec-documenting-data) in a file under `R/` the same way you always would. 
 
 And that's it! Your package will now be more user-friendly and CRAN-acceptable. I've been using this approach for months with no side effects^[Knock on wood for me, I've tempted the gods.] and am planning to keep using it going forward.
+
+## Update
+
+[Edzer points out on Mastodon](https://fosstodon.org/@edzer@mastodon.social/109439029871771876) that, in order to [play nicely with potential changes in sf](https://www.tidyverse.org/blog/2022/09/playing-on-the-same-team-as-your-dependecy/), you can [include your data as an external file](https://r-pkgs.org/data.html#sec-data-extdata) instead. The steps here are broadly similar: save your sf object to a file in `inst/extdata`, and write a file in `R/` that looks something like this:
+
+```r
+delayedAssign("your_data", local({
+  try(
+    sf::read_sf(
+      system.file("extdata/your_data.gpkg", package = "your_package")
+    ),
+    silent = TRUE
+  )
+}))
+```
+
+We need to wrap the call in `try()` in order to make this approach work with tooling like `devtools::document()`, which will otherwise complain about trying to read a file that isn't there. 
+
+In my tests, this was enough to fix issues 1 and 2; calling `sf::read_sf()` will load the sf package and should fix any interoperability issues. However, this approach doesn't necessarily fix the non-ASCII character WARNING given off by R CMD check. 
+
+Of course, you can also include external files in `inst/` and then have your users read it themselves using `system.file()`, like [the sf vignettes do themselves](https://r-spatial.github.io/sf/articles/sf1.html)!

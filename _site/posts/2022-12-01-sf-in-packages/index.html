@@ -260,6 +260,7 @@ cookieconsent.run({
   <li><a href="#tldr" id="toc-tldr" class="nav-link active" data-scroll-target="#tldr">tl;dr</a></li>
   <li><a href="#the-problem" id="toc-the-problem" class="nav-link" data-scroll-target="#the-problem">The Problem</a></li>
   <li><a href="#the-solution" id="toc-the-solution" class="nav-link" data-scroll-target="#the-solution">The Solution</a></li>
+  <li><a href="#update" id="toc-update" class="nav-link" data-scroll-target="#update">Update</a></li>
   </ul>
 </nav>
     </div>
@@ -277,6 +278,7 @@ cookieconsent.run({
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  your_package<span class="sc">:::</span>your_data</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p><a href="https://r-pkgs.org/data.html#sec-documenting-data">Document your data as usual</a>.</p>
+<p>See the update at the bottom of this post for a bit more information.</p>
 </section>
 <section id="the-problem" class="level2">
 <h2 class="anchored" data-anchor-id="the-problem">The Problem</h2>
@@ -350,6 +352,21 @@ cookieconsent.run({
 <p>This function makes it so that, whenever a user calls your data object for the first time in a session, you quietly load the sf package before assigning your internal data to the exported object. <a href="https://adv-r.hadley.nz/environments.html#search-path">This doesn’t <em>attach</em> the sf package</a>, meaning that your users won’t accidentally have the entire sf package dumped into their search path. Loading the sf package, however, is enough to fix both problems 1 and 2; your data will now play happily with tibbles, dplyr functions, and the broader R ecosystem.</p>
 <p>You then need to <a href="https://r-pkgs.org/data.html#sec-documenting-data">document your data</a> in a file under <code>R/</code> the same way you always would.</p>
 <p>And that’s it! Your package will now be more user-friendly and CRAN-acceptable. I’ve been using this approach for months with no side effects<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> and am planning to keep using it going forward.</p>
+</section>
+<section id="update" class="level2">
+<h2 class="anchored" data-anchor-id="update">Update</h2>
+<p><a href="https://fosstodon.org/@edzer@mastodon.social/109439029871771876">Edzer points out on Mastodon</a> that, in order to <a href="https://www.tidyverse.org/blog/2022/09/playing-on-the-same-team-as-your-dependecy/">play nicely with potential changes in sf</a>, you can <a href="https://r-pkgs.org/data.html#sec-data-extdata">include your data as an external file</a> instead. The steps here are broadly similar: save your sf object to a file in <code>inst/extdata</code>, and write a file in <code>R/</code> that looks something like this:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">delayedAssign</span>(<span class="st">"your_data"</span>, <span class="fu">local</span>({</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">try</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    sf<span class="sc">::</span><span class="fu">read_sf</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">system.file</span>(<span class="st">"extdata/your_data.gpkg"</span>, <span class="at">package =</span> <span class="st">"your_package"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">silent =</span> <span class="cn">TRUE</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We need to wrap the call in <code>try()</code> in order to make this approach work with tooling like <code>devtools::document()</code>, which will otherwise complain about trying to read a file that isn’t there.</p>
+<p>In my tests, this was enough to fix issues 1 and 2; calling <code>sf::read_sf()</code> will load the sf package and should fix any interoperability issues. However, this approach doesn’t necessarily fix the non-ASCII character WARNING given off by R CMD check.</p>
+<p>Of course, you can also include external files in <code>inst/</code> and then have your users read it themselves using <code>system.file()</code>, like <a href="https://r-spatial.github.io/sf/articles/sf1.html">the sf vignettes do themselves</a>!</p>
 
 
 </section>

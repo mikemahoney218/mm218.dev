@@ -522,7 +522,7 @@
     "href": "posts/2022-12-01-sf-in-packages/index.html",
     "title": "How to include sf data in R packages",
     "section": "",
-    "text": "Store your sf objects as internal data. Add a .R file to data/ (probably named your_data.R) containing the following:\ndelayedAssign(\"your_data\", local({\n  requireNamespace(\"sf\", quietly = TRUE)\n  your_package:::your_data\n}))\nDocument your data as usual."
+    "text": "Store your sf objects as internal data. Add a .R file to data/ (probably named your_data.R) containing the following:\ndelayedAssign(\"your_data\", local({\n  requireNamespace(\"sf\", quietly = TRUE)\n  your_package:::your_data\n}))\nDocument your data as usual.\nSee the update at the bottom of this post for a bit more information."
   },
   {
     "objectID": "posts/2022-12-01-sf-in-packages/index.html#the-problem",
@@ -537,6 +537,13 @@
     "title": "How to include sf data in R packages",
     "section": "The Solution",
     "text": "The Solution\nRather than including sf objects directly as package data in the normal manner, you should store the sf object as internal data and then load it via delayedAssign. This is an approach inspired by palmerpenguins (here’s the relevant PR), now in use in the spatialsample and waywiser packages I maintain.\nTo store your sf objects as internal data, save them into a file named R/sysdata.rda. If you use usethis::use_data(), set the argument internal = TRUE to make this happen automatically. This solves the third problem for us; something about not exporting the sf object directly means that R CMD check no longer checks the CRS for non-ASCII characters, and the warning is no longer triggered.\nYou now need to somehow export this data, in order to let users actually use your newly-internal sf object. To do so, we’re going to write a file in the data/ folder, named something like your_data.R, taking advantage of the delayedAssign() function like so:2\ndelayedAssign(\"your_data\", local({\n  requireNamespace(\"sf\", quietly = TRUE)\n  your_package:::your_data\n}))\nThis function makes it so that, whenever a user calls your data object for the first time in a session, you quietly load the sf package before assigning your internal data to the exported object. This doesn’t attach the sf package, meaning that your users won’t accidentally have the entire sf package dumped into their search path. Loading the sf package, however, is enough to fix both problems 1 and 2; your data will now play happily with tibbles, dplyr functions, and the broader R ecosystem.\nYou then need to document your data in a file under R/ the same way you always would.\nAnd that’s it! Your package will now be more user-friendly and CRAN-acceptable. I’ve been using this approach for months with no side effects3 and am planning to keep using it going forward."
+  },
+  {
+    "objectID": "posts/2022-12-01-sf-in-packages/index.html#update",
+    "href": "posts/2022-12-01-sf-in-packages/index.html#update",
+    "title": "How to include sf data in R packages",
+    "section": "Update",
+    "text": "Update\nEdzer points out on Mastodon that, in order to play nicely with potential changes in sf, you can include your data as an external file instead. The steps here are broadly similar: save your sf object to a file in inst/extdata, and write a file in R/ that looks something like this:\ndelayedAssign(\"your_data\", local({\n  try(\n    sf::read_sf(\n      system.file(\"extdata/your_data.gpkg\", package = \"your_package\")\n    ),\n    silent = TRUE\n  )\n}))\nWe need to wrap the call in try() in order to make this approach work with tooling like devtools::document(), which will otherwise complain about trying to read a file that isn’t there.\nIn my tests, this was enough to fix issues 1 and 2; calling sf::read_sf() will load the sf package and should fix any interoperability issues. However, this approach doesn’t necessarily fix the non-ASCII character WARNING given off by R CMD check.\nOf course, you can also include external files in inst/ and then have your users read it themselves using system.file(), like the sf vignettes do themselves!"
   },
   {
     "objectID": "cdi/index.html",
