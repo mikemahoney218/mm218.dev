@@ -57,15 +57,14 @@ This is [a known bug](https://github.com/r-lib/pillar/issues/552) that packages 
 try(dplyr::group_by(geodaData::guerry, CODE_DE))
 ```
 
-But it doesn't _always_ happen; for instance, implicitly casting `guerry` to a tibble through `mutate()` will succeed. Even in this case, though, the printed output is uglier than we'd expect from a tibble:
+But it can happen without casting to tibbles as well, for instance when trying
+to use `dplyr::arrange()`:^[This section was edited on 2022-12-01; thanks to [Barry Rowlingson](https://fosstodon.org/@geospacedman@mastodon.social/109439358830660533) for pointing out a mistake in the original draft.]
 
 ```{r}
-geodaData::guerry |> 
-  dplyr::mutate() |> # This does nothing, beside cast guerry to a tibble
-  head(1)
+try(dplyr::arrange(geodaData::guerry))
 ```
 
-I haven't been able to figure out the logic behind when casting these objects succeeds and when it just mucks up the printing; but either way, packages currently need to implement their own workarounds for these problems when including sf objects as data.
+Any code that calls `vctrs::vec_size()` will wind up erroring in this situation, which includes a good amount of tidyverse code.
 
 A final challenge with including sf objects in R packages is that some projected CRS include non-ASCII characters in their WKT, [causing an aggravating warning](https://github.com/r-spatial/sf/issues/1341) in R CMD check:  `Warning: found non-ASCII string`. Your package won't be accepted to CRAN with that warning, and as such, this needs to be fixed.^[Theoretically this _should_ be fixed by setting `Encoding: UTF8` in your package DESCRIPTION, but [that rarely seems to help](https://github.com/r-spatial/sf/issues/1341#issuecomment-609645514).]
 
