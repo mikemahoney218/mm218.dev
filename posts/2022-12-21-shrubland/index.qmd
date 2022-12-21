@@ -15,7 +15,7 @@ format:
 engine: knitr
 ---
 
-I have a new paper, "Classification and mapping of low-statured shrubland cover types in post-agricultural landscapes of the US Northeast", out today in the International Journal of Remote Sensing! This project was a fantastic collaboration with with Lucas Johnson, Abigail Guinan, and Colin Beier, and I'm thrilled to see it in print.
+I have a new paper, ["Classification and mapping of low-statured shrubland cover types in post-agricultural landscapes of the US Northeast", out today in the International Journal of Remote Sensing](https://doi.org/10.1080/01431161.2022.2155086)! This project was a fantastic collaboration with with Lucas Johnson, Abigail Guinan, and Colin Beier, and I'm thrilled to see it in print.
 
 ![Predicted probability of shrubland for 2019 across all mapped areas within New York State, from the logistic ensemble model. Pixels in non-vegetated LCPRI land cover classes (developed, water, ice/snow, and barren) or above 1067 meters in elevation were not mapped and are shown in white.](map.jpg){fig-alt="A map of predicted shrubland probabilities for all of New York State."}
 
