@@ -2,7 +2,7 @@
 title: "Cool graphs about elevators"
 author: Mike Mahoney
 subtitle: "Last generated on: `r Sys.Date()`"
-date: today
+date: last-modified
 execute:
   freeze: true
 format: 

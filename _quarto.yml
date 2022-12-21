@@ -30,6 +30,8 @@ website:
         href: blog.xml
   page-footer:
     left: "© Copyright 2022 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0."
+  google-analytics: "G-YZLKD6JCSW"
+  cookie-consent: true
 format:
   html:
     theme: [sandstone, _variables.scss]
