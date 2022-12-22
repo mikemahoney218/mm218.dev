@@ -5,6 +5,12 @@
     As lead/presenting author:
     <h3>2022</h3>
     <p>
+        <div><strong>Virtual Environments for Communicating Changing Forests.</strong></div>
+        <div>With <a href = 'https://www.esf.edu/faculty/beier/'>Colin M. Beier</a> and <a href = 'https://aidanackerman.com/'>Aidan C. Ackerman</a></div>
+        <div>Regular talk, Forest Ecosystem Monitoring Cooperative Conference, Burlington, VT, December 15 2022.</div>
+        <div>Slides available at <a href="https://mm218.dev/femc2022">https://mm218.dev/femc2022</a></div>
+    </p>
+    <p>
         <div><strong>Building trust in AI outputs: Approaches from NY’s forest carbon monitoring program.</strong></div>
         <div>Invited talk, Federation of Earth Science Information Partners (ESIP) July Meeting, Pittsburgh, PA, July 22 2022.</div>
         <div>Slides available at <a href="https://mm218.dev/esip2022">https://mm218.dev/esip2022</a></div>
@@ -14,19 +20,16 @@
         <div>With <a href = "https://www.lucaskjohnson.com/">Lucas K. Johnson,</a> and <a href = 'https://www.esf.edu/faculty/beier/'>Colin M. Beier</a></div>
         <div>Regular talk, Ecological Society of America and Canadian Society for Ecology and Evolution Joint Annual Meeting, Montreal, Quebec, Canada, August 15 2022.</div>
     </p>
-    <p>
       <p>
         <div><strong>unifir: A Unifying API for Working with Unity in R.</strong></div>
         <div>With <a href = 'https://www.esf.edu/faculty/beier/'>Colin M. Beier</a> and <a href = 'https://aidanackerman.com/'>Aidan C. Ackerman</a></div>
         <div>Regular talk, useR! 2022 (Virtual), June 22 2022.</div>
     </p>
-    <p>
       <p>
         <div><strong>Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass.</strong></div>
         <div>With <a href = "https://www.lucaskjohnson.com/">Lucas K. Johnson,</a> and <a href = 'https://www.esf.edu/faculty/beier/'>Colin M. Beier</a></div>
         <div>Regular talk, North American Forest Ecology Workshop (Virtual), June 20 2022.</div>
     </p>
-    <p>
     <p>
         <div><strong>It's not what it looks like: Learning to question assumptions when debugging ML models.</strong></div>
         <div>Regular talk, Data Mishaps Night (Virtual), February 24 2022.</div>
@@ -95,10 +98,16 @@ York.</strong></div>
     As co-/non-presenting author:
     <h3>2022</h3>
     <p>
+        <div><strong>A Map‑based Stock Change Approach for Fine‑scale Biomass
+and Carbon Accounting in NYS.</strong></div>
+        <div>With <a href = "https://www.lucaskjohnson.com/">Lucas K. Johnson (lead author),</a> and <a href = 'https://www.esf.edu/faculty/beier/'>Colin M. Beier</a></div>
+        <div>Regular talk, Forest Ecosystem Monitoring Cooperative Conference, Burlington, VT, December 15 2022.</div>
+    </p>
+    <p>
         <div><strong>Historical Time Series Biomass Modeling: To Train on Plots
 or Pixels?.</strong></div>
         <div>With <a href = "https://www.lucaskjohnson.com/">Lucas K. Johnson (lead author),</a> and <a href = 'https://www.esf.edu/faculty/beier/'>Colin M. Beier</a></div>
-        <div>Regular talk, American Geophysical Union Fall Meeting, Chicago, IL, December 15 2022.</div>
+        <div>Regular talk, American Geophysical Union Fall Meeting, Chicago, IL, December 14 2022.</div>
     </p>
     <h3>2021</h3>
     <p>
