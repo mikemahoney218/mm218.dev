@@ -6,7 +6,7 @@
     <hr>
     <h3>2022</h3>
     
-    <p><strong>Mahoney, MJ</strong>, Johnson, J. K., Guinan, A. Z., and Beier, C. M. 2022. Classification and mapping of low‑statured ’shrubland’ cover types in post‑agricultural landscapes of the US Northeast. <em>The International Journal of Remote Sensing</em>, 43(19‑24), 7117‑7138. <a href="https://doi.org/10.1080/01431161.2022.2155086">https://doi.org/10.1080/01431161.2022.2155086</a> <a href='shrubland_2022.pdf'>[PDF]</a>
+    <p><strong>Mahoney, MJ</strong>, Johnson, J. K., Guinan, A. Z., and Beier, C. M. 2022. Classification and mapping of low‑statured ’shrubland’ cover types in post‑agricultural landscapes of the US Northeast. <em>The International Journal of Remote Sensing</em>, 43(19‑24), 7117‑7138. <a href="https://doi.org/10.1080/01431161.2022.2155086">https://doi.org/10.1080/01431161.2022.2155086</a> <a href='shrubland_pub_2022.pdf'>[PDF]</a>
     </p>
     <p>Johnson, L. K., <strong>Mahoney, M. J.</strong>, Bevilacqua, E., Stehman, S. V., Domke, G. M., and Beier, C. M. In Review. Fine-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages. 2022. <em>International Journal of Applied Earth Observation and Geoinformation</em> 114: 103059. <a href="https://doi.org/10.1016/j.jag.2022.103059">https://doi.org/10.1016/j.jag.2022.103059</a> <a href='lidar_agb_2022.pdf'>[PDF]</a></p>
     <p><strong>Mahoney, MJ</strong>, Johnson, J. K., Bevilacqua, E., and Beier, C. M. 2022. Ground noise filtering produces inferior models of forest aboveground biomass. <em>GIScience and Remote Sensing</em> 59(1): 1266-1280. <a href="https://doi.org/10.1080/15481603.2022.2103069">https://doi.org/10.1080/15481603.2022.2103069</a> <a href='groundfiltering_2022.pdf'>[PDF]</a>
