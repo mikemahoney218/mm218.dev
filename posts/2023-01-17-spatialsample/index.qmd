@@ -1,0 +1,56 @@
+---
+title: "spatialsample 0.3.0 is now on CRAN"
+description: "Repeats, standardization, repeats, spatial clustering, repeats, and more."
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2023-01-17"
+categories: [R, spatialsample, tidymodels, R packages, geospatial data]
+image: map.jpg
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+![Photo by <a href="https://unsplash.com/@tjump">Nik Shuliahin 💛💙</a> on <a href="https://unsplash.com/photos/rkFIIE9PxH0">Unsplash</a>](map.jpg){fig-alt="A pretty map picture. It has no relevance to the article."}
+
+A new release of [spatialsample](https://spatialsample.tidymodels.org/) -- an R package extending the [rsample](https://rsample.tidymodels.org/) framework to handle spatial resampling and cross-validation -- just landed on CRAN. This post will describe the new breaking changes to the `spatial_clustering_cv()` function, as well as improvements made to how spatialsample handles repeated cross-validation, as well as improvements made to how spatialsample handles repeated cross-validation; for a full list of changes, check out [this release's NEWS entry](https://spatialsample.tidymodels.org/news/index.html)
+
+You can install the package from CRAN via:
+
+```r
+install.packages("spatialsample")
+```
+
+
+## Breaking changes to `spatial_clustering_cv()`
+
+The only (intentional!) breaking changes in this version are to the function `spatial_clustering_cv()`. This function is the oldest part of the package, and as such didn't quite work like any of the other parts of the package: distance calculations sometimes used `dist()` instead of `sf::st_distance()`, distances used centroids instead of polygon edges, and trying to adapt this function to work with both `sf` and non-spatial data had made the internals a bit hairy.
+
+As of [rsample 1.1.1](https://rsample.tidymodels.org/news/index.html#rsample-111), all of those non-spatial elements have been outsourced to `rsample::clustering_cv()`. If you've been using `spatial_clustering_cv()` for non-spatial data, this function is pretty close to a drop-in replacement, and you should migrate code over.
+
+For spatial point data, `spatial_clustering_cv()` should work identically to past versions. For other geometry types however, note that distance calculations have now changed to use edge-to-edge distance between geometries, rather than centroids as in past versions. This means this function now uses distances in a way that's more consistent with the rest of the package, and more consistent with what I personally view as best practice; two polygons sharing a lot of perimeter but with centroids separated by a decent margin are still likely to be highly similar. 
+
+```{r}
+library(spatialsample)
+spatial_clustering_cv(boston_canopy, 2)
+```
+
+
+## Repetition, repetition, repetition^[This joke I keep making is stolen from [an old Kurt Braunohler video](https://www.youtube.com/watch?v=g4GRYQHccLo). Or potentially, [this other Kurt Braunohler video](https://www.youtube.com/watch?v=Lvd6MBsiDBo). Or potentially, [that first Kurt Braunohler video](https://www.youtube.com/watch?v=g4GRYQHccLo).]
+
+I think the most exciting part of this release is that all spatialsample functions can now handle cross-validation with repeats. Simply pass your desired number of repeats to the `repeats` argument of any function.^[Though note that spatialsample should error if repeats would return the same exact folds, such as when using `spatial_leave_location_out_cv()` with `v = NULL`. This behavior might change in the future if anyone complains, but for the modeling projects I've worked on, you'd only repeat identical CV folds by accident.] The `autoplot()` function will now also automatically detect when you've used repeated cross-validation, and facet plots accordingly:
+
+```{r}
+boston_canopy |> 
+  spatial_block_cv(v = 5, repeats = 4) |> 
+  autoplot()
+```
+
+
+## ...and more!
+
+This is just scratching the surface of the new features and improvements in this release of spatialsample. You can see a full list in [this release's NEWS entry](https://spatialsample.tidymodels.org/news/index.html).
+
+## Repetition!
