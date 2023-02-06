@@ -388,7 +388,7 @@ cookieconsent.run({
 <p>We can also go on to the third step of our assessment process, and get our model accuracy metrics for each aggregation scale we investigated. We’ll create a new data frame with only our cellsize variable and the associated model metrics:</p>
 <div class="cell" data-hash="index_cache/html/unnamed-chunk-10_cc9d162150cef70d7dcc926bf5fa8fa7">
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r code-with-copy"><code class="sourceCode R"><span><span class="va">riemann_metrics</span> <span class="op">&lt;-</span> <span class="va">riemann_resamples</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html">transmute</a></span><span class="op">(</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html">transmute</a></span><span class="op">(</span></span>
 <span>    cellsize <span class="op">=</span> <span class="va">cellsize</span>,</span>
 <span>    resampled_metrics <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html">map</a></span><span class="op">(</span><span class="va">resampled_outputs</span>, <span class="va">collect_metrics</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">|&gt;</span> </span>
