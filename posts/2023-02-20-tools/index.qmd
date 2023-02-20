@@ -1,0 +1,81 @@
+---
+title: "Commands I Use"
+description: "Everyone else was jumping off the bridge, so I did too."
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2023-02-20"
+categories: [shell]
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+[Greg Wilson posted this](https://third-bit.com/2023/01/24/commands-i-use/) and then [Eugene Wallingford posted this](https://www.cs.uni.edu/~wallingf/blog/archives/monthly/2023-02.html#e2023-02-20T10_18_38.htm) and it seemed like fun: what are the most common shell commands I use?
+
+Counting command usage is pretty straightforward:
+
+```bash
+$ history | awk '{print $2}' | sort | uniq -c | sort -nr | head -n 50
+```
+
+And my list winds up looking like this:
+
+```
+git # Though of course, this is a bunch of different commands
+cd # Did you know you don't need to use cd in zsh? 
+# You can just type the directory. I learned this last week, evidently.
+sudo
+ls
+find
+quarto # I don't think this includes rendering from RStudio! 
+grep
+rm
+gdalwarp # -multi -co NUM_THREADS=ALL_CPUS -co COMPRESS=DEFLATE \ 
+# -co PREDICTOR=3 -co BIGTIFF=YES
+ra # My alias for radian -- https://github.com/randy3k/radian
+nano # Possibly from teaching Software Carpentry lessons
+cat
+docker # I always teach using https://hub.docker.com/r/rocker/rstudio
+rsync
+cargo
+htop
+xkill # No, *you're* cheating at Crusader Kings
+pip
+ssh
+R # Interesting to me that I have three separate R calls here
+Rscript
+curl
+mkdir
+labrador # Alias to SSH into another computer
+convert # Have done a _lot_ of image processing work for the PhD
+tmux # Highly, highly recommend https://github.com/tmux/tmux
+qvm # The _only_ way to use Quarto https://github.com/dpastoor/qvm
+ping # I break my local network more than I care to admit
+gdal_calc.py 
+killall # "Whoops, accidentally used all threads for that job again"
+echo
+co # Alias to SSH into another computer
+cp
+ogr2ogr # Called a lot, but called _correctly_ very rarely
+mv
+python # More often called from inside an IDE
+ogrinfo
+history
+which
+touch
+wc
+source
+gdalinfo
+du # Doing spatial modeling on local compute resources is... rough
+sshpi # Alias to SSH into another computer
+sed
+gdal_translate
+ffmpeg # Surprisingly useful for conference talks
+wget
+scp
+```
+
+I'm surprised by how much more I use gdalwarp than the rest of the suite! But
+otherwise, this all makes pretty intuitive sense to me.

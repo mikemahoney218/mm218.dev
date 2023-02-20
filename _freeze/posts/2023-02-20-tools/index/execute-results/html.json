@@ -1,0 +1,14 @@
+{
+  "hash": "fa584037a395544094a83f6225ba3c27",
+  "result": {
+    "markdown": "---\ntitle: \"Commands I Use\"\ndescription: \"Everyone else was jumping off the bridge, so I did too.\"\nauthor:\n  - name: Mike Mahoney\n    url: {}\ndate: \"2023-02-20\"\ncategories: [shell]\nformat: \n  html:\n    toc: true\nengine: knitr\n---\n\n\n[Greg Wilson posted this](https://third-bit.com/2023/01/24/commands-i-use/) and then [Eugene Wallingford posted this](https://www.cs.uni.edu/~wallingf/blog/archives/monthly/2023-02.html#e2023-02-20T10_18_38.htm) and it seemed like fun: what are the most common shell commands I use?\n\nCounting command usage is pretty straightforward:\n\n```bash\n$ history | awk '{print $2}' | sort | uniq -c | sort -nr | head -n 50\n```\n\nAnd my list winds up looking like this:\n\n```\ngit # Though of course, this is a bunch of different commands\ncd # Did you know you don't need to use cd in zsh? \n# You can just type the directory. I learned this last week, evidently.\nsudo\nls\nfind\nquarto # I don't think this includes rendering from RStudio! \ngrep\nrm\ngdalwarp # -multi -co NUM_THREADS=ALL_CPUS -co COMPRESS=DEFLATE \\ \n# -co PREDICTOR=3 -co BIGTIFF=YES\nra # My alias for radian -- https://github.com/randy3k/radian\nnano # Possibly from teaching Software Carpentry lessons\ncat\ndocker # I always teach using https://hub.docker.com/r/rocker/rstudio\nrsync\ncargo\nhtop\nxkill # No, *you're* cheating at Crusader Kings\npip\nssh\nR # Interesting to me that I have three separate R calls here\nRscript\ncurl\nmkdir\nlabrador # Alias to SSH into another computer\nconvert # Have done a _lot_ of image processing work for the PhD\ntmux # Highly, highly recommend https://github.com/tmux/tmux\nqvm # The _only_ way to use Quarto https://github.com/dpastoor/qvm\nping # I break my local network more than I care to admit\ngdal_calc.py \nkillall # \"Whoops, accidentally used all threads for that job again\"\necho\nco # Alias to SSH into another computer\ncp\nogr2ogr # Called a lot, but called _correctly_ very rarely\nmv\npython # More often called from inside an IDE\nogrinfo\nhistory\nwhich\ntouch\nwc\nsource\ngdalinfo\ndu # Doing spatial modeling on local compute resources is... rough\nsshpi # Alias to SSH into another computer\nsed\ngdal_translate\nffmpeg # Surprisingly useful for conference talks\nwget\nscp\n```\n\nI'm surprised by how much more I use gdalwarp than the rest of the suite! But\notherwise, this all makes pretty intuitive sense to me.\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
