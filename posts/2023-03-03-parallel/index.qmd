@@ -1,0 +1,45 @@
+---
+title: "How to run R jobs across multiple (local) computers"
+description: "TIL this extremely, extremely easy thing"
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2023-03-03"
+categories: ["R", "Tutorials", "Spatial", "Data science"]
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+I've got a small homelab going at the moment, where in addition to my daily workstation I've also got a [NUC](https://www.intel.com/content/www/us/en/products/details/nuc.html), [Raspberry Pi](https://www.raspberrypi.org/), and [Synology NAS](https://www.synology.com/en-us/dsm) running on my local network.^[With external access via [tailscale](https://tailscale.com/).] I primarily use these other machines as always-on servers and storage for things like [Telegraf, Influx and Grafana](../2020/05/), [mealie](https://mealie.io/) and [paperless](https://github.com/paperless-ngx/paperless-ngx), but every so often it's useful to run a long-running, high CPU job on the NUC, rather than tying up my main workstation. In those situations, I tend to use [VS Code's Remote Server](https://code.visualstudio.com/docs/remote/ssh), at least for anything too complex for just ssh'ing into the NUC and running commands in the CLI.
+
+At the moment I'm working with some _extremely_ long-running jobs which will take a few weeks to complete and are blockers for my other work. As a result, I'm not really worried about tying up my main workstation, if it means the jobs will run faster -- in fact, I'd like to tie up as many computers as possible, if it means the jobs execute any faster.
+
+In the past, I've tried to manually split up jobs into smaller pieces and run them independently on the different computers. This is a pain. I've also shifted to using [targets](https://books.ropensci.org/targets/) for most analysis projects these days, in order to take advantage of its automatic DAG creation and state-saving. Manual splitting-and-execution really undermines targets' automatic orchestration abilities, so I've needed to find a better way to split workloads across computers.
+
+It turns out that better way is extremely straightforward,^[For a value of straightforward that includes "maintaining multiple machines with similar-enough R environments, access to shared storage if necessary, and ssh access to each other on a private subnet".] and I'm kicking myself for not finding it out earlier. Say you've got two machines with internal IP addresses of `192.168.1.001` and `192.168.1.002`, each with a user `some_user` who has [key-based access](https://www.digitalocean.com/community/tutorials/how-to-configure-ssh-key-based-authentication-on-a-linux-server#step-2-copying-an-ssh-public-key-to-your-server) to ssh into the other machine. If you're using [future](https://future.futureverse.org/), setting a [plan](https://future.futureverse.org/articles/future-1-overview.html#controlling-how-futures-are-resolved) to work across both computers takes two function calls:
+
+```r
+cl <- parallel::makePSOCKcluster(
+  c("192.168.1.001", "192.168.1.002"),
+  master = "192.168.1.001",
+  user = "some_user"
+)
+future::plan(future::cluster, workers = cl)
+```
+
+And that's it! Any future-enabled functions you use^[Highly recommend either [future.apply](https://future.apply.futureverse.org/) or [furrr](https://furrr.futureverse.org/) for ease-of-use, by the way.] will be split across your machines. For my targets-based workflow, I just run `targets::tar_make_future(workers = 2)` to split the jobs up. 
+
+To push things further, you can also run multiple clusters on a single machine:
+
+```r
+cl <- parallel::makePSOCKcluster(
+  c("192.168.1.001", "192.168.1.001", "192.168.1.002"),
+  master = "192.168.1.001",
+  user = "some_user"
+)
+future::plan(future::cluster, workers = cl)
+```
+
+Or set jobs to use multiple cores, either by [nesting futures](https://future.futureverse.org/index.html#nested-futures-and-evaluation-topologies) or using other forms of parallelism; for instance, my current job is primarily using [terra](https://github.com/rspatial/terra) for a lot of raster predictions, so by setting `cores = future::availableCores() - 1` inside of `terra::predict()` I'm able to more-or-less max out both machines I'm running on.
