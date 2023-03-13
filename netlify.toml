@@ -141,3 +141,7 @@
 [[redirects]]
   from = "esip2023"
   to = "https://mikemahoney218.github.io/2023-01-27-esip/slides.html#/title-slide"
+
+[[redirects]]
+  from = "boston_useR_2023"
+  to = "https://mikemahoney218.github.io/2023-04-05_boston_useR_lightning_talk/slides.html#/title-slide"
