@@ -5,7 +5,8 @@
     Click "[PDF]" to download each paper.
     <hr>
     <h3>2023</h3>
-    <p><strong>Mahoney, MJ</strong> In Review. waywiser: Ergonomic Methods for Assessing Spatial Models. <a href="https://arxiv.org/abs/2303.11312">https://arxiv.org/abs/2303.11312</a> <a href='https://arxiv.org/pdf/2303.11312'>[PDF]</a>
+    <p><strong>Mahoney, MJ</strong> In Review. waywiser: Ergonomic methods for assessing spatial models. <a href="https://arxiv.org/abs/2303.11312">https://arxiv.org/abs/2303.11312</a> <a href='https://arxiv.org/pdf/2303.11312'>[PDF]</a>
+    </p>
     <p><strong>Mahoney, MJ</strong>, Johnson, L. K., Silge, J., Frick, H., Kuhn, M., and Beier, C. M. In Review. Assessing the performance of spatial cross-validation approaches for models of spatially structured data. <a href="https://arxiv.org/abs/2303.07334">https://arxiv.org/abs/2303.07334</a> <a href='https://arxiv.org/pdf/2303.07334'>[PDF]</a>
     </p>
     <h3>2022</h3>
