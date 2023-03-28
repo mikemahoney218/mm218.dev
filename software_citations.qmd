@@ -1,0 +1,121 @@
+## Software Citations
+
+On this page I collect citations to software I maintain or am an author of. Software citations are particularly poorly captured by things like Google Scholar, both because software exists outside of standard citation formats and because software citations are often poorly formatted in publications. For that reason, I find it useful to keep my own list of projects which have cited my work.
+
+If you cited any of my packages in a publication, please let me know -- either on [Mastodon](https://fosstodon.org/@MikeMahoney218) or via email at [mike.mahoney.218+site@gmail.com](mailto:mike.mahoney.218+site@gmail.com) . I can't guarantee I'll add them to this list, [for secret reasons](https://www.jasongurley.com/quote-wall-white/), but it always makes me happy to see.
+
+## How to cite software
+
+The rOpenSci blog has [a fantastic post on how to cite R and R packages](https://ropensci.org/blog/2021/11/16/how-to-cite-r-and-r-packages/), which I quickly summarize below. I highly recommend their post, however, even if you aren't an R user; most of the topic generalizes to other software pretty easily.
+
+A software citation serves two functions for your readers:
+
++ Tells them _what you did_; for instance, if I see someone cite the `sf` package, I suddenly know more about the details of their spatial calculations than I can probably get from the text alone.
++ Tells them _how you did it_; package version information and source information helps others to replicate your work, and also can help readers assess an analysis. If you use `sf` >= 1.0.0, for instance, I know that you probably didn't run into issues doing distance calculations with geographic coordinates, so I don't need to consider that when I'm reading your results.
+
+Software citations also help the developers of your packages justify developing packages further; if you're a user of scientific software and want there to still _be_ scientific software in the future, you should cite your software. It also makes me, personally, feel great to see people benefiting from my work, and to see them credit me for any help my software gave them! 
+
+As such, you should cite any package that was relevant to the study you performed. If uninstalling the package (or deleting the relevant function calls) would change your results or make your code not run, you should cite it.
+
+If you _are_ an R user, you can get the citations for both R and your packages using the `citation()` function:
+
+```{r}
+citation()
+
+citation("rsample")
+```
+
+If you _aren't_ an R user, many scientific software libraries will still provide information on how to cite them -- for instance, [here's the instructions for citing numpy](https://numpy.org/citing-numpy/). If Google and such return nothing, then I think your best option is to style citations after the official R citation: list the authors and 
+
+## How I track citations
+
+As suggested in [a different rOpenSci post](https://ropensci.org/blog/2021/02/16/package-citation/#how-ropensci-tracks-package-usage), I find the best general tool I have for finding software citations is to set up a Google Scholar alert for my packages and investigate each alert as it comes in. This is not a foolproof method, and I'm sure I miss things; as mentioned above, if you cited any of my packages in a publication, please let me know either on [Mastodon](https://fosstodon.org/@MikeMahoney218) or via email at [mike.mahoney.218+site@gmail.com](mailto:mike.mahoney.218+site@gmail.com) .
+
+I only track citations for packages I'm an author on, once I'm an author on them. In cases where a paper mentions the package but doesn't cite it, I only list the article if it was published after I became an author on the package.
+
+While I track both citations and mentions of my packages, I really want to stress that citations are fantastic, help me justify maintaining open source scientific software (both to my boss and to myself), and make me really happy. Mentions do not. If you are going to mention one of these packages, please give it a full citation.
+
+The citations below are in a variety of formats; I'll confess to copying journal "cite this article" citations without reformatting for this list. If I messed up my citation for your article, please get in touch to let me know.
+
+## Software citations
+
+### terrainr
+
+#. Fox, N., Serrano-Vergel, R., Van Berkel, D., Lindquist, M. 2022. Towards Gamified Decision Support Systems: In-game 3D Representation of Real-word Landscapes from GIS Datasets. Journal of Digital Landscape Architecture. https://doi.org/10.14627/537724035
+
+#. Tamiminia, H., Salehi, B., Mahdianpari, M., Beier, C. M., Johnson, L. 2022.  Mapping Two Decades of New York State Forest Aboveground Biomass Change Using Remote Sensing. Remote Sensing 14(16): 4097. https://doi.org/10.3390/rs14164097
+
+The following are self-citations:
+
+#. Johnson, L. K., Mahoney, M. J., Bevilacqua, E., Stehman, S. V., Domke, G. M., & Beier, C. M. (2022). Fine-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages. International Journal of Applied Earth Observation and Geoinformation, 114, 103059.
+
+#. Mahoney, M. J., Johnson, L. K., Guinan, A. Z., & Beier, C. M. (2022). Classification and mapping of low-statured shrubland cover types in post-agricultural landscapes of the US Northeast. International Journal of Remote Sensing, 43(19-24), 7117-7138.
+
+#. Mahoney et al., (2022). unifir: A Unifying API for Working with Unity in R. Journal of Open Source Software, 7(73), 4388, https://doi.org/10.21105/joss.04388
+
+#. Tamiminia, H., Salehi, B., Mahdianpari, M., Beier, C. M., Johnson, L., Phoenix, D. B., and Mahoney, M. 2022. Decision tree-based machine learning models for above-ground biomass estimation using multi-source remote sensing data and object-based image analysis. Geocarto International 37(26): 12763-12791. https://doi.org/10.1080/10106049.2022.2071475
+
+```{r}
+citation("terrainr")
+```
+
+
+### unifir
+
+```{r}
+citation("unifir")
+```
+
+
+### waywiser
+
+```{r}
+citation("waywiser")
+```
+
+### spatialsample
+
+I took over maintenance of spatialsample in mid-2022, after spending the summer interning with the tidymodels crew at Posit working on spatialsample and rsample. I'm responsible for the majority of package functionality. I only track citations here for versions of the package I'm an author on (>= 0.2.0).
+
+#. Tutland, Niko J., Rodman, Kyle C., Andrus, Robert A., and Hart, Sarah J.. 2023. “ Overlapping Outbreaks of Multiple Bark Beetle Species are Rarely More Severe than Single-Species Outbreaks.” Ecosphere 14( 3): e4478. https://doi.org/10.1002/ecs2.4478
+
+#. Skinner, E.B., Glidden, C.K., MacDonald, A.J. et al. Human footprint is associated with shifts in the assemblages of major vector-borne diseases. Nat Sustain (2023). https://doi.org/10.1038/s41893-023-01080-1
+
+```{r}
+citation("spatialsample")
+```
+
+
+### rsample
+
+I am an author on rsample after implementing functions for grouped resampling and clustered cross-validation (as well as the "common resampling patterns" vignette and a few other improvements). I only track citations here for versions of the package I'm an author on (>= 1.1.1).
+
+#. Lundell, J. 2023. EZtune: A Package for Automated Hyperparameter Tuning in R. https://arxiv.org/abs/2303.12177
+
+#. Ying R., Monteiro, F. M., Wilson, J. D., and Schmidt, D. N. 2023. ForamEcoGEnIE 2.0: incorporating symbiosis and spine traits into a trait-based global planktic foraminiferal model. Geosci. Model Dev., 16, 813–832, https://doi.org/10.5194/gmd-16-813-2023
+
+#. Lyu H, Grafton M, Ramilan T, Irwin M, Sandoval E. Assessing the Leaf Blade Nutrient Status of Pinot Noir Using Hyperspectral Reflectance and Machine Learning Models. Remote Sensing. 2023; 15(6):1497. https://doi.org/10.3390/rs15061497 
+
+The following are self-citations:
+
+#. Mahoney, MJ, Johnson, L. K., Silge, J., Frick, H., Kuhn, M., and Beier, C. M. In Review. Assessing the performance of spatial cross-validation approaches for models of spatially structured data. https://arxiv.org/abs/2303.07334
+
+#. Mahoney, MJ In Review. waywiser: Ergonomic methods for assessing spatial models. https://arxiv.org/abs/2303.11312
+
+rsample is used in (but not cited in) [Wang et al 2023](https://dx.doi.org/10.2139/ssrn.4333412); [Lienard et al 2022](https://royalsocietypublishing.org/doi/full/10.1098/rstb.2021.0279); [Adu-Oppong et al 2022](https://doi.org/10.1186/s40168-021-01204-9); [Zappaterra et al 2022](https://doi.org/10.3390/app12031078); [Mull et al 2022](https://doi.org/10.1111/1365-2656.13694); [Dematheis et al 2022](https://doi.org/10.3390/microorganisms10081658); [Bellows et al 2022](https://doi.org/10.1093/ajh/hpac005); [Yates et al](https://doi.org/10.1002/ecm.1557); [Stevelink et al 2022](https://doi.org/10.1016/j.eclinm.2022.101732); [Bartz-Beielstein et al 2023](https://doi.org/10.1007/978-981-19-5170-1_8); [Han Nh 2022](https://doi.org/10.21203/rs.3.rs-1968295/v1); [Yan et al 2023](https://doi.org/10.1038/s41598-022-27150-6); [dos Santos et al 2022](https://doi.org/10.1016/j.compag.2022.106753); [Badonyi et al 2022](https://doi.org/10.1101/2022.11.17.516863); [Badonyi et al 2022](https://doi.org/10.7554/eLife.79602).
+
+```{r}
+citation("rsample")
+```
+
+
+### geojsonio
+
+I took over maintaining geojsonio in mid-2022, in order to keep the package on CRAN. Most functionality was either contributed by Scott and Andy or by community contributors; I primarily fix issues to keep the package on CRAN and shepherd community contributions prior to merging them into the project. As with rsample, I only track citations since I joined the project.
+
+geojsonio is used in (but not cited in) [Chauhan et al 2022](https://doi.org/10.3390/v14112461); [Wang 2023](https://www.routledge.com/Data-Science-for-Infectious-Disease-Data-Analytics-An-Introduction-with/Wang/p/book/9781032187426); [de Souza et al 2022](https://www.mdpi.com/1999-4915/14/10/2311).
+
+```{r}
+citation("geojsonio")
+```
+
