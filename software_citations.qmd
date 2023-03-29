@@ -1,3 +1,7 @@
+---
+toc: true
+---
+
 ## Software Citations
 
 On this page I collect citations to software I maintain or am an author of. Software citations are particularly poorly captured by things like Google Scholar, both because software exists outside of standard citation formats and because software citations are often poorly formatted in publications. For that reason, I find it useful to keep my own list of projects which have cited my work.
@@ -25,7 +29,7 @@ citation()
 citation("rsample")
 ```
 
-If you _aren't_ an R user, many scientific software libraries will still provide information on how to cite them -- for instance, [here's the instructions for citing numpy](https://numpy.org/citing-numpy/). If Google and such return nothing, then I think your best option is to style citations after the official R citation: list the authors and 
+If you _aren't_ an R user, many scientific software libraries will still provide information on how to cite them -- for instance, [here's the instructions for citing numpy](https://numpy.org/citing-numpy/). If Google and such return nothing, then I think your best option is to style citations after the official R citation: mimic book citation style, using authors, year, title, publication location, and an accessible URL.
 
 ## How I track citations
 
