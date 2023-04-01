@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/2023-04-01-fitting_models/index.html",
       "/posts/2023-03-21-waywiser-ropensci/index.html",
       "/posts/2023-03-03-parallel/index.html",
       "/posts/2023-02-20-tools/index.html",

@@ -1,0 +1,74 @@
+---
+title: "Using in-line grouping to fit many models"
+description: "An alternative to nesting for fitting separate models to multiple groups."
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2023-04-01"
+categories: ["R", "Tutorials", "Data science"]
+image: nests.jpg
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+Tim Tiefenbach [has a post](https://tim-tiefenbach.de/post/2023-dplyr-many-models/) on using dplyr and other tidymodels tools to fit many models in relatively few lines of code. Tim's post walks through a lot of interesting functions for more complicated model fitting, which I'm not going to talk about at all. What I want to talk about is that I recently realized I don't do much nesting in R anymore!
+
+The building block in Tim's post uses the new-ish `dplyr::nest_by()` to create a nested data frame, then fits models using the new `data` list column:
+
+```{r}
+dplyr::storms |> 
+  dplyr::nest_by(status) |> 
+  dplyr::mutate(
+    mod = list(lm(wind ~ pressure, data = data))
+  )
+```
+
+This is a pattern I used to use all the time^[Using `tidyr::nest()`, though.] -- my [undergrad thesis](https://www.mm218.dev/posts/2019/03/) and [eventual first pub from the same](https://www.mm218.dev/papers/mahoney_stella_2020.pdf) were built from strings of nesting and unnesting data and models. But over the years, I've realized that you can often get the same results using grouped data frames in the place of nested ones, and have shifted to using `dplyr::summarise()` and friends instead of nesting:
+
+```{r}
+dplyr::storms |> 
+  dplyr::summarise(
+    mod = list(lm(wind ~ pressure, data = dplyr::pick(dplyr::everything()))),
+    .by = status
+  )
+```
+
+Now, the obvious downside of using a grouped data frame instead of a nested one is that future function calls no longer have access to your raw data frame. The slightly less obvious downside is that the output of `dplyr::nest_by()` is a _rowwise_ data frame, which makes it easy to pass our model objects directly to other functions like `broom::tidy()`:
+
+```{r}
+dplyr::storms |> 
+  dplyr::nest_by(status) |> 
+  dplyr::mutate(
+    mod = list(lm(wind ~ pressure, data = data)),
+    res = list(broom::tidy(mod))
+  )
+```
+
+The outputs of the grouped data frame method are _not_ rowwise data frames, which means we need to use another function to iterate through each element of `mod`. I usually use `purrr::map()` for this:
+
+```{r}
+dplyr::storms |> 
+  dplyr::summarise(
+    mod = list(lm(wind ~ pressure, data = dplyr::pick(dplyr::everything()))),
+    res = purrr::map(mod, broom::glance),
+    .by = status
+  )
+```
+
+Part of the reason I use `purrr` for this is that `purrr` provides plenty of other helper functions for working with list columns; for instance, I tend to use `purrr::chuck()` to extract model fit statistics:
+
+```{r}
+dplyr::storms |> 
+  dplyr::summarise(
+    mod = list(lm(wind ~ pressure, data = dplyr::pick(dplyr::everything()))),
+    res = purrr::map(mod, broom::glance),
+    rsquared = purrr::map_dbl(res, purrr::chuck, "r.squared"),
+    .by = status
+  )
+```
+
+Anyway -- there's nothing better or worse (as far as I'm concerned) with either nesting or grouping for fitting many models; I just think it's interesting that my personal style has shifted over time to use much more grouping, and much less nesting.
+
+And as I said at the start, Tim's post walks through a lot of interesting functions for more complicated model fitting, which I'm not going to talk about at all; [here's the link again if you're interested](https://tim-tiefenbach.de/post/2023-dplyr-many-models/).
