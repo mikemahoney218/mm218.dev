@@ -27,7 +27,7 @@ comments: false
 
 ## Bio
 
-I’m a PhD candidate in at SUNY-ESF, working on new tools to make complex, 
+I’m a PhD candidate at SUNY-ESF, working on new tools to make complex, 
 broad-scale systems easier for humans to understand. 
 Right now, that means I split my time between predictive modeling
 (to [monitor forest carbon sequestration across New York State](https://cafri-ny.org/new-york-forest-carbon-assessment/), 
