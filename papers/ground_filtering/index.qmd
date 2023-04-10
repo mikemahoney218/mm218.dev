@@ -46,16 +46,12 @@ to represent useful 'signal' than extraneous 'noise' in these cases.
 
 <br />
 
-```{r}
-knitr::include_graphics("dists.svg")
-```
+![](dists.svg)
 
 Figure 1: Distributions of common LiDAR-derived metrics (including density percentiles, decile heights, L-moments, and quadratic mean height) for the pooled dataset at various levels of ground noise filtering. Filtering reduces the variance in many metrics, reducing the total amount of information available to models.
 
 <br />
 
-```{r}
-knitr::include_graphics("deltas.svg")
-```
+![](deltas.svg)
 
 Figure 2: Height threshold-based filtering of LiDAR returns produces inferior models across all landscape types, with more notable impacts in mixed-use landscapes

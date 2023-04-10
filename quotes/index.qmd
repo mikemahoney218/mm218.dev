@@ -1,7 +1,5 @@
 ---
 title: Quotes
-output:
-  tufte::tufte_html: default
 ---
 
 <hr id = "MoroCopShit">
