@@ -1,6 +1,6 @@
 ---
 title: "Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass"
-output: html_document
+freeze: true
 ---
 
 ```{r setup, include=FALSE}
