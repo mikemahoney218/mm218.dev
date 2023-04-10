@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.475">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mike Mahoney">
+<meta name="dcterms.date" content="2022-12-01">
+<meta name="description" content="An extremely opinionated guide for an extremely common problem.">
+
+<title>Mike Mahoney - How to include sf data in R packages</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Mike Mahoney - How to include sf data in R packages">
+<meta property="og:description" content="An extremely opinionated guide for an extremely common problem.">
+<meta property="og:image" content="https://mm218.dev/posts/2022-12-01-sf-in-packages/sf.jpg">
+<meta property="og:site-name" content="Mike Mahoney">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:title" content="Mike Mahoney - How to include sf data in R packages">
+<meta name="twitter:description" content="An extremely opinionated guide for an extremely common problem.">
+<meta name="twitter:image" content="https://mm218.dev/posts/2022-12-01-sf-in-packages/sf.jpg">
+<meta name="twitter:creator" content="@MikeMahoney218">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Mike Mahoney</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../papers">
+ <span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../presentations">
+ <span class="menu-text">Presentations</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../software_citations.html">
+ <span class="menu-text">Software citations</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../blog.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">How to include sf data in R packages</h1>
+                  <div>
+        <div class="description">
+          <p>An extremely opinionated guide for an extremely common problem.</p>
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">Tutorials</div>
+                <div class="quarto-category">Spatial</div>
+                <div class="quarto-category">Data science</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Mike Mahoney </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">December 1, 2022</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#tldr" id="toc-tldr" class="nav-link active" data-scroll-target="#tldr">tl;dr</a></li>
+  <li><a href="#the-problem" id="toc-the-problem" class="nav-link" data-scroll-target="#the-problem">The Problem</a></li>
+  <li><a href="#the-solution" id="toc-the-solution" class="nav-link" data-scroll-target="#the-solution">The Solution</a></li>
+  <li><a href="#update" id="toc-update" class="nav-link" data-scroll-target="#update">Update</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="tldr" class="level2">
+<h2 class="anchored" data-anchor-id="tldr">tl;dr</h2>
+<p>Store your sf objects as <a href="https://r-pkgs.org/data.html#sec-data-sysdata">internal data</a>. Add a <code>.R</code> file to <code>data/</code> (probably named <code>your_data.R</code>) containing the following:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">delayedAssign</span>(<span class="st">"your_data"</span>, <span class="fu">local</span>({</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">requireNamespace</span>(<span class="st">"sf"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  your_package<span class="sc">:::</span>your_data</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><a href="https://r-pkgs.org/data.html#sec-documenting-data">Document your data as usual</a>.</p>
+<p>See the update at the bottom of this post for a bit more information.</p>
+</section>
+<section id="the-problem" class="level2">
+<h2 class="anchored" data-anchor-id="the-problem">The Problem</h2>
+<p>If you work with spatial data in R, you’re familiar with <a href="https://r-spatial.github.io/sf/">the sf package</a>. If you write spatially-oriented packages for R, there’s a good chance you think a lot about how to handle and work with sf objects. I think that’s a good thing; sf makes data analysis with spatial data <em>miles</em> easier, and I rely on it throughout my packages.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="sf.jpg" class="img-fluid figure-img" alt="Three cute fuzzy monsters adding spatial geometries to an existing table of attributes using glue and tape, while one cuts out the spatial polygons. Title text reads &quot;sf: spatial data…simplified.&quot; and a caption at the bottom reads &quot;sticky geometries: for people who love their maps and sanity.&quot;"></p>
+<p></p><figcaption class="figure-caption">CC-BY 4.0 Artwork by Allison Horst.</figcaption><p></p>
+</figure>
+</div>
+<p>If you write spatially-oriented packages, there’s a good chance your examples or tests could benefit from your package including some sf objects as demonstration data. But there’s a few weird edge cases that crop up when including sf objects in package data.</p>
+<p>For instance, let’s look at the <code>guerry</code> data from the <a href="https://spatialanalysis.github.io/geodaData/">geodaData</a> package. On its own, this object seems to load and print perfectly fine:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>geodaData<span class="sc">::</span>guerry <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  CODE_DE COUNT AVE_ID_ dept Region Dprtmnt Crm_prs Crm_prp Litercy Donatns
+1      01     1      49    1      E     Ain   28870   15890      37    5098
+  Infants Suicids MainCty Wealth Commerc Clergy Crm_prn Infntcd Dntn_cl Lottery
+1   33120   35039       2     73      58     11      71      60      69      41
+  Desertn Instrct Prsttts Distanc Area Pop1831
+1      55      46      13 218.372 5762  346.03
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          geometry
+1 801150, 800669, 800688, 800780, 800589, 800333, 799095, 799136, 799690, 799329, 797715, 797655, 797410, 797149, 796755, 796738, 796612, 795234, 794905, 794547, 791555, 791465, 791935, 791835, 791670, 790205, 790035, 789304, 788617, 788005, 787670, 786705, 786350, 785720, 785562, 786670, 786930, 787055, 787208, 787367, 786900, 786795, 786830, 786811, 786384, 786550, 786560, 786465, 785956, 787211, 787415, 787600, 787536, 787137, 786610, 786457, 787138, 787365, 787545, 787880, 788198, 788225, 789130, 789370, 789790, 789995, 790445, 790237, 789585, 788993, 788830, 788650, 788638, 788673, 789501, 789510, 789596, 789680, 789845, 790050, 790594, 790750, 790740, 790739, 791139, 791749, 791860, 792199, 792285, 792880, 793615, 793737, 793650, 793618, 793480, 794012, 794347, 794535, 794686, 795135, 796115, 796193, 796250, 796311, 796335, 796324, 796316, 796385, 796495, 797830, 797970, 797959, 797910, 797905, 798850, 798930, 798980, 799122, 799255, 799340, 800295, 800326, 800757, 801505, 802043, 802820, 804846, 805165, 805338, 805485, 808352, 808655, 809605, 809930, 811710, 813076, 814292, 814670, 815189, 816978, 817045, 818290, 819798, 819990, 819753, 820496, 820305, 820810, 821023, 821020, 821753, 822453, 822690, 823263, 823585, 824250, 825284, 825600, 828440, 829372, 828470, 828705, 828395, 827745, 828485, 830445, 831525, 832747, 833030, 833286, 833885, 833687, 832940, 832830, 833866, 833825, 833752, 833675, 835995, 835930, 836194, 836185, 836190, 836405, 836690, 837059, 837545, 838628, 838735, 840056, 840530, 840855, 841371, 841670, 841591, 841093, 840525, 840483, 841576, 841898, 843750, 843973, 844372, 844675, 846805, 848292, 848440, 848651, 850029, 850390, 851184, 851650, 851857, 851710, 852195, 853883, 854050, 854684, 854950, 855010, 854706, 856495, 857425, 857675, 857795, 860115, 860522, 860356, 860868, 861160, 861499, 861800, 863931, 864270, 867954, 868320, 868625, 868940, 870819, 871569, 872099, 872230, 873891, 874080, 875215, 875688, 875836, 876350, 877249, 877575, 877751, 879950, 880577, 882757, 884049, 885600, 886165, 886435, 889069, 889778, 890867, 893000, 894101, 894575, 894622, 893375, 892712, 892540, 891600, 891281, 891245, 891340, 890292, 890080, 890987, 891235, 891560, 891794, 891337, 890413, 889185, 888822, 887853, 887180, 886092, 885735, 885432, 884760, 883760, 883455, 882749, 882058, 881989, 880591, 880422, 879890, 879855, 882197, 882019, 881408, 880810, 880202, 880177, 879600, 879351, 878142, 877449, 876853, 875845, 875089, 874800, 874322, 874925, 874725, 872900, 872100, 871837, 870648, 869972, 869296, 869435, 868710, 868663, 868525, 868760, 868985, 868525, 868617, 868760, 868864, 869034, 868545, 868661, 868975, 868911, 869020, 869215, 870970, 870979, 870925, 871130, 870721, 870455, 870800, 870344, 870311, 870897, 870710, 870615, 869975, 869465, 869314, 869040, 868989, 868710, 868050, 867940, 867995, 867975, 867825, 867736, 867995, 867979, 867788, 868170, 867935, 867643, 867110, 867246, 867588, 866723, 866013, 865294, 864275, 864000, 863659, 861885, 861845, 862185, 862398, 862694, 862533, 860925, 860842, 861160, 861300, 861210, 860973, 860337, 858511, 858205, 858072, 857453, 857320, 857265, 856650, 856355, 856182, 855610, 854744, 854474, 852864, 852620, 852647, 851685, 851354, 850753, 850470, 850320, 850069, 850023, 850741, 851509, 852157, 852073, 850451, 850375, 850111, 849805, 848375, 848150, 847545, 847281, 845980, 845694, 844840, 842895, 842098, 841825, 841604, 841170, 840895, 839825, 839769, 840798, 840745, 840580, 840305, 839320, 839165, 839016, 838200, 836342, 836100, 835840, 834252, 833175, 833017, 832785, 832719, 832433, 831189, 830330, 829565, 829550, 829422, 828638, 827810, 827523, 826955, 826653, 825785, 825487, 824587, 822700, 822339, 821748, 821660, 821459, 820815, 820470, 819281, 818215, 817851, 816405, 815735, 815844, 815501, 814830, 814502, 814175, 813785, 811510, 811202, 810503, 809935, 808612, 808305, 807965, 807085, 806759, 806450, 805480, 804700, 804426, 803230, 802864, 801150, 2092615, 2093190, 2095430, 2095795, 2096112, 2097190, 2098505, 2098838, 2100360, 2100395, 2100950, 2101330, 2102850, 2102788, 2102425, 2102785, 2103487, 2103892, 2104515, 2104359, 2102570, 2102760, 2104075, 2105023, 2105295, 2105555, 2105875, 2107116, 2107148, 2106760, 2106708, 2106990, 2107029, 2107335, 2108399, 2109486, 2109775, 2110010, 2110344, 2111056, 2113550, 2114260, 2114370, 2114751, 2116197, 2116940, 2117563, 2117860, 2119206, 2120474, 2120775, 2121475, 2121809, 2122743, 2123110, 2124100, 2124890, 2125160, 2125377, 2125830, 2126745, 2127075, 2128290, 2128585, 2129209, 2129525, 2131460, 2131793, 2132230, 2132742, 2133100, 2133655, 2134028, 2135142, 2136382, 2137110, 2138174, 2138520, 2139015, 2139590, 2140547, 2142011, 2142380, 2142716, 2143599, 2144456, 2144790, 2147049, 2147420, 2148815, 2150425, 2150782, 2152285, 2152660, 2153400, 2155103, 2155696, 2155980, 2156241, 2157025, 2159030, 2160314, 2160635, 2161408, 2161795, 2162102, 2163021, 2163470, 2163785, 2165380, 2165700, 2167362, 2167695, 2167835, 2169845, 2170117, 2170395, 2171035, 2171335, 2171435, 2171593, 2170924, 2170498, 2170754, 2171611, 2171760, 2171217, 2171380, 2170485, 2170210, 2168729, 2168520, 2168719, 2168735, 2170150, 2169640, 2170568, 2170640, 2171442, 2171075, 2172530, 2171719, 2171534, 2171205, 2170948, 2169812, 2169145, 2168648, 2167568, 2167190, 2167185, 2166355, 2166075, 2166394, 2166285, 2165476, 2165330, 2165160, 2165065, 2163119, 2162490, 2161655, 2161531, 2161519, 2161005, 2159908, 2159915, 2158958, 2158780, 2158494, 2158105, 2157807, 2157040, 2156696, 2155806, 2155445, 2155097, 2154750, 2153047, 2152675, 2151171, 2150780, 2150680, 2150149, 2150070, 2153840, 2154400, 2151187, 2150820, 2151192, 2151708, 2151840, 2151081, 2150965, 2150606, 2148479, 2148155, 2146631, 2145603, 2145394, 2145800, 2146033, 2145523, 2145410, 2146002, 2147688, 2148035, 2148733, 2148841, 2148775, 2149407, 2150710, 2150922, 2151180, 2152638, 2153465, 2153815, 2154550, 2153948, 2153605, 2152546, 2152522, 2151954, 2151680, 2151135, 2150917, 2149401, 2147845, 2145955, 2145690, 2145842, 2146060, 2146529, 2146675, 2146311, 2146245, 2146162, 2146145, 2146227, 2147047, 2147009, 2146655, 2148801, 2149145, 2148900, 2149908, 2151749, 2152270, 2151866, 2151825, 2152160, 2156500, 2157904, 2159490, 2160898, 2163565, 2164270, 2164140, 2163415, 2162493, 2162099, 2160395, 2160083, 2159465, 2158743, 2156340, 2155944, 2155185, 2153375, 2152677, 2152295, 2150917, 2149984, 2149695, 2147869, 2147615, 2147405, 2146272, 2145258, 2144570, 2145445, 2145356, 2144792, 2145110, 2143618, 2143730, 2143963, 2143997, 2143495, 2143280, 2142419, 2142149, 2141782, 2141448, 2140052, 2139555, 2139435, 2138192, 2137078, 2136753, 2134940, 2133632, 2132631, 2132205, 2132001, 2131755, 2131650, 2131962, 2130970, 2130628, 2130520, 2129464, 2128114, 2126982, 2126720, 2126810, 2127080, 2128513, 2128829, 2128495, 2127050, 2125650, 2125275, 2123780, 2123569, 2123070, 2121885, 2121591, 2120685, 2120349, 2119679, 2118760, 2118458, 2117935, 2117610, 2116295, 2115554, 2114005, 2113621, 2112855, 2111817, 2110485, 2110250, 2110165, 2109573, 2108843, 2107500, 2106390, 2106018, 2103410, 2101545, 2101232, 2099875, 2099512, 2098080, 2097320, 2096964, 2094425, 2094056, 2092595, 2092277, 2091670, 2091277, 2090131, 2088645, 2088380, 2088330, 2088110, 2087753, 2086334, 2085607, 2084278, 2084187, 2084575, 2084465, 2084328, 2084450, 2084109, 2083150, 2082820, 2082092, 2081333, 2079632, 2078870, 2078155, 2077808, 2077080, 2076787, 2076386, 2076155, 2075110, 2074811, 2074591, 2073960, 2073584, 2073221, 2073460, 2073797, 2074780, 2075941, 2077758, 2078730, 2079020, 2079386, 2079920, 2080021, 2079717, 2079917, 2080840, 2081131, 2082613, 2082507, 2081230, 2081554, 2082291, 2083206, 2083940, 2084174, 2084350, 2084500, 2084810, 2086215, 2086449, 2087620, 2087856, 2088564, 2091270, 2091898, 2092105, 2092424, 2093065, 2093318, 2094355, 2096198, 2096536, 2096910, 2097185, 2097470, 2098117, 2098880, 2099191, 2099825, 2100899, 2101165, 2101453, 2102554, 2102260, 2102031, 2101525, 2101162, 2100482, 2099710, 2098550, 2095140, 2094745, 2094389, 2093577, 2091920, 2091724, 2091325, 2091135, 2090510, 2090257, 2089517, 2089735, 2089692, 2090044, 2090765, 2091109, 2092110, 2092273, 2093148, 2093260, 2093406, 2093980, 2093715, 2092629, 2092497, 2094120, 2094025, 2093925, 2093907, 2093620, 2093793, 2093796, 2093390, 2093210, 2093030, 2092976, 2093490, 2093370, 2093210, 2092960, 2093105, 2093280, 2093210, 2093269, 2092615</code></pre>
+</div>
+</div>
+<p>But if we cast this object to a <a href="https://tibble.tidyverse.org/">tibble</a>, we get an error:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(tibble<span class="sc">::</span><span class="fu">as_tibble</span>(geodaData<span class="sc">::</span>guerry))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error : All columns in a tibble must be vectors.
+✖ Column `geometry` is a `sfc_MULTIPOLYGON/sfc` object.</code></pre>
+</div>
+</div>
+<p>This is <a href="https://github.com/r-lib/pillar/issues/552">a known bug</a> that packages need to work around themselves, and can be a bit of a pain to figure out solutions for. It tends to crop up when data.frame objects are implicitly casted to tibbles, for instance by <a href="https://dplyr.tidyverse.org/">dplyr</a> functions:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(dplyr<span class="sc">::</span><span class="fu">group_by</span>(geodaData<span class="sc">::</span>guerry, CODE_DE))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error : All columns in a tibble must be vectors.
+✖ Column `geometry` is a `sfc_MULTIPOLYGON/sfc` object.</code></pre>
+</div>
+</div>
+<p>But it can happen without casting to tibbles as well, for instance when trying to use <code>dplyr::arrange()</code>:<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(dplyr<span class="sc">::</span><span class="fu">arrange</span>(geodaData<span class="sc">::</span>guerry))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in vec_size() : 
+  `x` must be a vector, not a &lt;sfc_MULTIPOLYGON/sfc&gt; object.</code></pre>
+</div>
+</div>
+<p>Any code that calls <code>vctrs::vec_size()</code> will wind up erroring in this situation, which includes a good amount of tidyverse code.</p>
+<p>A final challenge with including sf objects in R packages is that some projected CRS include non-ASCII characters in their WKT, <a href="https://github.com/r-spatial/sf/issues/1341">causing an aggravating warning</a> in R CMD check: <code>Warning: found non-ASCII string</code>. Your package won’t be accepted to CRAN with that warning, and as such, this needs to be fixed.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<p>All three of these problems can be solved by the same approach, which I think is the best way to include sf objects in packages.</p>
+</section>
+<section id="the-solution" class="level2">
+<h2 class="anchored" data-anchor-id="the-solution">The Solution</h2>
+<p>Rather than including sf objects directly as package data in the normal manner, you should store the sf object as internal data and then load it via <code>delayedAssign</code>. This is an approach inspired by <a href="https://allisonhorst.github.io/palmerpenguins/">palmerpenguins</a> (<a href="https://github.com/allisonhorst/palmerpenguins/pull/36">here’s the relevant PR</a>), now in use in the <a href="spatialsample.tidymodels.org/">spatialsample</a> and <a href="https://mikemahoney218.github.io/waywiser/">waywiser</a> packages I maintain.</p>
+<p>To store <a href="https://r-pkgs.org/data.html#sec-data-sysdata">your sf objects as internal data</a>, save them into a file named <code>R/sysdata.rda</code>. If you use <code>usethis::use_data()</code>, set the argument <code>internal = TRUE</code> to make this happen automatically. This solves the third problem for us; something about not exporting the sf object directly means that R CMD check no longer checks the CRS for non-ASCII characters, and the warning is no longer triggered.</p>
+<p>You now need to somehow export this data, in order to let users actually use your newly-internal sf object. To do so, we’re going to write a file in the <code>data/</code> folder, named something like <code>your_data.R</code>, taking advantage of the <code>delayedAssign()</code> function like so:<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">delayedAssign</span>(<span class="st">"your_data"</span>, <span class="fu">local</span>({</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">requireNamespace</span>(<span class="st">"sf"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  your_package<span class="sc">:::</span>your_data</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This function makes it so that, whenever a user calls your data object for the first time in a session, you quietly load the sf package before assigning your internal data to the exported object. <a href="https://adv-r.hadley.nz/environments.html#search-path">This doesn’t <em>attach</em> the sf package</a>, meaning that your users won’t accidentally have the entire sf package dumped into their search path. Loading the sf package, however, is enough to fix both problems 1 and 2; your data will now play happily with tibbles, dplyr functions, and the broader R ecosystem.</p>
+<p>You then need to <a href="https://r-pkgs.org/data.html#sec-documenting-data">document your data</a> in a file under <code>R/</code> the same way you always would.</p>
+<p>And that’s it! Your package will now be more user-friendly and CRAN-acceptable. I’ve been using this approach for months with no side effects<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> and am planning to keep using it going forward.</p>
+</section>
+<section id="update" class="level2">
+<h2 class="anchored" data-anchor-id="update">Update</h2>
+<p><a href="https://fosstodon.org/@edzer@mastodon.social/109439029871771876">Edzer points out on Mastodon</a> that, in order to <a href="https://www.tidyverse.org/blog/2022/09/playing-on-the-same-team-as-your-dependecy/">play nicely with potential changes in sf</a>, you can <a href="https://r-pkgs.org/data.html#sec-data-extdata">include your data as an external file</a> instead. The steps here are broadly similar: save your sf object to a file in <code>inst/extdata</code>, and write a file in <code>R/</code> that looks something like this:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">delayedAssign</span>(<span class="st">"your_data"</span>, <span class="fu">local</span>({</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">try</span>(</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    sf<span class="sc">::</span><span class="fu">read_sf</span>(</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>      <span class="fu">system.file</span>(<span class="st">"extdata/your_data.gpkg"</span>, <span class="at">package =</span> <span class="st">"your_package"</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">silent =</span> <span class="cn">TRUE</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>}))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We need to wrap the call in <code>try()</code> in order to make this approach work with tooling like <code>devtools::document()</code>, which will otherwise complain about trying to read a file that isn’t there.</p>
+<p>In my tests, this was enough to fix issues 1 and 2; calling <code>sf::read_sf()</code> will load the sf package and should fix any interoperability issues. However, this approach doesn’t necessarily fix the non-ASCII character WARNING given off by R CMD check.</p>
+<p>Of course, you can also include external files in <code>inst/</code> and then have your users read it themselves using <code>system.file()</code>, like <a href="https://r-spatial.github.io/sf/articles/sf1.html">the sf vignettes do themselves</a>!</p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>This section was edited on 2022-12-01; thanks to <a href="https://fosstodon.org/@geospacedman@mastodon.social/109439358830660533">Barry Rowlingson</a> for pointing out a mistake in the original draft.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Theoretically this <em>should</em> be fixed by setting <code>Encoding: UTF8</code> in your package DESCRIPTION, but <a href="https://github.com/r-spatial/sf/issues/1341#issuecomment-609645514">that rarely seems to help</a>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Just in case it’s not clear: make sure to change <code>your_data</code> and <code>your_package</code> below to, well, the name of your data and the name of your package.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Knock on wood for me, I’ve tempted the gods.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">© Copyright 2022 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</div>   
+  </div>
+</footer>
+
+
+
+</body></html>

@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.475">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mike Mahoney">
+<meta name="dcterms.date" content="2020-04-22">
+<meta name="description" content="Part 3 in the data visualization series">
+
+<title>Mike Mahoney - Making Excellent Visualizations</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../../../">
+<script src="../../../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../../../styles.css">
+<meta property="og:title" content="Mike Mahoney - Making Excellent Visualizations">
+<meta property="og:description" content="Part 3 in the data visualization series">
+<meta property="og:site-name" content="Mike Mahoney">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:title" content="Mike Mahoney - Making Excellent Visualizations">
+<meta name="twitter:description" content="Part 3 in the data visualization series">
+<meta name="twitter:creator" content="@MikeMahoney218">
+<meta name="twitter:card" content="summary">
+</head>
+
+<body class="nav-fixed fullcontent">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../../../index.html">
+    <span class="navbar-title">Mike Mahoney</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../index.html">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../papers">
+ <span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../presentations">
+ <span class="menu-text">Presentations</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../software_citations.html">
+ <span class="menu-text">Software citations</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../../../blog.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../../../blog.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Making Excellent Visualizations</h1>
+                  <div>
+        <div class="description">
+          Part 3 in the data visualization series
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Data Visualization</div>
+                <div class="quarto-category">Tutorials</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Mike Mahoney </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">April 22, 2020</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>As we move into our final section, it’s time to dwell on our final mantra:</p>
+<section id="ink-is-cheap.-electrons-are-even-cheaper." class="level3">
+<h3 class="anchored" data-anchor-id="ink-is-cheap.-electrons-are-even-cheaper.">Ink is cheap. Electrons are even cheaper.</h3>
+<p>This is a fancy, dogmatic way to say: Make more than one chart. It’s rare that your first try is going to produce your best looking output. Play around with your data set, try out different visuals, and keep the concepts we’ve talked about in mind. Your graphs will be all the better for it. In this section, we’ll talk about solutions to some of the most common problems people have with making charts:</p>
+</section>
+<section id="dealing-with-big-data-sets" class="level3">
+<h3 class="anchored" data-anchor-id="dealing-with-big-data-sets">Dealing with big data sets</h3>
+<p>Think back to the diamonds data set we used in the last section. It contains data on 54,000 individual diamonds, including the carat and sale price for each. If we wanted to compare those two continuous variables, we might think a scatter plot would be a good way to do so:</p>
+<p><img src="making-1-1.png" class="img-fluid"></p>
+<p>Unfortunately, it seems like 54,000 points is a few too many for this plot to do us much good! This is a clear case of what’s called <em>overplotting</em> – we simply have too much data on a single graph.</p>
+<p>There are three real solutions to this problem. First off, we could decide simply that we want to refactor our chart, and instead show how a metric – such as average sale price – changes at different carats, rather than how our data is distributed:</p>
+<p><img src="making-2-1.png" class="img-fluid"></p>
+<p>There are all sorts of ways we can do this sort of refactoring – if we wanted, we could get a very similar graph by binning our data and making a bar plot:</p>
+<p><img src="making-3-1.png" class="img-fluid"></p>
+<p>Either way, though, we’re not truly showing the same thing as was in the original graph – we don’t have any indication of the actual distribution of our data set along these axes.</p>
+<p>The second solution solves this problem much more effectively – make all your points semi-transparent:</p>
+<p><img src="making-4-1.png" class="img-fluid"></p>
+<p>By doing this, we’re now able to see areas where our data is much more densely distributed, something that was lost in the summary statistics – for instance, it appears that low-carat diamonds are much more tighly grouped than higher carat ones. We can also see some dark stripes at “round-number” values for carat – that indicates to me that our data has some integrity issues, if appraisers are more likely to give a stone a rounded number.</p>
+<p>The challenge with this approach comes when we want to map a third variable – let’s use cut – in our graphic. We can try to change the aesthetics of our graph as usual:</p>
+<p><img src="making-5-1.png" class="img-fluid"></p>
+<p>But unfortunately the sheer number of points drowns out most of the variance in color and shape on the graphic. In this case, our best option may be to turn to option number three and facet our plots – that is, to split our one large plot into several small multiples:</p>
+<p><img src="making-6-1.png" class="img-fluid"></p>
+<p>Remember: Ink is cheap. Electrons are even cheaper. Make more than one graph.</p>
+<p>By splitting out our data into several smaller graphics, we’re much better able to see how the distribution shifts between our categories. In fact, we could use this technique to split our data even further, into a matrix of scatter plots showing how different groups are distributed:</p>
+<p><img src="making-7-1.png" class="img-fluid"></p>
+<p>One last, extremely helpful use of faceting is to split apart charts with multiple entangled lines: <img src="making-8-1.png" class="img-fluid"></p>
+<p>These charts, commonly referred to as “spaghetti charts”, are usually much easier to use when split into small multiples:</p>
+<p><img src="making-9-1.png" class="img-fluid"></p>
+<p>Now, one major drawback of facet charts is that they can make comparisons much harder – if, in our line chart, it’s more important to know that most clarities are similar in price at 2 carats than it is to know how the price for each clarity changes with carat, then the first chart is likely the more effective option. In those cases, however, it’s worth reassessing how many lines you actually need on your graph – if you only care about a few clarities, then only include those lines, and if you only care about a narrow band of prices or carats, window your data so that’s all you show. The goal is to make making comparisons easy, with the understanding that some comparisons are more important than others.</p>
+</section>
+<section id="dealing-with-chartjunk" class="level3">
+<h3 class="anchored" data-anchor-id="dealing-with-chartjunk">Dealing with chartjunk</h3>
+<p>Cast your mind back to the graphic I used as an example of an explanatory chart:</p>
+<p><img src="making-10-1.png" class="img-fluid"></p>
+<p>You might have noticed that this chart is differently styled from all the others in this course – it doesn’t have the grey background or grid lines or anything else.</p>
+<p>Think back to our second mantra: everything should be made as simple as possible, but no simpler. This chart reflects that goal. We’ve lost some of the distracting elements – the colored background and grid lines – and changed the other elements to make the overall graphic more effective. The objective is to have no extraneous element on the graph, so that it might be as expressive and effective as possible. This usually means using minimal colors, minimal text, and no grid lines. (After all, those lines are usually only useful in order to pick out a specific value – and if you’re expecting people to need specific values, you should give them a table!)</p>
+<p>Those extraneous elements are known as <em>chartjunk</em>. You see this a lot with graphs made in Excel – they’ll have dark backgrounds, dark lines, special shading effects or gradients that don’t encode information, or – worst of all – those “3D” bar/line/pie charts, because these things can be added with a single click. However, they tend to make your graphics less effective as they force the user to spend more time separating data from ornamentation. Everything should be made as simple as possible, but no simpler; every element of your graphic should increase expressiveness or effectiveness. In short: don’t try to pretty up your graph with non-useful elements.</p>
+<p>Another common instance of chartjunk is animation in graphics. While animated graphics are exciting and trendy, they tend to reduce the effectiveness of your graphics because as humans, when something is moving we can’t focus on anything else. <a href="http://visionlab.harvard.edu/silencing/">Check out these examples from the Harvard Vision Lab</a> – they show just how hard it is to notice changes when animation is added. This isn’t to say you can never use animation – but its uses are best kept to times when your graphic looking cool is more important than it conveying information.</p>
+</section>
+<section id="common-mistakes" class="level3">
+<h3 class="anchored" data-anchor-id="common-mistakes">Common Mistakes</h3>
+<p>As we wind down this section, I want to touch on a few common mistakes that didn’t have a great home in any other section – mostly because we were too busy talking about <em>good</em> design principles.</p>
+</section>
+<section id="dual-y-axes" class="level3">
+<h3 class="anchored" data-anchor-id="dual-y-axes">Dual y axes</h3>
+<p>Chief amongst these mistakes are plots with two y axes, beloved by charlatans and financial advisors since days unwritten. Plots with two y axes are a great way to force a correlation that doesn’t really exist into existence on your chart, through manipulation of your units and axes. In almost every case, you should just make two graphs – ink is cheap. Electrons are even cheaper.</p>
+<p>For an extremely entertaining read on this subject, <a href="https://kieranhealy.org/blog/archives/2016/01/16/two-y-axes/">check out this link</a>. I’ve borrowed Kieran’s code for the below viz – look at how we can imply different things, just by changing how we scale our axes!</p>
+<p><img src="making-11-1.png" class="img-fluid"></p>
+</section>
+<section id="overcomplex-visualizations" class="level3">
+<h3 class="anchored" data-anchor-id="overcomplex-visualizations">Overcomplex visualizations</h3>
+<p>Another common issue in visualizations comes from the analyst getting a little too technical with their graphs. For instance, think back to our original diamonds scatter plot: <img src="making-12-1.png" class="img-fluid"></p>
+<p>Looking at this chart, we can see that carat and price have a positive correlation – as one increases, the other does as well. However, it’s not a linear relationship; instead, it appears that price increases faster as carat increases.</p>
+<p>The more statistically-minded analyst might already be thinking that we could make this relationship linear by log-transforming the axes – and they’d be right! We can see a clear linear relationship when we make the transformation:</p>
+<p><img src="making-13-1.png" class="img-fluid"></p>
+<p>Unfortunately, transforming your visualizations in this way can make your graphic hard to understand – in fact, only about <a href="https://www.nature.com/articles/s41559-018-0610-7?WT.feed_name=subjects_ecology">60% of professional scientists</a> can even understand them. As such, transforming your axes like this tends to reduce the effectiveness of your graphic – this type of visualization should be reserved for exploratory graphics and modeling, instead.</p>
+</section>
+<section id="conclusion" class="level3">
+<h3 class="anchored" data-anchor-id="conclusion">Conclusion</h3>
+<p>And that just about wraps up this introduction to the basic concepts of data visualizations. Hopefully you’ve picked up some concepts or vocabulary that can help you think about your own visualizations in your daily life. I wanted to close out here with a list of resources I’ve found helpful in making graphics – I’ll keep adding to this over time:</p>
+<ul>
+<li>When picking colors, I often find myself reaching for one of the following tools:
+<ul>
+<li><a href="http://colorbrewer2.org/#type=diverging&amp;scheme=BrBG&amp;n=5">ColorBrewer</a> provided most of the palettes for these graphics</li>
+<li><a href="https://colorsupplyyy.com/">ColorSupply</a> makes picking custom colors easier</li>
+<li><a href="https://cran.r-project.org/web/packages/viridis/vignettes/intro-to-viridis.html">Viridis</a> provides beautiful, colorblind-friendly palettes for use (though this resource is a little harder to understand)</li>
+</ul></li>
+<li>I used the following resources in putting this post together:
+<ul>
+<li><a href="http://stat405.had.co.nz/">Hadley Wickham’s Stat 405 Course</a>, particularly the lecture on <a href="http://stat405.had.co.nz/lectures/20-effective-vis.pdf">effective visualizations</a> (I’ve lifted “perceptual topology should match data toplogy”, “make important comparisons easy”, and “visualization is only one part of data analysis” directly from his slides)</li>
+<li><a href="https://courses.cs.washington.edu/courses/cse442/17au/lectures/CSE442-VisualEncoding.pdf">Jeffrey Heer’s CSE 442 lecture on visualizations</a>, particularly the definitions for expressiveness and effectiveness</li>
+</ul></li>
+</ul>
+<hr>
+<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
+</script>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">© Copyright 2022 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</div>   
+  </div>
+</footer>
+
+
+
+</body></html>

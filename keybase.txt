@@ -1,0 +1,56 @@
+==================================================================
+https://keybase.io/mikemahoney218
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://mm218.dev
+  * I am mikemahoney218 (https://keybase.io/mikemahoney218) on keybase.
+  * I have a public key ASDyJEgKGLyyXclb88Qi-XeXGWcUDnbDCG3AJdIsNNHkXgo
+
+To do so, I am signing this object:
+
+{
+  "body": {
+    "key": {
+      "eldest_kid": "0120f224480a18bcb25dc95bf3c422f977971967140e76c3086dc025d22c34d1e45e0a",
+      "host": "keybase.io",
+      "kid": "0120f224480a18bcb25dc95bf3c422f977971967140e76c3086dc025d22c34d1e45e0a",
+      "uid": "1c77a8a58e954653a6e184e7bb9f3e19",
+      "username": "mikemahoney218"
+    },
+    "merkle_root": {
+      "ctime": 1614048879,
+      "hash": "cff9fb90a9e3004d339ef0fc53f53b06495a1dbf0926ea60be892bc7792e05da23db1ce9d54a36ce598c5e7b164af2eaf5caaee43bd81c4ae70665570ebe4612",
+      "hash_meta": "f7ee26cb393e8cfeab327ad77502741c9850a37202440d2cd4b696efc646209b",
+      "seqno": 19195309
+    },
+    "service": {
+      "entropy": "+eCLF6n4k9keJ4gBkF0FoZgp",
+      "hostname": "mm218.dev",
+      "protocol": "https:"
+    },
+    "type": "web_service_binding",
+    "version": 2
+  },
+  "client": {
+    "name": "keybase.io go client",
+    "version": "5.6.1"
+  },
+  "ctime": 1614048916,
+  "expire_in": 504576000,
+  "prev": "bc6de22170de4001b60b11faec159a700493b7df83cafce5c47ea3cb211af162",
+  "seqno": 8,
+  "tag": "signature"
+}
+
+which yields the signature:
+
+hKRib2R5hqhkZXRhY2hlZMOpaGFzaF90eXBlCqNrZXnEIwEg8iRIChi8sl3JW/PEIvl3lxlnFA52wwhtwCXSLDTR5F4Kp3BheWxvYWTESpcCCMQgvG3iIXDeQAG2CxH67BWacASTt9+DyvzlxH6jyyEa8WLEIO4yzhZlz06bhjBGQ5jKew6q6TfI+0BpnxG+uVDyAfpZAgHCo3NpZ8RANx3Oz8hkfaAdlYsl8JxhVeQJTANvTSC3lLNCSgMgKV3h1mdqV9eVgEfhhmfdEVdZmPtSV0KTu6awLDbjNBI2DahzaWdfdHlwZSCkaGFzaIKkdHlwZQildmFsdWXEIAGiFa7ynBrxA6Ef0/APRMNY4Y3GEpHIop/5Lo21+zjNo3RhZ80CAqd2ZXJzaW9uAQ==
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/mikemahoney218
+
+==================================================================

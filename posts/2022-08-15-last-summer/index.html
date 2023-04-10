@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.2.475">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mike Mahoney">
+<meta name="dcterms.date" content="2023-04-10">
+<meta name="description" content="An RStudio internship retrospective">
+
+<title>Mike Mahoney - I know what I did last summer</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Mike Mahoney - I know what I did last summer">
+<meta property="og:description" content="An RStudio internship retrospective">
+<meta property="og:image" content="https://mm218.dev/posts/2022-08-15-last-summer/autoplot.png">
+<meta property="og:site-name" content="Mike Mahoney">
+<meta property="og:locale" content="en_US">
+<meta property="og:image:height" content="830">
+<meta property="og:image:width" content="1344">
+<meta name="twitter:title" content="Mike Mahoney - I know what I did last summer">
+<meta name="twitter:description" content="An RStudio internship retrospective">
+<meta name="twitter:image" content="https://mm218.dev/posts/2022-08-15-last-summer/autoplot.png">
+<meta name="twitter:creator" content="@MikeMahoney218">
+<meta name="twitter:image-height" content="830">
+<meta name="twitter:image-width" content="1344">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Mike Mahoney</span>
+    </a>
+  </div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../papers">
+ <span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../presentations">
+ <span class="menu-text">Presentations</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../software_citations.html">
+ <span class="menu-text">Software citations</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../blog.xml"><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+              <div id="quarto-search" class="" title="Search"></div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">I know what I did last summer</h1>
+                  <div>
+        <div class="description">
+          An RStudio internship retrospective
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">Internship</div>
+                <div class="quarto-category">Quarto</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p>Mike Mahoney </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">April 10, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#the-job-itself" id="toc-the-job-itself" class="nav-link active" data-scroll-target="#the-job-itself">The Job Itself</a></li>
+  <li><a href="#the-things-we-did" id="toc-the-things-we-did" class="nav-link" data-scroll-target="#the-things-we-did">The Things We Did</a>
+  <ul class="collapse">
+  <li><a href="#spatialsample" id="toc-spatialsample" class="nav-link" data-scroll-target="#spatialsample">spatialsample</a></li>
+  <li><a href="#rsample" id="toc-rsample" class="nav-link" data-scroll-target="#rsample">rsample</a></li>
+  <li><a href="#waywiser" id="toc-waywiser" class="nav-link" data-scroll-target="#waywiser">waywiser</a></li>
+  </ul></li>
+  <li><a href="#and-another-thing" id="toc-and-another-thing" class="nav-link" data-scroll-target="#and-another-thing">And Another Thing</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>I’m wrapping up three months as an open-source intern with <a href="https://posit.co/">Posit</a> (née <a href="https://www.rstudio.com/">RStudio</a>). I wanted to write a small post talking a bit about what it was like and what we got done in that timespan. So, well, this post<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+<section id="the-job-itself" class="level1">
+<h1>The Job Itself</h1>
+<p>Let’s not bury the lede: this internship was an absolute blast.</p>
+<p>I could not have asked to work with a better group than the tidymodels team, who are all consistently fantastic people. It’s rare to find a group this consistently brilliant, and more importantly also this consistently friendly, inclusive, and welcoming. Working directly with Hannah Frick and Julia Silge was absolutely incredible; I highly recommend it for anyone if the opportunity comes up.</p>
+<p>The internship started off with an in-person work week (at the <em>beautiful</em> Boston office<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>), and then more or less wrapped up with the last ever<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> RStudio::conf() (perhaps the best in-person conference experience I’ve had). This was a fantastic way to structure what was otherwise a fully remote position, and I’m extremely appreciative of getting to work with the team both in-person and remotely over the span of the internship.</p>
+<p>It was a great few months, I learned a lot – about programming and design, sure, but also about technical communication, working in the open, interacting with an open source community, and more.</p>
+<p>And we did some really cool things! Speaking of which…</p>
+</section>
+<section id="the-things-we-did" class="level1">
+<h1>The Things We Did</h1>
+<p>Alright, time for some pretty blatant bragging. Sorry. But we did some really, really cool stuff the past few months.</p>
+<section id="spatialsample" class="level2">
+<h2 class="anchored" data-anchor-id="spatialsample">spatialsample</h2>
+<p>The main thrust (and originally, the entire scope) of the internship was writing the <a href="https://spatialsample.tidymodels.org/">spatialsample</a> package for spatial cross-validation. While not an entirely new package (the first version hit CRAN in 2021), by the end of June we had added support for:</p>
+<ul>
+<li>sf objects (and more correct distance calculations with geographic coordinates)</li>
+<li>exclusion buffers around assessment folds</li>
+<li>inclusion radii around assessment folds</li>
+<li>spatial clustering with more than just k-means clustering</li>
+<li>spatially buffered V-fold CV</li>
+<li>leave-location-out CV</li>
+<li>spatial block CV</li>
+<li>automatic plotting</li>
+</ul>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="autoplot.png" class="img-fluid figure-img"></p>
+<p></p><figcaption class="figure-caption">The results of calling <code>autoplot()</code> on a spatial clustering CV object, for the city of Boston.</figcaption><p></p>
+</figure>
+</div>
+<p>That meant a pretty huge update to the package, and that version was released <a href="https://www.tidyverse.org/blog/2022/06/spatialsample-0-2-0/">on CRAN as version 0.2.0</a>. A small patch to speed up buffering, work better with simulated data, and make me the official package maintainer as Julia moves to focus more on ModelOps just hit CRAN last Friday.</p>
+<p>I also wrote <a href="https://spatialsample.tidymodels.org/articles/buffering.html">a package vignette</a> on spatial buffering, and <a href="https://www.tidymodels.org/learn/work/multi-scale/">an article for tidymodels.org</a> on how to use spatialsample for multi-scale model assessment.</p>
+<p>We chose to not release spatialsample 1.0.0 as part of the broader tidymodels 1.0.0 release because the package is still very young – most of its features have only been on CRAN for a month or so, and we want more feedback on what else the package <em>should</em> do and any areas that people think we got wrong. However, I feel really good about where the package is right now, and am really excited to see people use it (and to use it in my own work going forward).</p>
+</section>
+<section id="rsample" class="level2">
+<h2 class="anchored" data-anchor-id="rsample">rsample</h2>
+<p>After the spatialsample release, I had the opportunity to start poking around the open issues on the <a href="https://rsample.tidymodels.org/">rsample</a> package. As rsample is a much more established package, it was important to focus on only the changes we could make without breaking people’s code; with that said, we were able to add a few highly-requested features:</p>
+<ul>
+<li>Improved support for grouped resampling, adding functions for grouped Monte Carlo CV, grouped bootstrap resampling, creating validation sets with groups, and creating initial training/testing splits with groups. This was the most-requested feature still missing from rsample, and it’s a personal point of pride that I was able to implement it (in a way that doesn’t seem awful to maintain).</li>
+<li>Added <code>reverse_splits()</code> to “swap” the analysis and assessment sets of an rsplit or rset object.</li>
+<li>Added <code>reshuffle_rset()</code> to re-generate an rset, using all the same parameters that were used to create it the first time (but potentially, a different random seed). This was the <em>oldest</em> open issue on rsample, and even though it wasn’t in particularly high demand I was very happy to close both the oldest and most requested issues on the package in a single release.</li>
+<li>Standardized the classes and attributes attached to the objects returned by rsample functions.</li>
+</ul>
+<p>I also added a new <a href="https://rsample.tidymodels.org/dev/articles/Common_Patterns.html">overview vignette</a> covering some of the most commonly used functions in the package, which I think will be a good first point of entry for a lot of users.</p>
+<p>All of this hit CRAN as <a href="https://cran.r-project.org/package=rsample">rsample 1.1.0</a> on Monday. I’m particularly excited for the grouped resampling functions to hit CRAN, since I think those will solve a very common use-case for a lot of people working with repeated measures data.</p>
+</section>
+<section id="waywiser" class="level2">
+<h2 class="anchored" data-anchor-id="waywiser">waywiser</h2>
+<p>On top of these resampling projects, I’ve also been noodling on a new package in my personal namespace, called <a href="https://mikemahoney218.github.io/waywiser/">waywiser</a>. This is a <a href="https://yardstick.tidymodels.org/">yardstick</a> extension package<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> focused on helping people assess spatial autocorrelation in model residuals.</p>
+<p>Version 0.1.0 is inching along to CRAN at the moment, as I clean off a few last new package checks, and should be viewed as mostly experimental – I’m currently figuring out how I can get spatial information from inside of <code>tune::fit_resamples()</code>, and the default neighbor lists and weights matrices will probably be outsourced to <a href="https://sfdep.josiahparry.com/">sfdep</a> in the next version. But it exists!</p>
+</section>
+</section>
+<section id="and-another-thing" class="level1">
+<h1>And Another Thing</h1>
+<p>I also did a few other (less RStudio related) things over the past few months:</p>
+<ul>
+<li>Made a <a href="https://github.com/mikemahoney218/quarto-arxiv">Quarto template</a> that imitates the <a href="https://pkgs.rstudio.com/rticles/">rticles</a> arXiv template.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></li>
+<li>Published <a href="https://doi.org/10.1080/15481603.2022.2103069">“Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass in heterogenous landscapes”</a> in GIScience and Remote Sensing<a href="#fn6" class="footnote-ref" id="fnref6" role="doc-noteref"><sup>6</sup></a>.</li>
+<li>Wrote a book chapter (“AI for Shrubland Identification and Mapping”) based on our <a href="https://arxiv.org/abs/2205.05047">shrubland research</a> for a forthcoming book on AI in Earth science. I’ll share more about that when it becomes more public.</li>
+<li>Helped run the virtual side of the <a href="https://2022esipjulymeeting.sched.com/info">ESIP 2022 July Meeting</a>.
+<ul>
+<li>Also, helped organize a session entitled <a href="https://2022esipjulymeeting.sched.com/event/12etz/ai-for-all-people-how-to-make-ai-useful-for-earth-science-applications">“AI for All People: How to make AI useful for Earth science applications?”</a> at the ESIP July meeting.</li>
+<li>Also also, gave a talk (<a href="https://mm218.dev/esip2022">“Building trust in AI outputs: Approaches from NY’s forest carbon monitoring program”</a>) at that session.</li>
+</ul></li>
+<li>Published a guest blog, <a href="https://www.esipfed.org/merge/student-fellow-blog/trust-in-machine-learning-guest-blog">“Building Trust in Machine Learning Outputs”</a>, on the ESIP website.</li>
+<li>Gave a talk <a href="mm218.dev/user2022">“unifir: A unifying API for interacting with Unity from R”</a> at useR! 2022</li>
+<li>Helped write a talk, <a href="https://mikemahoney218.github.io/2022-06-20_NAFEW_ground_filtering/slides.html#1">“Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass”</a>, for the 2022 North American Forest Ecology Workshop. The talk was given by my fantastic colleague <a href="https://www.lucaskjohnson.com/">Lucas Johnson</a>.</li>
+</ul>
+<p>It’s been a very fun few months! Here’s to a good back third of the year.</p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>By the way, the title of this post is a joke about a 25 year old horror film: <a href="https://en.wikipedia.org/wiki/I_Know_What_You_Did_Last_Summer" class="uri">https://en.wikipedia.org/wiki/I_Know_What_You_Did_Last_Summer</a><a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>I was in the middle of moving to Boston at this point, and this work week took place towards the end of May. So I did a very funny thing where I drove from Syracuse to Boston, stayed in a beautiful hotel and went to the office every day, then drove back to Syracuse on Sunday… only to drive back to Boston two days later, move into a slightly less beautiful apartment, and never go to the office again.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>I feel the need to clarify this is a joke; next year’s conference will be posit::conf() following the company’s name change. I had been joking that Hadley should kick off the announcement with “I do have some major news to share: this will be the last ever RStudio::conf()”, but that would probably have unleashed a purely irresponsible level of panic on Twitter.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>And “waywiser” is an old name for a surveyor’s wheel, get it?<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p>Which is not itself actually affiliated with arXiv at all, but rather <a href="https://github.com/kourgeorge/arxiv-style">a modified version of the NeurIPS template published by an individual researcher</a>. This is confusing; I decided that continuing to refer to it as an “arXiv template” was the least confusing option, but maybe the template should actually be called “preprint template” instead. It’s a very nice template, I like it a lot.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn6"><p>This link doesn’t work at the time of publication, but will <em>eventually</em> point to the article once the online version gets published.<a href="#fnref6" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">© Copyright 2022 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</div>   
+  </div>
+</footer>
+
+
+
+</body></html>
