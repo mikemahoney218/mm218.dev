@@ -121,3 +121,4 @@ dist
 /.quarto/
 *.tif
 elevators.db
+_site

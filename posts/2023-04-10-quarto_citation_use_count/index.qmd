@@ -1,0 +1,35 @@
+---
+title: "Counting the number of times each citation is used in a Quarto document"
+description: "Documenting this trick here for future me, six months from now."
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2023-04-10"
+categories: ["Quarto", "Tutorials", "Data science"]
+image: books.jpg
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+I'm currently editing my candidacy exam -- where I wrote what was effectively a review article on a subject adjacent to, but not within, my dissertation area -- down into something that might be publishable. Part of that work has been trimming down the number of citations in the paper: my original exam had 300 individual citations, which is a bit much, and the places I'm looking at sending this paper generally restrict articles to 100 total cites.
+
+As such, I've needed to trim down the number of citations used in this paper.^[And to be clear, these are not 300 citations which are truly core to the paper's argument. There's a number of places in the paper where I more or less say "This line of work has been highly influential in later work", and then cite every single article I read which cited the original study; this made a bit more sense in the context of "candidacy exam" where I was trying to demonstrate that I had comprehensively surveyed the literature, but isn't something I'd ever do in published work.] To do that, I've been trying to figure out which sources were only cited a handful of times and could be easily removed. There's plenty online about [how to do that calculation with LaTeX](https://tex.stackexchange.com/questions/14158/can-i-count-the-number-of-times-each-reference-is-cited), but I've been writing both my exam and this new paper in [Quarto](https://quarto.org/) and was having a hard time getting those code snippets to work.
+
+It turned out that I needed to use three fields in my document's YAML header. Namely, I needed to set the `cite-method` of my document to `biblatex`, set the `biblatexoptions` field to `citecounter=true`, and then include a LaTeX snippet to actually _print_ those citation counts to the `text` key below `include-before-body`:^[Is that key new? I could have sworn I used to provide raw TeX to the `include-before-body` field, but apparently now that needs to be a file name.]
+
+```yaml
+format:
+    pdf:
+      cite-method: biblatex
+      biblatexoptions: "citecounter=true"
+      include-before-body:
+        text: |
+          \renewcommand{\finentrypunct}{%
+            \addperiod\space
+            (Cited \arabic{citecounter}~time\ifnumequal{\value{citecounter}}{1}{}{s})%
+          }
+```
+
+Now when you render your document, each citation entry will be followed by a small snippet of text reading "Cited X times", where X is the number of times each reference was cited in your document. 

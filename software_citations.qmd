@@ -51,9 +51,11 @@ The citations below are in a variety of formats; I'll confess to copying journal
 
 The following are self-citations:
 
-#. Johnson, L. K., Mahoney, M. J., Bevilacqua, E., Stehman, S. V., Domke, G. M., & Beier, C. M. (2022). Fine-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages. International Journal of Applied Earth Observation and Geoinformation, 114, 103059.
+#. Johnson, L. K., Mahoney, M. J., Desrochers, M. L., & Beier, C. M. 2023. Mapping historical forest biomass for stock-change assessments at parcel to landscape scales. arXiv:2304.02632. https://doi.org/10.48550/arXiv.2304.02632
 
-#. Mahoney, M. J., Johnson, L. K., Guinan, A. Z., & Beier, C. M. (2022). Classification and mapping of low-statured shrubland cover types in post-agricultural landscapes of the US Northeast. International Journal of Remote Sensing, 43(19-24), 7117-7138.
+#. Johnson, L. K., Mahoney, M. J., Bevilacqua, E., Stehman, S. V., Domke, G. M., & Beier, C. M. (2022). Fine-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages. International Journal of Applied Earth Observation and Geoinformation, 114, 103059. https://doi.org/10.1016/j.jag.2022.103059
+
+#. Mahoney, M. J., Johnson, L. K., Guinan, A. Z., & Beier, C. M. (2022). Classification and mapping of low-statured shrubland cover types in post-agricultural landscapes of the US Northeast. International Journal of Remote Sensing, 43(19-24), 7117-7138. https://doi.org/10.1080/01431161.2022.2155086
 
 #. Mahoney et al., (2022). unifir: A Unifying API for Working with Unity in R. Journal of Open Source Software, 7(73), 4388, https://doi.org/10.21105/joss.04388
 
@@ -81,9 +83,13 @@ citation("waywiser")
 
 I took over maintenance of spatialsample in mid-2022, after spending the summer interning with the tidymodels crew at Posit working on spatialsample and rsample. I'm responsible for the majority of package functionality. I only track citations here for versions of the package I'm an author on (>= 0.2.0).
 
-#. Tutland, Niko J., Rodman, Kyle C., Andrus, Robert A., and Hart, Sarah J.. 2023. “ Overlapping Outbreaks of Multiple Bark Beetle Species are Rarely More Severe than Single-Species Outbreaks.” Ecosphere 14( 3): e4478. https://doi.org/10.1002/ecs2.4478
+#. Tutland, Niko J., Rodman, Kyle C., Andrus, Robert A., and Hart, Sarah J. 2023. “Overlapping Outbreaks of Multiple Bark Beetle Species are Rarely More Severe than Single-Species Outbreaks.” Ecosphere 14(3): e4478. https://doi.org/10.1002/ecs2.4478
 
 #. Skinner, E.B., Glidden, C.K., MacDonald, A.J. et al. Human footprint is associated with shifts in the assemblages of major vector-borne diseases. Nat Sustain (2023). https://doi.org/10.1038/s41893-023-01080-1
+
+The following are self-citations:
+
+#. Mahoney, MJ In Review. waywiser: Ergonomic methods for assessing spatial models. https://arxiv.org/abs/2303.11312
 
 ```{r}
 citation("spatialsample")
