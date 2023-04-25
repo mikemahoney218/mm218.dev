@@ -84,6 +84,8 @@ citation("waywiser")
 
 I took over maintenance of spatialsample in mid-2022, after spending the summer interning with the tidymodels crew at Posit working on spatialsample and rsample. I'm responsible for the majority of package functionality. I only track citations here for versions of the package I'm an author on (>= 0.2.0).
 
+#. Pebesma, E., Bivand, R. (2023). Spatial Data Science: With Applications in R (1st ed.). 314 pages. Chapman and Hall/CRC. https://doi.org/10.1201/9780429459016
+
 #. de Lara, A., Mieno, T., Luck, J.D. et al. Predicting site-specific economic optimal nitrogen rate using machine learning methods and on-farm precision experimentation. Precision Agric (2023). https://doi.org/10.1007/s11119-023-10018-8
 
 #. Tutland, Niko J., Rodman, Kyle C., Andrus, Robert A., and Hart, Sarah J. 2023. “Overlapping Outbreaks of Multiple Bark Beetle Species are Rarely More Severe than Single-Species Outbreaks.” Ecosphere 14(3): e4478. https://doi.org/10.1002/ecs2.4478
