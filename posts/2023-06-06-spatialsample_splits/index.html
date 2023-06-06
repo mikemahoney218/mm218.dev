@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.361">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mike Mahoney">
+<meta name="dcterms.date" content="2023-06-06">
+<meta name="description" content="Straightforward methods for answering a straightforward question.">
+
+<title>Mike Mahoney - From the inbox: How can I get fold assignments from spatialsample?</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Mike Mahoney - From the inbox: How can I get fold assignments from spatialsample?">
+<meta property="og:description" content="Straightforward methods for answering a straightforward question.">
+<meta property="og:image" content="https://mm218.dev/posts/2023-06-06-spatialsample_splits/map.jpg">
+<meta property="og:site-name" content="Mike Mahoney">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:title" content="Mike Mahoney - From the inbox: How can I get fold assignments from spatialsample?">
+<meta name="twitter:description" content="Straightforward methods for answering a straightforward question.">
+<meta name="twitter:image" content="https://mm218.dev/posts/2023-06-06-spatialsample_splits/map.jpg">
+<meta name="twitter:creator" content="@MikeMahoney218">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Mike Mahoney</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html" rel="" target="">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../papers" rel="" target="">
+ <span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../presentations" rel="" target="">
+ <span class="menu-text">Presentations</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../software_citations.html" rel="" target="">
+ <span class="menu-text">Software citations</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../blog.xml" rel="" target=""><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">From the inbox: How can I get fold assignments from spatialsample?</h1>
+                  <div>
+        <div class="description">
+          Straightforward methods for answering a straightforward question.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">spatialsample</div>
+                <div class="quarto-category">tidymodels</div>
+                <div class="quarto-category">R packages</div>
+                <div class="quarto-category">geospatial data</div>
+                <div class="quarto-category">Tutorials</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><a href="true">Mike Mahoney</a> </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">June 6, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>In my inbox,<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> someone asks:<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>
+<blockquote class="blockquote">
+<p>I’m using <code>spatial_clustering_cv()</code> from spatialsample to do cross-validation. How can I get separate data frames with each split created by this function?</p>
+</blockquote>
+<p>I think this question is decently common, because a lot of the spatialsample documentation is written assuming that you’re familiar with rsample already, which is often not the case for people working with spatial data. The functions to do this sort of thing live in rsample, and aren’t (<a href="https://github.com/tidymodels/spatialsample/issues/143">currently</a>) re-exported by spatialsample, so it can be hard to find the right function.</p>
+<p>First and foremost, let’s assume that you’ve got some object called <code>my_folds</code> created by <code>spatial_clustering_cv()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(spatialsample)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>my_folds <span class="ot">&lt;-</span> <span class="fu">spatial_clustering_cv</span>(boston_canopy, <span class="at">v =</span> <span class="dv">2</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>my_folds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>#  2-fold spatial cross-validation 
+# A tibble: 2 × 2
+  splits            id   
+  &lt;list&gt;            &lt;chr&gt;
+1 &lt;split [277/405]&gt; Fold1
+2 &lt;split [405/277]&gt; Fold2</code></pre>
+</div>
+</div>
+<p>The “my_folds” object that gets created should have a “splits” column, which is a list. Each element of that list contains your analysis and assessment sets.<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> To get a single split, use <code>rsample::get_rsplit()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rsample<span class="sc">::</span><span class="fu">get_rsplit</span>(my_folds, <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>&lt;Analysis/Assess/Total&gt;
+&lt;277/405/682&gt;</code></pre>
+</div>
+</div>
+<p>To get just the analysis data for that fold, use <code>rsample::analysis()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>rsample<span class="sc">::</span><span class="fu">get_rsplit</span>(my_folds, <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  rsample<span class="sc">::</span><span class="fu">analysis</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 277 features and 18 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 755424.9 ymin: 2935616 xmax: 812069.7 ymax: 2970073
+Projected CRS: NAD83 / Massachusetts Mainland (ftUS)
+# A tibble: 277 × 19
+   grid_id land_area canopy_gain canopy_loss canopy_no_change canopy_area_2014
+   &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+ 1 AB-4      795045.      15323.       3126.           53676.           56802.
+ 2 AO-9      270153        6187.       1184.           26930.           28114.
+ 3 V-7       107890.        219.       3612.             240.            3852.
+ 4 X-4       848558.       8275.       1760.            6872.            8632.
+ 5 AC-4     2069814.      82201.      50944.          240161.          291104.
+ 6 AC-15    1175032.      24517.      24010.          111148.          135158.
+ 7 U-14     2690727.      69780.      51404.          263796.          315201.
+ 8 AQ-15     453368.      13971.       3401.          343677.          347077.
+ 9 Q-10      156688.       9237.       3094.           57327.           60421.
+10 T-10      215340.      13984.       3947.           59539.           63487.
+# ℹ 267 more rows
+# ℹ 13 more variables: canopy_area_2019 &lt;dbl&gt;, change_canopy_area &lt;dbl&gt;,
+#   change_canopy_percentage &lt;dbl&gt;, canopy_percentage_2014 &lt;dbl&gt;,
+#   canopy_percentage_2019 &lt;dbl&gt;, change_canopy_absolute &lt;dbl&gt;,
+#   mean_temp_morning &lt;dbl&gt;, mean_temp_evening &lt;dbl&gt;, mean_temp &lt;dbl&gt;,
+#   mean_heat_index_morning &lt;dbl&gt;, mean_heat_index_evening &lt;dbl&gt;,
+#   mean_heat_index &lt;dbl&gt;, geometry &lt;MULTIPOLYGON [US_survey_foot]&gt;</code></pre>
+</div>
+</div>
+<p>Similarly, to get just the assessment data for that fold, use <code>rsample::assessment()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>rsample<span class="sc">::</span><span class="fu">get_rsplit</span>(my_folds, <span class="dv">1</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  rsample<span class="sc">::</span><span class="fu">assessment</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 405 features and 18 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 739826.9 ymin: 2908294 xmax: 781347.5 ymax: 2959751
+Projected CRS: NAD83 / Massachusetts Mainland (ftUS)
+# A tibble: 405 × 19
+   grid_id land_area canopy_gain canopy_loss canopy_no_change canopy_area_2014
+   &lt;chr&gt;       &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;            &lt;dbl&gt;            &lt;dbl&gt;
+ 1 I-33      265813.       8849.      11795.           78677.           90472.
+ 2 H-10     2691490.      73098.      80362.          345823.          426185.
+ 3 Q-22     2648089.     122211.     154236.         1026632.         1180868.
+ 4 P-18     2690726.     110928.     113146.          915137.         1028283.
+ 5 J-29     2574479.      38069.      15530.         2388638.         2404168.
+ 6 G-28     2641525.      87024.      39246.         1202528.         1241774.
+ 7 M-23     2690727.      87621.     124032.          748742.          872774.
+ 8 M-9      2690727.      52443.      53467.          304239.          357706.
+ 9 S-15     2690728.      93787.     162118.          478257.          640375.
+10 Q-21     2690727.      54712.     101816.         1359305.         1461121.
+# ℹ 395 more rows
+# ℹ 13 more variables: canopy_area_2019 &lt;dbl&gt;, change_canopy_area &lt;dbl&gt;,
+#   change_canopy_percentage &lt;dbl&gt;, canopy_percentage_2014 &lt;dbl&gt;,
+#   canopy_percentage_2019 &lt;dbl&gt;, change_canopy_absolute &lt;dbl&gt;,
+#   mean_temp_morning &lt;dbl&gt;, mean_temp_evening &lt;dbl&gt;, mean_temp &lt;dbl&gt;,
+#   mean_heat_index_morning &lt;dbl&gt;, mean_heat_index_evening &lt;dbl&gt;,
+#   mean_heat_index &lt;dbl&gt;, geometry &lt;MULTIPOLYGON [US_survey_foot]&gt;</code></pre>
+</div>
+</div>
+<p>If you’re trying to get your original data, with a column indicating which fold each row belongs to, there’s not a provided function for that. Instead, what you can do is take the assessment set from each split (which is “what fold data is assigned to”), add a new column to it with the fold name, and then combine those assessment sets into a single data frame. I do this via the function:<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>purrr<span class="sc">::</span><span class="fu">map2</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  my_folds<span class="sc">$</span>splits, </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  my_folds<span class="sc">$</span>id, </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  \(split, id) <span class="fu">cbind</span>(rsample<span class="sc">::</span><span class="fu">assessment</span>(split), <span class="at">fold_name =</span> id)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span> </span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">bind_rows</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 682 features and 19 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 739826.9 ymin: 2908294 xmax: 812069.7 ymax: 2970073
+Projected CRS: NAD83 / Massachusetts Mainland (ftUS)
+First 10 features:
+   grid_id land_area canopy_gain canopy_loss canopy_no_change canopy_area_2014
+1     I-33  265813.3    8848.818    11795.11         78676.56         90471.67
+2     H-10 2691489.9   73098.168    80361.85        345823.19        426185.04
+3     Q-22 2648088.6  122211.269   154236.43       1026631.85       1180868.27
+4     P-18 2690726.1  110927.833   113145.85        915137.00       1028282.85
+5     J-29 2574478.7   38068.676    15529.73       2388638.19       2404167.92
+6     G-28 2641525.3   87024.318    39246.15       1202527.94       1241774.09
+7     M-23 2690727.2   87620.730   124031.79        748742.13        872773.92
+8      M-9 2690726.6   52443.164    53466.56        304239.49        357706.04
+9     S-15 2690727.8   93786.589   162118.16        478257.33        640375.48
+10    Q-21 2690727.2   54711.827   101815.82       1359305.11       1461120.93
+   canopy_area_2019 change_canopy_area change_canopy_percentage
+1          87525.38          -2946.293               -3.2565923
+2         418921.35          -7263.685               -1.7043502
+3        1148843.12         -32025.158               -2.7120009
+4        1026064.83          -2218.014               -0.2157008
+5        2426706.87          22538.944                0.9374946
+6        1289552.26          47778.164                3.8475730
+7         836362.86         -36411.060               -4.1718776
+8         356682.65          -1023.393               -0.2860988
+9         572043.92         -68331.566              -10.6705469
+10       1414016.94         -47103.991               -3.2238256
+   canopy_percentage_2014 canopy_percentage_2019 change_canopy_absolute
+1                34.03579               32.92739            -1.10840701
+2                15.83454               15.56466            -0.26987600
+3                44.59323               43.38386            -1.20936883
+4                38.21581               38.13338            -0.08243181
+5                93.38465               94.26013             0.87547604
+6                47.00974               48.81847             1.80873391
+7                32.43636               31.08315            -1.35320518
+8                13.29403               13.25600            -0.03803406
+9                23.79934               21.25982            -2.53951988
+10               54.30208               52.55148            -1.75060448
+   mean_temp_morning mean_temp_evening mean_temp mean_heat_index_morning
+1           74.26247          83.87540  90.85933                75.63458
+2           74.64432          84.96917  91.71625                75.86767
+3           73.19889          82.29358  89.70302                74.47757
+4           73.77269          84.29003  91.26480                75.03802
+5           72.26419          79.77278  88.70229                73.65608
+6           73.60919          82.80297  90.33156                74.96955
+7           74.24167          83.34713  90.41143                75.66013
+8           76.74740          84.69933  91.96502                77.91048
+9           75.18260          84.85431  92.00132                76.39949
+10          73.37669          82.38064  90.59503                74.63029
+   mean_heat_index_evening mean_heat_index fold_name
+1                 89.71880        96.70939     Fold1
+2                 89.88733        96.19667     Fold1
+3                 87.34062        95.53811     Fold1
+4                 88.93811        96.43569     Fold1
+5                 81.32060        95.56059     Fold1
+6                 88.47864        96.82653     Fold1
+7                 89.23434        96.05418     Fold1
+8                 90.02009        96.14348     Fold1
+9                 89.91342        96.92160     Fold1
+10                86.90021        96.23439     Fold1
+                         geometry
+1  MULTIPOLYGON (((752945.6 29...
+2  MULTIPOLYGON (((751419.1 29...
+3  MULTIPOLYGON (((763631.7 29...
+4  MULTIPOLYGON (((763122.9 29...
+5  MULTIPOLYGON (((753963.4 29...
+6  MULTIPOLYGON (((749383.6 29...
+7  MULTIPOLYGON (((758543.1 29...
+8  MULTIPOLYGON (((758543.1 29...
+9  MULTIPOLYGON (((767702.6 29...
+10 MULTIPOLYGON (((764649.4 29...</code></pre>
+</div>
+</div>
+<p>I think it would make sense for <code>get_rsplit()</code>, <code>analysis()</code>, and <code>assessment()</code> to get ported over to spatialsample, to make it a bit easier for the folks whose first point-of-entry into tidymodels work is via spatialsample. I’ve got a <a href="https://github.com/tidymodels/spatialsample/issues/143">GitHub issue</a> to remind me to look into that before the package’s next release.</p>
+
+
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>I want to mention that I include a link to <a href="https://yihui.org/en/2017/08/so-gh-email/">Yihui Xie’s excellent blog post</a> in replies to help questions sent via email. I love seeing people use my packages, and I love helping people use them, but I don’t always have the time to give 1:1 help via email. If you post a question somewhere publicly, then other people might give an even better answer; if no one answers in a day or two, then email me the link, so I can answer it publicly and have a link to send the next person with the same question as you. That’s also why I turned this into a blog post – so that I can send others with the same question a pre-written answer!<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Anonymized and heavily paraphrased.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Sometimes called training and testing, respectively – rsample uses the analysis/assessment terminology to make it clear that all of this data should be in your training set, and doesn’t touch your final held-out test set.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>This is how spatialsample’s <code>autoplot()</code> methods do it, for instance.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">© Copyright 2022 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>
