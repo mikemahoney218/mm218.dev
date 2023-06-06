@@ -1,0 +1,61 @@
+---
+title: "From the inbox: How can I get fold assignments from spatialsample?"
+description: "Straightforward methods for answering a straightforward question."
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2023-06-06"
+categories: [R, spatialsample, tidymodels, R packages, geospatial data, Tutorials]
+image: map.jpg
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+In my inbox,^[I want to mention that I include a link to [Yihui Xie's excellent blog post](https://yihui.org/en/2017/08/so-gh-email/) in replies to help questions sent via email. I love seeing people use my packages, and I love helping people use them, but I don't always have the time to give 1:1 help via email. If you post a question somewhere publicly, then other people might give an even better answer; if no one answers in a day or two, then email me the link, so I can answer it publicly and have a link to send the next person with the same question as you. That's also why I turned this into a blog post -- so that I can send others with the same question a pre-written answer!] someone asks:^[Anonymized and heavily paraphrased.]
+
+> I'm using `spatial_clustering_cv()` from spatialsample to do cross-validation. How can I get separate data frames with each split created by this function?
+
+I think this question is decently common, because a lot of the spatialsample documentation is written assuming that you're familiar with rsample already, which is often not the case for people working with spatial data. The functions to do this sort of thing live in rsample, and aren't ([currently](https://github.com/tidymodels/spatialsample/issues/143)) re-exported by spatialsample, so it can be hard to find the right function.
+
+First and foremost, let's assume that you've got some object called `my_folds` created by `spatial_clustering_cv()`:
+
+```{r}
+library(spatialsample)
+my_folds <- spatial_clustering_cv(boston_canopy, v = 2)
+my_folds
+```
+
+The “my_folds” object that gets created should have a “splits” column, which is a list. Each element of that list contains your analysis and assessment sets.^[Sometimes called training and testing, respectively -- rsample uses the analysis/assessment terminology to make it clear that all of this data should be in your training set, and doesn't touch your final held-out test set.] To get a single split, use `rsample::get_rsplit()`:
+
+```{r}
+rsample::get_rsplit(my_folds, 1)
+```
+
+To get just the analysis data for that fold, use `rsample::analysis()`:
+
+```{r}
+rsample::get_rsplit(my_folds, 1) |>
+  rsample::analysis()
+```
+
+Similarly, to get just the assessment data for that fold, use `rsample::assessment()`:
+
+```{r}
+rsample::get_rsplit(my_folds, 1) |>
+  rsample::assessment()
+```
+
+If you’re trying to get your original data, with a column indicating which fold each row belongs to, there’s not a provided function for that. Instead, what you can do is take the assessment set from each split (which is “what fold data is assigned to”), add a new column to it with the fold name, and then combine those assessment sets into a single data frame. I do this via the function:^[This is how spatialsample's `autoplot()` methods do it, for instance.]
+
+```{r}
+purrr::map2(
+  my_folds$splits, 
+  my_folds$id, 
+  \(split, id) cbind(rsample::assessment(split), fold_name = id)
+) |> 
+  dplyr::bind_rows()
+```
+
+I think it would make sense for `get_rsplit()`, `analysis()`, and `assessment()` to get ported over to spatialsample, to make it a bit easier for the folks whose first point-of-entry into tidymodels work is via spatialsample. I've got a [GitHub issue](https://github.com/tidymodels/spatialsample/issues/143) to remind me to look into that before the package's next release.
