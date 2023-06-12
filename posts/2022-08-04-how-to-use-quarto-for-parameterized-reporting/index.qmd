@@ -34,7 +34,7 @@ remotes::install_github("EmilHvitfeldt/elevators")
 This package includes a tibble, `elevators`, which contains quite a few observations of quite a few variables describing the elevators throughout New York City:
 
 ```{r}
-elevators::elevators
+elevators::elevators |> head(20)
 ```
 
 Because all you're doing is writing a small example script, you just grab a few variables at random and plot them in a pretty simple Quarto document. That `.qmd` looks like this:
@@ -134,7 +134,7 @@ Your app has been a hit with your colleague! In fact, possibly too much of a hit
 You have now become appropriately resigned to the fact that you are now "the elevator guy", and will have weird facts about elevator speeds stored in your brain until the end of time. So you start digging into the Maryland data:
 
 ```{r}
-elevators::md_elevators
+elevators::md_elevators |> head(20)
 ```
 
 Now Maryland, being worse than New York, doesn't give you all the same information that you used for your original report. That means that only one of our graphs will actually render for both states.
