@@ -46,6 +46,8 @@ The citations below are in a variety of formats; I'll confess to copying journal
 
 ### terrainr
 
+#. Henderson, A. F., Cheeseman, T., Curcio, N., Marcías, M. L., Andrews, O., & Lea, M.-A. (2023). The most southerly occurrence of humpback whales in the western Weddell Sea. Marine Mammal Science, 1– 8. https://doi.org/10.1111/mms.13033
+
 #. Fox, N., Serrano-Vergel, R., Van Berkel, D., Lindquist, M. 2022. Towards Gamified Decision Support Systems: In-game 3D Representation of Real-word Landscapes from GIS Datasets. Journal of Digital Landscape Architecture. https://doi.org/10.14627/537724035
 
 #. Tamiminia, H., Salehi, B., Mahdianpari, M., Beier, C. M., Johnson, L. 2022.  Mapping Two Decades of New York State Forest Aboveground Biomass Change Using Remote Sensing. Remote Sensing 14(16): 4097. https://doi.org/10.3390/rs14164097
