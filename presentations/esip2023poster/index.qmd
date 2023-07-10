@@ -1,0 +1,44 @@
+---
+title: "Assessing spatial models in scientifically sound ways is hard. New tools for the tidymodels modeling framework can help make it easier."
+freeze: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+### **[See the poster!](poster.pdf)**
+
+### **[Read the spatialsample paper!](https://arxiv.org/abs/2303.07334)**
+
+### **[Read the waywiser paper!](https://arxiv.org/abs/2303.11312)**
+
+<br /> 
+
+Assessing spatial models can be difficult. Model errors may exhibit spatial autocorrelation, model predictions are often aggregated to multiple spatial scales by users, and models are often used to extrapolate outside the boundaries of their training data. To adjust for these considerations, modelers must choose from a dizzying array of assessment protocols and metrics which may give different or even contradictory results. Researchers are also often responsible for implementing these techniques themselves, or otherwise welding together multiple packages with incompatible interfaces in order to properly assess their models.
+
+New tools for R's tidymodels modeling framework aim to reduce this complexity, implementing common model assessment tasks in a straightforward, computationally efficient, and easy-to-learn manner.
+
+<br />
+
+## spatialsample
+
+The `spatialsample` package provides methods for spatial cross-validation. These methods provide more accurate estimates of model performance when extrapolating into new areas, and are particularly useful when there is no independent probability sample available for assessing predictions. 
+
+Functions in `spatialsample` provide a standardized interface to several of the most popular spatial CV approaches, and return objects which extend classes from the `rsample` package. As a result, these objects can seamlessly be used with any functions within the tidymodels modeling framework.
+
+
++ [Read the paper](https://arxiv.org/abs/2303.07334)
++ [Read the docs](https://spatialsample.tidymodels.org/)
++ [Get the package](https://github.com/tidymodels/spatialsample/)
+
+<br />
+
+## waywiser
+
+The `waywiser` package is an ergonomic toolbox providing a consistent user interface for assessing spatial models. To that end, `waywiser` makes it easy to compute model assessment metrics, evaluate predictions aggregated to multiple scales, and identify areas where your model can't safely make predictions. The multi-scale assessment protocol follows Riemann et al. (2010), and is designed to help modelers identify minimum mapping units and regions where models underperform, as well as to estimate how well models perform at relevant levels of aggregation.
+
+
++ [Read the paper](https://arxiv.org/abs/2303.11312)
++ [Read the docs](https://docs.ropensci.org/waywiser/)
++ [Get the package](https://github.com/mikemahoney218/waywiser)

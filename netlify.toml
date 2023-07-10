@@ -147,5 +147,6 @@
   to = "https://mikemahoney218.github.io/2023-04-05_boston_useR_lightning_talk/slides.html#/title-slide"
 
 [[redirects]]
-  from = "boston_user_2023"
-  to = "https://mikemahoney218.github.io/2023-04-05_boston_useR_lightning_talk/slides.html#/title-slide"
+  from = "/esip2023poster"
+  to = "presentations/esip2023poster"
+  
