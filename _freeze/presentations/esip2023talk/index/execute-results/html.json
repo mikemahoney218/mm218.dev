@@ -1,0 +1,14 @@
+{
+  "hash": "ccec9fede76e3f86e9cd79ebbc4943bf",
+  "result": {
+    "markdown": "---\ntitle: \"Mapping shrublands across New York State.\"\nfreeze: true\n---\n\n\n\n\n### **[See the slides!](MahoneyMapping.pdf)**\n\n### **[Read the IJRS paper!](https://www.mm218.dev/papers/shrubland_pub_2022.pdf)**\n\n### **[Read the book chapter!](https://www.mm218.dev/papers/shrub_book_2023.pdf)**\n\nNovel plant communities reshape landscapes and pose challenges for land cover classification and mapping that can constrain research and stewardship efforts. In the US Northeast, emergence of low-statured woody vegetation, or shrublands, instead of secondary forests in post-agricultural landscapes is well documented by field studies, but poorly understood from a landscape perspective, which limits the ability to systematically study and manage these lands. \n\nTo address gaps in classification/mapping of low-statured cover types where they have been historically rare, we developed models to predict shrubland distributions at 30 m resolution across New York State (NYS), using a stacked ensemble combining a random forest, gradient boosting machine, and artificial neural network to integrate remote sensing of structural (airborne LIDAR) and optical (satellite imagery) properties of vegetation cover. We first classified a 1 m canopy height model (CHM), derived from a patchwork of available LIDAR coverages, to define shrubland presence/absence. Next, these non-contiguous maps were used to train a model ensemble based on temporally segmented imagery to predict shrubland probability for the entire study landscape (NYS). Approximately 2.5% of the CHM coverage area was classified as shrubland. \n\nModels using Landsat predictors trained on the classified CHM were effective at identifying shrubland (test set AUC = 0.893, real-world AUC = 0.904), in discriminating between shrub/young forest and other cover classes, and produced qualitatively sensible maps, even when extending beyond the original training data. After ground-truthing, we expect these shrubland maps and models will have many research and stewardship applications including wildlife conservation, invasive species mitigation and natural climate solutions. Our results suggest that incorporation of airborne LiDAR, even from a discontinuous patchwork of coverages, can improve land cover classification of historically rare but increasingly prevalent shrubland habitats across broader areas.\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

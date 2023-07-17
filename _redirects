@@ -1,2 +1,3 @@
 # Redirects from what the browser requests to what we serve
 /esip2023poster                /presentations/esip2023poster
+/esip2023                      /presentations/esip2023talk
