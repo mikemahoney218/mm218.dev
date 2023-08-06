@@ -9,8 +9,896 @@
 <link>https://mm218.dev/blog.html</link>
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
-<generator>quarto-1.3.433</generator>
-<lastBuildDate>Tue, 06 Jun 2023 00:00:00 GMT</lastBuildDate>
+<generator>quarto-1.3.450</generator>
+<lastBuildDate>Mon, 07 Aug 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>A long digression about the word ‘vector’</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2023-08-07-vector/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>In linguistics, there’s this concept called “semantic overload” that refers to when a word has more than one distinct meaning, and the appropriate meaning needs to be inferred from context. The classic example is when someone says they’re “running to the store”: we can guess from context that the speaker isn’t going for a jog, but we’re forced to guess.</p>
+<p>Software engineering loves semantic overload. An “agile team” might be a vague way to say that you’re very responsive, or it might mean you work in tightly-defined two week sprints. A “transaction” might be a customer ordering from a website, or a database writing a new row. When you’re developing software that’s tackling new types of problems, there’s often not existing language that describes exactly what your tool is trying to do, and so instead programmers use existing terms and rely upon metaphors and analogies to adapt them for a new purpose. But because the meaning of these terms changes depending on the context they’re used in, this overload can be a real barrier to learning for new users who don’t yet have the context to understand the overloaded term. For example, I’ve worked with a number of new programmers who were afraid of opening “Issues” on GitHub projects, because in other contexts announcing an issue you have with someone’s work is an aggressive action.<sup>1</sup> Lacking the shared context makes it hard to decode what these terms mean.</p>
+<p>And so, the term “vector”. For a bit of context, my undergraduate degree was in ecology – forest ecosystem science specifically, a specialization chosen in order to not need to take courses in Calculus 2 or Organic Chemistry. Which meant that, coming out of my degree, I had one course in physics, a handful in GIS and spatial data, and none in computer science. So when I learned that the base unit of R data, the result of running code like:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1 2</code></pre>
+</div>
+</div>
+<p>Was called a “vector”, I was frustrated. At this point, I had been told that:</p>
+<ul>
+<li><p>In physics, a “vector” was any line with a magnitude (“length”) and a direction.</p></li>
+<li><p>In GIS, a “vector” was pretty much any type of data; points, lines, polygons, whatever.<sup>2</sup></p></li>
+<li><p>In R and apparently computer science, a “vector” was quite literally any data whatsoever.</p></li>
+</ul>
+<p>This felt to me like another case of pointless complexity, of the word “vector” being overloaded beyond the point of usefulness – and I didn’t feel like the word “vector” was particularly useful in the first place.</p>
+<p>It turns out, though, that I was just missing the context that linked these three meanings together. I wouldn’t get that context until I was in grad school, procrastinating by watching <a href="https://www.3blue1brown.com/topics/linear-algebra">3Blue1Brown’s excellent videos on the fundamentals of linear algebra</a>. I’m not nearly qualified to teach anything about linear algebra, and I don’t have the space nor the inclination to try to do so here – but I’m going to try and share the thing that gave me an “aha!” moment. To do that, I need to start off by getting really abstract.</p>
+<p>First off, let’s say we’ve got some 2-dimensional plane, that looks like this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)</span>
+<span id="cb3-2">df <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">runif</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">runif</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)</span>
+<span id="cb3-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(df, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(x, y)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb3-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb3-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb3-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We’ve got our X axis and our Y axis here, and both meet at the origin – the place where the X coordinate is 0, and the Y coordinate is 0. We’d say that the coordinates at that point are (0, 0).</p>
+<p>Now let’s go back to our physics definition of a vector – any line with a known length and direction. We could draw one of those in this coordinate plane – say our line is a bit longer than 70 “units”, going from (0, 0) all the way to (50, 50):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(df, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(x, y)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb4-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb4-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb4-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">annotate</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"segment"</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xend =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">yend =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb4-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">annotate</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"point"</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">shape =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">25</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb4-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This is how I was taught to think about vectors in those physics classes – arrows on some abstract plane. For instance, we could turn this into an acceleration vector by labeling these axes, so that our line is now charting speed over time:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(df, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(x, y)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb5-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Time"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb5-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Speed"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb5-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">annotate</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"segment"</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xend =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">yend =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb5-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">annotate</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"point"</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">shape =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">25</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb5-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>If you change the axis labels to distance over time, you have a velocity vector instead:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(df, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(x, y)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb6-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Time"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb6-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Distance"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb6-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">annotate</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"segment"</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xend =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">yend =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb6-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">annotate</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"point"</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">shape =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">25</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"black"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb6-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>The meaning of the line is defined by the axis labels – by the actual coordinate plane your vector is in. Looking at our velocity vector, we can tell how far we’ve gone (position on the Y axis) for any given time (position on the X axis).</p>
+<p>So if we use a different coordinate plane and relabel our axes to show “distance away from the origin”:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(df, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(x, y)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb7-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Distance away from the origin in this direction"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb7-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Distance away from the origin in this direction"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb7-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">annotate</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"segment"</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xend =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">yend =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb7-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We get vectors in a spatial sense. Rather than showing distance at a given time, we’re now showing the position of our data – in this case, a linestring – in one direction when it’s at a given position in the other direction. Just like in physics, the actual meaning of this line depends on the coordinate plane – on the <em>coordinate reference system</em> of the data. The CRS of your data is a standardized way to define <em>where</em> your origin is, <em>what units</em> your distances are measured in, and <em>which direction</em> away from the origin you’re going.</p>
+<p>And we can use spatial vector data to replace our physics vector. We just need to define a matrix containing the beginning and end coordinates of our line:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">our_matrix <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">matrix</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">nrow =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">byrow =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span>
+<span id="cb8-2">our_matrix</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1] [,2]
+[1,]    0    0
+[2,]   50   50</code></pre>
+</div>
+</div>
+<p>And then we can tell sf that it should understand that matrix as being a line:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1">our_line <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_linestring</span>(our_matrix)</span>
+<span id="cb10-2">our_line</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>LINESTRING (0 0, 50 50)</code></pre>
+</div>
+</div>
+<p>And voila, we have a spatial vector:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb12-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Distance away from the origin in this direction"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb12-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Distance away from the origin in this direction"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb12-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(</span>
+<span id="cb12-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> our_line</span>
+<span id="cb12-6">  )</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>At each point along this line on our X axis, our line is a single, known position on the Y axis. If we only have one measurement of XY position – say, a single GPS measurement – then our line would be of length 0. We’d have a point instead:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb13-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Distance away from the origin in this direction"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb13-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Distance away from the origin in this direction"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb13-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(</span>
+<span id="cb13-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_point</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>))</span>
+<span id="cb13-6">  )</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>That point represents a single position, which we’d understand through our coordinate reference system as being a certain distance away from a reference point.</p>
+<p>Similarly, this is what vectors in R are abstracting. Imagine that, instead of using sf to make this a spatial vector, we turned our matrix into a data frame and used that with ggplot2 instead:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1">our_matrix <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb14-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.data.frame</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb14-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">setNames</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"x"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"y"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb14-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(x, y)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb14-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Distance away from the origin in this direction"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb14-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Distance away from the origin in this direction"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb14-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">annotate</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"segment"</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">xend =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">yend =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">50</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb14-8">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Just like with sf, we’re representing vectors by the places they start and end. And because we’ve plotted this as a line, we’re able to tell the position of our data at each distance along either the X or Y axis, within this coordinate reference system.</p>
+<p>Or take for instance the <code>age</code> vector inside the <code>Orange</code> data frame:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1">Orange<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>age <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1]  118  484  664 1004 1231 1372</code></pre>
+</div>
+</div>
+<p>According to <code>?Orange</code>, this vector represents the age of the tree, in units of days since 1968-12-31. Similarly, the <code>circumference</code> vector is the circumference of each tree in millimeters. We can plot those vectors just as easily as our physics and our spatial vectors:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(Orange, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(age, circumference, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> Tree)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb17-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1700</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb17-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">225</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span></span>
+<span id="cb17-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_point</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This graph is using an abstract coordinate system – instead of “meters away from the origin”, one axis is “distance in time from a reference date”, and the other is “distance in length from not existing at all”. But just like our physics vectors, each of these points represents a magnitude in some direction. Our <code>age</code> vector is a set of magnitudes along a time axis; our <code>circumference</code> vector a set of magnitudes along a length axis.</p>
+<p>Because I didn’t have a ton of formal math education, I never made the connection across these three types of vectors, and never entirely understood that they were all different ways of understanding and representing position along a coordinate plane, under some coordinate reference system. Recognizing that these different versions of “vectors” are all sharing an underlying meaning made it a lot easier for me to understand what “vector data” actually meant, and to understand the semantic difference between vector and raster representations of the same data. Hopefully this digression makes things a bit clearer for someone else, as well.</p>
+
+
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>This has been partially addressed by the newer Discussions feature.↩︎</p></li>
+<li id="fn2"><p>Don’t worry, Mastodon commenter, I’m aware that rasters exist. The point is that my education here was incomplete.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>R</category>
+  <category>Tutorials</category>
+  <guid>https://mm218.dev/posts/2023-08-07-vector/index.html</guid>
+  <pubDate>Mon, 07 Aug 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2023-08-07-vector/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>From the inbox: How can I get fold assignments from spatialsample?</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -5031,440 +5919,6 @@ font-style: inherit;">```</span></span></code></pre></div>
   <guid>https://mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html</guid>
   <pubDate>Fri, 14 Jan 2022 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/fig1.png" medium="image" type="image/png" height="51" width="144"/>
-</item>
-<item>
-  <title>Automated {drat} uploads with GitHub Actions</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<p>This is a quick walkthrough of how to use GitHub actions to automatically upload packages to personal <a href="https://github.com/eddelbuettel/drat">{drat}</a> repos.</p>
-<p>If you just want the good stuff, <a href="https://github.com/mikemahoney218/upload-to-drat-repo/">here’s the link to the GitHub action I’m using</a> as well as <a href="https://github.com/ropensci/terrainr/blob/main/.github/workflows/drat.yml">the GitHub workflow that uploads terrainr to my own drat repo</a>.</p>
-<section id="what-are-we-doing" class="level2">
-<h2 class="anchored" data-anchor-id="what-are-we-doing">What are we doing?</h2>
-<p><a href="https://github.com/eddelbuettel/drat">{drat}</a> is an R package that helps you set up CRAN-like repositories, hosted (primarily) on GitHub Pages. <a href="https://github.com/features/actions">GitHub Actions</a> is a continuous integration/continuous deployment service<sup>1</sup>, also hosted by GitHub, which lets you trigger compute workloads based on a CRON schedule, activity on a hosted repository, or manually.</p>
-<p>This post walks through setting up a GitHub Actions CD workflow<sup>2</sup> to automatically build and upload an R package to a drat repo based on a schedule or repository activity.</p>
-</section>
-<section id="why-are-we-doing-it" class="level2">
-<h2 class="anchored" data-anchor-id="why-are-we-doing-it">Why are we doing it?</h2>
-<p>My lab has a number of internal packages we use for our day-to-day work which handle things like downloading data from our central server and producing standardized model assessment outputs. All of these packages live on GitHub in our central organization, and for a long time our workflow for installing these packages has been to clone the repository and then <code>devtools::install</code> the package.</p>
-<p>Recently, though, we’ve had to share one of our packages with a number of outside collaborators who we aren’t going to be adding to the organization. We’ve also started working with a number of people who are less familiar with git and GitHub, both externally and within the lab, which means we need to provide a bit more instruction than simply saying “clone the repo and install that”<sup>3</sup>. This also means that solutions like “use <code>remotes::install_github</code> with a PAT” aren’t feasible; we want people to be able to get the packages they need without needing to know anything about GitHub itself. Therefore, we needed a simpler method to actually distribute our code, both to people we’d happily give repo access and people we wouldn’t want to.</p>
-<p>For public repositories and organizations, I think the easiest solution to this problem is to set up your own <a href="https://r-universe.dev/organizations/">R Universe</a>, which rOpenSci has written <a href="https://ropensci.org/blog/2021/06/22/setup-runiverse/">fantastic instructions for getting started with</a>; this offloads your responsibility for managing CI to the rOpenSci team. For this project, however, we wanted a separate and mostly hidden repository page, which made {drat} a perfect candidate.</p>
-<p>The only problem was how to make sure we were always publishing the newest versions of our package. We’re a small team doing a lot of different things, so being able to automate away any repetitive task (like publishing patch releases to a {drat} repo) can really help reduce the cognitive load and number of mistakes associated with updating our shared codebase.</p>
-</section>
-<section id="how-did-we-do-it" class="level2">
-<h2 class="anchored" data-anchor-id="how-did-we-do-it">How did we do it?</h2>
-<p>Because the original version of this workflow is on a private repo, I’ll walk through <a href="https://github.com/ropensci/terrainr/blob/main/.github/workflows/drat.yml">the workflow</a> that uploads <a href="https://github.com/ropensci/terrainr">terrainr</a> to <a href="https://github.com/mikemahoney218/drat">my own personal drat repo</a>. The YAML file that runs the workflow looks like this:</p>
-<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">push</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">branches</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-4"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'main'</span></span>
-<span id="cb1-5"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">paths</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-6"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'DESCRIPTION'</span></span>
-<span id="cb1-7"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">workflow_dispatch</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-8"></span>
-<span id="cb1-9"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">jobs</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-10"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drat-upload</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-11"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">runs-on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> ubuntu-20.04</span></span>
-<span id="cb1-12"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> Drat Upload</span></span>
-<span id="cb1-13"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">steps</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-14"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> mikemahoney218/upload-to-drat-repo@v0.1</span></span>
-<span id="cb1-15"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">with</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-16"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drat_repo</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mikemahoney218/drat'</span></span>
-<span id="cb1-17"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">token</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"${{ secrets.DRAT_TOKEN }}"</span></span>
-<span id="cb1-18"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">commit_message</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Automated update (add terrainr)"</span></span>
-<span id="cb1-19"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">commit_email</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"mike.mahoney.218@gmail.com"</span></span></code></pre></div>
-<p>This script has two main components to it: running the job and configuring the action itself.</p>
-<section id="running-the-job" class="level3">
-<h3 class="anchored" data-anchor-id="running-the-job">Running the job</h3>
-<p>At the top of terrainr’s drat workflow script is the following chunk:</p>
-<div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb2-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">push</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb2-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">branches</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb2-4"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'main'</span></span>
-<span id="cb2-5"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">paths</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb2-6"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'DESCRIPTION'</span></span>
-<span id="cb2-7"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">workflow_dispatch</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span></code></pre></div>
-<p>This sets up two different ways to trigger the workflow. First off, any <code>push</code> commit to the <code>main</code> branch that touches the <code>DESCRIPTION</code> file will automatically build the package and push it to my drat repo. Because terrainr is published on CRAN and has a handful of users, I do my best to update version numbers whenever I make changes – even during development, I try and bump development versions whenever there’s a fix or update worth mentioning.</p>
-<p>Since the version number is stored in <code>DESCRIPTION</code>, this means I’ll only push updated package versions when I’ve actually updated something in the package; my small edits to the CI files, for instance, won’t create a new release.</p>
-<p>If you want to be freer about updating your repo, you can drop any of these restrictions. For instance, our internal packages have workflow triggers that look like this:</p>
-<div class="sourceCode" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb3-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">push</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb3-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">branches</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'main'</span></span></code></pre></div>
-<p>In this case, we push an update any time we push <em>any</em> commit to the main branch. This can cause problems – for instance, if we don’t update version numbers then <code>update.packages</code> won’t recognize that local installations are out of date – but makes more sense for our small team and small group of users.</p>
-<p>The second method this workflow uses to upload a new version is the <code>workflow_dispatch:</code> option, which lets me manually trigger the workflow from the GitHub UI. This is super helpful in case I accidentally mess up my drat repo, or make a small edit without changing the version number in the <code>DESCRIPTION</code>; without this line I’d have to rebuild the package on my laptop and update the drat repo from my local copy.</p>
-<p>There’s a lot of other ways you can set to trigger workflows – <a href="https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#on">see the full list here</a> – but the other one I want to highlight is that you can also set the workflow to trigger on a schedule using a crontab. This snippet for instance will release daily builds every day at 0:00 UTC:</p>
-<div class="sourceCode" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb4-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb4-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">schedule</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span></span>
-<span id="cb4-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">cron</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'0 0 * * *'</span></span></code></pre></div>
-<p>You can use this syntax to create incredibly complex schedules; I personally always use https://crontab.guru/ to make sure my crontabs are right when I’m trying to schedule jobs.</p>
-</section>
-<section id="configuring-the-action" class="level3">
-<h3 class="anchored" data-anchor-id="configuring-the-action">Configuring the action</h3>
-<p>The second half of the workflow script actually calls the action to build the package and upload it to your drat repo:</p>
-<div class="sourceCode" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb5-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">jobs</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb5-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drat-upload</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb5-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">runs-on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> ubuntu-20.04</span></span>
-<span id="cb5-4"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> Drat Upload</span></span>
-<span id="cb5-5"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">steps</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb5-6"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> mikemahoney218/upload-to-drat-repo@v0.1</span></span>
-<span id="cb5-7"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">with</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb5-8"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drat_repo</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mikemahoney218/drat'</span></span>
-<span id="cb5-9"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">token</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"${{ secrets.DRAT_TOKEN }}"</span></span>
-<span id="cb5-10"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">commit_message</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Automated update (add terrainr)"</span></span>
-<span id="cb5-11"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">commit_email</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"mike.mahoney.218@gmail.com"</span></span></code></pre></div>
-<p>This will, by default, spin up an Ubuntu 20.04 runner and run v0.1 of <a href="https://github.com/mikemahoney218/upload-to-drat-repo/">the upload action</a>, which is the current version. This action will automatically check out the repo the workflow is called from, build and install the R package in that repo, then insert it into a drat repo.</p>
-<p>There’s a few input values for this workflow which you <em>must</em> specify, which are under the “with” step:</p>
-<ul>
-<li><code>drat_repo</code>: The GitHub repository for the drat repo you’re trying to push your package to. If you don’t have a drat repo yet, you can create one locally using <code>drat::initRepo</code>, and then push the created directory up to GitHub.</li>
-<li><code>commit_email</code>: The author to write the drat repo commit as; used to set <code>git config user.email</code>. You must provide a value here.</li>
-<li><code>token</code>: A <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token">personal access token (PAT)</a>. The action will use this PAT to clone your package and drat repo, as well as to push your drat repo, so make sure to authorize the PAT to do so. It’s a good idea to use a service account with the fewest permissions possible for this job.</li>
-</ul>
-<p>You can also customize the job further with a few additional inputs:</p>
-<ul>
-<li><code>commit_message</code>: The message to use when committing to <code>drat_repo</code>.</li>
-<li><code>commit_author</code>: The author to write the commit as; used to set <code>git config user.name</code>.</li>
-<li><code>package</code>: The GitHub repository for the package you want to upload. Defaults to the repository the action is running in, but this can be used to run your workflow elsewhere (for instance, if you want to have all your upload jobs scheduled in the drat repo itself).</li>
-</ul>
-<p>And for most use cases, this should be enough to automatically deploy your package whenever you desire! So far, I’ve tested this workflow on a handful of my own packages (terrainr and then our internal packages), and things are working well so far – if you find any problems or have any suggestions, <a href="https://github.com/mikemahoney218/upload-to-drat-repo/issues">feel free to open an issue on the action repo here.</a></p>
-
-
-</section>
-</section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>Kinda. It’s probably more accurate to say GitHub Actions provides hosted compute which is typically used for CI/CD workflows, but can also be applied to other things; I use it to <a href="https://twitter.com/proc_tweets">make art and post to Twitter, for instance.</a>↩︎</p></li>
-<li id="fn2"><p>Workflows are explicit, repository-specific jobs, while actions are generic scripts which can be included inside of workflows.↩︎</p></li>
-<li id="fn3"><p>I had completely forgotten how complex getting started with GitHub can be as a novice until recently, teaching a Carpentries workshop, I realized that teaching the initial account set-up <a href="https://swcarpentry.github.io/git-novice/07-github/index.html">requires a full 45 minute lesson</a>.↩︎</p></li>
-</ol>
-</section></div> ]]></description>
-  <category>R</category>
-  <category>Tutorials</category>
-  <category>CI</category>
-  <category>CD</category>
-  <category>GitHub Actions</category>
-  <guid>https://mm218.dev/posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html</guid>
-  <pubDate>Thu, 23 Sep 2021 00:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>
