@@ -142,9 +142,9 @@ our_matrix |>
   as.data.frame() |>
   setNames(c("x", "y")) |>
   ggplot(aes(x, y)) +
+  geom_line() + 
   scale_x_continuous("Distance away from the origin in this direction", expand = c(0, 0), limits = c(0, 100)) + 
   scale_y_continuous("Distance away from the origin in this direction", expand = c(0, 0), limits = c(0, 100)) + 
-  annotate("segment", 0, 0, xend = 50, yend = 50) + 
   coord_fixed()
 ```
 
