@@ -10,7 +10,112 @@
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Mon, 07 Aug 2023 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Thu, 24 Aug 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Yes, you can rescale Landsat images after compositing them</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2023-08-24-landsat-scaling/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>Landsat data are distributed as unsigned 16-bit images, which need to be rescaled to get raw band values. The <a href="https://www.usgs.gov/faqs/how-do-i-use-a-scale-factor-landsat-level-2-science-products">rescaling formulas are dependent upon the band type and collection used</a>, but for current Collection 2 data boil down to two equations:</p>
+<ul>
+<li>For surface reflectance data, the formula is <img src="https://latex.codecogs.com/png.latex?X%20*%200.0000275%20-%200.2"> (where <img src="https://latex.codecogs.com/png.latex?X"> is the scaled band value)</li>
+<li>For surface temperature data, the formula is <img src="https://latex.codecogs.com/png.latex?X%20*%200.00341802%20+%20149.0">.</li>
+</ul>
+<p>For my use-cases, I’m only rarely looking to download (and rescale) a single Landsat image. More often, I want to take all the Landsat images from a given timeframe (for instance, the growing season in the area I care about) and combine them into a composite image, taking the mean or median pixel value for that time period.</p>
+<p>And every single time I go to do this, I need to figure out for the umpteenth time whether I can composite the images and <em>then</em> rescale them, or whether I need to rescale each individual image before making my composite. This is analytically solvable, and I think is pretty straightforward to solve – and, to spoil the rest of this post, the answer is that it doesn’t matter when you rescale. But I can never remember that, and I never trust my algebra when I try to prove that you can rescale before or after compositing either.</p>
+<p>But this is an easy thing to simulate – just make a bunch of replications of compositing some number of 16-bit values, rescaling either before or after making the composite, and test for equality. That’s do-able in a few lines of R:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">landsat_rescale <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(x) x <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.0000275</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.2</span></span>
+<span id="cb1-2"></span>
+<span id="cb1-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vapply</span>(</span>
+<span id="cb1-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(mean, median),</span>
+<span id="cb1-5">  \(f) {</span>
+<span id="cb1-6">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">replicate</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000</span>, {</span>
+<span id="cb1-7">      values <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">replicate</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sample.int</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">65455</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>))</span>
+<span id="cb1-8">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">all.equal</span>(</span>
+<span id="cb1-9">        <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">f</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">landsat_rescale</span>(values)),</span>
+<span id="cb1-10">        <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">landsat_rescale</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">f</span>(values))</span>
+<span id="cb1-11">      )</span>
+<span id="cb1-12">    }) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-13">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">all</span>()</span>
+<span id="cb1-14">  },</span>
+<span id="cb1-15">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">logical</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb1-16">) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb1-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">all</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>It’s fine! You can rescale before or after compositing, whether you’re using a mean or a median composite. Do whatever is easiest for your workflow. Go in peace.</p>
+
+
+
+ ]]></description>
+  <category>R</category>
+  <category>geospatial data</category>
+  <category>Tutorials</category>
+  <guid>https://mm218.dev/posts/2023-08-24-landsat-scaling/index.html</guid>
+  <pubDate>Thu, 24 Aug 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2023-08-24-landsat-scaling/landsat.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>A long digression about the word ‘vector’</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -5872,39 +5977,6 @@ font-style: inherit;">```</span></span></code></pre></div>
   <guid>https://mm218.dev/posts/2022-02-18-progress-purpose-process/index.html</guid>
   <pubDate>Fri, 18 Feb 2022 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2022-02-18-progress-purpose-process/pano.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>terrainr: An R package for creating immersive virtual environments</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<p>I’ve got a <a href="https://joss.theoj.org/papers/10.21105/joss.04060">new paper out at the Journal of Open Source Science</a>, documenting the <a href="https://www.mm218.dev/posts/2020/10/">“terrainr” package</a> I’ve been developing since late 2020. JOSS is a fantastic journal and is entirely open-source, so that first link should work for everyone.</p>
-<div class="cell">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/fig1.png" class="img-fluid figure-img" width="1571"></p>
-<figcaption class="figure-caption">Left: Where typical geodata-to-IVE workflows leave you. Right: Where terrainr gets you.</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p>The JOSS workflow is absolutely fascinating. I made a <a href="https://github.com/ropensci/terrainr/tree/paper">git branch in the terrainr repo</a> with the files needed to generate the paper, then (through a web form) opened a <a href="https://github.com/openjournals/joss-reviews/issues/4055">pre-review issue on GitHub</a>. The editors used that issue to assign a handling editor, then moved things over to <a href="https://github.com/openjournals/joss-reviews/issues/4060">a review issue</a>, where the paper was processed and prepared for submission via an <a href="https://github.com/openjournals/joss-papers/pull/2885">automatically generated PR</a>. The whole thing was incredibly efficient, and also entirely transparent – the logs of the paper processing workflow will be available until GitHub finally shuts down, a refreshing change compared to standard peer review.</p>
-<p>The paper itself is a general overview of the terrainr package, trying to be a new enough contribution that it’s not just repeating the package documentation but not adding enough to spin off into <a href="https://www.mm218.dev/posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/">an entirely separate research project</a>. It’s also very short – a nice feature of JOSS papers – so rather than summarize here I’ll just suggest you <a href="https://www.mm218.dev/papers/terrainr_2022.pdf">read it yourself</a>.</p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
-
-
-
- ]]></description>
-  <guid>https://mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html</guid>
-  <pubDate>Fri, 14 Jan 2022 00:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/fig1.png" medium="image" type="image/png" height="51" width="144"/>
 </item>
 </channel>
 </rss>

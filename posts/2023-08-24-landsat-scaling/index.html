@@ -8,8 +8,9 @@
 
 <meta name="author" content="Mike Mahoney">
 <meta name="dcterms.date" content="2023-08-24">
+<meta name="description" content="A note about something I keep needing to figure out.">
 
-<title>Mike Mahoney - Cool graphs about elevators</title>
+<title>Mike Mahoney - Yes, you can rescale Landsat images after compositing them</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -21,6 +22,40 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -62,25 +97,23 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
 <link rel="stylesheet" href="../../styles.css">
-<meta property="og:title" content="Mike Mahoney - Cool graphs about elevators">
-<meta property="og:description" content="Last generated on: r Sys.Date()">
-<meta property="og:image" content="https://mm218.dev/junkdrawer/more-complicated-logic/index_files/figure-html/unnamed-chunk-5-1.png">
+<meta property="og:title" content="Mike Mahoney - Yes, you can rescale Landsat images after compositing them">
+<meta property="og:description" content="A note about something I keep needing to figure out.">
+<meta property="og:image" content="https://mm218.dev/posts/2023-08-24-landsat-scaling/landsat.jpg">
 <meta property="og:site-name" content="Mike Mahoney">
 <meta property="og:locale" content="en_US">
-<meta property="og:image:height" content="960">
-<meta property="og:image:width" content="1344">
-<meta name="twitter:title" content="Mike Mahoney - Cool graphs about elevators">
-<meta name="twitter:description" content="Last generated on: r Sys.Date()">
-<meta name="twitter:image" content="https://mm218.dev/junkdrawer/more-complicated-logic/index_files/figure-html/unnamed-chunk-5-1.png">
+<meta name="twitter:title" content="Mike Mahoney - Yes, you can rescale Landsat images after compositing them">
+<meta name="twitter:description" content="A note about something I keep needing to figure out.">
+<meta name="twitter:image" content="https://mm218.dev/posts/2023-08-24-landsat-scaling/landsat.jpg">
 <meta name="twitter:creator" content="@MikeMahoney218">
-<meta name="twitter:image-height" content="960">
-<meta name="twitter:image-width" content="1344">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
@@ -130,53 +163,89 @@ ul.task-list li input[type="checkbox"] {
     </nav>
 </header>
 <!-- content -->
-<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Yes, you can rescale Landsat images after compositing them</h1>
+                  <div>
+        <div class="description">
+          A note about something I keep needing to figure out.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">geospatial data</div>
+                <div class="quarto-category">Tutorials</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><a href="true">Mike Mahoney</a> </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">August 24, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
-<!-- main -->
-<main class="content" id="quarto-document-content">
-
-<header id="title-block-header" class="quarto-title-block default">
-<div class="quarto-title">
-<h1 class="title">Cool graphs about elevators</h1>
-<p class="subtitle lead">Last generated on: 2022-08-10</p>
-</div>
-
-
-
-<div class="quarto-title-meta">
-
-    <div>
-    <div class="quarto-title-meta-heading">Author</div>
-    <div class="quarto-title-meta-contents">
-             <p>Mike Mahoney </p>
-          </div>
-  </div>
-    
-    <div>
-    <div class="quarto-title-meta-heading">Published</div>
-    <div class="quarto-title-meta-contents">
-      <p class="date">August 24, 2023</p>
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
     </div>
-  </div>
-  
-    
-  </div>
-  
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
 
-</header>
 
-<section id="speed-versus-capacity" class="level2">
-<h2 class="anchored" data-anchor-id="speed-versus-capacity">Speed versus capacity</h2>
+
+
+<p>Landsat data are distributed as unsigned 16-bit images, which need to be rescaled to get raw band values. The <a href="https://www.usgs.gov/faqs/how-do-i-use-a-scale-factor-landsat-level-2-science-products">rescaling formulas are dependent upon the band type and collection used</a>, but for current Collection 2 data boil down to two equations:</p>
+<ul>
+<li>For surface reflectance data, the formula is <span class="math inline">\(X * 0.0000275 - 0.2\)</span> (where <span class="math inline">\(X\)</span> is the scaled band value)</li>
+<li>For surface temperature data, the formula is <span class="math inline">\(X * 0.00341802 + 149.0\)</span>.</li>
+</ul>
+<p>For my use-cases, I’m only rarely looking to download (and rescale) a single Landsat image. More often, I want to take all the Landsat images from a given timeframe (for instance, the growing season in the area I care about) and combine them into a composite image, taking the mean or median pixel value for that time period.</p>
+<p>And every single time I go to do this, I need to figure out for the umpteenth time whether I can composite the images and <em>then</em> rescale them, or whether I need to rescale each individual image before making my composite. This is analytically solvable, and I think is pretty straightforward to solve – and, to spoil the rest of this post, the answer is that it doesn’t matter when you rescale. But I can never remember that, and I never trust my algebra when I try to prove that you can rescale before or after compositing either.</p>
+<p>But this is an easy thing to simulate – just make a bunch of replications of compositing some number of 16-bit values, rescaling either before or after making the composite, and test for equality. That’s do-able in a few lines of R:</p>
 <div class="cell">
-<div class="cell-output-display">
-<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>landsat_rescale <span class="ot">&lt;-</span> <span class="cf">function</span>(x) x <span class="sc">*</span> <span class="fl">0.0000275</span> <span class="sc">-</span> <span class="fl">0.2</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">vapply</span>(</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">c</span>(mean, median),</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  \(f) {</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">replicate</span>(<span class="dv">1000</span>, {</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>      values <span class="ot">&lt;-</span> <span class="fu">replicate</span>(<span class="dv">100</span>, <span class="fu">sample.int</span>(<span class="dv">65455</span>, <span class="dv">1</span>))</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>      <span class="fu">all.equal</span>(</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>        <span class="fu">f</span>(<span class="fu">landsat_rescale</span>(values)),</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">landsat_rescale</span>(<span class="fu">f</span>(values))</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    }) <span class="sc">|&gt;</span> </span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>      <span class="fu">all</span>()</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  },</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">logical</span>(<span class="dv">1</span>)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">all</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
 </div>
 </div>
+<p>It’s fine! You can rescale before or after compositing, whether you’re using a mean or a median composite. Do whatever is easiest for your workflow. Go in peace.</p>
 
 
-</section>
 
 </main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
