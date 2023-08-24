@@ -1,0 +1,14 @@
+{
+  "hash": "7bbd84ef11aab0e7ce46734ced6bbe08",
+  "result": {
+    "markdown": "---\ntitle: \"Yes, you can rescale Landsat images after compositing them\"\ndescription: \"A note about something I keep needing to figure out.\"\nauthor:\n  - name: Mike Mahoney\n    url: {}\ndate: \"2023-08-24\"\ncategories: [R, geospatial data, Tutorials]\nimage: landsat.jpg\nformat: \n  html:\n    toc: true\nengine: knitr\n---\n\n\nLandsat data are distributed as unsigned 16-bit images, which need to be rescaled to get raw band values. The [rescaling formulas are dependent upon the band type and collection used](https://www.usgs.gov/faqs/how-do-i-use-a-scale-factor-landsat-level-2-science-products), but for current Collection 2 data boil down to two equations:\n\n+ For surface reflectance data, the formula is $X * 0.0000275 - 0.2$ (where $X$ is the scaled band value)\n+ For surface temperature data, the formula is $X * 0.00341802 + 149.0$.\n\nFor my use-cases, I'm only rarely looking to download (and rescale) a single Landsat image. More often, I want to take all the Landsat images from a given timeframe (for instance, the growing season in the area I care about) and combine them into a composite image, taking the mean or median pixel value for that time period.\n\nAnd every single time I go to do this, I need to figure out for the umpteenth time whether I can composite the images and _then_ rescale them, or whether I need to rescale each individual image before making my composite. This is analytically solvable, and I think is pretty straightforward to solve -- and, to spoil the rest of this post, the answer is that it doesn't matter when you rescale. But I can never remember that, and I never trust my algebra when I try to prove that you can rescale before or after compositing either.\n\nBut this is an easy thing to simulate -- just make a bunch of replications of compositing some number of 16-bit values, rescaling either before or after making the composite, and test for equality. That's do-able in a few lines of R:\n\n\n::: {.cell}\n\n```{.r .cell-code}\nlandsat_rescale <- function(x) x * 0.0000275 - 0.2\n\nvapply(\n  c(mean, median),\n  \\(f) {\n    replicate(1000, {\n      values <- replicate(100, sample.int(65455, 1))\n      all.equal(\n        f(landsat_rescale(values)),\n        landsat_rescale(f(values))\n      )\n    }) |> \n      all()\n  },\n  logical(1)\n) |>\n  all()\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n[1] TRUE\n```\n:::\n:::\n\n\nIt's fine! You can rescale before or after compositing, whether you're using a mean or a median composite. Do whatever is easiest for your workflow. Go in peace.\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
