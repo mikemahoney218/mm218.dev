@@ -10,7 +10,577 @@
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Thu, 24 Aug 2023 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 29 Aug 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Pre-allocating vectors is for nerds</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2023-08-29-allocations/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>The second circle of R hell, in <a href="https://www.burns-stat.com/pages/Tutor/R_inferno.pdf">Patrick Burns’ seminal book The R Inferno</a>, is titled “Growing Objects”. This refers to a common antipattern for R users, usually among the first things taught when dealing with iteration: it is extremely inefficient to grow a vector using <code>c()</code>, like so:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">vector_c <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(n) {</span>
+<span id="cb1-2">  out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>()</span>
+<span id="cb1-3">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>n) {</span>
+<span id="cb1-4">    out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(out, i)</span>
+<span id="cb1-5">  }</span>
+<span id="cb1-6">  out</span>
+<span id="cb1-7">}</span></code></pre></div>
+</div>
+<p>Instead, Burns says, it is better to pre-allocate our vector <code>out</code>, and assign our function’s output to a specific position in <code>out</code> using either <code>[</code> or <code>[[</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">vector_prealloc_one_bracket <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(n) {</span>
+<span id="cb2-2">  out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"numeric"</span>, n)</span>
+<span id="cb2-3">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>n) {</span>
+<span id="cb2-4">    out[i] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> i</span>
+<span id="cb2-5">  }</span>
+<span id="cb2-6">  out</span>
+<span id="cb2-7">}</span>
+<span id="cb2-8"></span>
+<span id="cb2-9">vector_prealloc_two_bracket <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(n) {</span>
+<span id="cb2-10">  out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"numeric"</span>, n)</span>
+<span id="cb2-11">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>n) {</span>
+<span id="cb2-12">    out[[i]] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> i</span>
+<span id="cb2-13">  }</span>
+<span id="cb2-14">  out</span>
+<span id="cb2-15">}</span></code></pre></div>
+</div>
+<p>Of course, it would be better yet to avoid our loop entirely, and simply create our final object using the colon operator:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">colon_operator <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(n) {</span>
+<span id="cb3-2">  <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>n</span>
+<span id="cb3-3">}</span></code></pre></div>
+</div>
+<p>But that’s beside the point right now.</p>
+<p>This advice was originally written in 2011, but is even more important today. In Burns’ book, subsetting is roughly 7 times faster when <code>n</code> is 10,000; on my computer today, subsetting is roughly 200 times faster:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">n <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span></span>
+<span id="cb4-2">bench<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mark</span>(</span>
+<span id="cb4-3">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">c =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_c</span>(n),</span>
+<span id="cb4-4">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">one_bracket =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_prealloc_one_bracket</span>(n),</span>
+<span id="cb4-5">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">two_brackets =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_prealloc_two_bracket</span>(n),</span>
+<span id="cb4-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colon =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">colon_operator</span>(n),</span>
+<span id="cb4-7">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">filter_gc =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span></span>
+<span id="cb4-8">)[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"expression"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"median"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"itr/sec"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mem_alloc"</span>)]</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 4
+  expression     median `itr/sec` mem_alloc
+  &lt;bch:expr&gt;   &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;
+1 c              57.8ms      17.1   191.2MB
+2 one_bracket   270.9µs    3596.     99.1KB
+3 two_brackets  271.2µs    3570.     96.7KB
+4 colon         371.1ns 1841212.         0B</code></pre>
+</div>
+</div>
+<p>But what if <code>n</code> is unknowable? Well, to quote Burns:</p>
+<blockquote class="blockquote">
+<p>Often a reasonable upper bound on the size of the final object is known. If so, then create the object with that size and then remove the extra values at the end. If the final size is a mystery, then you can still follow the same scheme, but allow for periodic growth of the object.</p>
+</blockquote>
+<p>This is still probably a decent approach: over-allocate and trim down, or allocate in chunks and only grow when those chunks are exhausted.</p>
+<p>Or… perhaps we might try growing a vector with <code>[</code> or <code>[[</code>, rather than with <code>c()</code>? To anyone raised on R traditions, this might seem like a code smell:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">vector_unalloc_one_bracket <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(n) {</span>
+<span id="cb6-2">  out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>()</span>
+<span id="cb6-3">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>n) {</span>
+<span id="cb6-4">    out[i] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> i</span>
+<span id="cb6-5">  }</span>
+<span id="cb6-6">  out</span>
+<span id="cb6-7">}</span>
+<span id="cb6-8"></span>
+<span id="cb6-9">vector_unalloc_two_bracket <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(n) {</span>
+<span id="cb6-10">  out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>()</span>
+<span id="cb6-11">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">for</span> (i <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">in</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>n) {</span>
+<span id="cb6-12">    out[[i]] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> i</span>
+<span id="cb6-13">  }</span>
+<span id="cb6-14">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">unlist</span>(out)</span>
+<span id="cb6-15">}</span></code></pre></div>
+</div>
+<p>But if we test it out:<sup>1</sup></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">bench<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mark</span>(</span>
+<span id="cb7-2">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">c =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_c</span>(n),</span>
+<span id="cb7-3">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">prealloc_one_bracket =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_prealloc_one_bracket</span>(n),</span>
+<span id="cb7-4">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">unalloc_one_bracket =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_unalloc_one_bracket</span>(n),</span>
+<span id="cb7-5">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">unalloc_two_brackets =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_unalloc_two_bracket</span>(n),</span>
+<span id="cb7-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">filter_gc =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span></span>
+<span id="cb7-7">)[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"expression"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"median"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"itr/sec"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mem_alloc"</span>)]</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 4
+  expression             median `itr/sec` mem_alloc
+  &lt;bch:expr&gt;           &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;
+1 c                     61.23ms      14.8  191.23MB
+2 prealloc_one_bracket 269.86µs    3632.    78.17KB
+3 unalloc_one_bracket    1.27ms     679.   871.73KB
+4 unalloc_two_brackets   2.86ms     316.     1.72MB</code></pre>
+</div>
+</div>
+<p>Growing a vector via <code>[</code> is still notably slower than assigning values to a pre-allocated vector; it looks like it’s roughly ~5 times slower. But that still means it’s ~50 times faster than growing a vector via <code>c()</code>, and allocates ~200 times less memory to do so. Growing a vector via <code>[[</code> isn’t quite as efficient – taking roughly twice the time and memory as <code>[</code> here – but still blows <code>c()</code> out of the water.</p>
+<p>That’s not too shabby, for a code smell. How does a method like <code>vapply()</code> compare?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">vapply_lambda <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(n) {</span>
+<span id="cb9-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vapply</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span>n, \(i) i, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">numeric</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>))</span>
+<span id="cb9-3">}</span>
+<span id="cb9-4"></span>
+<span id="cb9-5">bench<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mark</span>(</span>
+<span id="cb9-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">c =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_c</span>(n),</span>
+<span id="cb9-7">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">prealloc_one_bracket =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_prealloc_one_bracket</span>(n),</span>
+<span id="cb9-8">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">unalloc_one_bracket =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_unalloc_one_bracket</span>(n),</span>
+<span id="cb9-9">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">unalloc_two_brackets =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_unalloc_two_bracket</span>(n),</span>
+<span id="cb9-10">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">vapply =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vapply_lambda</span>(n),</span>
+<span id="cb9-11">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">filter_gc =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span></span>
+<span id="cb9-12">)[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"expression"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"median"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"itr/sec"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mem_alloc"</span>)]</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+  expression             median `itr/sec` mem_alloc
+  &lt;bch:expr&gt;           &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;
+1 c                     51.14ms      19.2   191.2MB
+2 prealloc_one_bracket 268.72µs    3643.     78.2KB
+3 unalloc_one_bracket    1.33ms     567.      853KB
+4 unalloc_two_brackets   2.72ms     341.      1.7MB
+5 vapply                 3.44ms     270.     78.2KB</code></pre>
+</div>
+</div>
+<p><code>vapply()</code> uses as little memory as our pre-allocation approaches, but is slower than either of our un-allocated methods.<sup>2</sup></p>
+<p>It’s worth emphasizing that the differences between these methods are <em>microscopic</em> compared to the difference between them and <code>c()</code> for growing vectors:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1">benchmarks <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> bench<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">press</span>(</span>
+<span id="cb11-2">  bench<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mark</span>(</span>
+<span id="cb11-3">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">c =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_c</span>(n),</span>
+<span id="cb11-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">prealloc_one_bracket =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_prealloc_one_bracket</span>(n),</span>
+<span id="cb11-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">unalloc_one_bracket =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_unalloc_one_bracket</span>(n),</span>
+<span id="cb11-6">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">unalloc_two_brackets =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vector_unalloc_two_bracket</span>(n),</span>
+<span id="cb11-7">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">vapply =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vapply_lambda</span>(n),</span>
+<span id="cb11-8">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">filter_gc =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span></span>
+<span id="cb11-9">  ),</span>
+<span id="cb11-10">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">n =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100000</span>)</span>
+<span id="cb11-11">)</span>
+<span id="cb11-12"></span>
+<span id="cb11-13"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)</span>
+<span id="cb11-14"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(benchmarks, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(n, median, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.character</span>(expression))) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb11-15">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_line</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb11-16">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_minimal</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb11-17">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Median execution time (s)"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>But as far as execution speed goes, well, maybe growing objects in general isn’t worthy of its own circle of hell anymore:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1">benchmarks[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.character</span>(benchmarks<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>expression) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"c"</span>, ] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb12-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(n, median, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.character</span>(expression))) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb12-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_line</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb12-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_minimal</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb12-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Median execution time (s)"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Though of course, <code>vapply()</code> and the pre-allocated methods still win out in terms of memory allocation:<sup>3</sup></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1">benchmarks[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.character</span>(benchmarks<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>expression) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"c"</span>, ] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb13-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(n, mem_alloc, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.character</span>(expression))) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb13-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_line</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb13-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">theme_minimal</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb13-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Memory allocation (bytes)"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>So: pre-allocate your vectors when you’re able. But maybe it’s fine to grow an object every once in a while, as a treat. It probably won’t get you sent to hell.</p>
+<p>I have no idea when things changed to make growing vectors via <code>[</code> so much more efficient now than in 2011 – and please let me know in the comments/<a href="https://fosstodon.org/@MikeMahoney218">Mastodon</a>/<a href="https://bsky.app/profile/mikemahoney218.com">BlueSky</a> if you know any more details here.</p>
+
+
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>I dropped <code>prealloc_two_brackets</code> from the benchmarks because it was performing ~the same as the one-bracket alternative.↩︎</p></li>
+<li id="fn2"><p>Usual disclaimer that this is probably not a type of slowness that matters for your code, that you should look into moving computation to C++/Rust if you care about a few milliseconds execution time, and that the real benefits of *apply functions come from readability and their potential for parallelization, not speed.↩︎</p></li>
+<li id="fn3"><p>The pre-allocated line is hidden by the <code>vapply()</code> line; they’re practically identical, and possibly also literally identical.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>R</category>
+  <category>Tutorials</category>
+  <guid>https://mm218.dev/posts/2023-08-29-allocations/index.html</guid>
+  <pubDate>Tue, 29 Aug 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2023-08-29-allocations/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Yes, you can rescale Landsat images after compositing them</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -5948,35 +6518,6 @@ font-style: inherit;">```</span></span></code></pre></div>
   <guid>https://mm218.dev/posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html</guid>
   <pubDate>Fri, 05 Aug 2022 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/elevator.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Progress, Purpose, Process</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2022-02-18-progress-purpose-process/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2022-02-18-progress-purpose-process/pano.jpg" class="img-fluid" width="3059"></p>
-</div>
-</div>
-<p>Today is my birthday, so please forgive me one of the most self-indulgent things I will ever write.</p>
-<p>Two years ago I was living in Boston, working in tech, and a good bit bored. I was recognizing that I had spent most of the past year focusing on goals I had because they were the obvious next step, not because they were building me a life I wanted to live. I had lost a sense of agency over the future.</p>
-<p>Luckily, at the time, I had just come across this podcast called “Cortex”. Over the holiday season, the hosts had discussed how they structure their goals around a “yearly theme” – not New Years’ Resolutions, not specific targets that you either achieve or fail at, but a broad concept that they use to inform their decisions over the course of the year. The point is to gently nudge your life in the direction you want it to go. <a href="https://www.youtube.com/watch?v=NVGuFdX5guE">Here’s a video with more information about this</a>; I recommend it.</p>
-<p>So I decided that 23 would be my year of Progress; that I’d try and make a habit of making decisions that helped build momentum and kept me moving forward. I quit my job, started a PhD, moved states, and started building the personal and professional networks I rely on today. It wasn’t all perfect – about a month in there was a global pandemic I really wish I could have done something to prevent – but it nudged my life’s trajectory in a direction I’ve been happy with.</p>
-<p>So when 24 came and it was time to change my theme, I decided to make it the year of Purpose. The year of Progress had involved saying yes to every opportunity that came my way; with Purpose, I wanted to make sure that I was being intentional with how I spent my time and making explicit decisions about where I’d invest my energy. I’m still not great at it, but I’ve gotten better at saying no when needed. I spent time improving my organization and time management to help me efficiently work through the things I said yes to. And I made a point of learning to consciously decide when to take time off, when to disconnect, and when to purposefully relax, so that I can now make those decisions without worrying about all the things I “should” be doing instead.</p>
-<p>Now it’s 25, and it’s time for a new theme. I think my plan is for the year of Process: I like where I am with my life right now, and I like how I spend my time. But I could be better and more careful about how I approach both of those things. I’m going to try to get better with details, to improve my memory around small things.</p>
-<p>I told you this would be indulgent. I know this sounds froofy. But it’s worked for me for two years now and I’m betting on round three. And I’m looking forward to seeing where this year takes me.</p>
-
-
-
- ]]></description>
-  <guid>https://mm218.dev/posts/2022-02-18-progress-purpose-process/index.html</guid>
-  <pubDate>Fri, 18 Feb 2022 00:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2022-02-18-progress-purpose-process/pano.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>

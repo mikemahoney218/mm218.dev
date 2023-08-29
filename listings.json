@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/2023-08-29-allocations/index.html",
       "/posts/2023-08-24-landsat-scaling/index.html",
       "/posts/2023-08-07-vector/index.html",
       "/posts/2023-06-06-spatialsample_splits/index.html",
