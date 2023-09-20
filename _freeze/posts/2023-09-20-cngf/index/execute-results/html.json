@@ -1,0 +1,14 @@
+{
+  "hash": "b1218cf526a51f92f52442cb457f7698",
+  "result": {
+    "markdown": "---\ntitle: \"Cloud-Native Geospatial If You Don't Speak Snake\"\ndescription: \"New post on the Cloud-Native Geospatial Foundation's blog\"\nauthor:\n  - name: Mike Mahoney\n    url: {}\ndate: \"2023-09-20\"\ncategories: [R, Spatial, geospatial data]\nimage: banner.jpg\nformat: \n  html:\n    toc: true\nengine: knitr\n---\n\n\nI'm over in the [Cloud-Native Geospatial Foundation's blog today](https://cloudnativegeo.org/blog/2023/09/cloud-native-geospatial-if-you-dont-speak-snake) with a post called \"Cloud-Native Geospatial If You Don't Speak Snake\". This post comes from an UnConference session at the 2023 ESIP July Meeting, organized by [Alexey Shiklomanov](https://github.com/ashiklom), focusing on what tools and what gaps exist in the cloud-native geospatial workflow for non-Python users. It was an absolutely fantastic UnConference session, and I'm hoping that my summary of our takeaways is as useful for others as it was for me.\n\nOne challenge in the session -- and one that I don't get into in the post -- is that \"cloud-native\" means a lot of different things to different folks! The CNGF themselves have a pretty straightforward definition:\n\n> Cloud-Native data formats are structured to be efficiently retrived from cloud object storage services which are designed to serve large volumes of data using generic RESTful / HTTP data transfer protocols.\n\nBut our UnConference session was interested in a much broader definition, one that was a bit closer to the CNCF definition of the term:\n\n> Cloud native technologies empower organizations to build and run scalable applications in modern, dynamic environments such as public, private, and hybrid clouds. Containers, service meshes, microservices, immutable infrastructure, and declarative APIs exemplify this approach.\n\nMy post focuses a bit more on tools and gaps relating to the CNGF definition -- it's on their blog, after all! -- but our working group was interested in API specifications, serverless runtimes, and all sorts of other topics that I think haven't seen the same amount of standardization as the data format and retrieval side of geospatial workflows.^[Most of my data storage and retrieval work boils down to \"use COGs, use GDAL's virtual filesystem interface\". I _wish_ my analysis, runtime, and codebase setups could be boiled down to that level.] There's a lot of activity around geospatial workflows right now, and I'm excited to see what the future has in store!\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}
