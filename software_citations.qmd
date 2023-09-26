@@ -96,6 +96,9 @@ I took over maintenance of spatialsample in mid-2022, after spending the summer 
 
 #. Skinner, E.B., Glidden, C.K., MacDonald, A.J. et al. Human footprint is associated with shifts in the assemblages of major vector-borne diseases. Nat Sustain (2023). https://doi.org/10.1038/s41893-023-01080-1
 
+#. Sanderman, J., Smith, C., Safanelli, J. L., Morgan, C. L.S., Ackerman J., Looker, N., Mathers, C., Keating, R., Kumar, A. A. 2023. "Diffuse reflectance mid-infrared spectroscopy is viable without fine milling." Soil Security 13: 100104. https://doi.org/10.1016/j.soisec.2023.100104.
+
+
 The following are self-citations:
 
 #. Mahoney, MJ In Review. waywiser: Ergonomic methods for assessing spatial models. https://arxiv.org/abs/2303.11312
