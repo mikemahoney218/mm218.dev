@@ -86,6 +86,8 @@ citation("waywiser")
 
 I took over maintenance of spatialsample in mid-2022, after spending the summer interning with the tidymodels crew at Posit working on spatialsample and rsample. I'm responsible for the majority of package functionality. I only track citations here for versions of the package I'm an author on (>= 0.2.0).
 
+#. Epstein, G., Fuller, S. D., Hingmire, D., Myers, P. G., Peña, A., Pennelly, C., and Baum, J. K.: Predictive mapping of organic carbon stocks and accumulation rates in surficial sediments of the Canadian continental margin, Earth Syst. Sci. Data Discuss. [preprint], https://doi.org/10.5194/essd-2023-295, in review, 2023. 
+
 #. Leonardi, M., Colucci, M., Manica, A. (2023). tidysdm: leveraging the flexibility of tidymodels for Species Distribution Modelling in R. https://doi.org/10.1101/2023.07.24.550358
 
 #. Pebesma, E., Bivand, R. (2023). Spatial Data Science: With Applications in R (1st ed.). 314 pages. Chapman and Hall/CRC. https://doi.org/10.1201/9780429459016
