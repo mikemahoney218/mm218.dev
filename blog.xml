@@ -78,7 +78,7 @@ font-style: inherit;">scale</span>(x)</span>
 <span id="cb2-4">)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Attributes: &lt; Length mismatch: comparison on first 1 components &gt;"
-[2] "Mean relative difference: 0.5463949"                              </code></pre>
+[2] "Mean relative difference: 0.360556"                               </code></pre>
 </div>
 </div>
 <p>We could replicate our vector ourself, in order to take advantage of these element-wise operations:</p>
