@@ -259,10 +259,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 4 × 4
   expression     median `itr/sec` mem_alloc
   &lt;bch:expr&gt;   &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;
-1 c              57.8ms      17.1   191.2MB
-2 one_bracket   270.9µs    3596.     99.1KB
-3 two_brackets  271.2µs    3570.     96.7KB
-4 colon         371.1ns 1841212.         0B</code></pre>
+1 c                51ms      19.3   191.2MB
+2 one_bracket     277µs    3548.     99.1KB
+3 two_brackets    276µs    3538.     96.7KB
+4 colon           361ns 2124339.         0B</code></pre>
 </div>
 </div>
 <p>But what if <code>n</code> is unknowable? Well, to quote Burns:</p>
@@ -301,10 +301,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 4 × 4
   expression             median `itr/sec` mem_alloc
   &lt;bch:expr&gt;           &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;
-1 c                     61.23ms      14.8  191.23MB
-2 prealloc_one_bracket 269.86µs    3632.    78.17KB
-3 unalloc_one_bracket    1.27ms     679.   871.73KB
-4 unalloc_two_brackets   2.86ms     316.     1.72MB</code></pre>
+1 c                     54.02ms      16.6  191.23MB
+2 prealloc_one_bracket 285.52µs    3428.    78.17KB
+3 unalloc_one_bracket    1.24ms     710.   871.73KB
+4 unalloc_two_brackets   2.76ms     337.     1.72MB</code></pre>
 </div>
 </div>
 <p>Growing a vector via <code>[</code> is still notably slower than assigning values to a pre-allocated vector; it looks like it’s roughly ~5 times slower. But that still means it’s ~50 times faster than growing a vector via <code>c()</code>, and allocates ~200 times less memory to do so. Growing a vector via <code>[[</code> isn’t quite as efficient – taking roughly twice the time and memory as <code>[</code> here – but still blows <code>c()</code> out of the water.</p>
@@ -326,11 +326,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code># A tibble: 5 × 4
   expression             median `itr/sec` mem_alloc
   &lt;bch:expr&gt;           &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;
-1 c                     51.14ms      19.2   191.2MB
-2 prealloc_one_bracket 268.72µs    3643.     78.2KB
-3 unalloc_one_bracket    1.33ms     567.      853KB
-4 unalloc_two_brackets   2.72ms     341.      1.7MB
-5 vapply                 3.44ms     270.     78.2KB</code></pre>
+1 c                     50.87ms      19.5   191.2MB
+2 prealloc_one_bracket 279.79µs    3501.     78.2KB
+3 unalloc_one_bracket    1.18ms     649.      853KB
+4 unalloc_two_brackets   2.69ms     345.      1.7MB
+5 vapply                 3.41ms     272.     78.2KB</code></pre>
 </div>
 </div>
 <p><code>vapply()</code> uses as little memory as our pre-allocation approaches, but is slower than either of our un-allocated methods.<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a></p>

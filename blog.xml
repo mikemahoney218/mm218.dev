@@ -10,7 +10,414 @@
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Wed, 20 Sep 2023 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 24 Oct 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Three fun R functions</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2023-10-24-fun-r-funcs/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>Inspired by <a href="https://masalmon.eu/2023/10/20/three-neat-functions/">Maëlle</a> who was inspired by <a href="https://yihui.org/en/2023/10/three-functions/">Yihui</a> who was inspired by <a href="https://masalmon.eu/2023/09/29/three-functions/">Maëlle</a>(who has <a href="https://masalmon.eu/2023/08/31/three-shorten/">a whole</a> <a href="https://masalmon.eu/2023/06/06/basic-patterns/">series</a> <a href="https://masalmon.eu/2023/08/30/three-r-functions/">about</a> <a href="https://masalmon.eu/2023/07/24/basic-notions/">this</a>), I wanted to share three useful base R functions that I think maybe don’t get enough love. And inspired by <a href="https://masalmon.eu/2023/10/20/three-neat-functions/">Maëlle again</a>, my list here is actually four functions.</p>
+<section id="sweep" class="level2">
+<h2 class="anchored" data-anchor-id="sweep"><code>sweep()</code></h2>
+<p>If you ever need to do math with matrices, then <code>sweep()</code> is going to be your best friend. Say for instance we want to center and scale each column in a matrix. This is a pretty straightforward operation – we need to calculate the mean and standard deviations for each column, subtract the column mean from each observation, and then divide those by the corresponding standard deviation.</p>
+<p>We can use <code>apply</code> to get our means and standard deviations:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Generate some fake data in a 10x10 matrix:</span></span>
+<span id="cb1-2">x <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">matrix</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rnorm</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">100</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">nrow =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>)</span>
+<span id="cb1-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Calculate one mean and sd for each column of our matrix:</span></span>
+<span id="cb1-4">col_means <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">apply</span>(x, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, mean)</span>
+<span id="cb1-5">col_sds <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">apply</span>(x, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, sd)</span></code></pre></div>
+</div>
+<p>The subtraction and division are a bit less straightforward. R’s base math operators will attempt to do element-wise operations, treating our vector as a one-column array and replicating as needed. That’s not what we want:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">all.equal</span>(</span>
+<span id="cb2-2">  (x <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> col_means) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> col_sds,</span>
+<span id="cb2-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale</span>(x)</span>
+<span id="cb2-4">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "Attributes: &lt; Length mismatch: comparison on first 1 components &gt;"
+[2] "Mean relative difference: 0.5463949"                              </code></pre>
+</div>
+</div>
+<p>We could replicate our vector ourself, in order to take advantage of these element-wise operations:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">all.equal</span>(</span>
+<span id="cb4-2">  ((x <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">matrix</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rep</span>(col_means, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">byrow =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> </span>
+<span id="cb4-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">matrix</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rep</span>(col_sds, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">byrow =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.vector</span>(),</span>
+<span id="cb4-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale</span>(x) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.vector</span>()</span>
+<span id="cb4-5">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>But that’s silly, especially if we were working with more observations.</p>
+<p>Better instead is to use <code>sweep()</code> to perform some operation between each element of our vector and each column of the matrix:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Take every value in our matrix, and subtract its corresponding column mean:</span></span>
+<span id="cb6-2">centered <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sweep</span>(</span>
+<span id="cb6-3">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> x, </span>
+<span id="cb6-4">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">MARGIN =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># just like in apply()</span></span>
+<span id="cb6-5">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">STATS =</span> col_means, </span>
+<span id="cb6-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">FUN =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"-"</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># "-" is the default argument -- we don't NEED to provide it here</span></span>
+<span id="cb6-7">)</span></code></pre></div>
+</div>
+<p>And we can similarly use <code>sweep()</code> to divide each column by its corresponding standard deviation, finishing up our centering and scaling:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Divide each value by its corresponding column sd:</span></span>
+<span id="cb7-2">centered_and_scaled <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sweep</span>(centered, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, col_sds, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"/"</span>)</span>
+<span id="cb7-3"></span>
+<span id="cb7-4"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Works out identically to the built-in scale function:</span></span>
+<span id="cb7-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">all.equal</span>(</span>
+<span id="cb7-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.vector</span>(centered_and_scaled),</span>
+<span id="cb7-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">as.vector</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale</span>(x))</span>
+<span id="cb7-8">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>This is the main way I use <code>sweep()</code>, but there’s no requirement you use it for math – it works just as well with non-mathematical functions or non-numeric matrices:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">letter_mat <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">matrix</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rep</span>(letters[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>], <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>)</span>
+<span id="cb9-2">letter_mat</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     [,1] [,2] [,3] [,4] [,5]
+[1,] "a"  "a"  "a"  "a"  "a" 
+[2,] "b"  "b"  "b"  "b"  "b" 
+[3,] "c"  "c"  "c"  "c"  "c" 
+[4,] "d"  "d"  "d"  "d"  "d" 
+[5,] "e"  "e"  "e"  "e"  "e" </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">sweep</span>(letter_mat, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, LETTERS[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5</span>], paste0)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "aA" "bA" "cA" "dA" "eA" "aB" "bB" "cB" "dB" "eB" "aC" "bC" "cC" "dC" "eC"
+[16] "aD" "bD" "cD" "dD" "eD" "aE" "bE" "cE" "dE" "eE"</code></pre>
+</div>
+</div>
+</section>
+<section id="reformulate-and-df2formula" class="level2">
+<h2 class="anchored" data-anchor-id="reformulate-and-df2formula"><code>reformulate()</code> and <code>DF2formula()</code></h2>
+<p>The <code>reformulate()</code> function is a lifesaver if you’re trying to write long or complicated formulas, or multiple formulas generated by some other logic in your code.</p>
+<p>The function is pretty straightforward. If you’re trying to make a formula <code>y ~ x + z</code>, provide your predictors as the first argument and your outcome as the second:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">reformulate</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"x"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"z"</span>), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"y"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>y ~ x + z</code></pre>
+</div>
+</div>
+<p>The nice thing is that <code>reformulate</code> accepts vectors as inputs, making it easy to construct a vector of predictors and automatically turn them into a formula:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">reformulate</span>(letters, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"outcome"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>outcome ~ a + b + c + d + e + f + g + h + i + j + k + l + m + 
+    n + o + p + q + r + s + t + u + v + w + x + y + z</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">reformulate</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(Orange), <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"age"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>age ~ Tree + age + circumference</code></pre>
+</div>
+</div>
+<p>And in particular, this is an excellent alternative to dropping a few columns in order to use <code>outcome ~ .</code> – instead, you can use <code>setdiff()</code> to exclude those columns from your formula:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1">outcome_variable <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"age"</span></span>
+<span id="cb19-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">reformulate</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">setdiff</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(Orange), outcome_variable), outcome_variable)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>age ~ Tree + circumference</code></pre>
+</div>
+</div>
+<p>Relatedly, the function <code>DF2formula()</code> will automatically turn the column names from a data frame into a formula. The first column will become the outcome variable, and the rest will be used as predictors:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">DF2formula</span>(Orange)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Tree ~ age + circumference</code></pre>
+</div>
+</div>
+<p>To change what column is used as the outcome variable, reorder the columns in your data frame:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">DF2formula</span>(Orange[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>])</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>circumference ~ age + Tree</code></pre>
+</div>
+</div>
+</section>
+<section id="str2lang" class="level2">
+<h2 class="anchored" data-anchor-id="str2lang"><code>str2lang()</code></h2>
+<p>Shockingly enough, <code>str2lang()</code> function turns a string into a language object:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1">growth_rate <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"circumference / age"</span></span>
+<span id="cb25-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">str2lang</span>(growth_rate)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>circumference/age</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">class</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">str2lang</span>(growth_rate))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "call"</code></pre>
+</div>
+</div>
+<p>Wooooo!</p>
+<p>I think that, to most people, this does not sound immediately useful.<sup>1</sup> But the idea that your code can turn plain text into code at runtime is pretty powerful, and some of the most R-esque nonsense that R has to offer.</p>
+<p>For instance, we can use <code>eval()</code> to actually execute the call created by <code>str2lang()</code> in our global environment:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">str2lang</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2 + 2"</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4</code></pre>
+</div>
+</div>
+<p>And that string can do anything that regular R code can do – assign variables, manage connections, any procedure that normal R code can do:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">str2lang</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"x &lt;- 3"</span>))</span>
+<span id="cb31-2">x</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3</code></pre>
+</div>
+</div>
+<p>We can also use this with <code>with()</code> or <code>local()</code> to execute our code inside of other environments. For instance, if we want to calculate our <code>growth_rate</code> from earlier, we can run that code with the <code>Orange</code> data frame:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span>(Orange, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">str2lang</span>(growth_rate)))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] 0.25423729 0.11983471 0.13102410 0.11454183 0.09748172 0.10349854
+ [7] 0.09165613 0.27966102 0.14256198 0.16716867 0.15537849 0.13972380
+[13] 0.14795918 0.12831858 0.25423729 0.10537190 0.11295181 0.10756972
+[19] 0.09341998 0.10131195 0.08849558 0.27118644 0.12809917 0.16867470
+[25] 0.16633466 0.14541024 0.15233236 0.13527181 0.25423729 0.10123967
+[31] 0.12198795 0.12450199 0.11535337 0.12682216 0.11188369</code></pre>
+</div>
+</div>
+<p>This can be a powerful way to “import” code from other sources, for instance if you have a CSV of equations you want to run against a data frame. You want to be careful when using this with untrusted inputs, of course – if your input includes a call to <code>system()</code>, it might wind up wrecking your computer!</p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>I think, to most people, this barely sounds like English.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>R</category>
+  <category>Tutorials</category>
+  <guid>https://mm218.dev/posts/2023-10-24-fun-r-funcs/index.html</guid>
+  <pubDate>Tue, 24 Oct 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2023-10-24-fun-r-funcs/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Cloud-Native Geospatial If You Don’t Speak Snake</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -211,10 +618,10 @@ font-style: inherit;">"mem_alloc"</span>)]</span></code></pre></div>
 <pre><code># A tibble: 4 × 4
   expression     median `itr/sec` mem_alloc
   &lt;bch:expr&gt;   &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;
-1 c              57.8ms      17.1   191.2MB
-2 one_bracket   270.9µs    3596.     99.1KB
-3 two_brackets  271.2µs    3570.     96.7KB
-4 colon         371.1ns 1841212.         0B</code></pre>
+1 c                51ms      19.3   191.2MB
+2 one_bracket     277µs    3548.     99.1KB
+3 two_brackets    276µs    3538.     96.7KB
+4 colon           361ns 2124339.         0B</code></pre>
 </div>
 </div>
 <p>But what if <code>n</code> is unknowable? Well, to quote Burns:</p>
@@ -325,10 +732,10 @@ font-style: inherit;">"mem_alloc"</span>)]</span></code></pre></div>
 <pre><code># A tibble: 4 × 4
   expression             median `itr/sec` mem_alloc
   &lt;bch:expr&gt;           &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;
-1 c                     61.23ms      14.8  191.23MB
-2 prealloc_one_bracket 269.86µs    3632.    78.17KB
-3 unalloc_one_bracket    1.27ms     679.   871.73KB
-4 unalloc_two_brackets   2.86ms     316.     1.72MB</code></pre>
+1 c                     54.02ms      16.6  191.23MB
+2 prealloc_one_bracket 285.52µs    3428.    78.17KB
+3 unalloc_one_bracket    1.24ms     710.   871.73KB
+4 unalloc_two_brackets   2.76ms     337.     1.72MB</code></pre>
 </div>
 </div>
 <p>Growing a vector via <code>[</code> is still notably slower than assigning values to a pre-allocated vector; it looks like it’s roughly ~5 times slower. But that still means it’s ~50 times faster than growing a vector via <code>c()</code>, and allocates ~200 times less memory to do so. Growing a vector via <code>[[</code> isn’t quite as efficient – taking roughly twice the time and memory as <code>[</code> here – but still blows <code>c()</code> out of the water.</p>
@@ -402,11 +809,11 @@ font-style: inherit;">"mem_alloc"</span>)]</span></code></pre></div>
 <pre><code># A tibble: 5 × 4
   expression             median `itr/sec` mem_alloc
   &lt;bch:expr&gt;           &lt;bch:tm&gt;     &lt;dbl&gt; &lt;bch:byt&gt;
-1 c                     51.14ms      19.2   191.2MB
-2 prealloc_one_bracket 268.72µs    3643.     78.2KB
-3 unalloc_one_bracket    1.33ms     567.      853KB
-4 unalloc_two_brackets   2.72ms     341.      1.7MB
-5 vapply                 3.44ms     270.     78.2KB</code></pre>
+1 c                     50.87ms      19.5   191.2MB
+2 prealloc_one_bracket 279.79µs    3501.     78.2KB
+3 unalloc_one_bracket    1.18ms     649.      853KB
+4 unalloc_two_brackets   2.69ms     345.      1.7MB
+5 vapply                 3.41ms     272.     78.2KB</code></pre>
 </div>
 </div>
 <p><code>vapply()</code> uses as little memory as our pre-allocation approaches, but is slower than either of our un-allocated methods.<sup>2</sup></p>
@@ -4859,32 +5266,6 @@ font-style: inherit;">theme_minimal</span>()</span></code></pre></div>
   <category>geospatial data</category>
   <guid>https://mm218.dev/posts/2022-08-11-waywiser-010-is-now-on-cran/index.html</guid>
   <pubDate>Thu, 11 Aug 2022 00:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass in heterogenous landscapes</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2022-08-10-ground-filtering/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<p>I have a new open-access article, “<a href="https://doi.org/10.1080/15481603.2022.2103069">Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass in heterogenous landscapes</a>”, out today in GIScience &amp; Remote Sensing.</p>
-<p>A very common pre-processing step, when deriving predictors for machine learning models from LiDAR point clouds, is to filter out “ground returns” based on a simple height threshold (where all returns below a certain level are removed). This practice comes from the early days of LiDAR, where researchers were attempting to measure the heights of individual trees using LiDAR returns, and makes a lot of sense in that context; if a return didn’t hit a tree, it probably can’t tell you much about how tall that tree is. But the process stuck around as we moved from modeling trees to forests, and knowing that a return <em>could</em> reach the ground – that it was able to find a gap in the canopy to reach the ground through – might reflect important characteristics of stand openness and therefore structure.</p>
-<p>We show that filtering out “ground returns” from LiDAR based on height thresholds biases the derived predictors, and that bias can make predictive models of forest structure (in this case, AGB) worse. Particularly for models attempting to represent mixed landscape types, where gaps in the canopy are more common, filtering ground returns might remove valuable information and result in your model making worse predictions.</p>
-<p>Or as the cliche machine might put it: As we move to focus on seeing forests more than trees, it’s time for us to see these data as signal, not just noise.</p>
-<p>This was a very fun project, with an awesome team (Lucas Johnson, Eddie Bevilacqua, and Colin Beier). I’m very excited to see this one in press!</p>
-
-
-
- ]]></description>
-  <category>ecology</category>
-  <category>papers</category>
-  <category>remote sensing</category>
-  <category>machine learning</category>
-  <guid>https://mm218.dev/posts/2022-08-10-ground-filtering/index.html</guid>
-  <pubDate>Wed, 10 Aug 2022 00:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2022-08-10-ground-filtering/distributions.jpeg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>
