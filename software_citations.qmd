@@ -113,6 +113,8 @@ citation("spatialsample")
 
 I am an author on rsample after implementing functions for grouped resampling and clustered cross-validation (as well as the "common resampling patterns" vignette and a few other improvements). I only track citations here for versions of the package I'm an author on (>= 1.1.1).
 
+#. López-Álvarez, Ó., Franco-Vázquez, L., and Marey-Perez, M. (2023). "Base-age invariant models for predicting individual tree accumulated annual resin yield using two tapping methods in maritime pine (Pinus pinaster Ait.) forests in north-western Spain". Forest Ecology and Management 549: 121501. https://doi.org/10.1016/j.foreco.2023.121501
+
 #. Lundell, J. 2023. EZtune: A Package for Automated Hyperparameter Tuning in R. https://arxiv.org/abs/2303.12177
 
 #. Ying R., Monteiro, F. M., Wilson, J. D., and Schmidt, D. N. 2023. ForamEcoGEnIE 2.0: incorporating symbiosis and spine traits into a trait-based global planktic foraminiferal model. Geosci. Model Dev., 16, 813–832, https://doi.org/10.5194/gmd-16-813-2023
