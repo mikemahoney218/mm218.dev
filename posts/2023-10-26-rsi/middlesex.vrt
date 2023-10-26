@@ -1,0 +1,1649 @@
+<VRTDataset rasterXSize="2404" rasterYSize="2148">
+  <SRS dataAxisToSRSAxisMapping="1,2">PROJCS["NAD83 / Massachusetts Mainland",GEOGCS["NAD83",DATUM["North_American_Datum_1983",SPHEROID["GRS 1980",6378137,298.257222101,AUTHORITY["EPSG","7019"]],AUTHORITY["EPSG","6269"]],PRIMEM["Greenwich",0,AUTHORITY["EPSG","8901"]],UNIT["degree",0.0174532925199433,AUTHORITY["EPSG","9122"]],AUTHORITY["EPSG","4269"]],PROJECTION["Lambert_Conformal_Conic_2SP"],PARAMETER["latitude_of_origin",41],PARAMETER["central_meridian",-71.5],PARAMETER["standard_parallel_1",42.6833333333333],PARAMETER["standard_parallel_2",41.7166666666667],PARAMETER["false_easting",200000],PARAMETER["false_northing",750000],UNIT["metre",1,AUTHORITY["EPSG","9001"]],AXIS["Easting",EAST],AXIS["Northing",NORTH],AUTHORITY["EPSG","26986"]]</SRS>
+  <GeoTransform>  1.6733182986878199e+05,  3.0000000000000000e+01,  0.0000000000000000e+00,  9.4291281701277697e+05,  0.0000000000000000e+00, -3.0000000000000000e+01</GeoTransform>
+  <VRTRasterBand dataType="Float32" band="1">
+    <Description>A</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ColorInterp>Gray</ColorInterp>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">shell_liquid_doctor.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Float32" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="2">
+    <Description>B</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">shell_liquid_doctor.tif</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="3">
+    <Description>G</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">shell_liquid_doctor.tif</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="4">
+    <Description>R</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">shell_liquid_doctor.tif</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="5">
+    <Description>N</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">shell_liquid_doctor.tif</SourceFilename>
+      <SourceBand>5</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="6">
+    <Description>S1</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">shell_liquid_doctor.tif</SourceFilename>
+      <SourceBand>6</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="7">
+    <Description>S2</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">shell_liquid_doctor.tif</SourceFilename>
+      <SourceBand>7</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="8">
+    <Description>T1</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">shell_liquid_doctor.tif</SourceFilename>
+      <SourceBand>8</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="9">
+    <Description>elevation</Description>
+    <ColorInterp>Gray</ColorInterp>
+    <SimpleSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">circle_fit_roll.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Float32" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+    </SimpleSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="10">
+    <Description>AFRI1600</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ColorInterp>Gray</ColorInterp>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>1</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Float32" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="11">
+    <Description>AFRI2100</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>2</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="12">
+    <Description>ANDWI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>3</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="13">
+    <Description>AVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>4</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="14">
+    <Description>AWEInsh</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>5</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="15">
+    <Description>AWEIsh</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>6</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="16">
+    <Description>BAI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>7</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="17">
+    <Description>BAIM</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>8</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="18">
+    <Description>BCC</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>9</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="19">
+    <Description>BI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>10</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="20">
+    <Description>BITM</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>11</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="21">
+    <Description>BIXS</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>12</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="22">
+    <Description>BLFEI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>13</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="23">
+    <Description>BNDVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>14</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="24">
+    <Description>BRBA</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>15</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="25">
+    <Description>BaI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>16</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="26">
+    <Description>CIG</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>17</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="27">
+    <Description>CSI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>18</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="28">
+    <Description>CVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>19</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="29">
+    <Description>DBI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>20</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="30">
+    <Description>DBSI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>21</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="31">
+    <Description>DSI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>22</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="32">
+    <Description>DSWI1</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>23</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="33">
+    <Description>DSWI2</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>24</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="34">
+    <Description>DSWI3</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>25</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="35">
+    <Description>DSWI4</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>26</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="36">
+    <Description>DSWI5</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>27</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="37">
+    <Description>DVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>28</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="38">
+    <Description>EMBI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>29</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="39">
+    <Description>ExG</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>30</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="40">
+    <Description>ExGR</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>31</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="41">
+    <Description>ExR</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>32</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="42">
+    <Description>FCVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>33</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="43">
+    <Description>GARI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>34</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="44">
+    <Description>GBNDVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>35</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="45">
+    <Description>GCC</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>36</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="46">
+    <Description>GEMI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>37</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="47">
+    <Description>GLI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>38</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="48">
+    <Description>GNDVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>39</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="49">
+    <Description>GOSAVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>40</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="50">
+    <Description>GRNDVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>41</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="51">
+    <Description>GRVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>42</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="52">
+    <Description>GVMI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>43</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="53">
+    <Description>IKAW</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>44</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="54">
+    <Description>IPVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>45</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="55">
+    <Description>LSWI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>46</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="56">
+    <Description>MBI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>47</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="57">
+    <Description>MCARI1</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>48</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="58">
+    <Description>MCARI2</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>49</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="59">
+    <Description>MGRVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>50</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="60">
+    <Description>MIRBI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>51</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="61">
+    <Description>MLSWI26</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>52</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="62">
+    <Description>MLSWI27</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>53</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="63">
+    <Description>MNDVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>54</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="64">
+    <Description>MNDWI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>55</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="65">
+    <Description>MRBVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>56</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="66">
+    <Description>MSAVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>57</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="67">
+    <Description>MSI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>58</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="68">
+    <Description>MSR</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>59</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="69">
+    <Description>MTVI1</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>60</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="70">
+    <Description>MTVI2</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>61</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="71">
+    <Description>MuWIR</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>62</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="72">
+    <Description>NBAI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>63</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="73">
+    <Description>NBLIOLI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>64</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="74">
+    <Description>NBR</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>65</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="75">
+    <Description>NBR2</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>66</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="76">
+    <Description>NBRSWIR</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>67</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="77">
+    <Description>NBSIMS</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>68</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="78">
+    <Description>NDBI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>69</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="79">
+    <Description>NDDI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>70</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="80">
+    <Description>NDGlaI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>71</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="81">
+    <Description>NDII</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>72</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="82">
+    <Description>NDMI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>73</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="83">
+    <Description>NDPonI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>74</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="84">
+    <Description>NDSI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>75</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="85">
+    <Description>NDSII</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>76</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="86">
+    <Description>NDSWIR</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>77</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="87">
+    <Description>NDSaII</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>78</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="88">
+    <Description>NDSoiI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>79</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="89">
+    <Description>NDTI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>80</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="90">
+    <Description>NDVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>81</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="91">
+    <Description>NDVIMNDWI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>82</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="92">
+    <Description>NDWI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>83</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="93">
+    <Description>NDYI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>84</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="94">
+    <Description>NGRDI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>85</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="95">
+    <Description>NIRv</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>86</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="96">
+    <Description>NLI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>87</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="97">
+    <Description>NMDI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>88</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="98">
+    <Description>NRFIg</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>89</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="99">
+    <Description>NRFIr</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>90</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="100">
+    <Description>NSDS</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>91</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="101">
+    <Description>NSDSI1</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>92</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="102">
+    <Description>NSDSI2</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>93</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="103">
+    <Description>NSDSI3</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>94</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="104">
+    <Description>NWI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>95</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="105">
+    <Description>NormG</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>96</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="106">
+    <Description>NormNIR</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>97</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="107">
+    <Description>NormR</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>98</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="108">
+    <Description>OSAVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>99</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="109">
+    <Description>PISI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>100</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="110">
+    <Description>RCC</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>101</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="111">
+    <Description>RDVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>102</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="112">
+    <Description>RGBVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>103</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="113">
+    <Description>RGRI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>104</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="114">
+    <Description>RI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>105</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="115">
+    <Description>RI4XS</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>106</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="116">
+    <Description>S3</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>107</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="117">
+    <Description>SI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>108</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="118">
+    <Description>SIPI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>109</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="119">
+    <Description>SLAVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>110</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="120">
+    <Description>SR</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>111</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="121">
+    <Description>SR2</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>112</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="122">
+    <Description>SWI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>113</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="123">
+    <Description>SWM</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>114</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="124">
+    <Description>TDVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>115</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="125">
+    <Description>TGI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>116</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="126">
+    <Description>TVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>117</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="127">
+    <Description>TriVI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>118</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="128">
+    <Description>UI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>119</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="129">
+    <Description>VARI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>120</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="130">
+    <Description>VIBI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>121</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="131">
+    <Description>VIG</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>122</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="132">
+    <Description>VgNIRBI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>123</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="133">
+    <Description>VrNIRBI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>124</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="134">
+    <Description>WI1</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>125</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="135">
+    <Description>WI2</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>126</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="136">
+    <Description>WI2015</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>127</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+  <VRTRasterBand dataType="Float32" band="137">
+    <Description>WRI</Description>
+    <NoDataValue>nan</NoDataValue>
+    <ComplexSource resampling="bilinear">
+      <SourceFilename relativeToVRT="1">middlesex_indices.tif</SourceFilename>
+      <SourceBand>128</SourceBand>
+      <SourceProperties RasterXSize="2404" RasterYSize="2148" DataType="Byte" BlockXSize="2404" BlockYSize="1" />
+      <SrcRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <DstRect xOff="0" yOff="0" xSize="2404" ySize="2148" />
+      <NODATA>nan</NODATA>
+    </ComplexSource>
+  </VRTRasterBand>
+</VRTDataset>
