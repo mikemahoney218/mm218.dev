@@ -10,7 +10,361 @@
 <atom:link href="https://mm218.dev/blog-r.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Tue, 24 Oct 2023 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Thu, 26 Oct 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Introducing rsi</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2023-10-26-rsi/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>I am so, so excited to share that rsi,<sup>1</sup> a new R package for handling common spatial data wrangling tasks, is <a href="https://github.com/Permian-Global-Research/rsi">now available on GitHub</a>! Specifically, rsi handles:</p>
+<ul>
+<li>Downloading data from STAC APIs (using some of the tricks I wrote about in <a href="https://stacspec.org/en/tutorials/1-download-data-using-r/">the STAC R tutorials</a>),</li>
+<li>Computing indices from the <a href="https://github.com/awesome-spectral-indices/awesome-spectral-indices">Awesome Spectral Indices</a> project using that imagery,</li>
+<li>And a handful of other spatial data wrangling problems, including <a href="https://permian-global-research.github.io/rsi/reference/stack_rasters.html">merging multiple bands into a single VRT file</a>.</li>
+</ul>
+<p>Most of my work on the package happened while I was at <a href="https://permianglobal.com/">Permian Global</a>, helping them automate their MMRV pipelines used to make sure their carbon credit projects are actually preserving carbon sinks and have additive benefits over time.<sup>2</sup> I’m really excited and grateful that Permian has agreed to open-source this work.</p>
+<p>Let’s take a whirlwind tour through the features in this package! For the purposes of this blog post, let’s download and process imagery for Middlesex county in Massachusetts, USA.<sup>3</sup> We’ll use the tigris package to get the borders for this county, and then reproject it into the Massachusetts State Plane:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">ma_counties <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> tigris<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">counties</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"MA"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">progress_bar =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>)</span>
+<span id="cb1-2">middlesex <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> ma_counties[ma_counties<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>NAME <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Middlesex"</span>, ]</span>
+<span id="cb1-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Reprojecting into the MA state plane, a planar CRS:</span></span>
+<span id="cb1-4">middlesex <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_transform</span>(middlesex, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">26986</span>)</span>
+<span id="cb1-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_geometry</span>(middlesex))</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This is the area we’re going to download and process data for.</p>
+<p>Specifically, let’s start off by downloading Landsat imagery from Microsoft’s Planetary Computer STAC API! This is pretty straightforward using rsi: use the <code>get_landsat_imagery()</code> function with an area of interest and a timeframe, and you’ll automatically get a cloud-masked composite image of all acquisitions for that spatiotemporal window. Let’s grab all the imagery from September 2023:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(rsi)</span>
+<span id="cb2-2">future<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plan</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"multisession"</span>)</span>
+<span id="cb2-3"></span>
+<span id="cb2-4">middlesex_imagery <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_landsat_imagery</span>(</span>
+<span id="cb2-5">  middlesex,</span>
+<span id="cb2-6">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2023-09-01"</span>,</span>
+<span id="cb2-7">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2023-09-30"</span></span>
+<span id="cb2-8">)</span>
+<span id="cb2-9">middlesex_imagery</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "shell_liquid_doctor.tif"</code></pre>
+</div>
+</div>
+<p>Note that I’ve used <code>future::plan()</code> here to specify a parallelization methodology, as the data retrieval functions in rsi are all compatible with future<sup>4</sup> to speed up downloads by using multiple threads. These functions also use progressr to let users specify progress reporting methods, if they want them, by calling <code>progressr::handlers()</code>.</p>
+<p>By default, <code>get_landsat_imagery()</code> will download a composite of all bands available in Landsat 8 and 9 imagery for our timeframe:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(middlesex_imagery) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb4-2">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Notice that this composite has been cloud-masked (using the QA pixel band) and rescaled<sup>5</sup> (using the scale and offset specified in metadata provided by the STAC endpoint) automatically. You can control these behaviors via function arguments.</p>
+<p>We’re able to download more than just imagery via rsi functions – for instance, we could also grab a DEM for this area from Planetary Computer, using the <code>get_dem()</code> function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">middlesex_dem <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_dem</span>(middlesex)</span>
+<span id="cb5-2">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(middlesex_dem) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb5-3">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Under the hood, both of these functions (and their friends, <code>get_sentinel2_data()</code> and <code>get_sentinel1_data()</code>) are powered by a lower-level <code>get_stac_data()</code> function, which should theoretically work with any imagery provided by any STAC API, anywhere. These functions simply provide user-friendly defaults to make it faster to get the data you care about.</p>
+<p>In addition to these STAC-focused data-downloading functions, rsi also has an interface to the <a href="https://github.com/awesome-spectral-indices/awesome-spectral-indices">Awesome Spectral Indices</a> project, via the <code>spectral_indices()</code> function:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spectral_indices</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb6-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 9
+  application_domain bands     contributor    date_of_addition formula long_name
+  &lt;chr&gt;              &lt;list&gt;    &lt;chr&gt;          &lt;chr&gt;            &lt;chr&gt;   &lt;chr&gt;    
+1 vegetation         &lt;chr [2]&gt; https://githu… 2021-11-17       (N - 0… Aerosol …
+2 vegetation         &lt;chr [2]&gt; https://githu… 2021-11-17       (N - 0… Aerosol …
+3 water              &lt;chr [6]&gt; https://githu… 2022-09-22       (B + G… Augmente…
+4 vegetation         &lt;chr [2]&gt; https://githu… 2021-09-20       (1 / G… Anthocya…
+5 vegetation         &lt;chr [3]&gt; https://githu… 2022-04-08       N * ((… Anthocya…
+6 vegetation         &lt;chr [4]&gt; https://githu… 2021-05-11       (N - (… Atmosphe…
+# ℹ 3 more variables: platforms &lt;list&gt;, reference &lt;chr&gt;, short_name &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>This function attempts to grab the newest version of the spectral indices JSON file from the ASI repo, and then stores that data in a cache folder on your computer. If the downloading fails, the package will fall back (with a warning) to use your possibly outdated cache instead; if you don’t have a cache and can’t download the files, the package will instead (with a different warning) resort to using a packaged version of the indices file. This ensures that you’re always getting the latest and greatest version of the ASI list possible, but that the package can still be used without an internet connection.</p>
+<p>There are also functions in rsi to sort through the ASI list of indices. For instance, the <code>filter_platforms()</code> function can be used to, well, filter the list to only indices that can be calculated from a given platform. For instance, to filter to only indices that can be calculated using data from Landsat’s Operational Land Imager:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter_platforms</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">platforms =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Landsat-OLI"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb8-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 9
+  application_domain bands     contributor    date_of_addition formula long_name
+  &lt;chr&gt;              &lt;list&gt;    &lt;chr&gt;          &lt;chr&gt;            &lt;chr&gt;   &lt;chr&gt;    
+1 vegetation         &lt;chr [2]&gt; https://githu… 2021-11-17       (N - 0… Aerosol …
+2 vegetation         &lt;chr [2]&gt; https://githu… 2021-11-17       (N - 0… Aerosol …
+3 water              &lt;chr [6]&gt; https://githu… 2022-09-22       (B + G… Augmente…
+4 vegetation         &lt;chr [4]&gt; https://githu… 2021-05-11       (N - (… Atmosphe…
+5 vegetation         &lt;chr [4]&gt; https://githu… 2021-05-14       sla * … Adjusted…
+6 vegetation         &lt;chr [2]&gt; https://githu… 2022-04-08       (N * (… Advanced…
+# ℹ 3 more variables: platforms &lt;list&gt;, reference &lt;chr&gt;, short_name &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>There’s an equivalent function to filter indices based upon the bands that require. For instance, we can filter the list to only indices that use the red and blue band of images:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter_bands</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">bands =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"R"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"B"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb10-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 9
+  application_domain bands     contributor    date_of_addition formula long_name
+  &lt;chr&gt;              &lt;list&gt;    &lt;chr&gt;          &lt;chr&gt;            &lt;chr&gt;   &lt;chr&gt;    
+1 vegetation         &lt;chr [2]&gt; https://githu… 2022-04-08       (R - B… Kawashim…
+2 vegetation         &lt;chr [2]&gt; https://githu… 2022-04-08       (R^2.0… Modified…
+# ℹ 3 more variables: platforms &lt;list&gt;, reference &lt;chr&gt;, short_name &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>Arguments to these functions let you control whether you’re looking for indices that match <em>all</em> platforms and bands you’ve specified, or <em>any</em> of them.</p>
+<p>But rsi doesn’t simply make these formulas available in R, it also helps you compute these indices from imagery, via the <code>calculate_indices()</code> function. This function takes your imagery and a subset of <code>spectral_indices()</code> as arguments, and creates a raster containing all of those indices as an output. We can use <code>filter_bands()</code> to quickly get a list of the indices we can compute from our Landsat imagery, and then <code>calculate_indices()</code> to compute all 128 of those indices from our images:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1">middlesex_indices <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb12-2">  middlesex_imagery,</span>
+<span id="cb12-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter_bands</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">bands =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(middlesex_imagery))),</span>
+<span id="cb12-4">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"middlesex_indices.tif"</span></span>
+<span id="cb12-5">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+|---------|---------|---------|---------|
+=========================================
+                                          </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(middlesex_indices) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb14-2">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Note that <code>calculate_indices()</code> is evaluating the formulas in the <code>formula</code> column of the spectral indices data frame as if they were code.<sup>6</sup> These formulas are evaluated inside of a very limited environment, which doesn’t have access to the global environment or most R fixtures, which does <em>reduce</em> the amount of harm malicious code could do:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1">evil_index <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spectral_indices</span>()[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>, ]</span>
+<span id="cb15-2">evil_index<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>formula <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"system('echo OHNO')"</span></span>
+<span id="cb15-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(</span>
+<span id="cb15-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb15-5">    middlesex_imagery,</span>
+<span id="cb15-6">    evil_index,</span>
+<span id="cb15-7">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"test.tif"</span></span>
+<span id="cb15-8">  )</span>
+<span id="cb15-9">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in system("echo OHNO") : could not find function "system"</code></pre>
+</div>
+</div>
+<p>But it’s worth scanning your formulas before running <code>calculate_indices()</code>, just to make sure you aren’t going to be accidentally running something surprising!</p>
+<p>Last but not least, rsi also provides a way to combine disparate data sets covering the same geographic region into a single VRT, quickly creating a file that you can treat as a single raster without taking up much additional storage space. This is a great way to create predictor bricks from your indices and downloaded data<sup>7</sup> which you can then use for model fitting and prediction:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1">combined_layers <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stack_rasters</span>(</span>
+<span id="cb17-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(middlesex_imagery, middlesex_dem, middlesex_indices),</span>
+<span id="cb17-3">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"middlesex.vrt"</span></span>
+<span id="cb17-4">)</span>
+<span id="cb17-5"></span>
+<span id="cb17-6">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(combined_layers) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb17-7">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>I’m <em>extremely</em> excited for this package to be out in the open, and for people to start using it. If you find the package useful or interesting, <a href="https://github.com/Permian-Global-Research/rsi/">drop us a star on GitHub</a> – and if you have any questions/comments/concerns about how it does things, please open an issue or a PR! We’re planning a CRAN release in the not-too-distant future, and would love to incorporate any feedback we get into that first released version.</p>
+
+
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>The name is a nonsense acronym. Initially the package was going to be “rsi: An R interface to the Rsome Spectral Indices project”, but the scope very quickly outgrew that; now it’s a convenient short package name that’s not taken on CRAN, and I’m backronyming as many additional meanings into those three letters as I can make fit.↩︎</p></li>
+<li id="fn2"><p>I am not currently employed by Permian, and nothing I say here or elsewhere reflects their opinions! That said, Permian is a copyright holder and funder to rsi, just as Posit is to waywiser, given their support of the initial development of the package.↩︎</p></li>
+<li id="fn3"><p>I was originally going to use Boston’s Suffolk county, but Suffolk county’s borders are <em>ludicrous</em>, because they include not just Boston’s mainland but also Boston’s islands, meaning the county is a normal-enough shape with a huge rectangle extending into the Atlantic off to the East.↩︎</p></li>
+<li id="fn4"><p>Via future.apply, to be specific.↩︎</p></li>
+<li id="fn5"><p>Explaining <a href="https://www.mm218.dev/posts/2023-08-24-landsat-scaling/">this blog post from a few months ago</a>.↩︎</p></li>
+<li id="fn6"><p>Explaining <a href="https://www.mm218.dev/posts/2023-10-24-fun-r-funcs/#str2lang">this blog post from two days ago</a>.↩︎</p></li>
+<li id="fn7"><p>Not that you should be regressing using raw imagery bands, but this lets you combine a DEM and other computed metrics with calculated indices.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>R</category>
+  <category>Tutorials</category>
+  <category>Spatial</category>
+  <category>geospatial data</category>
+  <category>R packages</category>
+  <guid>https://mm218.dev/posts/2023-10-26-rsi/index.html</guid>
+  <pubDate>Thu, 26 Oct 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2023-10-26-rsi/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Three fun R functions</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -8790,64 +9144,6 @@ Wintle, B. A., M. A. McCarthy, C. T. Volinsky, and R. P. Kavanagh. 2003. <span>�
   <guid>https://mm218.dev/posts/2021/01/model-averaging/index.html</guid>
   <pubDate>Mon, 18 Jan 2021 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2021/01/model-averaging/model_avg.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Some Updates</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2020/10/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<p>It’s been a busy few months! Rather than try to make separate update posts for everything I’ve been up to, here’s a list of the top bullets from my past four months.</p>
-<section id="new-digs-and-new-gigs" class="level2">
-<h2 class="anchored" data-anchor-id="new-digs-and-new-gigs">New Digs and New Gigs</h2>
-<p>I’ve left Boston and left Wayfair to take a PhD position at SUNY-ESF in Syracuse, working with Colin Beier and Aidan Ackerman to make 3D landscape visualizations as a way to improve the interpretability of ecological models and help democratize scientific outputs.</p>
-</section>
-<section id="paper-stem-size-selectivity-is-stronger-than-species-preferences-for-beaver-a-central-place-forager" class="level2">
-<h2 class="anchored" data-anchor-id="paper-stem-size-selectivity-is-stronger-than-species-preferences-for-beaver-a-central-place-forager">Paper: Stem size selectivity is stronger than species preferences for beaver, a central place forager</h2>
-<p><a href="https://www.sciencedirect.com/science/article/abs/pii/S0378112720311002">My first first-authored paper is out in Forest Ecology and Management!</a> I wrote a little about the process of this paper, from start to finish, <a href="https://systematica.substack.com/p/the-making-of">on my extremely short-lived newsletter.</a></p>
-</section>
-<section id="tweetbots" class="level2">
-<h2 class="anchored" data-anchor-id="tweetbots">Tweetbots</h2>
-<p>I’ve now got a small army of robots living in the corner of my apartment, tweeting out to their heart’s content. At the moment, I’ve got three retweet bots running off the original <a href="https://github.com/mikemahoney218/retweet_bot">ecology_tweets codebase</a>, namely <a href="https://twitter.com/ecology_tweets"><span class="citation" data-cites="ecology_tweets">@ecology_tweets</span></a>, <a href="https://twitter.com/rstats_tweets"><span class="citation" data-cites="rstats_tweets">@rstats_tweets</span></a> (a more heavily-filtered alternative to the more popular rstatstweets bot), and <a href="https://twitter.com/30daymap_tweets"><span class="citation" data-cites="30daymap_tweets">@30daymap_tweets</span></a>, built for the #30DayMapChallenge.</p>
-<p>More interesting are the two GPT-2 “AI” tweetbots now running, including <a href="https://twitter.com/fortunes_teller"><span class="citation" data-cites="fortunes_teller">@fortunes_teller</span></a> and <a href="https://twitter.com/fund_me_please_"><span class="citation" data-cites="fund_me_please_">@fund_me_please_</span></a>. The former is trained against a collection of <code>fortunes</code> packages from various *nix distros and the R fortunes package, while the latter was run against 150 GRFP personal statements and is now tweeting out some frankly bizarre applications of its own making.</p>
-</section>
-<section id="terrainr" class="level2">
-<h2 class="anchored" data-anchor-id="terrainr">{terrainr}</h2>
-<p>I’ve got a new R package out, the first real “product” from my PhD. {terrainr} wraps the USGS National Map family of APIs to help users download geospatial data for their areas of interest, and provides functionality to turn those files into tiles that can be imported into Unity for 3D landscape visualization:</p>
-<div class="cell">
-<div class="cell-output-display">
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2020/10/terrainr.jpg" class="img-fluid figure-img" width="2126"></p>
-<figcaption class="figure-caption">A 3D landscape visualization of the area southeast of Mt. Whitney, California, USA.</figcaption>
-</figure>
-</div>
-</div>
-</div>
-<p>I love writing packages with visual outputs. I love writing packages with visual outputs that look like <em>this</em>.</p>
-</section>
-<section id="misc" class="level2">
-<h2 class="anchored" data-anchor-id="misc">Misc</h2>
-<p>I bought a <a href="https://www.instagram.com/p/CDJVN-JlB5R/">pen plotter.</a></p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
-
-
-</section>
-
- ]]></description>
-  <category>R</category>
-  <category>Twitter</category>
-  <category>phd</category>
-  <category>terrainr</category>
-  <category>beaver</category>
-  <guid>https://mm218.dev/posts/2020/10/index.html</guid>
-  <pubDate>Fri, 16 Oct 2020 00:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2020/10/terrainr.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>
