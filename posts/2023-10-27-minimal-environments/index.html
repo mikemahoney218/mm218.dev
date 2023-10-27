@@ -248,7 +248,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-  1.679   0.028   1.707 </code></pre>
+  1.754   0.040   1.794 </code></pre>
 </div>
 </div>
 <div class="cell">
@@ -381,7 +381,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>})</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-  0.015   0.000   0.015 </code></pre>
+  0.016   0.000   0.015 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">plot</span>(terra<span class="sc">::</span><span class="fu">rast</span>(out))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
@@ -402,7 +402,94 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   could not find function "system"</code></pre>
 </div>
 </div>
-<p>This isn’t a perfect fix – and rsi also checks to make sure that all of your formulas are only using symbols that match the band names of your rasters. Even with these checks, you should investigate the formulas you’re going to run before you actually run them – or save a copy of the trusted indices you’re going to calculate and provide <em>those</em> to <code>calculate_indices()</code>, rather than using <code>spectral_indices()</code> directly. But this hopefully makes this function a pinch safer.</p>
+<p><strong>Update 2023-10-27</strong>: However, we actually need to go one step further. Because we’ve included <code>::</code> in our minimal environment, we’ve left in an “escape hatch” that malicious code can use to access any functions it wants:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>evil_index<span class="sc">$</span>formula <span class="ot">&lt;-</span> <span class="st">"base::system('echo oh no &gt; /tmp/example2.txt')"</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate_indices</span>(</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">system.file</span>(<span class="st">"rasters/example_sentinel1.tif"</span>, <span class="at">package =</span> <span class="st">"rsi"</span>),</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    evil_index,</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">".tif"</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error : [predict] the number of values returned by 'fun' (model predict function) does not match the input. Try na.rm=TRUE?</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">readLines</span>(<span class="st">"/tmp/example2.txt"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "oh no"</code></pre>
+</div>
+</div>
+<p>Instead of calling <code>terra::predict()</code> via <code>::</code> inside our environment, we’ll need to include that function in the environment directly, in order to remove this escape hatch:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>calculate_indices <span class="ot">&lt;-</span> <span class="cf">function</span>(raster,</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>                              indices,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>                              output_filename) {</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">inherits</span>(raster, <span class="st">"SpatRaster"</span>)) raster <span class="ot">&lt;-</span> terra<span class="sc">::</span><span class="fu">rast</span>(raster)</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>  formulas <span class="ot">&lt;-</span> <span class="fu">lapply</span>(indices[[<span class="st">"formula"</span>]], str2lang)</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  exec_env <span class="ot">&lt;-</span> rlang<span class="sc">::</span><span class="fu">new_environment</span>(</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">list</span>(</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">-</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">-</span><span class="st">`</span>,</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">(</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">(</span><span class="st">`</span>,</span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">*</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">*</span><span class="st">`</span>,</span>
+<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">/</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">/</span><span class="st">`</span>,</span>
+<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">^</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">^</span><span class="st">`</span>,</span>
+<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">+</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">+</span><span class="st">`</span>,</span>
+<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">&lt;-</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">&lt;-</span><span class="st">`</span>,</span>
+<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">{</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">{</span><span class="st">`</span>,</span>
+<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">names&lt;-</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">names&lt;-</span><span class="st">`</span>,</span>
+<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">function</span><span class="st">`</span> <span class="ot">=</span> <span class="st">`</span><span class="at">function</span><span class="st">`</span>,</span>
+<span id="cb25-19"><a href="#cb25-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">list =</span> list,</span>
+<span id="cb25-20"><a href="#cb25-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">lapply =</span> lapply,</span>
+<span id="cb25-21"><a href="#cb25-21" aria-hidden="true" tabindex="-1"></a>      <span class="at">with =</span> with,</span>
+<span id="cb25-22"><a href="#cb25-22" aria-hidden="true" tabindex="-1"></a>      <span class="at">eval =</span> eval,</span>
+<span id="cb25-23"><a href="#cb25-23" aria-hidden="true" tabindex="-1"></a>      <span class="at">formulas =</span> formulas,</span>
+<span id="cb25-24"><a href="#cb25-24" aria-hidden="true" tabindex="-1"></a>      <span class="at">short_names =</span> indices[[<span class="st">"short_name"</span>]],</span>
+<span id="cb25-25"><a href="#cb25-25" aria-hidden="true" tabindex="-1"></a>      <span class="at">raster =</span> raster,</span>
+<span id="cb25-26"><a href="#cb25-26" aria-hidden="true" tabindex="-1"></a>      <span class="at">output_filename =</span> output_filename,</span>
+<span id="cb25-27"><a href="#cb25-27" aria-hidden="true" tabindex="-1"></a>      <span class="at">predict =</span> terra<span class="sc">::</span>predict</span>
+<span id="cb25-28"><a href="#cb25-28" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb25-29"><a href="#cb25-29" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-30"><a href="#cb25-30" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-31"><a href="#cb25-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">local</span>(</span>
+<span id="cb25-32"><a href="#cb25-32" aria-hidden="true" tabindex="-1"></a>    {</span>
+<span id="cb25-33"><a href="#cb25-33" aria-hidden="true" tabindex="-1"></a>      <span class="fu">predict</span>(</span>
+<span id="cb25-34"><a href="#cb25-34" aria-hidden="true" tabindex="-1"></a>        raster,</span>
+<span id="cb25-35"><a href="#cb25-35" aria-hidden="true" tabindex="-1"></a>        <span class="fu">list</span>(),</span>
+<span id="cb25-36"><a href="#cb25-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">fun =</span> <span class="cf">function</span>(model, newdata) {</span>
+<span id="cb25-37"><a href="#cb25-37" aria-hidden="true" tabindex="-1"></a>          out <span class="ot">&lt;-</span> <span class="fu">lapply</span>(</span>
+<span id="cb25-38"><a href="#cb25-38" aria-hidden="true" tabindex="-1"></a>            formulas,</span>
+<span id="cb25-39"><a href="#cb25-39" aria-hidden="true" tabindex="-1"></a>            <span class="cf">function</span>(calc) {</span>
+<span id="cb25-40"><a href="#cb25-40" aria-hidden="true" tabindex="-1"></a>              <span class="fu">with</span>(newdata, <span class="fu">eval</span>(calc))</span>
+<span id="cb25-41"><a href="#cb25-41" aria-hidden="true" tabindex="-1"></a>            }</span>
+<span id="cb25-42"><a href="#cb25-42" aria-hidden="true" tabindex="-1"></a>          )</span>
+<span id="cb25-43"><a href="#cb25-43" aria-hidden="true" tabindex="-1"></a>          <span class="fu">names</span>(out) <span class="ot">&lt;-</span> short_names</span>
+<span id="cb25-44"><a href="#cb25-44" aria-hidden="true" tabindex="-1"></a>          out</span>
+<span id="cb25-45"><a href="#cb25-45" aria-hidden="true" tabindex="-1"></a>        },</span>
+<span id="cb25-46"><a href="#cb25-46" aria-hidden="true" tabindex="-1"></a>        <span class="at">filename =</span> output_filename</span>
+<span id="cb25-47"><a href="#cb25-47" aria-hidden="true" tabindex="-1"></a>      )</span>
+<span id="cb25-48"><a href="#cb25-48" aria-hidden="true" tabindex="-1"></a>    },</span>
+<span id="cb25-49"><a href="#cb25-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">envir =</span> exec_env</span>
+<span id="cb25-50"><a href="#cb25-50" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb25-51"><a href="#cb25-51" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb25-52"><a href="#cb25-52" aria-hidden="true" tabindex="-1"></a>  output_filename</span>
+<span id="cb25-53"><a href="#cb25-53" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">try</span>(</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">calculate_indices</span>(</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">system.file</span>(<span class="st">"rasters/example_sentinel1.tif"</span>, <span class="at">package =</span> <span class="st">"rsi"</span>),</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>    evil_index,</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">".tif"</span>)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in base::system : could not find function "::"</code></pre>
+</div>
+</div>
+<p>Thanks Gábor Csárdi for the catch!</p>
+<p>This still isn’t a perfect fix – and rsi also checks to make sure that all of your formulas are only using symbols that match the band names of your rasters. Even with these checks, you should investigate the formulas you’re going to run before you actually run them – or save a copy of the trusted indices you’re going to calculate and provide <em>those</em> to <code>calculate_indices()</code>, rather than using <code>spectral_indices()</code> directly. But this hopefully makes this function a pinch safer.</p>
 <p>I wrote this piece of rsi back in August and then more or less didn’t think of it again until yesterday, when we released rsi on GitHub – and at the same time, started using GitHub Actions for CI for the package. All of a sudden, I started seeing a lot of CI runs that looked like this:</p>
 <p><img src="gh.png" class="img-fluid" alt="A screenshot of GitHub Actions, where all workflows -- including R CMD check -- are successful, but test coverage is failing."></p>
 <p>R CMD check succeeding and test coverage failing made no sense to me, as theoretically they’re both running a full check and reporting the results. In classic developer tradition, I spent a few hours flailing around before finally giving up and resorting to the final option I had available: reading the error messages.</p>

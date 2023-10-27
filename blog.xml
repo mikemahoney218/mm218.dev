@@ -142,7 +142,7 @@ font-style: inherit;">".tif"</span>)</span>
 <span id="cb2-10">})</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-  1.679   0.028   1.707 </code></pre>
+  1.754   0.040   1.794 </code></pre>
 </div>
 </div>
 <div class="cell">
@@ -635,7 +635,7 @@ font-style: inherit;">".tif"</span>)</span>
 <span id="cb16-7">})</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   user  system elapsed 
-  0.015   0.000   0.015 </code></pre>
+  0.016   0.000   0.015 </code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1">terra<span class="sc" style="color: #5E5E5E;
 background-color: null;
@@ -682,7 +682,362 @@ font-style: inherit;">".tif"</span>)</span>
   could not find function "system"</code></pre>
 </div>
 </div>
-<p>This isn’t a perfect fix – and rsi also checks to make sure that all of your formulas are only using symbols that match the band names of your rasters. Even with these checks, you should investigate the formulas you’re going to run before you actually run them – or save a copy of the trusted indices you’re going to calculate and provide <em>those</em> to <code>calculate_indices()</code>, rather than using <code>spectral_indices()</code> directly. But this hopefully makes this function a pinch safer.</p>
+<p><strong>Update 2023-10-27</strong>: However, we actually need to go one step further. Because we’ve included <code>::</code> in our minimal environment, we’ve left in an “escape hatch” that malicious code can use to access any functions it wants:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1">evil_index<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>formula <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"base::system('echo oh no &gt; /tmp/example2.txt')"</span></span>
+<span id="cb21-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(</span>
+<span id="cb21-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb21-4">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rasters/example_sentinel1.tif"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rsi"</span>),</span>
+<span id="cb21-5">    evil_index,</span>
+<span id="cb21-6">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb21-7">  )</span>
+<span id="cb21-8">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error : [predict] the number of values returned by 'fun' (model predict function) does not match the input. Try na.rm=TRUE?</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">readLines</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"/tmp/example2.txt"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "oh no"</code></pre>
+</div>
+</div>
+<p>Instead of calling <code>terra::predict()</code> via <code>::</code> inside our environment, we’ll need to include that function in the environment directly, in order to remove this escape hatch:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1">calculate_indices <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(raster,</span>
+<span id="cb25-2">                              indices,</span>
+<span id="cb25-3">                              output_filename) {</span>
+<span id="cb25-4">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">if</span> (<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">inherits</span>(raster, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SpatRaster"</span>)) raster <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(raster)</span>
+<span id="cb25-5">  formulas <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(indices[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"formula"</span>]], str2lang)</span>
+<span id="cb25-6">  </span>
+<span id="cb25-7">  exec_env <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_environment</span>(</span>
+<span id="cb25-8">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(</span>
+<span id="cb25-9">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb25-10">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb25-11">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">*</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">*</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb25-12">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">/</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">/</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb25-13">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">^</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">^</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb25-14">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">+</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">+</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb25-15">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">&lt;-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">&lt;-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb25-16">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">{</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">{</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb25-17">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">names&lt;-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">names&lt;-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb25-18">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">function</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">function</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb25-19">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">list =</span> list,</span>
+<span id="cb25-20">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lapply =</span> lapply,</span>
+<span id="cb25-21">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">with =</span> with,</span>
+<span id="cb25-22">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">eval =</span> eval,</span>
+<span id="cb25-23">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">formulas =</span> formulas,</span>
+<span id="cb25-24">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">short_names =</span> indices[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"short_name"</span>]],</span>
+<span id="cb25-25">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">raster =</span> raster,</span>
+<span id="cb25-26">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> output_filename,</span>
+<span id="cb25-27">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">predict =</span> terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>predict</span>
+<span id="cb25-28">    )</span>
+<span id="cb25-29">  )</span>
+<span id="cb25-30">  </span>
+<span id="cb25-31">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">local</span>(</span>
+<span id="cb25-32">    {</span>
+<span id="cb25-33">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(</span>
+<span id="cb25-34">        raster,</span>
+<span id="cb25-35">        <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(),</span>
+<span id="cb25-36">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(model, newdata) {</span>
+<span id="cb25-37">          out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(</span>
+<span id="cb25-38">            formulas,</span>
+<span id="cb25-39">            <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(calc) {</span>
+<span id="cb25-40">              <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span>(newdata, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval</span>(calc))</span>
+<span id="cb25-41">            }</span>
+<span id="cb25-42">          )</span>
+<span id="cb25-43">          <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(out) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> short_names</span>
+<span id="cb25-44">          out</span>
+<span id="cb25-45">        },</span>
+<span id="cb25-46">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">filename =</span> output_filename</span>
+<span id="cb25-47">      )</span>
+<span id="cb25-48">    },</span>
+<span id="cb25-49">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">envir =</span> exec_env</span>
+<span id="cb25-50">  )</span>
+<span id="cb25-51">  </span>
+<span id="cb25-52">  output_filename</span>
+<span id="cb25-53">}</span></code></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(</span>
+<span id="cb26-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb26-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rasters/example_sentinel1.tif"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rsi"</span>),</span>
+<span id="cb26-4">    evil_index,</span>
+<span id="cb26-5">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb26-6">  )</span>
+<span id="cb26-7">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in base::system : could not find function "::"</code></pre>
+</div>
+</div>
+<p>Thanks Gábor Csárdi for the catch!</p>
+<p>This still isn’t a perfect fix – and rsi also checks to make sure that all of your formulas are only using symbols that match the band names of your rasters. Even with these checks, you should investigate the formulas you’re going to run before you actually run them – or save a copy of the trusted indices you’re going to calculate and provide <em>those</em> to <code>calculate_indices()</code>, rather than using <code>spectral_indices()</code> directly. But this hopefully makes this function a pinch safer.</p>
 <p>I wrote this piece of rsi back in August and then more or less didn’t think of it again until yesterday, when we released rsi on GitHub – and at the same time, started using GitHub Actions for CI for the package. All of a sudden, I started seeing a lot of CI runs that looked like this:</p>
 <p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/gh.png" class="img-fluid" alt="A screenshot of GitHub Actions, where all workflows -- including R CMD check -- are successful, but test coverage is failing."></p>
 <p>R CMD check succeeding and test coverage failing made no sense to me, as theoretically they’re both running a full check and reporting the results. In classic developer tradition, I spent a few hours flailing around before finally giving up and resorting to the final option I had available: reading the error messages.</p>
