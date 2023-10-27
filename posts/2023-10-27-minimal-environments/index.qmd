@@ -200,7 +200,91 @@ try(
 )
 ```
 
-This isn't a perfect fix -- and rsi also checks to make sure that all of your formulas are only using symbols that match the band names of your rasters. Even with these checks, you should investigate the formulas you're going to run before you actually run them -- or save a copy of the trusted indices you're going to calculate and provide _those_ to `calculate_indices()`, rather than using `spectral_indices()` directly. But this hopefully makes this function a pinch safer.
+**Update 2023-10-27**: However, we actually need to go one step further. Because we've included `::` in our minimal environment, we've left in an "escape hatch" that malicious code can use to access any functions it wants:
+
+```{r}
+evil_index$formula <- "base::system('echo oh no > /tmp/example2.txt')"
+try(
+  calculate_indices(
+    system.file("rasters/example_sentinel1.tif", package = "rsi"),
+    evil_index,
+    tempfile(fileext = ".tif")
+  )
+)
+readLines("/tmp/example2.txt")
+```
+
+Instead of calling `terra::predict()` via `::` inside our environment, we'll need to include that function in the environment directly, in order to remove this escape hatch:
+
+```{r}
+calculate_indices <- function(raster,
+                              indices,
+                              output_filename) {
+  if (!inherits(raster, "SpatRaster")) raster <- terra::rast(raster)
+  formulas <- lapply(indices[["formula"]], str2lang)
+  
+  exec_env <- rlang::new_environment(
+    list(
+      `-` = `-`,
+      `(` = `(`,
+      `*` = `*`,
+      `/` = `/`,
+      `^` = `^`,
+      `+` = `+`,
+      `<-` = `<-`,
+      `{` = `{`,
+      `names<-` = `names<-`,
+      `function` = `function`,
+      list = list,
+      lapply = lapply,
+      with = with,
+      eval = eval,
+      formulas = formulas,
+      short_names = indices[["short_name"]],
+      raster = raster,
+      output_filename = output_filename,
+      predict = terra::predict
+    )
+  )
+  
+  local(
+    {
+      predict(
+        raster,
+        list(),
+        fun = function(model, newdata) {
+          out <- lapply(
+            formulas,
+            function(calc) {
+              with(newdata, eval(calc))
+            }
+          )
+          names(out) <- short_names
+          out
+        },
+        filename = output_filename
+      )
+    },
+    envir = exec_env
+  )
+  
+  output_filename
+}
+```
+
+```{r}
+try(
+  calculate_indices(
+    system.file("rasters/example_sentinel1.tif", package = "rsi"),
+    evil_index,
+    tempfile(fileext = ".tif")
+  )
+)
+```
+
+Thanks Gábor Csárdi for the catch!
+
+This still isn't a perfect fix -- and rsi also checks to make sure that all of your formulas are only using symbols that match the band names of your rasters. Even with these checks, you should investigate the formulas you're going to run before you actually run them -- or save a copy of the trusted indices you're going to calculate and provide _those_ to `calculate_indices()`, rather than using `spectral_indices()` directly. But this hopefully makes this function a pinch safer.
 
 I wrote this piece of rsi back in August and then more or less didn't think of it again until yesterday, when we released rsi on GitHub -- and at the same time, started using GitHub Actions for CI for the package. All of a sudden, I started seeing a lot of CI runs that looked like this:
 
