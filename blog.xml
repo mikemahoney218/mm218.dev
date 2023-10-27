@@ -10,7 +10,703 @@
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Thu, 26 Oct 2023 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 27 Oct 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Executing R code from untrusted sources in minimal environments</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2023-10-27-minimal-environments/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>Yesterday we released <a href="https://github.com/Permian-Global-Research/rsi">rsi</a>, an R package that (among other things) makes it easy to retrieve spectral indices from the <a href="https://github.com/davemlz/awesome-spectral-indices">Awesome Spectral Indices</a> project and calculate them against any images you have on hand.</p>
+<p>The actual code required to do these calculations is mostly just a bit of glue. The ASI project provides the formulas you’d use to calculate any spectral indices you might be interested in, which as relatively simple arithmetic are easily <a href="https://www.mm218.dev/posts/2023-10-24-fun-r-funcs/#str2lang">transformed into R code via <code>str2lang()</code></a>.</p>
+<p>Once we’ve done that transformation, we can evaluate that R code against our images through a slightly off-label use of <code>terra::predict()</code>. This function loads chunks of our raster into R as a data frame with column names corresponding to our band labels, meaning that if we’re careful to ensure that our band names align with the standardized band names used by ASI<sup>1</sup> we can compute indices by evaluating their formulas “with” the data frame.</p>
+<p>This sounds complex, but doesn’t actually require that much code to put together:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">calculate_indices <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(raster,</span>
+<span id="cb1-2">                              indices,</span>
+<span id="cb1-3">                              output_filename) {</span>
+<span id="cb1-4">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">if</span> (<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">inherits</span>(raster, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SpatRaster"</span>)) raster <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(raster)</span>
+<span id="cb1-5">  formulas <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(indices[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"formula"</span>]], str2lang)</span>
+<span id="cb1-6">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(</span>
+<span id="cb1-7">    raster,</span>
+<span id="cb1-8">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(),</span>
+<span id="cb1-9">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(model, newdata) {</span>
+<span id="cb1-10">      out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(formulas, \(calc) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span>(newdata, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval</span>(calc)))</span>
+<span id="cb1-11">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(out) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> indices[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"short_name"</span>]]</span>
+<span id="cb1-12">      out</span>
+<span id="cb1-13">    },</span>
+<span id="cb1-14">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">filename =</span> output_filename</span>
+<span id="cb1-15">  )</span>
+<span id="cb1-16">  output_filename</span>
+<span id="cb1-17">}</span></code></pre></div>
+</div>
+<p>Turn our formulas into calls, load our raster into R chunk by chunk, evaluate those calls in the context of our raster, lather rinse repeat. The conceptual complexity here is a lot higher, in my view, than the code complexity.</p>
+<p>Because this code is pretty straightforward, and relies on the fantastic, highly-optimized <a href="https://github.com/rspatial/terra">terra package</a> to actually do these computations, we’re able to calculate these indices <em>fast</em>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">example_index <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> rsi<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spectral_indices</span>()</span>
+<span id="cb2-2">example_index <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> example_index[example_index<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>short_name <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"DPDD"</span>, ]</span>
+<span id="cb2-3"></span>
+<span id="cb2-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.time</span>({</span>
+<span id="cb2-5">  out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb2-6">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rasters/example_sentinel1.tif"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rsi"</span>),</span>
+<span id="cb2-7">    example_index,</span>
+<span id="cb2-8">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb2-9">  )</span>
+<span id="cb2-10">})</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   user  system elapsed 
+  1.679   0.028   1.707 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(out))</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This is pretty nifty!</p>
+<p>That said, we should be careful about what text we’re willing to turn into R code and execute. In particular, rsi is designed to integrate nicely with the Awesome Spectral Indices project, and to retrieve and compute the ASI set of indices – which, phrased differently, means we’re downloading code from the internet and running it on our computers. If someone were to mess with our indices – either by corrupting the GitHub repository or by editing the cached file on your machine – this could wind up giving them access to <code>system()</code> or other scary commands:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">evil_index <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> example_index</span>
+<span id="cb5-2">evil_index<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>formula <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"system('echo oh no &gt; /tmp/example.txt')"</span></span>
+<span id="cb5-3"></span>
+<span id="cb5-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(</span>
+<span id="cb5-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb5-6">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rasters/example_sentinel1.tif"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rsi"</span>),</span>
+<span id="cb5-7">    evil_index,</span>
+<span id="cb5-8">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb5-9">  ),</span>
+<span id="cb5-10">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">silent =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span></span>
+<span id="cb5-11">)</span>
+<span id="cb5-12"></span>
+<span id="cb5-13"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">readLines</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"/tmp/example.txt"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "oh no"</code></pre>
+</div>
+</div>
+<p>So, how can we make this safer?</p>
+<p>One way is by taking away the number of toys any malicious code has available to play with. We can do this by running the code in a locked-down environment, where it won’t have access to functions that might let code mess with our machine.</p>
+<p>One way of creating a locked down environment is <code>rlang::new_environment()</code>. By default, this function creates a new environment with nothing in it – no built-in functions or objects:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ls</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">envir =</span> rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_environment</span>())</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>character(0)</code></pre>
+</div>
+</div>
+<p>This environment is also going to have the empty environment as its parent, meaning that code executed in this scope won’t be able to use functions or objects from the global environment<sup>2</sup>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># inheriting from the global environment</span></span>
+<span id="cb9-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">local</span>(</span>
+<span id="cb9-3">  <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>,</span>
+<span id="cb9-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new.env</span>()</span>
+<span id="cb9-5">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># inheriting from the empty environment</span></span>
+<span id="cb11-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(</span>
+<span id="cb11-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">local</span>(</span>
+<span id="cb11-4">    <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>,</span>
+<span id="cb11-5">    rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_environment</span>()</span>
+<span id="cb11-6">  )</span>
+<span id="cb11-7">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in 2 + 2 : could not find function "+"</code></pre>
+</div>
+</div>
+<p>That means that any code we run inside of this new environment will only have access to whatever functions and variables we purposefully include in the environment. The <code>data</code> argument to <code>rlang::new_environment()</code> makes it relatively easy to define whatever objects we’re looking to make available in this new environment:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">local</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_environment</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">+</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">+</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>)))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4</code></pre>
+</div>
+</div>
+<p>That means that, if we create a minimal environment containing only the functions and variables essential for calculating our indices, we should hopefully be able to reduce the potential blast radius of malicious code – or at least make it a lot harder for malicious code to impact anything we care about. In rsi, that means we wind up calculating indices inside a minimal environment that looks like this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1">calculate_indices <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(raster,</span>
+<span id="cb15-2">                              indices,</span>
+<span id="cb15-3">                              output_filename) {</span>
+<span id="cb15-4">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">if</span> (<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">inherits</span>(raster, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SpatRaster"</span>)) raster <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(raster)</span>
+<span id="cb15-5">  formulas <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(indices[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"formula"</span>]], str2lang)</span>
+<span id="cb15-6">  </span>
+<span id="cb15-7">  exec_env <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_environment</span>(</span>
+<span id="cb15-8">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(</span>
+<span id="cb15-9">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">::</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">::</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-10">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-11">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-12">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">*</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">*</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-13">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">/</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">/</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-14">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">^</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">^</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-15">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">+</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">+</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-16">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">&lt;-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">&lt;-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-17">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">{</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">{</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-18">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">names&lt;-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">names&lt;-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-19">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">function</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">function</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-20">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">list =</span> list,</span>
+<span id="cb15-21">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lapply =</span> lapply,</span>
+<span id="cb15-22">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">with =</span> with,</span>
+<span id="cb15-23">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">eval =</span> eval,</span>
+<span id="cb15-24">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">formulas =</span> formulas,</span>
+<span id="cb15-25">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">short_names =</span> indices[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"short_name"</span>]],</span>
+<span id="cb15-26">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">raster =</span> raster,</span>
+<span id="cb15-27">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> output_filename</span>
+<span id="cb15-28">    )</span>
+<span id="cb15-29">  )</span>
+<span id="cb15-30">  </span>
+<span id="cb15-31">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">local</span>(</span>
+<span id="cb15-32">    {</span>
+<span id="cb15-33">      terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(</span>
+<span id="cb15-34">        raster,</span>
+<span id="cb15-35">        <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(),</span>
+<span id="cb15-36">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(model, newdata) {</span>
+<span id="cb15-37">          out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(</span>
+<span id="cb15-38">            formulas,</span>
+<span id="cb15-39">            <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(calc) {</span>
+<span id="cb15-40">              <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span>(newdata, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval</span>(calc))</span>
+<span id="cb15-41">            }</span>
+<span id="cb15-42">          )</span>
+<span id="cb15-43">          <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(out) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> short_names</span>
+<span id="cb15-44">          out</span>
+<span id="cb15-45">        },</span>
+<span id="cb15-46">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">filename =</span> output_filename</span>
+<span id="cb15-47">      )</span>
+<span id="cb15-48">    },</span>
+<span id="cb15-49">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">envir =</span> exec_env</span>
+<span id="cb15-50">  )</span>
+<span id="cb15-51">  </span>
+<span id="cb15-52">  output_filename</span>
+<span id="cb15-53">}</span></code></pre></div>
+</div>
+<p>This shouldn’t impact anything from the user’s perspective when calculating well-behaved formulas:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.time</span>({</span>
+<span id="cb16-2">  out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb16-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rasters/example_sentinel1.tif"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rsi"</span>),</span>
+<span id="cb16-4">    example_index,</span>
+<span id="cb16-5">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb16-6">  )</span>
+<span id="cb16-7">})</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   user  system elapsed 
+  0.015   0.000   0.015 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(out))</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>But it makes the most obvious malicious code fail:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(</span>
+<span id="cb19-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb19-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rasters/example_sentinel1.tif"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rsi"</span>),</span>
+<span id="cb19-4">    evil_index,</span>
+<span id="cb19-5">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb19-6">  )</span>
+<span id="cb19-7">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in system("echo oh no &gt; /tmp/example.txt") : 
+  could not find function "system"</code></pre>
+</div>
+</div>
+<p>This isn’t a perfect fix – and rsi also checks to make sure that all of your formulas are only using symbols that match the band names of your rasters. Even with these checks, you should investigate the formulas you’re going to run before you actually run them – or save a copy of the trusted indices you’re going to calculate and provide <em>those</em> to <code>calculate_indices()</code>, rather than using <code>spectral_indices()</code> directly. But this hopefully makes this function a pinch safer.</p>
+<p>I wrote this piece of rsi back in August and then more or less didn’t think of it again until yesterday, when we released rsi on GitHub – and at the same time, started using GitHub Actions for CI for the package. All of a sudden, I started seeing a lot of CI runs that looked like this:</p>
+<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/gh.png" class="img-fluid" alt="A screenshot of GitHub Actions, where all workflows -- including R CMD check -- are successful, but test coverage is failing."></p>
+<p>R CMD check succeeding and test coverage failing made no sense to me, as theoretically they’re both running a full check and reporting the results. In classic developer tradition, I spent a few hours flailing around before finally giving up and resorting to the final option I had available: reading the error messages.</p>
+<p>And it turned out that each of those failed test coverage runs had the same error message:</p>
+<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/err.png" class="img-fluid" alt="Expected `... <- NULL` to run without any errors. Actually got a <simpleError> with text: could not find function :::"></p>
+<p><code>could not find function ":::"</code>.</p>
+<p>My test coverage workflow is using the (fantastic) <a href="https://covr.r-lib.org/">covr</a> package to measure line coverage. Behind the scenes, covr is doing a lot more than just running R CMD check, like my other workflows – covr is actually <a href="https://covr.r-lib.org/articles/how_it_works.html">changing what R runs when it runs your code</a>, in order to measure how many times any given line of code gets called. This is a really neat workflow, but it doesn’t play nicely with our minimal environment here; the new code added inside of our <code>local()</code> statement depends upon functions that we didn’t (and aren’t going to) provide to the minimal environment, such as <code>:::</code>. Adding a new environment variable to the test coverage workflow, and skipping tests that ran the <code>local()</code> call when that environment variable was defined, wound up solving the issue.</p>
+
+
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Which rsi will automatically enforce when using <code>get_*_imagery()</code> functions.↩︎</p></li>
+<li id="fn2"><p>Or any other environments this one inherits from.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>R</category>
+  <category>Tutorials</category>
+  <guid>https://mm218.dev/posts/2023-10-27-minimal-environments/index.html</guid>
+  <pubDate>Fri, 27 Oct 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2023-10-27-minimal-environments/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Introducing rsi</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -5311,108 +6007,6 @@ font-style: inherit;">obj_size</span>(boots)</span></code></pre></div>
   <guid>https://mm218.dev/posts/2022-10-04-rsample/index.html</guid>
   <pubDate>Tue, 04 Oct 2022 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2022-10-04-rsample/splash.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>I know what I did last summer</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2022-08-15-last-summer/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<p>I’m wrapping up three months as an open-source intern with <a href="https://posit.co/">Posit</a> (née <a href="https://www.rstudio.com/">RStudio</a>). I wanted to write a small post talking a bit about what it was like and what we got done in that timespan. So, well, this post<sup>1</sup>.</p>
-<section id="the-job-itself" class="level1">
-<h1>The Job Itself</h1>
-<p>Let’s not bury the lede: this internship was an absolute blast.</p>
-<p>I could not have asked to work with a better group than the tidymodels team, who are all consistently fantastic people. It’s rare to find a group this consistently brilliant, and more importantly also this consistently friendly, inclusive, and welcoming. Working directly with Hannah Frick and Julia Silge was absolutely incredible; I highly recommend it for anyone if the opportunity comes up.</p>
-<p>The internship started off with an in-person work week (at the <em>beautiful</em> Boston office<sup>2</sup>), and then more or less wrapped up with the last ever<sup>3</sup> RStudio::conf() (perhaps the best in-person conference experience I’ve had). This was a fantastic way to structure what was otherwise a fully remote position, and I’m extremely appreciative of getting to work with the team both in-person and remotely over the span of the internship.</p>
-<p>It was a great few months, I learned a lot – about programming and design, sure, but also about technical communication, working in the open, interacting with an open source community, and more.</p>
-<p>And we did some really cool things! Speaking of which…</p>
-</section>
-<section id="the-things-we-did" class="level1">
-<h1>The Things We Did</h1>
-<p>Alright, time for some pretty blatant bragging. Sorry. But we did some really, really cool stuff the past few months.</p>
-<section id="spatialsample" class="level2">
-<h2 class="anchored" data-anchor-id="spatialsample">spatialsample</h2>
-<p>The main thrust (and originally, the entire scope) of the internship was writing the <a href="https://spatialsample.tidymodels.org/">spatialsample</a> package for spatial cross-validation. While not an entirely new package (the first version hit CRAN in 2021), by the end of June we had added support for:</p>
-<ul>
-<li>sf objects (and more correct distance calculations with geographic coordinates)</li>
-<li>exclusion buffers around assessment folds</li>
-<li>inclusion radii around assessment folds</li>
-<li>spatial clustering with more than just k-means clustering</li>
-<li>spatially buffered V-fold CV</li>
-<li>leave-location-out CV</li>
-<li>spatial block CV</li>
-<li>automatic plotting</li>
-</ul>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-08-15-last-summer/autoplot.png" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">The results of calling <code>autoplot()</code> on a spatial clustering CV object, for the city of Boston.</figcaption>
-</figure>
-</div>
-<p>That meant a pretty huge update to the package, and that version was released <a href="https://www.tidyverse.org/blog/2022/06/spatialsample-0-2-0/">on CRAN as version 0.2.0</a>. A small patch to speed up buffering, work better with simulated data, and make me the official package maintainer as Julia moves to focus more on ModelOps just hit CRAN last Friday.</p>
-<p>I also wrote <a href="https://spatialsample.tidymodels.org/articles/buffering.html">a package vignette</a> on spatial buffering, and <a href="https://www.tidymodels.org/learn/work/multi-scale/">an article for tidymodels.org</a> on how to use spatialsample for multi-scale model assessment.</p>
-<p>We chose to not release spatialsample 1.0.0 as part of the broader tidymodels 1.0.0 release because the package is still very young – most of its features have only been on CRAN for a month or so, and we want more feedback on what else the package <em>should</em> do and any areas that people think we got wrong. However, I feel really good about where the package is right now, and am really excited to see people use it (and to use it in my own work going forward).</p>
-</section>
-<section id="rsample" class="level2">
-<h2 class="anchored" data-anchor-id="rsample">rsample</h2>
-<p>After the spatialsample release, I had the opportunity to start poking around the open issues on the <a href="https://rsample.tidymodels.org/">rsample</a> package. As rsample is a much more established package, it was important to focus on only the changes we could make without breaking people’s code; with that said, we were able to add a few highly-requested features:</p>
-<ul>
-<li>Improved support for grouped resampling, adding functions for grouped Monte Carlo CV, grouped bootstrap resampling, creating validation sets with groups, and creating initial training/testing splits with groups. This was the most-requested feature still missing from rsample, and it’s a personal point of pride that I was able to implement it (in a way that doesn’t seem awful to maintain).</li>
-<li>Added <code>reverse_splits()</code> to “swap” the analysis and assessment sets of an rsplit or rset object.</li>
-<li>Added <code>reshuffle_rset()</code> to re-generate an rset, using all the same parameters that were used to create it the first time (but potentially, a different random seed). This was the <em>oldest</em> open issue on rsample, and even though it wasn’t in particularly high demand I was very happy to close both the oldest and most requested issues on the package in a single release.</li>
-<li>Standardized the classes and attributes attached to the objects returned by rsample functions.</li>
-</ul>
-<p>I also added a new <a href="https://rsample.tidymodels.org/dev/articles/Common_Patterns.html">overview vignette</a> covering some of the most commonly used functions in the package, which I think will be a good first point of entry for a lot of users.</p>
-<p>All of this hit CRAN as <a href="https://cran.r-project.org/package=rsample">rsample 1.1.0</a> on Monday. I’m particularly excited for the grouped resampling functions to hit CRAN, since I think those will solve a very common use-case for a lot of people working with repeated measures data.</p>
-</section>
-<section id="waywiser" class="level2">
-<h2 class="anchored" data-anchor-id="waywiser">waywiser</h2>
-<p>On top of these resampling projects, I’ve also been noodling on a new package in my personal namespace, called <a href="https://mikemahoney218.github.io/waywiser/">waywiser</a>. This is a <a href="https://yardstick.tidymodels.org/">yardstick</a> extension package<sup>4</sup> focused on helping people assess spatial autocorrelation in model residuals.</p>
-<p>Version 0.1.0 is inching along to CRAN at the moment, as I clean off a few last new package checks, and should be viewed as mostly experimental – I’m currently figuring out how I can get spatial information from inside of <code>tune::fit_resamples()</code>, and the default neighbor lists and weights matrices will probably be outsourced to <a href="https://sfdep.josiahparry.com/">sfdep</a> in the next version. But it exists!</p>
-</section>
-</section>
-<section id="and-another-thing" class="level1">
-<h1>And Another Thing</h1>
-<p>I also did a few other (less RStudio related) things over the past few months:</p>
-<ul>
-<li>Made a <a href="https://github.com/mikemahoney218/quarto-arxiv">Quarto template</a> that imitates the <a href="https://pkgs.rstudio.com/rticles/">rticles</a> arXiv template.<sup>5</sup></li>
-<li>Published <a href="https://doi.org/10.1080/15481603.2022.2103069">“Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass in heterogenous landscapes”</a> in GIScience and Remote Sensing<sup>6</sup>.</li>
-<li>Wrote a book chapter (“AI for Shrubland Identification and Mapping”) based on our <a href="https://arxiv.org/abs/2205.05047">shrubland research</a> for a forthcoming book on AI in Earth science. I’ll share more about that when it becomes more public.</li>
-<li>Helped run the virtual side of the <a href="https://2022esipjulymeeting.sched.com/info">ESIP 2022 July Meeting</a>.
-<ul>
-<li>Also, helped organize a session entitled <a href="https://2022esipjulymeeting.sched.com/event/12etz/ai-for-all-people-how-to-make-ai-useful-for-earth-science-applications">“AI for All People: How to make AI useful for Earth science applications?”</a> at the ESIP July meeting.</li>
-<li>Also also, gave a talk (<a href="https://mm218.dev/esip2022">“Building trust in AI outputs: Approaches from NY’s forest carbon monitoring program”</a>) at that session.</li>
-</ul></li>
-<li>Published a guest blog, <a href="https://www.esipfed.org/merge/student-fellow-blog/trust-in-machine-learning-guest-blog">“Building Trust in Machine Learning Outputs”</a>, on the ESIP website.</li>
-<li>Gave a talk <a href="mm218.dev/user2022">“unifir: A unifying API for interacting with Unity from R”</a> at useR! 2022</li>
-<li>Helped write a talk, <a href="https://mikemahoney218.github.io/2022-06-20_NAFEW_ground_filtering/slides.html#1">“Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass”</a>, for the 2022 North American Forest Ecology Workshop. The talk was given by my fantastic colleague <a href="https://www.lucaskjohnson.com/">Lucas Johnson</a>.</li>
-</ul>
-<p>It’s been a very fun few months! Here’s to a good back third of the year.</p>
-
-
-</section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>By the way, the title of this post is a joke about a 25 year old horror film: <a href="https://en.wikipedia.org/wiki/I_Know_What_You_Did_Last_Summer" class="uri">https://en.wikipedia.org/wiki/I_Know_What_You_Did_Last_Summer</a>↩︎</p></li>
-<li id="fn2"><p>I was in the middle of moving to Boston at this point, and this work week took place towards the end of May. So I did a very funny thing where I drove from Syracuse to Boston, stayed in a beautiful hotel and went to the office every day, then drove back to Syracuse on Sunday… only to drive back to Boston two days later, move into a slightly less beautiful apartment, and never go to the office again.↩︎</p></li>
-<li id="fn3"><p>I feel the need to clarify this is a joke; next year’s conference will be posit::conf() following the company’s name change. I had been joking that Hadley should kick off the announcement with “I do have some major news to share: this will be the last ever RStudio::conf()”, but that would probably have unleashed a purely irresponsible level of panic on Twitter.↩︎</p></li>
-<li id="fn4"><p>And “waywiser” is an old name for a surveyor’s wheel, get it?↩︎</p></li>
-<li id="fn5"><p>Which is not itself actually affiliated with arXiv at all, but rather <a href="https://github.com/kourgeorge/arxiv-style">a modified version of the NeurIPS template published by an individual researcher</a>. This is confusing; I decided that continuing to refer to it as an “arXiv template” was the least confusing option, but maybe the template should actually be called “preprint template” instead. It’s a very nice template, I like it a lot.↩︎</p></li>
-<li id="fn6"><p>This link doesn’t work at the time of publication, but will <em>eventually</em> point to the article once the online version gets published.↩︎</p></li>
-</ol>
-</section></div> ]]></description>
-  <category>R</category>
-  <category>Internship</category>
-  <category>Quarto</category>
-  <guid>https://mm218.dev/posts/2022-08-15-last-summer/index.html</guid>
-  <pubDate>Fri, 12 Aug 2022 00:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2022-08-15-last-summer/autoplot.png" medium="image" type="image/png" height="89" width="144"/>
 </item>
 </channel>
 </rss>

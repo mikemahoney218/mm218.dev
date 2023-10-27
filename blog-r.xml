@@ -10,7 +10,703 @@
 <atom:link href="https://mm218.dev/blog-r.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Thu, 26 Oct 2023 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 27 Oct 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Executing R code from untrusted sources in minimal environments</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2023-10-27-minimal-environments/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>Yesterday we released <a href="https://github.com/Permian-Global-Research/rsi">rsi</a>, an R package that (among other things) makes it easy to retrieve spectral indices from the <a href="https://github.com/davemlz/awesome-spectral-indices">Awesome Spectral Indices</a> project and calculate them against any images you have on hand.</p>
+<p>The actual code required to do these calculations is mostly just a bit of glue. The ASI project provides the formulas you’d use to calculate any spectral indices you might be interested in, which as relatively simple arithmetic are easily <a href="https://www.mm218.dev/posts/2023-10-24-fun-r-funcs/#str2lang">transformed into R code via <code>str2lang()</code></a>.</p>
+<p>Once we’ve done that transformation, we can evaluate that R code against our images through a slightly off-label use of <code>terra::predict()</code>. This function loads chunks of our raster into R as a data frame with column names corresponding to our band labels, meaning that if we’re careful to ensure that our band names align with the standardized band names used by ASI<sup>1</sup> we can compute indices by evaluating their formulas “with” the data frame.</p>
+<p>This sounds complex, but doesn’t actually require that much code to put together:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">calculate_indices <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(raster,</span>
+<span id="cb1-2">                              indices,</span>
+<span id="cb1-3">                              output_filename) {</span>
+<span id="cb1-4">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">if</span> (<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">inherits</span>(raster, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SpatRaster"</span>)) raster <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(raster)</span>
+<span id="cb1-5">  formulas <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(indices[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"formula"</span>]], str2lang)</span>
+<span id="cb1-6">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(</span>
+<span id="cb1-7">    raster,</span>
+<span id="cb1-8">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(),</span>
+<span id="cb1-9">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(model, newdata) {</span>
+<span id="cb1-10">      out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(formulas, \(calc) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span>(newdata, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval</span>(calc)))</span>
+<span id="cb1-11">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(out) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> indices[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"short_name"</span>]]</span>
+<span id="cb1-12">      out</span>
+<span id="cb1-13">    },</span>
+<span id="cb1-14">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">filename =</span> output_filename</span>
+<span id="cb1-15">  )</span>
+<span id="cb1-16">  output_filename</span>
+<span id="cb1-17">}</span></code></pre></div>
+</div>
+<p>Turn our formulas into calls, load our raster into R chunk by chunk, evaluate those calls in the context of our raster, lather rinse repeat. The conceptual complexity here is a lot higher, in my view, than the code complexity.</p>
+<p>Because this code is pretty straightforward, and relies on the fantastic, highly-optimized <a href="https://github.com/rspatial/terra">terra package</a> to actually do these computations, we’re able to calculate these indices <em>fast</em>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">example_index <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> rsi<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spectral_indices</span>()</span>
+<span id="cb2-2">example_index <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> example_index[example_index<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>short_name <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"DPDD"</span>, ]</span>
+<span id="cb2-3"></span>
+<span id="cb2-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.time</span>({</span>
+<span id="cb2-5">  out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb2-6">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rasters/example_sentinel1.tif"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rsi"</span>),</span>
+<span id="cb2-7">    example_index,</span>
+<span id="cb2-8">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb2-9">  )</span>
+<span id="cb2-10">})</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   user  system elapsed 
+  1.679   0.028   1.707 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(out))</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This is pretty nifty!</p>
+<p>That said, we should be careful about what text we’re willing to turn into R code and execute. In particular, rsi is designed to integrate nicely with the Awesome Spectral Indices project, and to retrieve and compute the ASI set of indices – which, phrased differently, means we’re downloading code from the internet and running it on our computers. If someone were to mess with our indices – either by corrupting the GitHub repository or by editing the cached file on your machine – this could wind up giving them access to <code>system()</code> or other scary commands:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">evil_index <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> example_index</span>
+<span id="cb5-2">evil_index<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>formula <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"system('echo oh no &gt; /tmp/example.txt')"</span></span>
+<span id="cb5-3"></span>
+<span id="cb5-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(</span>
+<span id="cb5-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb5-6">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rasters/example_sentinel1.tif"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rsi"</span>),</span>
+<span id="cb5-7">    evil_index,</span>
+<span id="cb5-8">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb5-9">  ),</span>
+<span id="cb5-10">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">silent =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span></span>
+<span id="cb5-11">)</span>
+<span id="cb5-12"></span>
+<span id="cb5-13"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">readLines</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"/tmp/example.txt"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "oh no"</code></pre>
+</div>
+</div>
+<p>So, how can we make this safer?</p>
+<p>One way is by taking away the number of toys any malicious code has available to play with. We can do this by running the code in a locked-down environment, where it won’t have access to functions that might let code mess with our machine.</p>
+<p>One way of creating a locked down environment is <code>rlang::new_environment()</code>. By default, this function creates a new environment with nothing in it – no built-in functions or objects:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ls</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">envir =</span> rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_environment</span>())</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>character(0)</code></pre>
+</div>
+</div>
+<p>This environment is also going to have the empty environment as its parent, meaning that code executed in this scope won’t be able to use functions or objects from the global environment<sup>2</sup>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># inheriting from the global environment</span></span>
+<span id="cb9-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">local</span>(</span>
+<span id="cb9-3">  <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>,</span>
+<span id="cb9-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new.env</span>()</span>
+<span id="cb9-5">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># inheriting from the empty environment</span></span>
+<span id="cb11-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(</span>
+<span id="cb11-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">local</span>(</span>
+<span id="cb11-4">    <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>,</span>
+<span id="cb11-5">    rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_environment</span>()</span>
+<span id="cb11-6">  )</span>
+<span id="cb11-7">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in 2 + 2 : could not find function "+"</code></pre>
+</div>
+</div>
+<p>That means that any code we run inside of this new environment will only have access to whatever functions and variables we purposefully include in the environment. The <code>data</code> argument to <code>rlang::new_environment()</code> makes it relatively easy to define whatever objects we’re looking to make available in this new environment:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">local</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span> <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>, rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_environment</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">+</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">+</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>)))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 4</code></pre>
+</div>
+</div>
+<p>That means that, if we create a minimal environment containing only the functions and variables essential for calculating our indices, we should hopefully be able to reduce the potential blast radius of malicious code – or at least make it a lot harder for malicious code to impact anything we care about. In rsi, that means we wind up calculating indices inside a minimal environment that looks like this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1">calculate_indices <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(raster,</span>
+<span id="cb15-2">                              indices,</span>
+<span id="cb15-3">                              output_filename) {</span>
+<span id="cb15-4">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">if</span> (<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">!</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">inherits</span>(raster, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"SpatRaster"</span>)) raster <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(raster)</span>
+<span id="cb15-5">  formulas <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(indices[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"formula"</span>]], str2lang)</span>
+<span id="cb15-6">  </span>
+<span id="cb15-7">  exec_env <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">new_environment</span>(</span>
+<span id="cb15-8">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(</span>
+<span id="cb15-9">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">::</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">::</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-10">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-11">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">(</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-12">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">*</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">*</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-13">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">/</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">/</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-14">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">^</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">^</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-15">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">+</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">+</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-16">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">&lt;-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">&lt;-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-17">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">{</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">{</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-18">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">names&lt;-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">names&lt;-</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-19">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">function</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span> <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">=</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span><span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">function</span><span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">`</span>,</span>
+<span id="cb15-20">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">list =</span> list,</span>
+<span id="cb15-21">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lapply =</span> lapply,</span>
+<span id="cb15-22">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">with =</span> with,</span>
+<span id="cb15-23">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">eval =</span> eval,</span>
+<span id="cb15-24">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">formulas =</span> formulas,</span>
+<span id="cb15-25">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">short_names =</span> indices[[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"short_name"</span>]],</span>
+<span id="cb15-26">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">raster =</span> raster,</span>
+<span id="cb15-27">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> output_filename</span>
+<span id="cb15-28">    )</span>
+<span id="cb15-29">  )</span>
+<span id="cb15-30">  </span>
+<span id="cb15-31">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">local</span>(</span>
+<span id="cb15-32">    {</span>
+<span id="cb15-33">      terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(</span>
+<span id="cb15-34">        raster,</span>
+<span id="cb15-35">        <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(),</span>
+<span id="cb15-36">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fun =</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(model, newdata) {</span>
+<span id="cb15-37">          out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(</span>
+<span id="cb15-38">            formulas,</span>
+<span id="cb15-39">            <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(calc) {</span>
+<span id="cb15-40">              <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">with</span>(newdata, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">eval</span>(calc))</span>
+<span id="cb15-41">            }</span>
+<span id="cb15-42">          )</span>
+<span id="cb15-43">          <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(out) <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> short_names</span>
+<span id="cb15-44">          out</span>
+<span id="cb15-45">        },</span>
+<span id="cb15-46">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">filename =</span> output_filename</span>
+<span id="cb15-47">      )</span>
+<span id="cb15-48">    },</span>
+<span id="cb15-49">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">envir =</span> exec_env</span>
+<span id="cb15-50">  )</span>
+<span id="cb15-51">  </span>
+<span id="cb15-52">  output_filename</span>
+<span id="cb15-53">}</span></code></pre></div>
+</div>
+<p>This shouldn’t impact anything from the user’s perspective when calculating well-behaved formulas:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.time</span>({</span>
+<span id="cb16-2">  out <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb16-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rasters/example_sentinel1.tif"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rsi"</span>),</span>
+<span id="cb16-4">    example_index,</span>
+<span id="cb16-5">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb16-6">  )</span>
+<span id="cb16-7">})</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   user  system elapsed 
+  0.015   0.000   0.015 </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(out))</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>But it makes the most obvious malicious code fail:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(</span>
+<span id="cb19-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb19-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rasters/example_sentinel1.tif"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rsi"</span>),</span>
+<span id="cb19-4">    evil_index,</span>
+<span id="cb19-5">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb19-6">  )</span>
+<span id="cb19-7">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in system("echo oh no &gt; /tmp/example.txt") : 
+  could not find function "system"</code></pre>
+</div>
+</div>
+<p>This isn’t a perfect fix – and rsi also checks to make sure that all of your formulas are only using symbols that match the band names of your rasters. Even with these checks, you should investigate the formulas you’re going to run before you actually run them – or save a copy of the trusted indices you’re going to calculate and provide <em>those</em> to <code>calculate_indices()</code>, rather than using <code>spectral_indices()</code> directly. But this hopefully makes this function a pinch safer.</p>
+<p>I wrote this piece of rsi back in August and then more or less didn’t think of it again until yesterday, when we released rsi on GitHub – and at the same time, started using GitHub Actions for CI for the package. All of a sudden, I started seeing a lot of CI runs that looked like this:</p>
+<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/gh.png" class="img-fluid" alt="A screenshot of GitHub Actions, where all workflows -- including R CMD check -- are successful, but test coverage is failing."></p>
+<p>R CMD check succeeding and test coverage failing made no sense to me, as theoretically they’re both running a full check and reporting the results. In classic developer tradition, I spent a few hours flailing around before finally giving up and resorting to the final option I had available: reading the error messages.</p>
+<p>And it turned out that each of those failed test coverage runs had the same error message:</p>
+<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/err.png" class="img-fluid" alt="Expected `... <- NULL` to run without any errors. Actually got a <simpleError> with text: could not find function :::"></p>
+<p><code>could not find function ":::"</code>.</p>
+<p>My test coverage workflow is using the (fantastic) <a href="https://covr.r-lib.org/">covr</a> package to measure line coverage. Behind the scenes, covr is doing a lot more than just running R CMD check, like my other workflows – covr is actually <a href="https://covr.r-lib.org/articles/how_it_works.html">changing what R runs when it runs your code</a>, in order to measure how many times any given line of code gets called. This is a really neat workflow, but it doesn’t play nicely with our minimal environment here; the new code added inside of our <code>local()</code> statement depends upon functions that we didn’t (and aren’t going to) provide to the minimal environment, such as <code>:::</code>. Adding a new environment variable to the test coverage workflow, and skipping tests that ran the <code>local()</code> call when that environment variable was defined, wound up solving the issue.</p>
+
+
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>Which rsi will automatically enforce when using <code>get_*_imagery()</code> functions.↩︎</p></li>
+<li id="fn2"><p>Or any other environments this one inherits from.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>R</category>
+  <category>Tutorials</category>
+  <guid>https://mm218.dev/posts/2023-10-27-minimal-environments/index.html</guid>
+  <pubDate>Fri, 27 Oct 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2023-10-27-minimal-environments/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Introducing rsi</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -7832,1318 +8528,6 @@ font-style: inherit;">4326</span>)</span></code></pre></div>
   <category>terrainr</category>
   <guid>https://mm218.dev/posts/2021/02/terrainr/index.html</guid>
   <pubDate>Wed, 17 Feb 2021 00:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>Model averaging methods: how and why to build ensemble models</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2021/01/model-averaging/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<div class="cell">
-<div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2021/01/model-averaging/model_avg.jpg" class="img-fluid" width="3612"></p>
-</div>
-</div>
-<aside>
-Cartoon components are CC-BY 4.0 Allison Horst (<a href="https://twitter.com/allison_horst/">allison_horst on twitter</a>)
-</aside>
-<section id="introduction" class="level2">
-<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
-<p>Building models is hard. Choosing what models to build can be even harder. With seemingly infinite different modeling approaches to select between (and somehow even more individual implementations), it can be difficult to guess what methods will be the best fit for your data – particularly if you’re working with data that will change over time with new observations or predictors being added to the mix.</p>
-<p>Usually, we disclose this sort of uncertainty with things like confidence intervals and standard errors. Yet when it comes to selecting a single model, we often don’t discuss how confident we are in that model being the <em>right</em> one – instead, we present and report only our final choice as if there was no chance other candidate models would be as good or even better fits.</p>
-<p>Ensemble models prove a way to deal with that uncertainty <span class="citation" data-cites="Wintle">(Wintle et al. 2003)</span>. By averaging predictions from a handful of candidate models, ensembles acknowledge that there might be multiple models that could be used to describe our data – and by weighting the average we can communicate how confident we are in each individual model’s view of the world. Of course, while <a href="https://www.bloomberg.com/graphics/2015-paul-ford-what-is-code/">this is all nice and flowery, it needs to work too</a> – and model averaging delivers, typically reducing prediction errors beyond even above even the best individual component model <span class="citation" data-cites="Dormann">(Dormann et al. 2018)</span>.</p>
-<p>There are a ton of approaches to model averaging<sup>1</sup>. The rest of this post will walk through a few of the simplest – equal-weight averaging, fit-based averages, and model-based combinations – that you can easily implement yourself without needing to worry about slowing down your iteration time or making your modeling code too complex.</p>
-<section id="getting-started" class="level3">
-<h3 class="anchored" data-anchor-id="getting-started">Getting Started</h3>
-<p>We’ll be using the following libraries for data manipulation and visualization:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(dplyr)</span></code></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'dplyr'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:stats':
-
-    filter, lag</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:base':
-
-    intersect, setdiff, setequal, union</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(tidyr)</span>
-<span id="cb5-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(ggplot2)</span>
-<span id="cb5-3"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(knitr)</span></code></pre></div>
-</div>
-<p>Additionally, we’ll be using both <code>ranger</code> and <code>lightgbm</code> to develop component models:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(ranger)</span>
-<span id="cb6-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(lightgbm)</span></code></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'lightgbm'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following object is masked from 'package:dplyr':
-
-    slice</code></pre>
-</div>
-</div>
-<p>And finally, we need the actual data we’re modeling. For this example, we’ll build models predicting the arrival delay of the flights included in the <code>nycflights13</code> package using both flight details and weather data. This next chunk of code will preprocess our data into a model-ready format:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">flights <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> nycflights13<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>flights</span>
-<span id="cb9-2">weather <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> nycflights13<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>weather <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb9-3">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">select</span>(<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span>wind_gust) <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># About 80% missing values, so we'll drop this column</span></span>
-<span id="cb9-4"></span>
-<span id="cb9-5"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># combine the two data frames into one complete set</span></span>
-<span id="cb9-6">flight_data <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> flights <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb9-7">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">left_join</span>(weather,</span>
-<span id="cb9-8">            <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">by =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"year"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"month"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"day"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"origin"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"hour"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"time_hour"</span>)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb9-9">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drop_na</span>()</span>
-<span id="cb9-10"></span>
-<span id="cb9-11">flight_data <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> flight_data <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb9-12">  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Drop 37 pretty dramatic outliers</span></span>
-<span id="cb9-13">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">filter</span>(arr_delay <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&lt;=</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">500</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb9-14">  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Get rid of useless predictors -- </span></span>
-<span id="cb9-15">  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># these each cause problems with at least one of our regressions</span></span>
-<span id="cb9-16">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">select</span>(<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span>year, <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span>time_hour, <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span>minute) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb9-17">  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Skip the work of encoding non-numeric values, to save my poor laptop</span></span>
-<span id="cb9-18">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">select_if</span>(is.numeric)</span></code></pre></div>
-</div>
-<p>And for one final pre-processing step, we’ll split our data into training, validation, and testing sets (sticking 20% into both validation and testing and dumping the rest into training). We’ll be using model performance against the validation set to determine weights for our averages.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">123</span>)</span>
-<span id="cb10-2"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Generate a random sequence to subset our data into train/validate/test splits</span></span>
-<span id="cb10-3">row_index <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sample</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nrow</span>(flight_data), <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nrow</span>(flight_data))</span>
-<span id="cb10-4"></span>
-<span id="cb10-5"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Testing gets the 20% of data with the highest random index values</span></span>
-<span id="cb10-6">flight_testing <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> flight_data[row_index <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&gt;=</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nrow</span>(flight_data) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.8</span>, ]</span>
-<span id="cb10-7"></span>
-<span id="cb10-8"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Validation gets the next highest 20%</span></span>
-<span id="cb10-9">flight_validation <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> flight_data[row_index <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&gt;=</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nrow</span>(flight_data) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.6</span> <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&amp;</span></span>
-<span id="cb10-10">                                   row_index <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&lt;</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nrow</span>(flight_data) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.8</span>, ]</span>
-<span id="cb10-11"></span>
-<span id="cb10-12"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Training gets the rest</span></span>
-<span id="cb10-13">flight_training <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> flight_data[row_index <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&lt;</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nrow</span>(flight_data) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.6</span>, ]</span>
-<span id="cb10-14"></span>
-<span id="cb10-15"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># LightGBM requires matrices, rather than data frames and formulas:</span></span>
-<span id="cb10-16">xtrain <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">as.matrix</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">select</span>(flight_training, <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span>arr_delay))</span>
-<span id="cb10-17">ytrain <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">as.matrix</span>(flight_training[[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"arr_delay"</span>]])</span>
-<span id="cb10-18"></span>
-<span id="cb10-19">xvalid <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">as.matrix</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">select</span>(flight_validation, <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span>arr_delay))</span>
-<span id="cb10-20">xtest <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">as.matrix</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">select</span>(flight_testing, <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span>arr_delay))</span></code></pre></div>
-</div>
-<p>So with that out of the way, it’s time to start training our models!</p>
-</section>
-</section>
-<section id="component-models" class="level2">
-<h2 class="anchored" data-anchor-id="component-models">Component Models</h2>
-<section id="linear-model" class="level3">
-<h3 class="anchored" data-anchor-id="linear-model">Linear Model</h3>
-<p>Let’s start off with a simple linear regression model, using all of our predictors in the flight dataset to try and estimate arrival delays:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1">linear_model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(arr_delay <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> ., flight_training)</span>
-<span id="cb11-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summary</span>(linear_model)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>
-Call:
-lm(formula = arr_delay ~ ., data = flight_training)
-
-Residuals:
-    Min      1Q  Median      3Q     Max 
--58.895  -9.133  -1.538   7.076 159.388 
-
-Coefficients:
-                  Estimate  Std. Error  t value           Pr(&gt;|t|)    
-(Intercept)    -4.61324673  5.99244467   -0.770           0.441394    
-month           0.03825040  0.01117238    3.424           0.000618 ***
-day             0.02220492  0.00410860    5.404 0.0000000650770797 ***
-dep_time        0.00009509  0.00027953    0.340           0.733722    
-sched_dep_time -0.00349249  0.00189448   -1.844           0.065257 .  
-dep_delay       1.01251264  0.00106768  948.332            &lt; 2e-16 ***
-arr_time        0.00088164  0.00011818    7.460 0.0000000000000868 ***
-sched_arr_time -0.00471343  0.00014783  -31.884            &lt; 2e-16 ***
-flight         -0.00004692  0.00002541   -1.846           0.064863 .  
-air_time        0.75629859  0.00307431  246.006            &lt; 2e-16 ***
-distance       -0.09791613  0.00039245 -249.500            &lt; 2e-16 ***
-hour            0.59997173  0.18707035    3.207           0.001341 ** 
-temp            0.11726625  0.02231781    5.254 0.0000001487014873 ***
-dewp            0.03632142  0.02404661    1.510           0.130928    
-humid           0.01860018  0.01228626    1.514           0.130053    
-wind_dir       -0.00607627  0.00040085  -15.158            &lt; 2e-16 ***
-wind_speed      0.19198999  0.00753768   25.471            &lt; 2e-16 ***
-precip         26.88470146  3.01386317    8.920            &lt; 2e-16 ***
-pressure       -0.01634187  0.00561852   -2.909           0.003631 ** 
-visib          -0.46031686  0.03238825  -14.212            &lt; 2e-16 ***
----
-Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
-
-Residual standard error: 14.82 on 170687 degrees of freedom
-Multiple R-squared:  0.8707,    Adjusted R-squared:  0.8707 
-F-statistic: 6.048e+04 on 19 and 170687 DF,  p-value: &lt; 2.2e-16</code></pre>
-</div>
-</div>
-<p>Cool! We have our first model – and it seems to be a pretty ok fit, with an R^2 of 0.87. We could probably make this model better by being a bit more selective with our terms or throwing in some interaction terms – but as a first stab at a model that we’ll incorporate into our average, this is pretty alright.</p>
-<p>Of course, we want to make sure this model can generalize outside of the data it was trained with – let’s use it to make predictions against our validation set, too:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1">flight_validation<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>lm_pred <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">predict</span>(</span>
-<span id="cb13-2">  linear_model,</span>
-<span id="cb13-3">  <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">newdata =</span> flight_validation</span>
-<span id="cb13-4">)</span>
-<span id="cb13-5"></span>
-<span id="cb13-6"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sqrt</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>((flight_validation<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>lm_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span> flight_validation<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>arr_delay)<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>))</span>
-<span id="cb13-7"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summary</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(arr_delay <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> lm_pred, flight_validation))<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>r.squared</span></code></pre></div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 14.73962</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.8684178</code></pre>
-</div>
-</div>
-<p>R^2 remains at about 0.87 and RMSE comes in at about 14.74 minutes – which, considering delays in the validation set range from -75 to 485 minutes, feels not too bad for a naively implemented linear model.</p>
-</section>
-<section id="random-forest" class="level3">
-<h3 class="anchored" data-anchor-id="random-forest">Random Forest</h3>
-<p>So we have our first model sorted, but we need more than that to take an average! While we could average out a number of linear models with different parameters, it feels more interesting to combine a few different algorithms as component models. So let’s use <a href="https://github.com/imbs-hl/ranger">ranger</a> to implement a random forest to represent our data – fair warning, this one takes a little while to train!</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1">ranger_model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> ranger<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ranger</span>(arr_delay <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> ., <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> flight_training)</span>
-<span id="cb16-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sqrt</span>(ranger_model<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>prediction.error)</span>
-<span id="cb16-3">ranger_model<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>r.squared</span></code></pre></div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 11.08573</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9276561</code></pre>
-</div>
-</div>
-<p>So this model has an RMSE of 11.09 and an R^2 of 0.93 – an improvement over our linear model! While we could eke out some improvements with careful tuning, it looks like this version is a good enough fit to use as an example in our ensemble. As before, we want to check out how well this model generalizes by using it to generate predictions for our validation set:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1">ranger_predictions <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">predict</span>(</span>
-<span id="cb19-2">    ranger_model,</span>
-<span id="cb19-3">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> flight_validation</span>
-<span id="cb19-4">  )</span>
-<span id="cb19-5"></span>
-<span id="cb19-6">flight_validation<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>ranger_pred <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> ranger_predictions<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>predictions</span>
-<span id="cb19-7"></span>
-<span id="cb19-8"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sqrt</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>((flight_validation<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>ranger_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span> flight_validation<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>arr_delay)<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>))</span>
-<span id="cb19-9"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summary</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(arr_delay <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> ranger_pred, flight_validation))<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>r.squared</span></code></pre></div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 10.96209</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9302306</code></pre>
-</div>
-</div>
-<p>Our model actually performs (extremely) slightly better on the validation set!</p>
-</section>
-<section id="gbm" class="level3">
-<h3 class="anchored" data-anchor-id="gbm">GBM</h3>
-<p>So that’s two models sorted! For completeness sake, let’s implement a third and final component model, this time using the <a href="https://github.com/microsoft/LightGBM/tree/master/R-package">LightGBM</a> package to fit a gradient boosting machine. Similar to the last two, we won’t do a ton to parameterize this model – the only change I’ll make to the model fit defaults is to use 100 rounds, to let the boosting algorithm get into the same performance range as our other two models.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1">lightgbm_model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> lightgbm<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lightgbm</span>(xtrain, </span>
-<span id="cb22-2">                                     ytrain, </span>
-<span id="cb22-3">                                     <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">nrounds =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">100</span>, </span>
-<span id="cb22-4">                                     <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">obj =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"regression"</span>, </span>
-<span id="cb22-5">                                     <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">metric =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"rmse"</span>,</span>
-<span id="cb22-6">                                     <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Suppress output</span></span>
-<span id="cb22-7">                                     <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">force_col_wise =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">TRUE</span>,</span>
-<span id="cb22-8">                                     <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">verbose =</span> 0L)</span></code></pre></div>
-</div>
-<p>The <code>lightgbm_model</code> doesn’t have the same easy method for evaluating in-bag performance as our linear model and random forests did. We’ll skip right to the validation set instead:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1">flight_validation<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>lightgbm_pred <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">predict</span>(</span>
-<span id="cb23-2">  lightgbm_model,</span>
-<span id="cb23-3">  xvalid</span>
-<span id="cb23-4">)</span>
-<span id="cb23-5"></span>
-<span id="cb23-6"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sqrt</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>((flight_validation<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>lightgbm_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span> flight_validation<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>arr_delay)<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>))</span>
-<span id="cb23-7"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summary</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(arr_delay <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> lightgbm_pred, flight_validation))<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>r.squared</span></code></pre></div>
-</div>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 10.4088</code></pre>
-</div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.9347398</code></pre>
-</div>
-</div>
-<p>So it looks like LightGBM model performs about as well (if not marginally better than) our random forest! For reference, here are the RMSE values from each of our candidate models:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1">prediction_values <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> flight_validation <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb26-2">  <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Only select our y and y-hat columns</span></span>
-<span id="cb26-3">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">select</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ends_with</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"pred"</span>), <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">matches</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"arr_delay"</span>))</span>
-<span id="cb26-4"></span>
-<span id="cb26-5">prediction_plots <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> prediction_values <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb26-6">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">pivot_longer</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">cols =</span> <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span>arr_delay) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb26-7">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">name =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">regmatches</span>(name, <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">regexpr</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">".*(?=_pred)"</span>, name, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">perl =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">TRUE</span>)),</span>
-<span id="cb26-8">         <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">resid =</span> value <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span> arr_delay,</span>
-<span id="cb26-9">         <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">name =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">factor</span>(name, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">levels =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"lightgbm"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"ranger"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"lm"</span>)))</span>
-<span id="cb26-10"></span>
-<span id="cb26-11">prediction_plots <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb26-12">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">group_by</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">Model =</span> name) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb26-13">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summarise</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">RMSE =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sqrt</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>(resid<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>)), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">.groups =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"drop"</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb26-14">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">arrange</span>(RMSE) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb26-15">  knitr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">kable</span>()</span></code></pre></div>
-<div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Model</th>
-<th style="text-align: right;">RMSE</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">lightgbm</td>
-<td style="text-align: right;">10.40880</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">ranger</td>
-<td style="text-align: right;">10.96209</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">lm</td>
-<td style="text-align: right;">14.73962</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<p>Of course, individual metrics don’t tell the whole story – it can be helpful to look at diagnostic plots of our predictions to try and understand patterns in how our predictions match the data. For instance, “linear models are about four minutes worse on average” is all well and good in the abstract, but graphics like the one below can help us see that – for instance – linear models tend to do a bit worse around 0 minute delays (where most of the data is clustered) while our random forest performs worse on higher extremes:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1">prediction_plots <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb27-2">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">aes</span>(value, arr_delay)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb27-3">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.05</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span></span>
-<span id="cb27-4">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_abline</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">slope =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">intercept =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"red"</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb27-5">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">facet_wrap</span>(<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> name) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb27-6">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_minimal</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb27-7">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Predicted"</span>,</span>
-<span id="cb27-8">       <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Actual"</span>)</span></code></pre></div>
-<div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2021/01/model-averaging/index_files/figure-html/ggplot-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</section>
-</section>
-<section id="model-averaging" class="level2">
-<h2 class="anchored" data-anchor-id="model-averaging">Model Averaging</h2>
-<p>With our candidate models in tow, we’re now fully ready to move on to model averaging methods! We’ll walk through basic implementations of three methods (equal weighting, fit-based weights, and model-based estimates) and then evaluate our ensembles at the end.</p>
-<section id="equal-weights" class="level3">
-<h3 class="anchored" data-anchor-id="equal-weights">Equal Weights</h3>
-<p>Perhaps the most obvious way to average models is to take the simple arithmetic mean of your model predictions. This method presupposes that each of your models are equally good representations of your underlying data; since that isn’t the case here, we might expect this method to not substantially reduce error overall.</p>
-<p>A benefit of this method, though, is that implementation takes no time at all:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1">prediction_values <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> prediction_values <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb28-2">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">equal_weight_pred =</span> (lm_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> ranger_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> lightgbm_pred) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">3</span>)</span></code></pre></div>
-</div>
-</section>
-<section id="fit-based-weights" class="level3">
-<h3 class="anchored" data-anchor-id="fit-based-weights">Fit-Based Weights</h3>
-<p>A slightly more involved method is to weight models based on some metric of their performance. Almost any metric with a standard definition across component models can be used (so for instance, AIC or BIC with nested models or MSE and MAPE); as we’ve been using RMSE so far, we’ll use it to weight our errors.</p>
-<p>Weighting models based on fit statistics is also relatively easy in the grand scheme of data science. First, calculate the fit statistic for each of your models:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1">model_rmse <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">vapply</span>(</span>
-<span id="cb29-2">  prediction_values,</span>
-<span id="cb29-3">  <span class="cf" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">function</span>(x) <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sqrt</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>((x <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span> prediction_values<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>arr_delay)<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>)),</span>
-<span id="cb29-4">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">numeric</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>)</span>
-<span id="cb29-5">  )[<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">3</span>] <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Only our 3 component models!</span></span>
-<span id="cb29-6">model_rmse</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>      lm_pred   ranger_pred lightgbm_pred 
-     14.73962      10.96209      10.40880 </code></pre>
-</div>
-</div>
-<p>Then, depending on your statistic, you may need to take the reciprocal of each value – as lower RMSEs are better, we need to do so here:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1">rmse_weights <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> (<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span> <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> (model_rmse))</span></code></pre></div>
-</div>
-<p>Lastly, calculate your weights as proportion of the whole set of – you can view these values as the proportion of the ensemble prediction contributed by each component:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb32" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1">rmse_weights <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> rmse_weights <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sum</span>(rmse_weights)</span>
-<span id="cb32-2">rmse_weights</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>      lm_pred   ranger_pred lightgbm_pred 
-    0.2659099     0.3575422     0.3765479 </code></pre>
-</div>
-</div>
-<p>Making predictions with the ensemble is then relatively easy – just multiply each of your predicted values by their proportion and sum the results:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb34" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1">prediction_values <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> prediction_values <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb34-2">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fit_based_pred =</span> ((lm_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> rmse_weights[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"lm_pred"</span>]) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb34-3">                             (ranger_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> rmse_weights[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"ranger_pred"</span>]) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb34-4">                             (lightgbm_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> rmse_weights[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"lightgbm_pred"</span>])))</span></code></pre></div>
-</div>
-</section>
-<section id="model-based-weights" class="level3">
-<h3 class="anchored" data-anchor-id="model-based-weights">Model-Based Weights</h3>
-<p>The last averaging method we’ll walk through is a little more involved, but still pretty comprehensible: take your model outputs, turn around, and use them as model inputs.</p>
-<p><img src="https://mm218.dev/posts/2021/01/model-averaging/Inception-image.jpeg" class="img-fluid"></p>
-<p>Our toy example here is a pretty good fit for this method – we already saw in our graphics that a strong linear relationship exists between our predictions and the true value, and this relationship is a little different for each model:</p>
-<div class="cell">
-<div class="cell-output cell-output-stderr">
-<pre><code>`geom_smooth()` using formula 'y ~ x'</code></pre>
-</div>
-<div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2021/01/model-averaging/index_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<p>From this plot, we can guess that a linear model combining our component predictions as features will be a good fit<sup>2</sup> for averaging these models. To do so, we simply need to build a linear model:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb36" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1">predictions_model <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(arr_delay <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> lm_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> ranger_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> lightgbm_pred, </span>
-<span id="cb36-2">                        <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> prediction_values)</span></code></pre></div>
-</div>
-<p>And then use it to generate predictions just like our original component linear model:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1">prediction_values<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>model_based_pred <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">predict</span>(</span>
-<span id="cb37-2">  predictions_model,</span>
-<span id="cb37-3">  <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">newdata =</span> prediction_values</span>
-<span id="cb37-4">)</span></code></pre></div>
-</div>
-<p>Note that if we saw non-linear relationships between our predictions and true values, we’d want to rely on non-linear methods to average out predictions; it just so happens that our models are already pretty strong fits for the underlying data and can be well-represented with simple linear regression.</p>
-</section>
-</section>
-<section id="howd-we-do" class="level2">
-<h2 class="anchored" data-anchor-id="howd-we-do">How’d We Do?</h2>
-<p>Now that we have our ensemble models prepared, it’s time to evaluate all of our models out against our testing set!</p>
-<p>The first step is to generate predictions for the test set using our component models:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb38" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1">flight_testing<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>lm_pred <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">predict</span>(</span>
-<span id="cb38-2">  linear_model,</span>
-<span id="cb38-3">  <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">newdata =</span> flight_testing</span>
-<span id="cb38-4">)</span>
-<span id="cb38-5"></span>
-<span id="cb38-6">ranger_predictions <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">predict</span>(</span>
-<span id="cb38-7">    ranger_model,</span>
-<span id="cb38-8">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> flight_testing</span>
-<span id="cb38-9">  )</span>
-<span id="cb38-10"></span>
-<span id="cb38-11">flight_testing<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>ranger_pred <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> ranger_predictions<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>predictions</span>
-<span id="cb38-12"></span>
-<span id="cb38-13">flight_testing<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>lightgbm_pred <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">predict</span>(</span>
-<span id="cb38-14">  lightgbm_model,</span>
-<span id="cb38-15">  xtest</span>
-<span id="cb38-16">)</span></code></pre></div>
-</div>
-<p>We can use those predictions to generate our ensemble predictions. Note that we’re still using the weights and models calibrated on the validation data – we (theoretically) shouldn’t know the “true” values for the test set, so we can’t re-weight our averages now!</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb39" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1">flight_testing <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> flight_testing <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb39-2">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">equal_weight_pred =</span> (lm_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> ranger_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> lightgbm_pred) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">3</span>)</span>
-<span id="cb39-3"></span>
-<span id="cb39-4">flight_testing <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> flight_testing <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb39-5">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fit_based_pred =</span> ((lm_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> rmse_weights[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"lm_pred"</span>]) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb39-6">                             (ranger_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> rmse_weights[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"ranger_pred"</span>]) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb39-7">                             (lightgbm_pred <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> rmse_weights[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"lightgbm_pred"</span>])))</span>
-<span id="cb39-8"></span>
-<span id="cb39-9">flight_testing<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>model_based_pred <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">predict</span>(</span>
-<span id="cb39-10">  predictions_model,</span>
-<span id="cb39-11">  <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">newdata =</span> flight_testing</span>
-<span id="cb39-12">)</span></code></pre></div>
-</div>
-<p>So how’d we do? Let’s check out the RMSE for each of our models:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb40" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1">prediction_values <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> flight_testing <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb40-2">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">select</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ends_with</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"pred"</span>), <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">matches</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"arr_delay"</span>))</span>
-<span id="cb40-3"></span>
-<span id="cb40-4">prediction_plots <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> prediction_values <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb40-5">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">pivot_longer</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">cols =</span> <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span>arr_delay) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb40-6">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">name =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">regmatches</span>(name, <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">regexpr</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">".*(?=_pred)"</span>, name, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">perl =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">TRUE</span>)),</span>
-<span id="cb40-7">         <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">resid =</span> value <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span> arr_delay,</span>
-<span id="cb40-8">         <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">name =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">factor</span>(name, </span>
-<span id="cb40-9">                       <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">levels =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"lightgbm"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"ranger"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"lm"</span>,</span>
-<span id="cb40-10">                                  <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"model_based"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"fit_based"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"equal_weight"</span>)))</span>
-<span id="cb40-11"></span>
-<span id="cb40-12">prediction_plots <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb40-13">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">group_by</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">Model =</span> name) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb40-14">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summarise</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">RMSE =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sqrt</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mean</span>(resid<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">^</span><span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>)), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">.groups =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"drop"</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb40-15">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">arrange</span>(RMSE) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb40-16">  knitr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">kable</span>()</span></code></pre></div>
-<div class="cell-output-display">
-<table class="table table-sm table-striped small">
-<thead>
-<tr class="header">
-<th style="text-align: left;">Model</th>
-<th style="text-align: right;">RMSE</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">model_based</td>
-<td style="text-align: right;">9.492409</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">lightgbm</td>
-<td style="text-align: right;">10.290113</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">ranger</td>
-<td style="text-align: right;">10.968544</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">fit_based</td>
-<td style="text-align: right;">11.057728</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">equal_weight</td>
-<td style="text-align: right;">11.311836</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">lm</td>
-<td style="text-align: right;">14.621943</td>
-</tr>
-</tbody>
-</table>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb41" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1">prediction_plots <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb41-2">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">aes</span>(value, arr_delay)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb41-3">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_point</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">alpha =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.05</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span></span>
-<span id="cb41-4">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_abline</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">slope =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">intercept =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"red"</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb41-5">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">facet_wrap</span>(<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> name) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb41-6">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_minimal</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb41-7">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">labs</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Predicted"</span>,</span>
-<span id="cb41-8">       <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Actual"</span>)</span></code></pre></div>
-<div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2021/01/model-averaging/index_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<p>Cool – our model-based ensemble actually performed better than any of the components! While the equal weight and fit-based averages were pretty middle-of-the-road, in other settings these methods can also help to reduce bias in predictions and produce estimates with less variance than any of the component models.</p>
-</section>
-<section id="conclusion" class="level2">
-<h2 class="anchored" data-anchor-id="conclusion">Conclusion</h2>
-<p>Model averaging can be a powerful tool for reducing model bias and addressing the implicit uncertainty in attempting to pick the “best” model for a situation. While plenty of complex and computationally expensive approaches to averaging exist – and can greatly improve model performance – simpler ensemble methods can provide the same benefits without necessarily incurring the same costs.</p>
-<hr>
-<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="url" label="comment" theme="github-light" crossorigin="anonymous" async="">
-</script>
-
-
-
-</section>
-
-
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent">
-<div id="ref-Dormann" class="csl-entry">
-Dormann, Carsten F., Justin M. Calabrese, Gurutzeta Guillera-Arroita, Eleni Matechou, Volker Bahn, Kamil Bartoń, Colin M. Beale, et al. 2018. <span>“Model Averaging in Ecology: A Review of Bayesian, Information-Theoretic, and Tactical Approaches for Predictive Inference.”</span> <em>Ecological Monographs</em> 88 (4): 485–504. https://doi.org/<a href="https://doi.org/10.1002/ecm.1309">https://doi.org/10.1002/ecm.1309</a>.
-</div>
-<div id="ref-Wintle" class="csl-entry">
-Wintle, B. A., M. A. McCarthy, C. T. Volinsky, and R. P. Kavanagh. 2003. <span>“The Use of Bayesian Model Averaging to Better Represent Uncertainty in Ecological Models.”</span> <em>Conservation Biology</em> 17 (6): 1579–90. https://doi.org/<a href="https://doi.org/10.1111/j.1523-1739.2003.00614.x">https://doi.org/10.1111/j.1523-1739.2003.00614.x</a>.
-</div>
-</div></section><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>See table 1 of Dormann et. al.&nbsp;for a partial list.↩︎</p></li>
-<li id="fn2"><p>No pun intended.↩︎</p></li>
-</ol>
-</section></div> ]]></description>
-  <category>R</category>
-  <category>Data science</category>
-  <guid>https://mm218.dev/posts/2021/01/model-averaging/index.html</guid>
-  <pubDate>Mon, 18 Jan 2021 00:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2021/01/model-averaging/model_avg.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>
