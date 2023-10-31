@@ -10,7 +10,392 @@
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Fri, 27 Oct 2023 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 31 Oct 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Adding context to maps made with ggplot2</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2023-10-31-map-context/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>A colleague asked me today how they could best add a larger data set for context to a map of a (spatially) smaller data set, without the map expanding to incorporate the whole of the larger data set. I didn’t have a great answer off the top of my head, so this blog post is here to record what we tried, and what wound up working for us!</p>
+<p>Say we’ve got some spatial data set that covers a broad area; for instance, the <code>nc</code> data set from sf that contains the counties of North Carolina:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">suppressPackageStartupMessages</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(sf))</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)</span>
+<span id="cb1-3">nc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"shape/nc.shp"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"sf"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">read_sf</span>()</span>
+<span id="cb1-5"></span>
+<span id="cb1-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(nc) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb1-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We also need a comparatively smaller data set that we’re interested in visualizing. For this blog, simulate some number of observations inside one of the more central counties:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">johnston <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> nc[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">which</span>(nc<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>NAME <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Johnston"</span>), ]</span>
+<span id="cb2-2">johnston_obs <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_sample</span>(johnston, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">500</span>)</span>
+<span id="cb2-3"></span>
+<span id="cb2-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb2-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> johnston) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb2-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> johnston_obs, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Our goal is to add a bit more context to this map by drawing the borders of surrounding counties. The challenge is that ggplot will, by default, expand our visualization to contain the largest layer that we add:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb3-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> nc) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb3-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> johnston_obs, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We could control this using <code>expansion()</code> inside of <code>scale_*_continuous()</code> functions, in order to restrict the range of our visualization:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb4-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> nc) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb4-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> johnston_obs, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb4-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expansion</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.63</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.29</span>))) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb4-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expansion</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.28</span>)))</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>But these <code>expansion()</code> calls are relative to the scale of our larger data set, which makes them a bit difficult to reason about. We aren’t specifying our extents in terms of the data that we actually care about visualizing, we’re forced to specify them relative to the larger context that we don’t care as much about.</p>
+<p>We could make this a bit easier by filtering our larger data set to only observations that are near (or in this case, touching) the area we’re actually trying to visualize:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">neighbors <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> nc[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_touches</span>(johnston, nc)[[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]], ]</span>
+<span id="cb5-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb5-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> neighbors) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb5-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> johnston_obs, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb5-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expansion</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.3</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.25</span>))) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb5-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expansion</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.4</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.25</span>)))</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>But while this <em>reduces</em> the problem, moving the center of the larger layer closer to the center of the layer we care about, it still has the same issue as when we used the entire <code>nc</code> object.</p>
+<p>So what we wound up doing was embracing a little bit of jank and reaching into the ggplot2 internals. We started off by making a “base plot” object that was zoomed out to the level of detail that we wanted:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">base_plot <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(johnston_obs) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb6-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb6-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expansion</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb6-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expansion</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>))</span>
+<span id="cb6-5"></span>
+<span id="cb6-6">base_plot</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Defining our boundaries here is a bit easier to reason about – the <code>expansion()</code> calls are centered on our data of interest and are expanding the scales relative to this focal data set. Once we’ve got our level of zoom where we want it, we can build our plot using <code>ggplot_build()</code> and then extract the ranges of our x and y scales from the constructed plot object:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">base_plot <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot_build</span>(base_plot)</span>
+<span id="cb7-2">xlim <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> base_plot<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>layout<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>panel_params[[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>x_range</span>
+<span id="cb7-3">ylim <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> base_plot<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>layout<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>panel_params[[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>y_range</span></code></pre></div>
+</div>
+<p>We can then use those ranges as limits, to force our final plot to have the same level of zoom as our simple map. That means we can add whatever layers we want to add context to our map, and not need to worry about fiddling with our scales in term of the largest layer we’ve added:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb8-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> nc) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb8-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> johnston_obs, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb8-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> xlim) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb8-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> ylim)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>I have no idea how stable this approach will be – <a href="https://www.tidyverse.org/blog/2022/09/playing-on-the-same-team-as-your-dependecy/">we’re decidedly not playing on the same team as ggplot2</a> with this approach – but it works as of ggplot version 3.4.3, and it’s made making maps a bit easier for us at the moment!</p>
+
+
+
+ ]]></description>
+  <category>R</category>
+  <category>Tutorials</category>
+  <category>Spatial</category>
+  <category>geospatial data</category>
+  <guid>https://mm218.dev/posts/2023-10-31-map-context/index.html</guid>
+  <pubDate>Tue, 31 Oct 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2023-10-31-map-context/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Executing R code from untrusted sources in minimal environments</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -5977,391 +6362,6 @@ font-style: inherit;">TRUE</span></span>
   <guid>https://mm218.dev/posts/2022-11-07-agb/index.html</guid>
   <pubDate>Mon, 07 Nov 2022 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2022-11-07-agb/map.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>How rsample keeps memory usage low</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2022-10-04-rsample/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<p>A few months back, I wrote two comments on <a href="https://github.com/tidymodels/rsample/issues/335">a GitHub issue</a> explaining a bit of how <a href="https://rsample.tidymodels.org/">rsample</a> works under the hood. Specifically, a user asked how rsample keeps the total amount of memory that its resamples use relatively low. I’ve sent this GitHub issue to a few people since then, so it felt like it might be useful enough to turn the issue into a blog.<sup>1</sup></p>
-<section id="whats-an-rsample" class="level2">
-<h2 class="anchored" data-anchor-id="whats-an-rsample">What’s an rsample?</h2>
-<p>In case you’ve never used it, <a href="https://rsample.tidymodels.org/">rsample</a> is an R package for data resampling – if you need bootstrap resampling, V-fold cross-validation, permutation sampling, and more, rsample is meant for you.<sup>2</sup> The majority of these rsample functions return <code>rset</code> objects, which are just jazzed-up tibbles:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">123</span>)</span>
-<span id="cb1-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(rsample)</span>
-<span id="cb1-3"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(mlbench)</span>
-<span id="cb1-4"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">data</span>(LetterRecognition)</span>
-<span id="cb1-5"></span>
-<span id="cb1-6">boots <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">bootstraps</span>(LetterRecognition, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">times =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>)</span>
-<span id="cb1-7">boots</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># Bootstrap sampling 
-# A tibble: 2 × 2
-  splits               id        
-  &lt;list&gt;               &lt;chr&gt;     
-1 &lt;split [20000/7403]&gt; Bootstrap1
-2 &lt;split [20000/7375]&gt; Bootstrap2</code></pre>
-</div>
-</div>
-<p>Each of our individual resamples is stored as an <code>rsplit</code> object, each of which takes up a row in the <code>splits</code> column. Printing these objects tells us how many rows are in our analysis and assessment sets,<sup>3</sup> but hides most of the actual structure of the <code>rsplit</code> object. If we use <code>str()</code> instead, we can see that there are three named elements in each <code>rsplit</code>: <code>data</code>, our original data frame; <code>in_id</code>, which has the indices for which observations are going to be held “in” our analysis set, and <code>out_id</code>, which sometimes<sup>4</sup> has the indices for which observations are going to be held “out” to make up our assessment set, but here is <code>NA</code>:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">boots<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>splits[[<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>]]</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>&lt;Analysis/Assess/Total&gt;
-&lt;20000/7403/20000&gt;</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">str</span>(</span>
-<span id="cb5-2">  boots<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>splits[[<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>]]</span>
-<span id="cb5-3">)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>List of 4
- $ data  :'data.frame': 20000 obs. of  17 variables:
-  ..$ lettr: Factor w/ 26 levels "A","B","C","D",..: 20 9 4 14 7 19 2 1 10 13 ...
-  ..$ x.box: num [1:20000] 2 5 4 7 2 4 4 1 2 11 ...
-  ..$ y.box: num [1:20000] 8 12 11 11 1 11 2 1 2 15 ...
-  ..$ width: num [1:20000] 3 3 6 6 3 5 5 3 4 13 ...
-  ..$ high : num [1:20000] 5 7 8 6 1 8 4 2 4 9 ...
-  ..$ onpix: num [1:20000] 1 2 6 3 1 3 4 1 2 7 ...
-  ..$ x.bar: num [1:20000] 8 10 10 5 8 8 8 8 10 13 ...
-  ..$ y.bar: num [1:20000] 13 5 6 9 6 8 7 2 6 2 ...
-  ..$ x2bar: num [1:20000] 0 5 2 4 6 6 6 2 2 6 ...
-  ..$ y2bar: num [1:20000] 6 4 6 6 6 9 6 2 6 2 ...
-  ..$ xybar: num [1:20000] 6 13 10 4 6 5 7 8 12 12 ...
-  ..$ x2ybr: num [1:20000] 10 3 3 4 5 6 6 2 4 1 ...
-  ..$ xy2br: num [1:20000] 8 9 7 10 9 6 6 8 8 9 ...
-  ..$ x.ege: num [1:20000] 0 2 3 6 1 0 2 1 1 8 ...
-  ..$ xegvy: num [1:20000] 8 8 7 10 7 8 8 6 6 1 ...
-  ..$ y.ege: num [1:20000] 0 4 3 2 5 9 7 2 1 1 ...
-  ..$ yegvx: num [1:20000] 8 10 9 8 10 7 10 7 7 8 ...
- $ in_id : int [1:20000] 18847 18895 2986 1842 3371 11638 4761 6746 16128 2757 ...
- $ out_id: logi NA
- $ id    : tibble [1 × 1] (S3: tbl_df/tbl/data.frame)
-  ..$ id: chr "Bootstrap1"
- - attr(*, "class")= chr [1:2] "boot_split" "rsplit"</code></pre>
-</div>
-</div>
-</section>
-<section id="the-mystery-of-the-missing-mbs" class="level2">
-<h2 class="anchored" data-anchor-id="the-mystery-of-the-missing-mbs">The mystery of the missing MBs</h2>
-<p>So, just looking at this structure, it seems like each <code>rsplit</code> contains a complete copy of our original data. But somehow, to borrow the example from the rsample README, creating a 50-times bootstrap sample doesn’t require 50 times as much memory, but instead about 3x:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_size</span>(LetterRecognition)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>2.64 MB</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">set.seed</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">35222</span>)</span>
-<span id="cb9-2">boots <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">bootstraps</span>(LetterRecognition, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">times =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">50</span>)</span>
-<span id="cb9-3">lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_size</span>(boots)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>6.69 MB</code></pre>
-</div>
-</div>
-<p>Even that top-line result is a little misleading, though, because rsample isn’t copying the data to actually create <code>boots</code>. If we look at the object sizes for both the original data and the resamples together, we can see that <code>boots</code> is only contributing ~4 MB:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1">lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_size</span>(LetterRecognition, boots)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>6.69 MB</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1">lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_sizes</span>(LetterRecognition, boots)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>* 2.64 MB
-* 4.04 MB</code></pre>
-</div>
-</div>
-<p>So: what? How?</p>
-</section>
-<section id="copying-modifying" class="level2">
-<h2 class="anchored" data-anchor-id="copying-modifying">Copying; modifying</h2>
-<p>Well, R uses what’s known as <a href="https://adv-r.hadley.nz/names-values.html">copy-on-modify</a> semantics. That means that, when you assign the same data to multiple variables, each of those variables will actually point at the same address in RAM:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1">LetterRecognition2 <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> LetterRecognition</span>
-<span id="cb15-2"></span>
-<span id="cb15-3">lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_addr</span>(LetterRecognition)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x5573114c93e0"</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1">lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_addr</span>(LetterRecognition2)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "0x5573114c93e0"</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">identical</span>(</span>
-<span id="cb19-2">  lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_addr</span>(LetterRecognition),</span>
-<span id="cb19-3">  lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_addr</span>(LetterRecognition2)</span>
-<span id="cb19-4">)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] TRUE</code></pre>
-</div>
-</div>
-<p>This also means that <code>LetterRecognition2</code> takes up literally 0 space in your RAM:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1">lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_size</span>(LetterRecognition, LetterRecognition2)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>2.64 MB</code></pre>
-</div>
-</div>
-<p>And that will stay true up until we modify either of these objects. No copy is made, no additional RAM gets used, until one of the objects is modified.</p>
-<p>That also means that, right now, <code>LetterRecognition2</code> is another name for the data stored in each of our <code>rsplits</code>:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">identical</span>(</span>
-<span id="cb23-2">  lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_addr</span>(boots<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>splits[[<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>data),</span>
-<span id="cb23-3">  lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_addr</span>(LetterRecognition2)</span>
-<span id="cb23-4">)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] TRUE</code></pre>
-</div>
-</div>
-<p>And if we get rid of <code>LetterRecognition</code>, which both <code>LetterRecognition2</code> and our bootstraps are based off of, those objects will <em>still</em> point at the same address,<sup>5</sup> and our <code>data</code> slot in <code>boots</code> still won’t take up additional space:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">rm</span>(LetterRecognition)</span>
-<span id="cb25-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">gc</span>()</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>          used (Mb) gc trigger (Mb) max used (Mb)
-Ncells  849739 45.4    1358681 72.6  1358681 72.6
-Vcells 2362850 18.1    8388608 64.0  8384745 64.0</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">identical</span>(</span>
-<span id="cb27-2">  lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_addr</span>(boots<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>splits[[<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>data),</span>
-<span id="cb27-3">  lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_addr</span>(LetterRecognition2)</span>
-<span id="cb27-4">)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] TRUE</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1">lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_sizes</span>(LetterRecognition2, boots<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>splits[[<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>data)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>* 2.64 MB
-*     0 B</code></pre>
-</div>
-</div>
-<p>So how does rsample keep its objects so small? By not making extra copies of your data where it doesn’t have to. This is how the entire <code>boots</code> table winds up only adding ~1.5x the space of the original data:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1">lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_sizes</span>(LetterRecognition2, boots)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>* 2.64 MB
-* 4.04 MB</code></pre>
-</div>
-</div>
-<p>And that’s pretty close to as small as this object could get – that’s just the amount of space required to store the indices (in this case, 20,000 indices per repeat, 50 repeats):</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1">lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_size</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sample.int</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">20000</span> <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">50</span>))</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>4.00 MB</code></pre>
-</div>
-</div>
-<p>(The 42kb difference is the attributes we’ve attached to each split – things like its class and ID and so on – but that’s not going to be enough memory to be relevant for most applications.)</p>
-<p>This is also, as it happens, why <code>out_id</code> is set <code>NA</code> in our bootstrap resamples.<sup>6</sup> Because you can figure out which observations we want to “hold out” for the assessment set based on which ones we’re keeping “in” for analysis, rsample doesn’t store those indices for most of its resampling methods.<sup>7</sup></p>
-<p>And one last thought: if you modified <code>LetterRecognition2</code>, <em>then</em> the data in our splits would no longer point at the same address space as the original table. That’s entirely on purpose and desirable, because once you start messing with your original data, your resampling indices are no longer guaranteed to correspond to the original table you used to create them.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1">LetterRecognition2 <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">NA</span></span>
-<span id="cb35-2"></span>
-<span id="cb35-3"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">identical</span>(</span>
-<span id="cb35-4">  lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_addr</span>(boots<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>splits[[<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>data),</span>
-<span id="cb35-5">  lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_addr</span>(LetterRecognition2)</span>
-<span id="cb35-6">)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] FALSE</code></pre>
-</div>
-</div>
-<p>But, as best as possible, rsample will keep the <code>rset</code> small.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1">lobstr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">obj_size</span>(boots)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>6.69 MB</code></pre>
-</div>
-</div>
-
-
-</section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>Plus, I’ve been writing my candidacy exam for two weeks now, and need an excuse to look at anything else for an hour.↩︎</p></li>
-<li id="fn2"><p>For what it’s worth, while I’m an author on rsample, I didn’t write any of the rsample features mentioned in this blog post. I believe the rsample-specific details were all written by Max Kuhn. All the copy-on-modify semantics stuff, however, is just part of R and written over the past few decades by R Core.↩︎</p></li>
-<li id="fn3"><p>“Analysis” maps to “training” while “assessment” maps to “testing”. “Analysis” and “assessment” are purposefully used to <a href="https://www.tmwr.org/resampling.html#resampling-methods">avoid confusion over <em>which</em> training and test set are being used</a>.↩︎</p></li>
-<li id="fn4"><p>We’ll come back to this.↩︎</p></li>
-<li id="fn5"><p>As of <a href="https://stat.ethz.ch/pipermail/r-announce/2020/000653.html">R 4.0</a>, as I understand it.↩︎</p></li>
-<li id="fn6"><p>Told ya we’d come back to it.↩︎</p></li>
-<li id="fn7"><p>Now the package I maintain, spatialsample, <em>does</em> include <code>out_id</code> on its objects relatively often. Most of the time, this is because the objects were created with a non <code>NULL</code> buffer, and so our hold out set isn’t simply “all of the data that’s not in”; sometimes it’s because I initially <em>always</em> included <code>out_id</code>, and haven’t fixed my code to be more efficient yet. PRs welcome!↩︎</p></li>
-</ol>
-</section></div> ]]></description>
-  <category>R</category>
-  <category>rsample</category>
-  <category>tidymodels</category>
-  <guid>https://mm218.dev/posts/2022-10-04-rsample/index.html</guid>
-  <pubDate>Tue, 04 Oct 2022 00:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2022-10-04-rsample/splash.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>

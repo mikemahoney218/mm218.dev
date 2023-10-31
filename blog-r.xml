@@ -10,7 +10,392 @@
 <atom:link href="https://mm218.dev/blog-r.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Fri, 27 Oct 2023 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 31 Oct 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Adding context to maps made with ggplot2</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2023-10-31-map-context/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>A colleague asked me today how they could best add a larger data set for context to a map of a (spatially) smaller data set, without the map expanding to incorporate the whole of the larger data set. I didn’t have a great answer off the top of my head, so this blog post is here to record what we tried, and what wound up working for us!</p>
+<p>Say we’ve got some spatial data set that covers a broad area; for instance, the <code>nc</code> data set from sf that contains the counties of North Carolina:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">suppressPackageStartupMessages</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(sf))</span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)</span>
+<span id="cb1-3">nc <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"shape/nc.shp"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"sf"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">read_sf</span>()</span>
+<span id="cb1-5"></span>
+<span id="cb1-6"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(nc) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb1-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We also need a comparatively smaller data set that we’re interested in visualizing. For this blog, simulate some number of observations inside one of the more central counties:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">johnston <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> nc[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">which</span>(nc<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>NAME <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">==</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Johnston"</span>), ]</span>
+<span id="cb2-2">johnston_obs <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_sample</span>(johnston, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">500</span>)</span>
+<span id="cb2-3"></span>
+<span id="cb2-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb2-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> johnston) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb2-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> johnston_obs, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Our goal is to add a bit more context to this map by drawing the borders of surrounding counties. The challenge is that ggplot will, by default, expand our visualization to contain the largest layer that we add:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb3-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> nc) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb3-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> johnston_obs, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>We could control this using <code>expansion()</code> inside of <code>scale_*_continuous()</code> functions, in order to restrict the range of our visualization:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb4-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> nc) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb4-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> johnston_obs, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb4-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expansion</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.63</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.29</span>))) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb4-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expansion</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.5</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.28</span>)))</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>But these <code>expansion()</code> calls are relative to the scale of our larger data set, which makes them a bit difficult to reason about. We aren’t specifying our extents in terms of the data that we actually care about visualizing, we’re forced to specify them relative to the larger context that we don’t care as much about.</p>
+<p>We could make this a bit easier by filtering our larger data set to only observations that are near (or in this case, touching) the area we’re actually trying to visualize:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">neighbors <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> nc[<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_touches</span>(johnston, nc)[[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]], ]</span>
+<span id="cb5-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb5-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> neighbors) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb5-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> johnston_obs, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb5-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expansion</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.3</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.25</span>))) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb5-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expansion</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.4</span>, <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.25</span>)))</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>But while this <em>reduces</em> the problem, moving the center of the larger layer closer to the center of the layer we care about, it still has the same issue as when we used the entire <code>nc</code> object.</p>
+<p>So what we wound up doing was embracing a little bit of jank and reaching into the ggplot2 internals. We started off by making a “base plot” object that was zoomed out to the level of detail that we wanted:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">base_plot <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(johnston_obs) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb6-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb6-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expansion</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb6-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expansion</span>(<span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0.1</span>))</span>
+<span id="cb6-5"></span>
+<span id="cb6-6">base_plot</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Defining our boundaries here is a bit easier to reason about – the <code>expansion()</code> calls are centered on our data of interest and are expanding the scales relative to this focal data set. Once we’ve got our level of zoom where we want it, we can build our plot using <code>ggplot_build()</code> and then extract the ranges of our x and y scales from the constructed plot object:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">base_plot <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot_build</span>(base_plot)</span>
+<span id="cb7-2">xlim <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> base_plot<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>layout<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>panel_params[[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>x_range</span>
+<span id="cb7-3">ylim <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> base_plot<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>layout<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>panel_params[[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]]<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>y_range</span></code></pre></div>
+</div>
+<p>We can then use those ranges as limits, to force our final plot to have the same level of zoom as our simple map. That means we can add whatever layers we want to add context to our map, and not need to worry about fiddling with our scales in term of the largest layer we’ve added:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb8-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> nc) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb8-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> johnston_obs, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"red"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb8-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_x_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> xlim) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb8-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">limits =</span> ylim)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>I have no idea how stable this approach will be – <a href="https://www.tidyverse.org/blog/2022/09/playing-on-the-same-team-as-your-dependecy/">we’re decidedly not playing on the same team as ggplot2</a> with this approach – but it works as of ggplot version 3.4.3, and it’s made making maps a bit easier for us at the moment!</p>
+
+
+
+ ]]></description>
+  <category>R</category>
+  <category>Tutorials</category>
+  <category>Spatial</category>
+  <category>geospatial data</category>
+  <guid>https://mm218.dev/posts/2023-10-31-map-context/index.html</guid>
+  <pubDate>Tue, 31 Oct 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2023-10-31-map-context/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Executing R code from untrusted sources in minimal environments</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -8442,447 +8827,6 @@ font-style: inherit;">"mike.mahoney.218@gmail.com"</span></span></code></pre></d
   <category>GitHub Actions</category>
   <guid>https://mm218.dev/posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html</guid>
   <pubDate>Thu, 23 Sep 2021 00:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>terrainr 0.3.0 is out today</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2021/02/terrainr/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<p><a href="https://mikemahoney218.github.io/terrainr/">terrainr</a> is <a href="https://github.com/ropensci/software-review/issues/416">in review with rOpenSci</a> and the first review just came back! I’ve been working through the comments over the past week or so, and today that work has culminated in the release of terrainr version 0.3.0.</p>
-<p>This is a big release with a handful of breaking changes, so I felt like I should give a brief overview of the biggest user-facing changes.</p>
-<section id="breaking-changes" class="level2">
-<h2 class="anchored" data-anchor-id="breaking-changes">Breaking Changes</h2>
-<section id="object-classes-are-dead-long-live-object-classes" class="level3">
-<h3 class="anchored" data-anchor-id="object-classes-are-dead-long-live-object-classes">Object Classes Are Dead; Long Live Object Classes</h3>
-<p>The single largest change is that <em>terrainr specific classes are no longer exported</em>, and users shouldn’t need to worry about getting data into or out of those formats anymore. Instead, use any <code>sf</code> or <code>Raster</code> object in their place. For instance, workflows that used to look like this:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Doesn't run:</span></span>
-<span id="cb1-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(terrainr)</span>
-<span id="cb1-3">simulated_data <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span>  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">id =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">seq</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">100</span>, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>),</span>
-<span id="cb1-4">                              <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">lat =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">runif</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">100</span>, <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">44.04905</span>, <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">44.17609</span>), </span>
-<span id="cb1-5">                              <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">lng =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">runif</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">100</span>, <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">74.01188</span>, <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">73.83493</span>))</span>
-<span id="cb1-6"></span>
-<span id="cb1-7">bbox <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">get_bbox</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">lat =</span> simulated_data<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>lat, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">lng =</span> simulated_data<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>lng) </span>
-<span id="cb1-8"></span>
-<span id="cb1-9">output_tiles <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">get_tiles</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">bbox =</span> bbox,</span>
-<span id="cb1-10">                          <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">services =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"elevation"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"ortho"</span>),</span>
-<span id="cb1-11">                          <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">resolution =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">90</span>)</span></code></pre></div>
-</div>
-<p>Now look like this:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(terrainr)</span>
-<span id="cb2-2">simulated_data <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span>  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">id =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">seq</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">100</span>, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>),</span>
-<span id="cb2-3">                              <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">lat =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">runif</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">100</span>, <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">44.04905</span>, <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">44.17609</span>), </span>
-<span id="cb2-4">                              <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">lng =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">runif</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">100</span>, <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">74.01188</span>, <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">73.83493</span>))</span>
-<span id="cb2-5"></span>
-<span id="cb2-6">simulated_data <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">st_as_sf</span>(simulated_data, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">coords =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"lng"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"lat"</span>))</span>
-<span id="cb2-7">simulated_data <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">st_set_crs</span>(simulated_data, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">4326</span>)</span>
-<span id="cb2-8"></span>
-<span id="cb2-9">output_tiles <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">get_tiles</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> simulated_data,</span>
-<span id="cb2-10">                          <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">services =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"elevation"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"ortho"</span>),</span>
-<span id="cb2-11">                          <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">resolution =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">90</span>)</span></code></pre></div>
-</div>
-<p>As part of this change, <code>get_bbox</code>, <code>get_coordinate_bbox</code>, and all class creation and export functions are gone now. Use sf (or Raster*) objects in their place instead.</p>
-</section>
-<section id="new-names-who-this" class="level3">
-<h3 class="anchored" data-anchor-id="new-names-who-this">New Names, Who This?</h3>
-<p><code>get_tiles</code> now uses the <code>services</code> argument to name its output list:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">names</span>(output_tiles)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] "elevation" "ortho"    </code></pre>
-</div>
-</div>
-<p>This means that if you request the service <code>elevation</code> you can retrieve your tiles using the name <code>elevation</code>. If you request the same endpoint with multiple names, <code>get_tiles</code> will use whatever name was first in the vector.</p>
-</section>
-<section id="fewer-utilities-more-useful" class="level3">
-<h3 class="anchored" data-anchor-id="fewer-utilities-more-useful">Fewer Utilities, More Useful</h3>
-<p>Utility functions <code>calc_haversine_distance</code>, <code>convert_distance</code>, <code>point_from_distance</code>, <code>rad_to_deg</code>, and <code>deg_to_rad</code> have been removed (or removed from exports). For unit conversions, check out the <a href="cran.r-project.org/package=units">units</a> package. This shouldn’t impact the main uses of the package, but is still worth flagging.</p>
-</section>
-</section>
-<section id="show-me-what-you-got" class="level2">
-<h2 class="anchored" data-anchor-id="show-me-what-you-got">Show Me What You Got</h2>
-<p>terrainr 0.3.0 adds a ggplot2 geom, <code>geom_spatial_rgb</code>, for plotting 3 band RGB rasters:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(ggplot2)</span>
-<span id="cb5-2"></span>
-<span id="cb5-3"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb5-4">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_spatial_rgb</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> output_tiles[[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"ortho"</span>]],</span>
-<span id="cb5-5">                   <span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Required aesthetics r/g/b specify color bands:</span></span>
-<span id="cb5-6">                   <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> x, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> y, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">r =</span> red, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">g =</span> green, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">b =</span> blue)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb5-7">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">coord_sf</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">4326</span>)</span></code></pre></div>
-<div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2021/02/terrainr/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<p>Note that above we just passed the file path to our raster; we can also pass a RasterStack:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1">ortho <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> raster<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">stack</span>(output_tiles[[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"ortho"</span>]])</span>
-<span id="cb6-2"></span>
-<span id="cb6-3"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb6-4">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_spatial_rgb</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> ortho,</span>
-<span id="cb6-5">                   <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> x, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> y, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">r =</span> red, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">g =</span> green, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">b =</span> blue)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb6-6">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">coord_sf</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">4326</span>)</span></code></pre></div>
-<div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2021/02/terrainr/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<p>Or a data.frame:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">ortho_df <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> raster<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">as.data.frame</span>(ortho, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">xy =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">TRUE</span>)</span>
-<span id="cb7-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">names</span>(ortho_df) <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"x"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"y"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"red"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"green"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"blue"</span>)</span>
-<span id="cb7-3"></span>
-<span id="cb7-4"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb7-5">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_spatial_rgb</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> ortho,</span>
-<span id="cb7-6">                   <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> x, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> y, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">r =</span> red, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">g =</span> green, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">b =</span> blue)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb7-7">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">coord_sf</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">4326</span>)</span></code></pre></div>
-<div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2021/02/terrainr/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<p>Note that each step here gives you a little more control over the output image – for instance, if your raster bands aren’t in RGB order (or you have more than RGBA bands), you’ll need to provide a data.frame to get a true color image.</p>
-<p>You can then use these basemaps like most other ggplot geoms:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb8-2">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_spatial_rgb</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> ortho_df,</span>
-<span id="cb8-3">                   <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> x, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> y, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">r =</span> red, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">g =</span> green, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">b =</span> blue)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb8-4">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_sf</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> simulated_data) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb8-5">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">coord_sf</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">4326</span>)</span></code></pre></div>
-<div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2021/02/terrainr/index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</section>
-<section id="new-docs-who-this" class="level2">
-<h2 class="anchored" data-anchor-id="new-docs-who-this">New Docs, Who This?</h2>
-<p>Those are just a few of the changes in 0.3.0; you can find a longer list in the NEWS file.</p>
-<p>One thing not mentioned in the <a href="https://mikemahoney218.github.io/terrainr/news/index.html">NEWS</a> file, though, is that this version of terrainr included a complete rewrite of the documentation. The docs were mostly written while the package was being conceptually developed, and as a result gave a bit too much emphasis to some ideas while completely ignoring others. So I’ve rewritten all of the documentation that lives on the <a href="https://mikemahoney218.github.io/terrainr/">terrainr website</a> – let me know what you think about the new versions (or if you catch anything I’ve missed!).</p>
-
-
-</section>
-
- ]]></description>
-  <category>R</category>
-  <category>Data science</category>
-  <category>terrainr</category>
-  <guid>https://mm218.dev/posts/2021/02/terrainr/index.html</guid>
-  <pubDate>Wed, 17 Feb 2021 00:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>

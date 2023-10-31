@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/2023-10-31-map-context/index.html",
       "/posts/2023-10-27-minimal-environments/index.html",
       "/posts/2023-10-26-rsi/index.html",
       "/posts/2023-10-24-fun-r-funcs/index.html",
