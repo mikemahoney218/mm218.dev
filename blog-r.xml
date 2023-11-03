@@ -10,7 +10,151 @@
 <atom:link href="https://mm218.dev/blog-r.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Tue, 31 Oct 2023 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 03 Nov 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>spatialsample 0.5.0 is now on CRAN</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2023-11-03-spatialsample/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>The <a href="https://github.com/tidymodels/spatialsample">newest version of spatialsample</a>, the tidymodels package I maintain for spatial cross-validation, just landed on CRAN, with binaries for Windows and Mac coming in the next few days.</p>
+<p>This release mostly fixes a few bugs in <code>spatial_block_cv()</code> and <code>spatial_nndm_cv()</code>. The only new feature is that <code>get_rsplit()</code> is now reexported from rsample, providing a nicer interface for extracting individual <code>rsplit</code> objects from an <code>rset</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(spatialsample)</span>
+<span id="cb1-2"></span>
+<span id="cb1-3">folds <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spatial_clustering_cv</span>(boston_canopy, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb1-4"></span>
+<span id="cb1-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">all.equal</span>(</span>
+<span id="cb1-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_rsplit</span>(folds, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>),</span>
+<span id="cb1-7">  folds<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>splits[[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]]</span>
+<span id="cb1-8">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>More pressing are two sets of breaking changes. The first of these is that <code>spatial_block_cv()</code> now creates slightly different grids, covering a very slightly larger area, which may change what fold any given observation is assigned into. This is to address a problem <a href="https://stackoverflow.com/q/77374348/9625040">reported on StackOverflow</a> where, if data fell exactly on grid lines (which was somewhat common with regularly-spaced grids of data), it would be assigned to both of the polygons on either side of the line.</p>
+<p>The amount of grid expansion performed can be controlled using the new <code>expand_bbox</code> argument to <code>spatial_block_cv()</code>. If observations are still assigned to multiple folds, the function will now throw an error:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">drought_sf <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_as_sf</span>(</span>
+<span id="cb3-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expand.grid</span>(</span>
+<span id="cb3-3">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">995494</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1018714</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">430</span>),</span>
+<span id="cb3-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1019422</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">by =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">430</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">length.out =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">55</span>)</span>
+<span id="cb3-5">  ),</span>
+<span id="cb3-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">coords =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"x"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"y"</span>),</span>
+<span id="cb3-7">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7760</span></span>
+<span id="cb3-8">)</span>
+<span id="cb3-9"></span>
+<span id="cb3-10"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spatial_block_cv</span>(drought_sf, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand_bbox =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in generate_folds_from_blocks(data, centroids, grid_blocks, v, n,  : 
+  Some observations fell exactly on block boundaries, meaning they were assigned to multiple assessment sets unexpectedly.
+ℹ Try setting a different `expand_bbox` value, an `offset`, or use a different number of folds.</code></pre>
+</div>
+</div>
+<p>But hopefully the expansion will make this error relatively uncommon:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">folds <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spatial_block_cv</span>(drought_sf)</span>
+<span id="cb5-2"></span>
+<span id="cb5-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">autoplot</span>(folds)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-11-03-spatialsample/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This is a breaking change for data in projected coordinate reference systems. Data in geographic coordinates was actually already using these slightly larger grids, <a href="https://github.com/ropensci/stplanr/pull/467">due to issues with straight-line grids in non-planar CRS</a>, so this change just makes the amount of grid expansion controllable there.</p>
+<p>The other breaking change/bug-fix is in <code>spatial_nndm_cv()</code>. The <code>prediction_sites</code> argument to <code>spatial_nndm_cv()</code> lets you specify the actual sites you were going to generate predictions at. In older versions of spatialsample, if any of the data in <code>prediction_sites</code> weren’t points, then this function would instead randomly sample points from inside the bounding box of the entire <code>prediction_sites</code> object.</p>
+<p>Starting with spatialsample 0.5.0, passing a single polygon to <code>prediction_sites</code> will cause <code>spatial_nndm_cv()</code> to instead sample points from inside that polygon, allowing you fine-grained control over the boundaries for this sampling stage. This feels like a more intuitive interface, and you can always revert to previous behaviors by passing <code>sf::st_as_sf(sf::st_as_sfc(sf::st_bbox(prediction_sites)))</code> if you’d rather sample from the bounding box instead.</p>
+
+
+
+ ]]></description>
+  <category>R</category>
+  <category>Spatial</category>
+  <category>geospatial data</category>
+  <category>spatialsample</category>
+  <category>R packages</category>
+  <guid>https://mm218.dev/posts/2023-11-03-spatialsample/index.html</guid>
+  <pubDate>Fri, 03 Nov 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2023-11-03-spatialsample/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Adding context to maps made with ggplot2</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -8393,440 +8537,6 @@ font-style: inherit;">```</span></span></code></pre></div>
   <guid>https://mm218.dev/posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html</guid>
   <pubDate>Fri, 05 Aug 2022 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/elevator.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Automated {drat} uploads with GitHub Actions</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<p>This is a quick walkthrough of how to use GitHub actions to automatically upload packages to personal <a href="https://github.com/eddelbuettel/drat">{drat}</a> repos.</p>
-<p>If you just want the good stuff, <a href="https://github.com/mikemahoney218/upload-to-drat-repo/">here’s the link to the GitHub action I’m using</a> as well as <a href="https://github.com/ropensci/terrainr/blob/main/.github/workflows/drat.yml">the GitHub workflow that uploads terrainr to my own drat repo</a>.</p>
-<section id="what-are-we-doing" class="level2">
-<h2 class="anchored" data-anchor-id="what-are-we-doing">What are we doing?</h2>
-<p><a href="https://github.com/eddelbuettel/drat">{drat}</a> is an R package that helps you set up CRAN-like repositories, hosted (primarily) on GitHub Pages. <a href="https://github.com/features/actions">GitHub Actions</a> is a continuous integration/continuous deployment service<sup>1</sup>, also hosted by GitHub, which lets you trigger compute workloads based on a CRON schedule, activity on a hosted repository, or manually.</p>
-<p>This post walks through setting up a GitHub Actions CD workflow<sup>2</sup> to automatically build and upload an R package to a drat repo based on a schedule or repository activity.</p>
-</section>
-<section id="why-are-we-doing-it" class="level2">
-<h2 class="anchored" data-anchor-id="why-are-we-doing-it">Why are we doing it?</h2>
-<p>My lab has a number of internal packages we use for our day-to-day work which handle things like downloading data from our central server and producing standardized model assessment outputs. All of these packages live on GitHub in our central organization, and for a long time our workflow for installing these packages has been to clone the repository and then <code>devtools::install</code> the package.</p>
-<p>Recently, though, we’ve had to share one of our packages with a number of outside collaborators who we aren’t going to be adding to the organization. We’ve also started working with a number of people who are less familiar with git and GitHub, both externally and within the lab, which means we need to provide a bit more instruction than simply saying “clone the repo and install that”<sup>3</sup>. This also means that solutions like “use <code>remotes::install_github</code> with a PAT” aren’t feasible; we want people to be able to get the packages they need without needing to know anything about GitHub itself. Therefore, we needed a simpler method to actually distribute our code, both to people we’d happily give repo access and people we wouldn’t want to.</p>
-<p>For public repositories and organizations, I think the easiest solution to this problem is to set up your own <a href="https://r-universe.dev/organizations/">R Universe</a>, which rOpenSci has written <a href="https://ropensci.org/blog/2021/06/22/setup-runiverse/">fantastic instructions for getting started with</a>; this offloads your responsibility for managing CI to the rOpenSci team. For this project, however, we wanted a separate and mostly hidden repository page, which made {drat} a perfect candidate.</p>
-<p>The only problem was how to make sure we were always publishing the newest versions of our package. We’re a small team doing a lot of different things, so being able to automate away any repetitive task (like publishing patch releases to a {drat} repo) can really help reduce the cognitive load and number of mistakes associated with updating our shared codebase.</p>
-</section>
-<section id="how-did-we-do-it" class="level2">
-<h2 class="anchored" data-anchor-id="how-did-we-do-it">How did we do it?</h2>
-<p>Because the original version of this workflow is on a private repo, I’ll walk through <a href="https://github.com/ropensci/terrainr/blob/main/.github/workflows/drat.yml">the workflow</a> that uploads <a href="https://github.com/ropensci/terrainr">terrainr</a> to <a href="https://github.com/mikemahoney218/drat">my own personal drat repo</a>. The YAML file that runs the workflow looks like this:</p>
-<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">push</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">branches</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-4"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'main'</span></span>
-<span id="cb1-5"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">paths</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-6"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'DESCRIPTION'</span></span>
-<span id="cb1-7"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">workflow_dispatch</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-8"></span>
-<span id="cb1-9"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">jobs</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-10"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drat-upload</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-11"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">runs-on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> ubuntu-20.04</span></span>
-<span id="cb1-12"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> Drat Upload</span></span>
-<span id="cb1-13"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">steps</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-14"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> mikemahoney218/upload-to-drat-repo@v0.1</span></span>
-<span id="cb1-15"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">with</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb1-16"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drat_repo</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mikemahoney218/drat'</span></span>
-<span id="cb1-17"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">token</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"${{ secrets.DRAT_TOKEN }}"</span></span>
-<span id="cb1-18"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">commit_message</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Automated update (add terrainr)"</span></span>
-<span id="cb1-19"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">commit_email</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"mike.mahoney.218@gmail.com"</span></span></code></pre></div>
-<p>This script has two main components to it: running the job and configuring the action itself.</p>
-<section id="running-the-job" class="level3">
-<h3 class="anchored" data-anchor-id="running-the-job">Running the job</h3>
-<p>At the top of terrainr’s drat workflow script is the following chunk:</p>
-<div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb2-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb2-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">push</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb2-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">branches</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb2-4"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'main'</span></span>
-<span id="cb2-5"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">paths</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb2-6"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'DESCRIPTION'</span></span>
-<span id="cb2-7"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">workflow_dispatch</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span></code></pre></div>
-<p>This sets up two different ways to trigger the workflow. First off, any <code>push</code> commit to the <code>main</code> branch that touches the <code>DESCRIPTION</code> file will automatically build the package and push it to my drat repo. Because terrainr is published on CRAN and has a handful of users, I do my best to update version numbers whenever I make changes – even during development, I try and bump development versions whenever there’s a fix or update worth mentioning.</p>
-<p>Since the version number is stored in <code>DESCRIPTION</code>, this means I’ll only push updated package versions when I’ve actually updated something in the package; my small edits to the CI files, for instance, won’t create a new release.</p>
-<p>If you want to be freer about updating your repo, you can drop any of these restrictions. For instance, our internal packages have workflow triggers that look like this:</p>
-<div class="sourceCode" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb3-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb3-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">push</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb3-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">branches</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'main'</span></span></code></pre></div>
-<p>In this case, we push an update any time we push <em>any</em> commit to the main branch. This can cause problems – for instance, if we don’t update version numbers then <code>update.packages</code> won’t recognize that local installations are out of date – but makes more sense for our small team and small group of users.</p>
-<p>The second method this workflow uses to upload a new version is the <code>workflow_dispatch:</code> option, which lets me manually trigger the workflow from the GitHub UI. This is super helpful in case I accidentally mess up my drat repo, or make a small edit without changing the version number in the <code>DESCRIPTION</code>; without this line I’d have to rebuild the package on my laptop and update the drat repo from my local copy.</p>
-<p>There’s a lot of other ways you can set to trigger workflows – <a href="https://docs.github.com/en/actions/learn-github-actions/workflow-syntax-for-github-actions#on">see the full list here</a> – but the other one I want to highlight is that you can also set the workflow to trigger on a schedule using a crontab. This snippet for instance will release daily builds every day at 0:00 UTC:</p>
-<div class="sourceCode" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb4-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb4-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">schedule</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span></span>
-<span id="cb4-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">cron</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'0 0 * * *'</span></span></code></pre></div>
-<p>You can use this syntax to create incredibly complex schedules; I personally always use https://crontab.guru/ to make sure my crontabs are right when I’m trying to schedule jobs.</p>
-</section>
-<section id="configuring-the-action" class="level3">
-<h3 class="anchored" data-anchor-id="configuring-the-action">Configuring the action</h3>
-<p>The second half of the workflow script actually calls the action to build the package and upload it to your drat repo:</p>
-<div class="sourceCode" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb5-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">jobs</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb5-2"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">  </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drat-upload</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb5-3"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">runs-on</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> ubuntu-20.04</span></span>
-<span id="cb5-4"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">name</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> Drat Upload</span></span>
-<span id="cb5-5"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">    </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">steps</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb5-6"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">      </span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">-</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">uses</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> mikemahoney218/upload-to-drat-repo@v0.1</span></span>
-<span id="cb5-7"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">        </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">with</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span></span>
-<span id="cb5-8"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">drat_repo</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'mikemahoney218/drat'</span></span>
-<span id="cb5-9"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">token</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"${{ secrets.DRAT_TOKEN }}"</span></span>
-<span id="cb5-10"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">commit_message</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Automated update (add terrainr)"</span></span>
-<span id="cb5-11"><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">          </span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">commit_email</span><span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">:</span><span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;"> </span><span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"mike.mahoney.218@gmail.com"</span></span></code></pre></div>
-<p>This will, by default, spin up an Ubuntu 20.04 runner and run v0.1 of <a href="https://github.com/mikemahoney218/upload-to-drat-repo/">the upload action</a>, which is the current version. This action will automatically check out the repo the workflow is called from, build and install the R package in that repo, then insert it into a drat repo.</p>
-<p>There’s a few input values for this workflow which you <em>must</em> specify, which are under the “with” step:</p>
-<ul>
-<li><code>drat_repo</code>: The GitHub repository for the drat repo you’re trying to push your package to. If you don’t have a drat repo yet, you can create one locally using <code>drat::initRepo</code>, and then push the created directory up to GitHub.</li>
-<li><code>commit_email</code>: The author to write the drat repo commit as; used to set <code>git config user.email</code>. You must provide a value here.</li>
-<li><code>token</code>: A <a href="https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token">personal access token (PAT)</a>. The action will use this PAT to clone your package and drat repo, as well as to push your drat repo, so make sure to authorize the PAT to do so. It’s a good idea to use a service account with the fewest permissions possible for this job.</li>
-</ul>
-<p>You can also customize the job further with a few additional inputs:</p>
-<ul>
-<li><code>commit_message</code>: The message to use when committing to <code>drat_repo</code>.</li>
-<li><code>commit_author</code>: The author to write the commit as; used to set <code>git config user.name</code>.</li>
-<li><code>package</code>: The GitHub repository for the package you want to upload. Defaults to the repository the action is running in, but this can be used to run your workflow elsewhere (for instance, if you want to have all your upload jobs scheduled in the drat repo itself).</li>
-</ul>
-<p>And for most use cases, this should be enough to automatically deploy your package whenever you desire! So far, I’ve tested this workflow on a handful of my own packages (terrainr and then our internal packages), and things are working well so far – if you find any problems or have any suggestions, <a href="https://github.com/mikemahoney218/upload-to-drat-repo/issues">feel free to open an issue on the action repo here.</a></p>
-
-
-</section>
-</section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>Kinda. It’s probably more accurate to say GitHub Actions provides hosted compute which is typically used for CI/CD workflows, but can also be applied to other things; I use it to <a href="https://twitter.com/proc_tweets">make art and post to Twitter, for instance.</a>↩︎</p></li>
-<li id="fn2"><p>Workflows are explicit, repository-specific jobs, while actions are generic scripts which can be included inside of workflows.↩︎</p></li>
-<li id="fn3"><p>I had completely forgotten how complex getting started with GitHub can be as a novice until recently, teaching a Carpentries workshop, I realized that teaching the initial account set-up <a href="https://swcarpentry.github.io/git-novice/07-github/index.html">requires a full 45 minute lesson</a>.↩︎</p></li>
-</ol>
-</section></div> ]]></description>
-  <category>R</category>
-  <category>Tutorials</category>
-  <category>CI</category>
-  <category>CD</category>
-  <category>GitHub Actions</category>
-  <guid>https://mm218.dev/posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html</guid>
-  <pubDate>Thu, 23 Sep 2021 00:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>

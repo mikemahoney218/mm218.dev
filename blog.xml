@@ -10,7 +10,151 @@
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Tue, 31 Oct 2023 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Fri, 03 Nov 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>spatialsample 0.5.0 is now on CRAN</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2023-11-03-spatialsample/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>The <a href="https://github.com/tidymodels/spatialsample">newest version of spatialsample</a>, the tidymodels package I maintain for spatial cross-validation, just landed on CRAN, with binaries for Windows and Mac coming in the next few days.</p>
+<p>This release mostly fixes a few bugs in <code>spatial_block_cv()</code> and <code>spatial_nndm_cv()</code>. The only new feature is that <code>get_rsplit()</code> is now reexported from rsample, providing a nicer interface for extracting individual <code>rsplit</code> objects from an <code>rset</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(spatialsample)</span>
+<span id="cb1-2"></span>
+<span id="cb1-3">folds <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spatial_clustering_cv</span>(boston_canopy, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>)</span>
+<span id="cb1-4"></span>
+<span id="cb1-5"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">all.equal</span>(</span>
+<span id="cb1-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_rsplit</span>(folds, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>),</span>
+<span id="cb1-7">  folds<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>splits[[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]]</span>
+<span id="cb1-8">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] TRUE</code></pre>
+</div>
+</div>
+<p>More pressing are two sets of breaking changes. The first of these is that <code>spatial_block_cv()</code> now creates slightly different grids, covering a very slightly larger area, which may change what fold any given observation is assigned into. This is to address a problem <a href="https://stackoverflow.com/q/77374348/9625040">reported on StackOverflow</a> where, if data fell exactly on grid lines (which was somewhat common with regularly-spaced grids of data), it would be assigned to both of the polygons on either side of the line.</p>
+<p>The amount of grid expansion performed can be controlled using the new <code>expand_bbox</code> argument to <code>spatial_block_cv()</code>. If observations are still assigned to multiple folds, the function will now throw an error:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">drought_sf <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_as_sf</span>(</span>
+<span id="cb3-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expand.grid</span>(</span>
+<span id="cb3-3">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">x =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">995494</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1018714</span>, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">430</span>),</span>
+<span id="cb3-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">y =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">seq</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1019422</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">by =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">430</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">length.out =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">55</span>)</span>
+<span id="cb3-5">  ),</span>
+<span id="cb3-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">coords =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"x"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"y"</span>),</span>
+<span id="cb3-7">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">7760</span></span>
+<span id="cb3-8">)</span>
+<span id="cb3-9"></span>
+<span id="cb3-10"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spatial_block_cv</span>(drought_sf, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">expand_bbox =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">0</span>))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in generate_folds_from_blocks(data, centroids, grid_blocks, v, n,  : 
+  Some observations fell exactly on block boundaries, meaning they were assigned to multiple assessment sets unexpectedly.
+ℹ Try setting a different `expand_bbox` value, an `offset`, or use a different number of folds.</code></pre>
+</div>
+</div>
+<p>But hopefully the expansion will make this error relatively uncommon:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">folds <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spatial_block_cv</span>(drought_sf)</span>
+<span id="cb5-2"></span>
+<span id="cb5-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">autoplot</span>(folds)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-11-03-spatialsample/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This is a breaking change for data in projected coordinate reference systems. Data in geographic coordinates was actually already using these slightly larger grids, <a href="https://github.com/ropensci/stplanr/pull/467">due to issues with straight-line grids in non-planar CRS</a>, so this change just makes the amount of grid expansion controllable there.</p>
+<p>The other breaking change/bug-fix is in <code>spatial_nndm_cv()</code>. The <code>prediction_sites</code> argument to <code>spatial_nndm_cv()</code> lets you specify the actual sites you were going to generate predictions at. In older versions of spatialsample, if any of the data in <code>prediction_sites</code> weren’t points, then this function would instead randomly sample points from inside the bounding box of the entire <code>prediction_sites</code> object.</p>
+<p>Starting with spatialsample 0.5.0, passing a single polygon to <code>prediction_sites</code> will cause <code>spatial_nndm_cv()</code> to instead sample points from inside that polygon, allowing you fine-grained control over the boundaries for this sampling stage. This feels like a more intuitive interface, and you can always revert to previous behaviors by passing <code>sf::st_as_sf(sf::st_as_sfc(sf::st_bbox(prediction_sites)))</code> if you’d rather sample from the bounding box instead.</p>
+
+
+
+ ]]></description>
+  <category>R</category>
+  <category>Spatial</category>
+  <category>geospatial data</category>
+  <category>spatialsample</category>
+  <category>R packages</category>
+  <guid>https://mm218.dev/posts/2023-11-03-spatialsample/index.html</guid>
+  <pubDate>Fri, 03 Nov 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2023-11-03-spatialsample/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Adding context to maps made with ggplot2</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -6316,52 +6460,6 @@ font-style: inherit;">TRUE</span></span>
   <guid>https://mm218.dev/posts/2022-12-01-sf-in-packages/index.html</guid>
   <pubDate>Thu, 01 Dec 2022 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2022-12-01-sf-in-packages/sf.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Fine-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2022-11-07-agb/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<p>I’m part of the team behind a new open-access article, “<a href="https://doi.org/10.1016/j.jag.2022.103059">Fine-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages</a>”, newly out in International Journal of Applied Earth Observation and Geoinformation.<sup>1</sup> The paper was lead by my incredible coworker <a href="https://www.lucaskjohnson.com/">Lucas Johnson</a>, and is his first first-author paper – and what a powerful way to enter the field!</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-11-07-agb/map.jpg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">A map, showing the AGB prediction surfaces reflecting a temporal patchwork of conditions across the 17 component LiDAR coverages in the GPO-LiDAR area with New York State.</figcaption>
-</figure>
-</div>
-<p>This paper is, plain and simple, the first public documentation we’ve released about how we’re helping New York State track how much carbon is stored in its forests statewide. Using a patchwork of LiDAR collections and FIA field measurements, we use a stacked ensemble (a linear regression combining a random forest, LightGBM-based gradient boosting machine, and support vector machine) to estimate forest aboveground biomass (all the woody non-root bits of a tree, which<sup>2</sup> are made out of carbon pulled out of the atmosphere) at a 30 meter resolution across New York State. This data is already being used to identify high-priority areas across the state where the most carbon is currently stored and where a- and re-forestation might have the greatest impacts in the future.</p>
-<p>This is very exciting in and of itself, but I’m also extremely proud of the effort we put into validating our predictions, to make sure we’re speaking only with exactly as much confidence as we deserve. We use the <a href="https://doi.org/10.1111/2041-210X.13650">area of applicability from Meyer and Pebesma (2021)</a> to mask out areas where LiDAR data is too “different” from what our models were trained with, in order to make sure we aren’t accidentally extrapolating into areas our models aren’t prepared to handle. We implement the <a href="https://doi.org/10.1016/j.rse.2010.05.010">Riemann et al.&nbsp;(2010) multi-scale assessment procedure</a> to make sure our predictions are useful when aggregated to other scales. We look at our error spatially and as a function of FIA-measured AGB to try and fully characterize where our models succeed and where they need a bit more work. The goal is for our maps to be useful, and not just <a href="https://doi.org/10.1016/j.rse.2010.10.013">“pretty pictures”</a>.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-11-07-agb/validation.jpg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Plot-to-pixel residuals summarized at units spaced 50 km apart. Hexagons with only one reference plot were removed. (a) RMSE Mg ha−1; (b) MAE Mg ha−1; (c) ME Mg ha−1; (d) Mean FIA AGB value Mg ha−1; (e) Hex-level % RMSE as a function of mean reference value; (f) Hex-level % MAE as a function of mean reference value; (g) Hex-level ME as a function of mean reference value. 1 observation excluded from (e) and (f) where 0 FIA AGB makes % RMSE impossible to compute. Trend lines in (e) and (f) produced using logarithmic regression. Trend line in g produced using least-squares regression.</figcaption>
-</figure>
-</div>
-<p>In addition to <a href="https://www.lucaskjohnson.com/">Lucas</a> (who, I cannot stress enough, did a <em>fantastic</em> job leading this paper), I was lucky enough to get to work with <a href="https://www.esf.edu/faculty/bevilacqua/">Eddie Bevilacqua</a>, <a href="https://www.esf.edu/faculty/stehman/">Steve Stehman</a>, <a href="https://www.fs.usda.gov/research/about/people/gmdomke">Grant Domke</a>, and <a href="https://www.esf.edu/faculty/beier/">Colin Beier</a> on this one. It’s a great team and a great project, and I’m very excited for the things we’ve got coming down the pipeline next.</p>
-
-
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>I’ve needed to google this journal name every time I go to post about the article. I’ve read papers from this journal before and generally like their output, but for some reason the acronym IJAEOG just refuses to stick in my mind.↩︎</p></li>
-<li id="fn2"><p>To simplify quite a bit.↩︎</p></li>
-</ol>
-</section></div> ]]></description>
-  <category>ecology</category>
-  <category>papers</category>
-  <category>remote sensing</category>
-  <category>machine learning</category>
-  <category>earth science</category>
-  <category>AGB</category>
-  <guid>https://mm218.dev/posts/2022-11-07-agb/index.html</guid>
-  <pubDate>Mon, 07 Nov 2022 00:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2022-11-07-agb/map.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>
