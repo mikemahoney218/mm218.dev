@@ -1,0 +1,60 @@
+---
+title: "spatialsample 0.5.0 is now on CRAN"
+description: "Bug fixes and reexports, oh my"
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2023-11-03"
+categories: [R, Spatial, geospatial data, spatialsample, R packages]
+image: banner.jpg
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+The [newest version of spatialsample](https://github.com/tidymodels/spatialsample), the tidymodels package I maintain for spatial cross-validation, just landed on CRAN, with binaries for Windows and Mac coming in the next few days. 
+
+This release mostly fixes a few bugs in `spatial_block_cv()` and `spatial_nndm_cv()`. The only new feature is that `get_rsplit()` is now reexported from rsample, providing a nicer interface for extracting individual `rsplit` objects from an `rset`:
+
+```{r}
+library(spatialsample)
+
+folds <- spatial_clustering_cv(boston_canopy, 2)
+
+all.equal(
+  get_rsplit(folds, 1),
+  folds$splits[[1]]
+)
+```
+
+More pressing are two sets of breaking changes. The first of these is that `spatial_block_cv()` now creates slightly different grids, covering a very slightly larger area, which may change what fold any given observation is assigned into. This is to address a problem [reported on StackOverflow](https://stackoverflow.com/q/77374348/9625040) where, if data fell exactly on grid lines (which was somewhat common with regularly-spaced grids of data), it would be assigned to both of the polygons on either side of the line.
+
+The amount of grid expansion performed can be controlled using the new `expand_bbox` argument to `spatial_block_cv()`. If observations are still assigned to multiple folds, the function will now throw an error:
+
+```{r}
+drought_sf <- sf::st_as_sf(
+  expand.grid(
+    x = seq(995494, 1018714, 430),
+    y = seq(1019422, by = 430, length.out = 55)
+  ),
+  coords = c("x", "y"),
+  crs = 7760
+)
+
+try(spatial_block_cv(drought_sf, expand_bbox = 0))
+```
+
+But hopefully the expansion will make this error relatively uncommon:
+
+```{r}
+folds <- spatial_block_cv(drought_sf)
+
+autoplot(folds)
+```
+
+This is a breaking change for data in projected coordinate reference systems. Data in geographic coordinates was actually already using these slightly larger grids, [due to issues with straight-line grids in non-planar CRS](https://github.com/ropensci/stplanr/pull/467), so this change just makes the amount of grid expansion controllable there.
+
+The other breaking change/bug-fix is in `spatial_nndm_cv()`. The `prediction_sites` argument to `spatial_nndm_cv()` lets you specify the actual sites you were going to generate predictions at. In older versions of spatialsample, if any of the data in `prediction_sites` weren't points, then this function would instead randomly sample points from inside the bounding box of the entire `prediction_sites` object.
+
+Starting with spatialsample 0.5.0, passing a single polygon to `prediction_sites` will cause `spatial_nndm_cv()` to instead sample points from inside that polygon, allowing you fine-grained control over the boundaries for this sampling stage. This feels like a more intuitive interface, and you can always revert to previous behaviors by passing `sf::st_as_sf(sf::st_as_sfc(sf::st_bbox(prediction_sites)))` if you'd rather sample from the bounding box instead.
