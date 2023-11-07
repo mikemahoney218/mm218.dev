@@ -1,0 +1,95 @@
+---
+title: "Classed conditions from rlang functions"
+description: "Improve your testing, your control flow, your programming life."
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2023-11-07"
+categories: [R, Tutorials]
+image: banner.jpg
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+I'm a huge fan of the condition functions from rlang -- `rlang::inform()` for sending messages, `rlang::warn()` for warnings, and `rlang::abort()` for errors. Compared to their base equivalents (`message()`, `warning()`, and `stop()`, respectively) these functions [are extremely flexible](https://rlang.r-lib.org/reference/topic-condition-customisation.html) and make it easy to specify [which user-facing function actually caused the condition](https://rlang.r-lib.org/reference/topic-error-call.html). And recently I've become a huge fan of how these functions let you easily set the class of your conditions, which makes it a lot easier to implement logic to handle these conditions.
+
+For instance, let's say we've got some function that sends up a warning if you give it an unexpected input:
+
+```{r}
+f1 <- function(x) {
+  if (!is.numeric(x)) {
+    rlang::warn(
+      "`x` wasn't numeric. Was this expected?"
+    )
+  }
+  mean(x)
+}
+f1(TRUE)
+```
+
+If we know that we're going to be passing unexpected inputs to this function, we might consider using `suppressWarnings()` to hide this warning. I do this every so often in package code, where I know my inputs to another function are going to trigger a condition that I don't need the user to see:^[For instance, the way that `autoplot()` in spatialsample [adds grids to spatial_block_cv() plots](https://github.com/tidymodels/spatialsample/blob/a8834bbe646967bc224cf5e558789e1d704b0778/R/autoplot.R#L141-L143) always triggers the same message, which is expected and not worth worrying about. I hide that message so my users don't need to be concerned.]
+
+```{r}
+suppressWarnings(f1(TRUE))
+```
+
+The challenge with this is that `suppressWarnings()`, used this way, is a blunt tool that hides _all_ warnings sent up by this function. For instance, if we passed a character vector as input to this function, we'd also trigger a warning from `mean()` that it's going to return NA:
+
+```{r}
+f1("a")
+```
+
+And that useful warning _also_ gets hidden by the `suppressWarnings()` call:
+
+```{r}
+suppressWarnings(f1("a"))
+```
+
+Adding a subclass to our warning helps solve this. By specifying the `class` argument in any of the rlang condition functions, we're able to easily subclass our warning. This doesn't change how the warning displays during standard usage:
+
+```{r}
+f2 <- function(x) {
+  if (!is.numeric(x)) {
+    rlang::warn(
+      "`x` wasn't numeric. Was this expected?",
+      class = "non_numeric_x"
+    )
+  }
+  mean(x)
+}
+f2(TRUE)
+```
+
+But it _does_ mean that we can now use the `classes` argument to `suppressWarnings()` to only supress the warnings we care about, without accidentally hiding other unexpected warnings we might trigger:
+
+```{r}
+suppressWarnings(f2("a"), classes = "non_numeric_x")
+```
+
+This is great, and makes it a lot easier to incorporate conditions into your program's control flow. For instance, we can use these classed warnings with `tryCatch()` or `rlang::try_fetch()` to "catch" conditions, perhaps running a cleanup script or fallback method in the event that a specific classed warning is returned:^[I don't currently, but I _should_ do this in terrainr, where I [currently assume that any error during `merge_rasters()` can be fixed by the fallback method.](https://github.com/ropensci/terrainr/blob/36fc069cb05dbcb44ff358858f5544863d506aee/R/merge_rasters.R#L58-L81)]
+
+```{r}
+rlang::try_fetch(
+  f2("a"),
+  non_numeric_x = function(...) "We're running a completely different function now!"
+)
+```
+
+Last but not least, classed errors help in package testing. A huge number of my tests are designed to make sure that conditions fire when they're supposed to -- bad inputs trigger errors, concerning outputs trigger warnings and so on. Using classed errors can help me make sure I'm triggering the error or warning that I want to, not just any random error or warning that might be lurking in my code.
+
+If you're [using testthat's 3rd edition](https://testthat.r-lib.org/articles/third-edition.html), the `expect_condition()` set of functions (including `expect_message()`, `expect_warning()`, `expect_error()`) all share a `class` argument which will make sure the warning or error you're triggering is actually the one you expect:
+
+```{r}
+testthat::local_edition(3)
+testthat::expect_warning(f2(TRUE), class = "non_numeric_x")
+```
+
+If our condition class doesn't match the expected class, these tests will fail:
+
+```{r}
+try(testthat::expect_warning(f2(TRUE), class = "wrong_class"))
+```
+
+I'm a late adopter of classed conditions, only really systematically adopting them for [the new rsi package](https://github.com/Permian-Global-Research/rsi), but I've found them super useful so far and am planning to slowly use them more and more in the rest of my packages over time!
