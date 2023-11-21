@@ -1,0 +1,89 @@
+---
+title: "Downloading STAC data using rsi when you've got a geographic CRS or don't want a composite."
+description: "Methods for straying _slightly_ off the happy path: just say `NULL`."
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2023-11-21"
+categories: [R, Tutorials, Spatial, geospatial data, R packages]
+image: banner.jpg
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+A quick post today, inspired by [a GitHub issue](https://github.com/Permian-Global-Research/rsi/issues/6). 
+
+I've been working recently on [the new rsi package](https://github.com/Permian-Global-Research/rsi) which helps you download, reproject, resample, mask, rescale, and composite data from STAC APIs.^[And calculate spectral indices from these data, and wrangle multiple rasters into a multi-band VRT -- it's a pretty neat package if I do say so myself.] The standard function interface does all of these steps: it grabs all the relevant files from your STAC source, reprojects them to match your AOI and desired resolution, masks and rescales the component files, and then merges them into a composite:
+
+```{r}
+library(rsi)
+future::plan("multisession")
+
+aoi <- sf::st_point(c(-74.912131, 44.080410)) |> 
+  sf::st_sfc() |> 
+  sf::st_set_crs(4326) |> 
+  sf::st_transform(3857) |> 
+  sf::st_buffer(1000)
+
+start_date <- "2022-06-01"
+end_date <- "2022-07-01"
+
+get_landsat_imagery(
+  aoi = aoi,
+  start_date = start_date,
+  end_date = end_date,
+  output_filename = tempfile(fileext = ".tif")
+) |> 
+  terra::rast() |> 
+  terra::plot()
+```
+
+What if you want to skip some of these steps? For instance, if you try to call `get_landsat_imagery()` with an AOI in geographic coordinates, you'll get a warning (likely followed by an error) saying that you're asking to resample the data to 30 degree pixels, which is probably not what you wanted:
+
+```{r}
+try(
+  get_landsat_imagery(
+    aoi = sf::st_transform(aoi, 4326),
+    start_date = start_date,
+    end_date = end_date,
+    output_filename = tempfile(fileext = ".tif")
+  )
+)
+```
+
+That's coming from the resampling step of the function's workflow. Can we just skip that?
+
+Short answer: yes! If we pass `NULL` to the `pixel_*_size` arguments, we'll skip the resampling stage and instead download our data in its native resolution:
+
+```{r}
+get_landsat_imagery(
+  aoi = sf::st_transform(aoi, 4326),
+  start_date = start_date,
+  end_date = end_date,
+  pixel_x_size = NULL,
+  pixel_y_size = NULL,
+  output_filename = tempfile(fileext = ".tif")
+) |> 
+  terra::rast() |> 
+  terra::plot()
+```
+
+This is a pattern throughout the rsi API design: if you want to skip something, pass `NULL` to the relevant argument. For instance (and this is where [the GitHub issue comes in](https://github.com/Permian-Global-Research/rsi/issues/6)), if you want to not composite and instead download all the images within your spatiotemporal area of interest, we can pass `NULL` to the `composite_function` argument to skip compositing. I'll also skip masking by passing `NULL` to the `mask_function` argument, because otherwise a handful of these images are entirely masked out:
+
+```{r}
+#| warning: false
+get_landsat_imagery(
+  aoi = aoi,
+  start_date = start_date,
+  end_date = end_date,
+  output_filename = tempfile(fileext = ".tif"),
+  composite_function = NULL,
+  mask_function = NULL # otherwise half of these images are blank
+) |> 
+  lapply(terra::rast) |> 
+  lapply(terra::plot)
+```
+
+Hopefully this helps people use rsi to only perform the data wrangling steps they want!
