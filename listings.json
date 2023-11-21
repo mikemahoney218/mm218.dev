@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/2023-11-21-rsi-null/index.html",
       "/posts/2023-11-07-classed-errors/index.html",
       "/posts/2023-11-03-spatialsample/index.html",
       "/posts/2023-10-31-map-context/index.html",

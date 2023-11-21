@@ -10,7 +10,354 @@
 <atom:link href="https://mm218.dev/blog-r.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Tue, 07 Nov 2023 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Tue, 21 Nov 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Downloading STAC data using rsi when you’ve got a geographic CRS or don’t want a composite.</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2023-11-21-rsi-null/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>A quick post today, inspired by <a href="https://github.com/Permian-Global-Research/rsi/issues/6">a GitHub issue</a>.</p>
+<p>I’ve been working recently on <a href="https://github.com/Permian-Global-Research/rsi">the new rsi package</a> which helps you download, reproject, resample, mask, rescale, and composite data from STAC APIs.<sup>1</sup> The standard function interface does all of these steps: it grabs all the relevant files from your STAC source, reprojects them to match your AOI and desired resolution, masks and rescales the component files, and then merges them into a composite:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(rsi)</span>
+<span id="cb1-2">future<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plan</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"multisession"</span>)</span>
+<span id="cb1-3"></span>
+<span id="cb1-4">aoi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_point</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">74.912131</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">44.080410</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-5">  sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_sfc</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-6">  sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_set_crs</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4326</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-7">  sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_transform</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3857</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-8">  sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_buffer</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1000</span>)</span>
+<span id="cb1-9"></span>
+<span id="cb1-10">start_date <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2022-06-01"</span></span>
+<span id="cb1-11">end_date <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2022-07-01"</span></span>
+<span id="cb1-12"></span>
+<span id="cb1-13"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_landsat_imagery</span>(</span>
+<span id="cb1-14">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">aoi =</span> aoi,</span>
+<span id="cb1-15">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">start_date =</span> start_date,</span>
+<span id="cb1-16">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">end_date =</span> end_date,</span>
+<span id="cb1-17">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb1-18">) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-19">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-20">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>What if you want to skip some of these steps? For instance, if you try to call <code>get_landsat_imagery()</code> with an AOI in geographic coordinates, you’ll get a warning (likely followed by an error) saying that you’re asking to resample the data to 30 degree pixels, which is probably not what you wanted:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(</span>
+<span id="cb2-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_landsat_imagery</span>(</span>
+<span id="cb2-3">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">aoi =</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_transform</span>(aoi, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4326</span>),</span>
+<span id="cb2-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">start_date =</span> start_date,</span>
+<span id="cb2-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">end_date =</span> end_date,</span>
+<span id="cb2-6">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb2-7">  )</span>
+<span id="cb2-8">)</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: The default pixel size arguments are intended for use with projected AOIs, but `aoi` appears to be in geographic coordinates.
+ℹ Pixel X size: 30. Pixel Y size: 30.
+ℹ These dimensions will be interpreted in the same units as `aoi` (likely degrees), which may cause errors.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in CPL_gdalwarp(source, destination, options, oo, doo, config_options,
+: GDAL Error 1: Attempt to create 0x0 dataset is illegal,sizes must be larger
+than zero.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Failed to download LC08_L2SP_015029_20220617_02_T1 from
+2022-06-17T15:45:03.055481Z</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in CPL_gdalwarp(source, destination, options, oo, doo, config_options,
+: GDAL Error 1: Attempt to create 0x0 dataset is illegal,sizes must be larger
+than zero.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Failed to download LC09_L2SP_015029_20220609_02_T2 from
+2022-06-09T15:44:23.649712Z</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in CPL_gdalwarp(source, destination, options, oo, doo, config_options,
+: GDAL Error 1: Attempt to create 0x0 dataset is illegal,sizes must be larger
+than zero.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Failed to download LC08_L2SP_015029_20220601_02_T1 from
+2022-06-01T15:44:51.569374Z</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in new_CppObject_xp(fields$.module, fields$.pointer, ...): GDAL Error
+4: /tmp/Rtmp7E1urK/filedddb8dfac1e.tif: No such file or directory</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error : [rast] file does not exist: /tmp/Rtmp7E1urK/filedddb8dfac1e.tif</code></pre>
+</div>
+</div>
+<p>That’s coming from the resampling step of the function’s workflow. Can we just skip that?</p>
+<p>Short answer: yes! If we pass <code>NULL</code> to the <code>pixel_*_size</code> arguments, we’ll skip the resampling stage and instead download our data in its native resolution:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_landsat_imagery</span>(</span>
+<span id="cb12-2">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">aoi =</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_transform</span>(aoi, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4326</span>),</span>
+<span id="cb12-3">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">start_date =</span> start_date,</span>
+<span id="cb12-4">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">end_date =</span> end_date,</span>
+<span id="cb12-5">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pixel_x_size =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>,</span>
+<span id="cb12-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pixel_y_size =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>,</span>
+<span id="cb12-7">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb12-8">) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb12-9">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb12-10">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>()</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This is a pattern throughout the rsi API design: if you want to skip something, pass <code>NULL</code> to the relevant argument. For instance (and this is where <a href="https://github.com/Permian-Global-Research/rsi/issues/6">the GitHub issue comes in</a>), if you want to not composite and instead download all the images within your spatiotemporal area of interest, we can pass <code>NULL</code> to the <code>composite_function</code> argument to skip compositing. I’ll also skip masking by passing <code>NULL</code> to the <code>mask_function</code> argument, because otherwise a handful of these images are entirely masked out:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_landsat_imagery</span>(</span>
+<span id="cb13-2">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">aoi =</span> aoi,</span>
+<span id="cb13-3">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">start_date =</span> start_date,</span>
+<span id="cb13-4">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">end_date =</span> end_date,</span>
+<span id="cb13-5">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>),</span>
+<span id="cb13-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">composite_function =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span>,</span>
+<span id="cb13-7">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mask_function =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span> <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># otherwise half of these images are blank</span></span>
+<span id="cb13-8">) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb13-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>rast) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb13-10">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>plot)</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-3.png" class="img-fluid" width="672"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+NULL
+
+[[2]]
+NULL
+
+[[3]]
+NULL</code></pre>
+</div>
+</div>
+<p>Hopefully this helps people use rsi to only perform the data wrangling steps they want!</p>
+
+
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>And calculate spectral indices from these data, and wrangle multiple rasters into a multi-band VRT – it’s a pretty neat package if I do say so myself.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>R</category>
+  <category>Tutorials</category>
+  <category>Spatial</category>
+  <category>geospatial data</category>
+  <category>R packages</category>
+  <guid>https://mm218.dev/posts/2023-11-21-rsi-null/index.html</guid>
+  <pubDate>Tue, 21 Nov 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2023-11-21-rsi-null/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Classed conditions from rlang functions</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -6909,213 +7256,6 @@ font-style: inherit;">obj_size</span>(boots)</span></code></pre></div>
   <guid>https://mm218.dev/posts/2022-08-15-last-summer/index.html</guid>
   <pubDate>Fri, 12 Aug 2022 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2022-08-15-last-summer/autoplot.png" medium="image" type="image/png" height="89" width="144"/>
-</item>
-<item>
-  <title>Waywiser version 0.1.0 is now on CRAN!</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2022-08-11-waywiser-010-is-now-on-cran/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-08-11-waywiser-010-is-now-on-cran/waywiser.svg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">The waywiser hex sticker logo: a surveyor’s wheel over the word “waywiser”.</figcaption>
-</figure>
-</div>
-<p>I’ve got a new package on CRAN! <a href="https://github.com/mikemahoney218/waywiser">waywiser</a> is a <a href="https://yardstick.tidymodels.org/">yardstick</a> extension package, providing functions for calculating spatial autocorrelation in model residuals in a way that cooperates with <em>most</em> (but not all, see below) of the tidymodels framework.</p>
-<p>You can install it from CRAN:</p>
-<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">install.packages</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"waywiser"</span>)</span></code></pre></div>
-<p>Or the development version from <a href="https://github.com/mikemahoney218/waywiser">the package’s GitHub page</a>:</p>
-<div class="sourceCode" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># install.packages("remotes")</span></span>
-<span id="cb2-2">remotes<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">install_github</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"mikemahoney218/waywiser"</span>)</span></code></pre></div>
-<p>You can use the package to estimate the spatial autocorrelation in residuals from any model – just provide spatial data, a vector of your “true” measurements, and a vector of your predicted values:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(waywiser)</span>
-<span id="cb3-2"></span>
-<span id="cb3-3"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># Data on morality crimes in France:</span></span>
-<span id="cb3-4"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">data</span>(guerry, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"sfdep"</span>)</span>
-<span id="cb3-5"></span>
-<span id="cb3-6"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ww_global_moran</span>(guerry, crime_pers, <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">predict</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(crime_pers <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> literacy, guerry)))</span></code></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: multiple methods tables found for 'area'</code></pre>
-</div>
-<div class="cell-output-display">
-
-<div data-pagedtable="false">
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["geometry"],"name":[4],"type":["s_MULTIP"],"align":["right"]}],"data":[{"1":"global_moran_i","2":"standard","3":"0.4115651506187433","4":"<s_MULTIP>"},{"1":"global_moran_pvalue","2":"standard","3":"0.0000000007234758","4":"<s_MULTIP>"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-</div>
-<p>Under the hood, waywiser uses two functions (<code>ww_build_neighbors()</code> and <code>ww_build_weights()</code>) to build sensible, if likely non-ideal neighbor lists and spatial weights for your data. However, waywiser also lets you provide your own weights object to override the automatic calculations, or provide a function to calculate spatial weights based on the input data frame:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">weights <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ww_build_weights</span>(guerry)</span>
-<span id="cb5-2"></span>
-<span id="cb5-3"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ww_global_moran</span>(</span>
-<span id="cb5-4">  guerry, </span>
-<span id="cb5-5">  crime_pers, </span>
-<span id="cb5-6">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">predict</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(crime_pers <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> literacy, guerry)),</span>
-<span id="cb5-7">  <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">wt =</span> weights</span>
-<span id="cb5-8">)</span></code></pre></div>
-<div class="cell-output-display">
-
-<div data-pagedtable="false">
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".estimate"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["geometry"],"name":[4],"type":["s_MULTIP"],"align":["right"]}],"data":[{"1":"global_moran_i","2":"standard","3":"0.4115651506187433","4":"<s_MULTIP>"},{"1":"global_moran_pvalue","2":"standard","3":"0.0000000007234758","4":"<s_MULTIP>"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-</div>
-<p>Providing our own weights is necessary in order to use the <code>_vec()</code> versions of waywiser functions, which can be helpful for use in dplyr functions:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># For the %&gt;% pipe and mutate:</span></span>
-<span id="cb6-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(dplyr)</span>
-<span id="cb6-3"><span class="co" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;"># For visualization:</span></span>
-<span id="cb6-4"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(ggplot2)</span>
-<span id="cb6-5"></span>
-<span id="cb6-6">guerry <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span></span>
-<span id="cb6-7">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mutate</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">pred =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">predict</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(crime_pers <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> literacy, .)),</span>
-<span id="cb6-8">         <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">.estimate =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ww_local_moran_i_vec</span>(crime_pers, pred, weights)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb6-9">  sf<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">st_as_sf</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">%&gt;%</span> </span>
-<span id="cb6-10">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fill =</span> .estimate)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span></span>
-<span id="cb6-11">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_sf</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb6-12">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">scale_fill_gradient2</span>(</span>
-<span id="cb6-13">    <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Moran's I"</span>, </span>
-<span id="cb6-14">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">low =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#018571"</span>, </span>
-<span id="cb6-15">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">mid =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"white"</span>, </span>
-<span id="cb6-16">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">high =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"#A6611A"</span></span>
-<span id="cb6-17">  ) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb6-18">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_minimal</span>()</span></code></pre></div>
-<div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2022-08-11-waywiser-010-is-now-on-cran/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-<p>The package currently provides three main indices of autocorrelation – namely, Moran’s I and Geary’s C (both in global and local variants), as well as Getis-Ord’s G and G* (only the local variant).</p>
-<p>This first version of the package integrates well with the rest of the tidymodels framework, <em>except</em> for the tune package (due to some difficulty in exposing either the original spatial data or the weights object to waywiser function while tuning a model). As a result, this version doesn’t let you include these functions as metrics to calculate inside of a call to <code>fit_resamples()</code>.</p>
-<p>The full list of features and documentation can be found on <a href="https://mikemahoney218.github.io/waywiser/">the package’s website</a>. This has been a really fun package to work on; I’m excited to see it out in public, and will look forward to seeing if anyone else finds it useful!</p>
-
-
-
- ]]></description>
-  <category>R</category>
-  <category>waywiser</category>
-  <category>tidymodels</category>
-  <category>R packages</category>
-  <category>geospatial data</category>
-  <guid>https://mm218.dev/posts/2022-08-11-waywiser-010-is-now-on-cran/index.html</guid>
-  <pubDate>Thu, 11 Aug 2022 00:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>
