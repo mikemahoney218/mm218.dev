@@ -211,7 +211,7 @@ font-style: inherit;">"/dev/null"</span></span>
 </div>
 </div>
 <p>Anyway, back to the point. Complicated objects print ugly, and don’t have any of their other methods available, when you unserialize them in a new session.</p>
-<p>The reason for this is pretty straightforward: the print (and other) methods are inside the namespace of the package that created the objects,<sup>3</sup> if that namespace isn’t loaded then R can’t find the methods when they’re needed, and deserializing the object doesn’t automatically load the relevant namespace. So the reason that <code>boston_canopy</code> printed nicely in our current session is that spatialsample sneakily loaded sf in the background when we called the <code>boston_canopy</code> object:<sup>4</sup></p>
+<p>The reason for this is pretty straightforward: the print (and other) methods are inside the namespace of the package that created the objects,<sup>3</sup> if that namespace isn’t loaded then R can’t find the methods when they’re needed, and unserializing the object doesn’t automatically load the relevant namespace. So the reason that <code>boston_canopy</code> printed nicely in our current session is that spatialsample sneakily loaded sf in the background when we called the <code>boston_canopy</code> object:<sup>4</sup></p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1">is_sf_loaded <span class="ot" style="color: #003B4F;
 background-color: null;
@@ -338,7 +338,7 @@ Backtrace:
   9. ├─base::saveRDS(...)
  10. ├─base::do.call(...)
  11. ├─base (local) `&lt;fn&gt;`(...)
- 12. ├─global `&lt;fn&gt;`(bos_rds = base::quote("/tmp/RtmpMLtYi9/file709d79a74949.rds"))
+ 12. ├─global `&lt;fn&gt;`(bos_rds = base::quote("/tmp/Rtmpb70291/file7571358e23a4.rds"))
  13. │ ├─base::try(dplyr::arrange(readRDS(bos_rds)))
  14. │ │ └─base::tryCatch(...)
  15. │ │   └─base (local) tryCatchList(expr, classes, parentenv, handlers)
@@ -369,7 +369,7 @@ font-style: inherit;">:::</span>arrange.sf</span></code></pre></div>
     class(.data) = setdiff(class(.data), "sf")
     st_as_sf(NextMethod(), sf_column_name = sf_column_name)
 }
-&lt;bytecode: 0x560f44ad5378&gt;
+&lt;bytecode: 0x558e252883b0&gt;
 &lt;environment: namespace:sf&gt;</code></pre>
 </div>
 </div>
@@ -633,7 +633,7 @@ font-style: inherit;">".sf_namespace"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>function () 
 NULL
-&lt;bytecode: 0x560f4ca71f90&gt;
+&lt;bytecode: 0x558e2d2322d8&gt;
 &lt;environment: namespace:sf&gt;</code></pre>
 </div>
 </div>
@@ -697,7 +697,7 @@ font-style: inherit;">"/dev/null"</span></span>
 <ol>
 <li id="fn1"><p>Note that we need to use the <code>stdout</code> argument to capture how this object actually prints to R’s console, and to then use <code>readLines()</code> to print the contents of that file into our current session.↩︎</p></li>
 <li id="fn2"><p>Thanks to <a href="https://fosstodon.org/@gaborcsardi/111472185756408510">Gabor on Mastodon</a> for teaching me that R will always have access to the system library.↩︎</p></li>
-<li id="fn3"><p>I mean, mostly. Some packages like <a href="https://broom.tidymodels.org">broom</a> provide a bunch of methods for objects that don’t come from that package. But those packages aren’t automatically loaded on deserialization either (and can you imagine how chaotic a world that would be!), so the basic point stands.↩︎</p></li>
+<li id="fn3"><p>I mean, mostly. Some packages like <a href="https://broom.tidymodels.org">broom</a> provide a bunch of methods for objects that don’t come from that package. But those packages aren’t automatically loaded on unserialization either (and can you imagine how chaotic a world that would be!), so the basic point stands.↩︎</p></li>
 <li id="fn4"><p>More on the trick <a href="https://www.mm218.dev/posts/2022-12-01-sf-in-packages/">in this old blog post</a>.↩︎</p></li>
 <li id="fn5"><p>Well, the <em>root</em> root cause is that <a href="https://github.com/r-lib/pillar/issues/552">vctrs can’t calculate the length of sf geometry columns</a>, because they don’t subclass the list class.↩︎</p></li>
 <li id="fn6"><p>I’m trying to be very precise with my wording here, so let me highlight that this call to <code>library()</code> is actually <em>attaching</em> sf, when all that’s necessary is <em>loading</em> it. For <em>this post</em> this is a distinction without a difference, so I’m not spending a lot of time on it. But only loading the namespace is necessary, you don’t need to attach it to the search path.↩︎</p></li>
