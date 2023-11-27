@@ -1,0 +1,236 @@
+---
+title: "Helping R find the right methods for unserialized complex objects."
+description: "Automatically load package namespaces when reading serialized objects with this One Quick Trick."
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2023-11-27"
+categories: [R, Tutorials, Spatial, geospatial data, R packages]
+image: banner.jpg
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+So here's a problem you may have encountered. Say you've serialized some complicated R object using a function like `saveRDS()`, which saves your objects as a binary file. For instance, we can take the `boston_canopy` sf object from spatialsample, which looks like this:
+
+```{r}
+spatialsample::boston_canopy |> 
+  head()
+```
+
+And save it out as an RDS file:
+
+```{r}
+bos_rds <- tempfile(fileext = ".rds")
+callr::r(
+  \(bos_rds) saveRDS(spatialsample::boston_canopy, bos_rds),
+  args = list(bos_rds = bos_rds)
+) |> 
+  invisible()
+```
+
+When you unserialize that file, R won't automatically be able to find all the methods associated with your complicated object. For instance, in a new session, our `boston_canopy` data doesn't print nearly as nicely:^[Note that we need to use the `stdout` argument to capture how this object actually prints to R's console, and to then use `readLines()` to print the contents of that file into our current session.]
+
+```{r}
+console_output <- tempfile()
+callr::r(
+  \(bos_rds) {
+    readRDS(bos_rds) |> 
+      head(1) |> 
+      print()
+    NULL
+  },
+  args = list(bos_rds = bos_rds),
+  stdout = console_output
+) |> 
+  invisible()
+readLines(console_output)
+```
+
+What on Earth is up with that geometry column? That's unworkable.
+
+Before we dig into this further, let's write a quick wrapper function that will handle the `console_output` and `readLines()` dance we just did for the rest of this post:
+
+```{r}
+run_isolated <- function(..., libpath = .libPaths()) {
+  console_output <- tempfile()
+  callr::r(
+    ...,
+    libpath = libpath,
+    stdout = console_output
+  )
+  readLines(console_output)
+}
+```
+
+I've also added a `libpath` argument, which will let me control what packages these new R sessions are able to access. By default, R sessions run via `run_isolated()` will have access to all the libraries installed on my machine:
+
+```{r}
+run_isolated(
+  \() print(requireNamespace("sf"))
+)
+```
+
+But because I've got all my packages installed into a user library (not the system library), I can use that new `libpath` argument to make it so these R sessions are _entirely_ isolated, without access to any non-base packages at all:^[Thanks to [Gabor on Mastodon](https://fosstodon.org/@gaborcsardi/111472185756408510) for teaching me that R will always have access to the system library.]
+
+```{r}
+run_isolated(
+  \() print(requireNamespace("sf")),
+  libpath = "/dev/null"
+)
+```
+
+Anyway, back to the point. Complicated objects print ugly, and don't have any of their other methods available, when you unserialize them in a new session.
+
+The reason for this is pretty straightforward: the print (and other) methods are inside the namespace of the package that created the objects,^[I mean, mostly. Some packages like [broom](https://broom.tidymodels.org) provide a bunch of methods for objects that don't come from that package. But those packages aren't automatically loaded on deserialization either (and can you imagine how chaotic a world that would be!), so the basic point stands.] if that namespace isn't loaded then R can't find the methods when they're needed, and deserializing the object doesn't automatically load the relevant namespace. So the reason that `boston_canopy` printed nicely in our current session is that spatialsample sneakily loaded sf in the background when we called the `boston_canopy` object:^[More on the trick [in this old blog post](https://www.mm218.dev/posts/2022-12-01-sf-in-packages/).] 
+
+```{r}
+is_sf_loaded <- function() {
+  sessionInfo()[c("otherPkgs", "loadedOnly")] |> 
+    lapply(names) |> 
+    grepl(pattern = "sf") |> 
+    any()
+}
+is_sf_loaded()
+```
+
+But when we unserialize the object this doesn't happen:
+
+```{r}
+callr::r(
+  \(bos_rds, is_sf_loaded) {
+    readRDS(bos_rds)
+    is_sf_loaded()
+  },
+  args = list(bos_rds = bos_rds, is_sf_loaded = is_sf_loaded)
+)
+```
+
+Because `print.sf()` is defined in sf, and sf isn't loaded, we fall back to the default, ugly print method.
+
+This has broader-reaching impacts. For instance, a number of dplyr functions fail for seemingly nonsensical reasons if they're used on a unserialized object:
+
+```{r}
+callr::r(
+  \(bos_rds) {
+    readRDS(bos_rds) |> 
+      dplyr::arrange() |> 
+      try()
+  },
+  args = list(bos_rds = bos_rds)
+)
+```
+
+Just like with printing, the root cause here is that R can't find the `arrange.sf()` method when sf isn't loaded, and winds up using the basic data frame method instead (which then errors out).^[Well, the _root_ root cause is that [vctrs can't calculate the length of sf geometry columns](https://github.com/r-lib/pillar/issues/552), because they don't subclass the list class.]
+
+```{r}
+sf:::arrange.sf
+```
+
+The fix is pretty straightforward: load sf (or whatever package has the methods you're looking for). That'll let R find your methods, arrange your data, print all pretty, and do everything else you want:^[I'm trying to be very precise with my wording here, so let me highlight that this call to `library()` is actually _attaching_ sf, when all that's necessary is _loading_ it. For _this post_ this is a distinction without a difference, so I'm not spending a lot of time on it. But only loading the namespace is necessary, you don't need to attach it to the search path.]
+
+```{r}
+run_isolated(
+  \(bos_rds) {
+    library(sf)
+    readRDS(bos_rds) |> 
+      dplyr::arrange() |> 
+      head(1) |> 
+      print()
+  },
+  args = list(bos_rds = bos_rds)
+)
+```
+
+This all might sound pretty familiar; I wrote a post about [more or less about this a year ago](https://www.mm218.dev/posts/2022-12-01-sf-in-packages/). So why bring it up again?
+
+Well, because I saw [a cool trick in patchwork](https://github.com/thomasp85/patchwork/commit/f7fbab5452c3545211724fee5f9303106ed9b257) that is currently [in the development version of sf](https://github.com/r-spatial/sf/pull/2212) that I like a lot better than the one I wrote about last year. It's possible for these unserialized objects to load their relevant packages themselves, making all their methods available as soon as they exist in your R session. For this example to work on your machine, you're going to need the development version (at time of writing) of sf:
+
+```{r}
+packageVersion("sf") > "1.0-14"
+```
+
+Let's create a new RDS file, this time using an object that was created by the development version of sf:
+
+```{r}
+nc_rds <- tempfile(fileext = ".rds")
+callr::r(
+  \(nc_rds) {
+    system.file("shape/nc.shp", package = "sf") |> 
+      sf::st_read() |> 
+      saveRDS(nc_rds)
+  },
+  args = list(nc_rds = nc_rds)
+) |> 
+  invisible()
+```
+
+Just like before, let's unserialize this RDS file and print it to our console:
+
+```{r}
+run_isolated(
+  \(nc_rds) {
+    readRDS(nc_rds) |> 
+      head(1) |> 
+      print()
+    invisible(NULL)
+  }, 
+  args = list(nc_rds = nc_rds)
+)
+```
+
+Somehow, magically, R found the right print method! 
+
+R can now also find the right methods for other functions, like `arrange()`:
+
+```{r}
+callr::r(
+  \(nc_rds) {
+    readRDS(nc_rds) |> 
+      dplyr::arrange() |> 
+      try()
+  },
+  args = list(nc_rds = nc_rds)
+) |> 
+  head(1)
+```
+
+So what's the trick? Well, under the hood these new sf objects are quietly loading sf when they get unserialized:
+
+```{r}
+callr::r(
+  \(nc_rds, is_sf_loaded) {
+    readRDS(nc_rds)
+    is_sf_loaded()
+  }, 
+  args = list(nc_rds = nc_rds, is_sf_loaded = is_sf_loaded)
+)
+```
+
+The trick here is that sf objects now have an attribute, `.sf_namespace`, that's a simple stub function defined in the sf namespace:
+
+```{r}
+nc_from_rds <- readRDS(nc_rds)
+attr(nc_from_rds, ".sf_namespace")
+```
+
+That attribute -- which takes up nearly no RAM or disk space -- is enough to cause R to automatically load the sf namespace when these objects are unserialized. You now magically have access to all the methods for your complex objects right out of the box. 
+
+What if sf isn't installed? Then it doesn't get loaded. But that means objects fall back to their default methods, which isn't _great_ but seems _fine_:
+
+```{r}
+run_isolated(
+  \(nc_rds) {
+    readRDS(nc_rds) |> 
+      head(1) |> 
+      print()
+    invisible(NULL)
+  }, 
+  args = list(nc_rds = nc_rds),
+  libpath = "/dev/null"
+)
+```
+
+I think this is really cool! It feels like a user-friendly way to make unserialized complex objects work like you'd expect them to, and prevents confusing error chains like the ones above. 
