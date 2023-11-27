@@ -26,7 +26,7 @@
 background-color: null;
 font-style: inherit;">::</span>boston_canopy <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
+font-style: inherit;">|&gt;</span></span>
 <span id="cb1-2">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">head</span>()</span></code></pre></div>
@@ -64,29 +64,11 @@ background-color: null;
 font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">".rds"</span>)</span>
-<span id="cb3-2">callr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">r</span>(</span>
-<span id="cb3-3">  \(bos_rds) <span class="fu" style="color: #4758AB;
+<span id="cb3-2"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">saveRDS</span>(spatialsample<span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">::</span>boston_canopy, bos_rds),</span>
-<span id="cb3-4">  <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">list</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">bos_rds =</span> bos_rds)</span>
-<span id="cb3-5">) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb3-6">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">invisible</span>()</span></code></pre></div>
+font-style: inherit;">::</span>boston_canopy, bos_rds)</span></code></pre></div>
 </div>
 <p>When you unserialize that file, R won’t automatically be able to find all the methods associated with your complicated object. For instance, in a new session, our <code>boston_canopy</code> data doesn’t print nearly as nicely:<sup>1</sup></p>
 <div class="cell">
@@ -105,14 +87,14 @@ font-style: inherit;">r</span>(</span>
 background-color: null;
 font-style: inherit;">readRDS</span>(bos_rds) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
+font-style: inherit;">|&gt;</span></span>
 <span id="cb4-5">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">head</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
+font-style: inherit;">|&gt;</span></span>
 <span id="cb4-6">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">print</span>()</span>
@@ -132,7 +114,7 @@ background-color: null;
 font-style: inherit;">stdout =</span> console_output</span>
 <span id="cb4-11">) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
+font-style: inherit;">|&gt;</span></span>
 <span id="cb4-12">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">invisible</span>()</span>
@@ -246,12 +228,12 @@ font-style: inherit;">"otherPkgs"</span>, <span class="st" style="color: #20794D
 background-color: null;
 font-style: inherit;">"loadedOnly"</span>)] <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
+font-style: inherit;">|&gt;</span></span>
 <span id="cb11-3">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">lapply</span>(names) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
+font-style: inherit;">|&gt;</span></span>
 <span id="cb11-4">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">grepl</span>(<span class="at" style="color: #657422;
@@ -260,7 +242,7 @@ font-style: inherit;">pattern =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"sf"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
+font-style: inherit;">|&gt;</span></span>
 <span id="cb11-5">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">any</span>()</span>
@@ -314,14 +296,14 @@ font-style: inherit;">r</span>(</span>
 background-color: null;
 font-style: inherit;">readRDS</span>(bos_rds) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
+font-style: inherit;">|&gt;</span></span>
 <span id="cb15-4">      dplyr<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">arrange</span>() <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
+font-style: inherit;">|&gt;</span></span>
 <span id="cb15-5">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">try</span>()</span>
@@ -356,7 +338,7 @@ Backtrace:
   9. ├─base::saveRDS(...)
  10. ├─base::do.call(...)
  11. ├─base (local) `&lt;fn&gt;`(...)
- 12. ├─global `&lt;fn&gt;`(bos_rds = base::quote("/tmp/Rtmpw6kTUL/file89277132ad01.rds"))
+ 12. ├─global `&lt;fn&gt;`(bos_rds = base::quote("/tmp/RtmpMLtYi9/file709d79a74949.rds"))
  13. │ ├─base::try(dplyr::arrange(readRDS(bos_rds)))
  14. │ │ └─base::tryCatch(...)
  15. │ │   └─base (local) tryCatchList(expr, classes, parentenv, handlers)
@@ -387,7 +369,7 @@ font-style: inherit;">:::</span>arrange.sf</span></code></pre></div>
     class(.data) = setdiff(class(.data), "sf")
     st_as_sf(NextMethod(), sf_column_name = sf_column_name)
 }
-&lt;bytecode: 0x563371c1f8f0&gt;
+&lt;bytecode: 0x560f44ad5378&gt;
 &lt;environment: namespace:sf&gt;</code></pre>
 </div>
 </div>
@@ -404,21 +386,21 @@ font-style: inherit;">library</span>(sf)</span>
 background-color: null;
 font-style: inherit;">readRDS</span>(bos_rds) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
+font-style: inherit;">|&gt;</span></span>
 <span id="cb19-5">      dplyr<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">arrange</span>() <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
+font-style: inherit;">|&gt;</span></span>
 <span id="cb19-6">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">head</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
+font-style: inherit;">|&gt;</span></span>
 <span id="cb19-7">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">print</span>()</span>
@@ -476,13 +458,7 @@ background-color: null;
 font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">".rds"</span>)</span>
-<span id="cb23-2">callr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">r</span>(</span>
-<span id="cb23-3">  \(nc_rds) {</span>
-<span id="cb23-4">    <span class="fu" style="color: #4758AB;
+<span id="cb23-2"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
 background-color: null;
@@ -492,67 +468,63 @@ font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"sf"</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb23-5">      sf<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb23-3">  sf<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">st_read</span>() <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb23-6">      <span class="fu" style="color: #4758AB;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb23-4">  <span class="fu" style="color: #4758AB;
 background-color: null;
-font-style: inherit;">saveRDS</span>(nc_rds)</span>
-<span id="cb23-7">  },</span>
-<span id="cb23-8">  <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">list</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">nc_rds =</span> nc_rds)</span>
-<span id="cb23-9">) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb23-10">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">invisible</span>()</span></code></pre></div>
+font-style: inherit;">saveRDS</span>(nc_rds)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Reading layer `nc' from data source 
+  `/home/mikemahoney218/R/x86_64-pc-linux-gnu-library/4.3/sf/shape/nc.shp' 
+  using driver `ESRI Shapefile'
+Simple feature collection with 100 features and 14 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: -84.32385 ymin: 33.88199 xmax: -75.45698 ymax: 36.58965
+Geodetic CRS:  NAD27</code></pre>
+</div>
 </div>
 <p>Just like before, let’s unserialize this RDS file and print it to our console:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><span class="fu" style="color: #4758AB;
+<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">run_isolated</span>(</span>
-<span id="cb24-2">  \(nc_rds) {</span>
-<span id="cb24-3">    <span class="fu" style="color: #4758AB;
+<span id="cb25-2">  \(nc_rds) {</span>
+<span id="cb25-3">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">readRDS</span>(nc_rds) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb24-4">      <span class="fu" style="color: #4758AB;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb25-4">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">head</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb24-5">      <span class="fu" style="color: #4758AB;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb25-5">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">print</span>()</span>
-<span id="cb24-6">    <span class="fu" style="color: #4758AB;
+<span id="cb25-6">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">invisible</span>(<span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">NULL</span>)</span>
-<span id="cb24-7">  }, </span>
-<span id="cb24-8">  <span class="at" style="color: #657422;
+<span id="cb25-7">  },</span>
+<span id="cb25-8">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">list</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">nc_rds =</span> nc_rds)</span>
-<span id="cb24-9">)</span></code></pre></div>
+<span id="cb25-9">)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "Simple feature collection with 1 feature and 14 fields"                        
 [2] "Geometry type: MULTIPOLYGON"                                                   
@@ -568,39 +540,39 @@ font-style: inherit;">nc_rds =</span> nc_rds)</span>
 <p>Somehow, magically, R found the right print method!</p>
 <p>R can now also find the right methods for other functions, like <code>arrange()</code>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1">callr<span class="sc" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1">callr<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">r</span>(</span>
-<span id="cb26-2">  \(nc_rds) {</span>
-<span id="cb26-3">    <span class="fu" style="color: #4758AB;
+<span id="cb27-2">  \(nc_rds) {</span>
+<span id="cb27-3">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">readRDS</span>(nc_rds) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb26-4">      dplyr<span class="sc" style="color: #5E5E5E;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb27-4">      dplyr<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">arrange</span>() <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb26-5">      <span class="fu" style="color: #4758AB;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb27-5">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">try</span>()</span>
-<span id="cb26-6">  },</span>
-<span id="cb26-7">  <span class="at" style="color: #657422;
+<span id="cb27-6">  },</span>
+<span id="cb27-7">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">list</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">nc_rds =</span> nc_rds)</span>
-<span id="cb26-8">) <span class="sc" style="color: #5E5E5E;
+<span id="cb27-8">) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb26-9">  <span class="fu" style="color: #4758AB;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb27-9">  <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">head</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
@@ -619,20 +591,20 @@ Geodetic CRS:  NAD27
 </div>
 <p>So what’s the trick? Well, under the hood these new sf objects are quietly loading sf when they get unserialized:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1">callr<span class="sc" style="color: #5E5E5E;
+<div class="sourceCode cell-code" id="cb29" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1">callr<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">r</span>(</span>
-<span id="cb28-2">  \(nc_rds, is_sf_loaded) {</span>
-<span id="cb28-3">    <span class="fu" style="color: #4758AB;
+<span id="cb29-2">  \(nc_rds, is_sf_loaded) {</span>
+<span id="cb29-3">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">readRDS</span>(nc_rds)</span>
-<span id="cb28-4">    <span class="fu" style="color: #4758AB;
+<span id="cb29-4">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">is_sf_loaded</span>()</span>
-<span id="cb28-5">  }, </span>
-<span id="cb28-6">  <span class="at" style="color: #657422;
+<span id="cb29-5">  },</span>
+<span id="cb29-6">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
@@ -641,19 +613,19 @@ background-color: null;
 font-style: inherit;">nc_rds =</span> nc_rds, <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">is_sf_loaded =</span> is_sf_loaded)</span>
-<span id="cb28-7">)</span></code></pre></div>
+<span id="cb29-7">)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] TRUE</code></pre>
 </div>
 </div>
-<p>The trick here is that sf objects now have an attribute, <code>.sf_namespace</code>, that’s a simple stub function defined in the sf namespace:</p>
+<p>The magic here is that sf objects now have an attribute, <code>.sf_namespace</code>, that’s a simple stub function defined in the sf namespace:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1">nc_from_rds <span class="ot" style="color: #003B4F;
+<div class="sourceCode cell-code" id="cb31" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1">nc_from_rds <span class="ot" style="color: #003B4F;
 background-color: null;
 font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">readRDS</span>(nc_rds)</span>
-<span id="cb30-2"><span class="fu" style="color: #4758AB;
+<span id="cb31-2"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">attr</span>(nc_from_rds, <span class="st" style="color: #20794D;
 background-color: null;
@@ -661,51 +633,51 @@ font-style: inherit;">".sf_namespace"</span>)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>function () 
 NULL
-&lt;bytecode: 0x563378b39500&gt;
+&lt;bytecode: 0x560f4ca71f90&gt;
 &lt;environment: namespace:sf&gt;</code></pre>
 </div>
 </div>
 <p>That attribute – which takes up nearly no RAM or disk space – is enough to cause R to automatically load the sf namespace when these objects are unserialized. You now magically have access to all the methods for your complex objects right out of the box.</p>
 <p>What if sf isn’t installed? Then it doesn’t get loaded. But that means objects fall back to their default methods, which isn’t <em>great</em> but seems <em>fine</em>:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><span class="fu" style="color: #4758AB;
+<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">run_isolated</span>(</span>
-<span id="cb32-2">  \(nc_rds) {</span>
-<span id="cb32-3">    <span class="fu" style="color: #4758AB;
+<span id="cb33-2">  \(nc_rds) {</span>
+<span id="cb33-3">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">readRDS</span>(nc_rds) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb32-4">      <span class="fu" style="color: #4758AB;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb33-4">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">head</span>(<span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">1</span>) <span class="sc" style="color: #5E5E5E;
 background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb32-5">      <span class="fu" style="color: #4758AB;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb33-5">      <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">print</span>()</span>
-<span id="cb32-6">    <span class="fu" style="color: #4758AB;
+<span id="cb33-6">    <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">invisible</span>(<span class="cn" style="color: #8f5902;
 background-color: null;
 font-style: inherit;">NULL</span>)</span>
-<span id="cb32-7">  }, </span>
-<span id="cb32-8">  <span class="at" style="color: #657422;
+<span id="cb33-7">  },</span>
+<span id="cb33-8">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">args =</span> <span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">list</span>(<span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">nc_rds =</span> nc_rds),</span>
-<span id="cb32-9">  <span class="at" style="color: #657422;
+<span id="cb33-9">  <span class="at" style="color: #657422;
 background-color: null;
 font-style: inherit;">libpath =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"/dev/null"</span></span>
-<span id="cb32-10">)</span></code></pre></div>
+<span id="cb33-10">)</span></code></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "   AREA PERIMETER CNTY_ CNTY_ID NAME  FIPS FIPSNO CRESS_ID BIR74 SID74 NWBIR74"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 [2] "1 0.114     1.442  1825    1825 Ashe 37009  37009        5  1091     1      10"                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
