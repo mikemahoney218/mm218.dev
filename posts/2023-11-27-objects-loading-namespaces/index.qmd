@@ -16,7 +16,7 @@ engine: knitr
 So here's a problem you may have encountered. Say you've serialized some complicated R object using a function like `saveRDS()`, which saves your objects as a binary file. For instance, we can take the `boston_canopy` sf object from spatialsample, which looks like this:
 
 ```{r}
-spatialsample::boston_canopy |> 
+spatialsample::boston_canopy |>
   head()
 ```
 
@@ -24,11 +24,7 @@ And save it out as an RDS file:
 
 ```{r}
 bos_rds <- tempfile(fileext = ".rds")
-callr::r(
-  \(bos_rds) saveRDS(spatialsample::boston_canopy, bos_rds),
-  args = list(bos_rds = bos_rds)
-) |> 
-  invisible()
+saveRDS(spatialsample::boston_canopy, bos_rds)
 ```
 
 When you unserialize that file, R won't automatically be able to find all the methods associated with your complicated object. For instance, in a new session, our `boston_canopy` data doesn't print nearly as nicely:^[Note that we need to use the `stdout` argument to capture how this object actually prints to R's console, and to then use `readLines()` to print the contents of that file into our current session.]
@@ -37,14 +33,14 @@ When you unserialize that file, R won't automatically be able to find all the me
 console_output <- tempfile()
 callr::r(
   \(bos_rds) {
-    readRDS(bos_rds) |> 
-      head(1) |> 
+    readRDS(bos_rds) |>
+      head(1) |>
       print()
     NULL
   },
   args = list(bos_rds = bos_rds),
   stdout = console_output
-) |> 
+) |>
   invisible()
 readLines(console_output)
 ```
@@ -88,9 +84,9 @@ The reason for this is pretty straightforward: the print (and other) methods are
 
 ```{r}
 is_sf_loaded <- function() {
-  sessionInfo()[c("otherPkgs", "loadedOnly")] |> 
-    lapply(names) |> 
-    grepl(pattern = "sf") |> 
+  sessionInfo()[c("otherPkgs", "loadedOnly")] |>
+    lapply(names) |>
+    grepl(pattern = "sf") |>
     any()
 }
 is_sf_loaded()
@@ -115,8 +111,8 @@ This has broader-reaching impacts. For instance, a number of dplyr functions fai
 ```{r}
 callr::r(
   \(bos_rds) {
-    readRDS(bos_rds) |> 
-      dplyr::arrange() |> 
+    readRDS(bos_rds) |>
+      dplyr::arrange() |>
       try()
   },
   args = list(bos_rds = bos_rds)
@@ -135,9 +131,9 @@ The fix is pretty straightforward: load sf (or whatever package has the methods 
 run_isolated(
   \(bos_rds) {
     library(sf)
-    readRDS(bos_rds) |> 
-      dplyr::arrange() |> 
-      head(1) |> 
+    readRDS(bos_rds) |>
+      dplyr::arrange() |>
+      head(1) |>
       print()
   },
   args = list(bos_rds = bos_rds)
@@ -156,15 +152,9 @@ Let's create a new RDS file, this time using an object that was created by the d
 
 ```{r}
 nc_rds <- tempfile(fileext = ".rds")
-callr::r(
-  \(nc_rds) {
-    system.file("shape/nc.shp", package = "sf") |> 
-      sf::st_read() |> 
-      saveRDS(nc_rds)
-  },
-  args = list(nc_rds = nc_rds)
-) |> 
-  invisible()
+system.file("shape/nc.shp", package = "sf") |>
+  sf::st_read() |>
+  saveRDS(nc_rds)
 ```
 
 Just like before, let's unserialize this RDS file and print it to our console:
@@ -172,11 +162,11 @@ Just like before, let's unserialize this RDS file and print it to our console:
 ```{r}
 run_isolated(
   \(nc_rds) {
-    readRDS(nc_rds) |> 
-      head(1) |> 
+    readRDS(nc_rds) |>
+      head(1) |>
       print()
     invisible(NULL)
-  }, 
+  },
   args = list(nc_rds = nc_rds)
 )
 ```
@@ -188,12 +178,12 @@ R can now also find the right methods for other functions, like `arrange()`:
 ```{r}
 callr::r(
   \(nc_rds) {
-    readRDS(nc_rds) |> 
-      dplyr::arrange() |> 
+    readRDS(nc_rds) |>
+      dplyr::arrange() |>
       try()
   },
   args = list(nc_rds = nc_rds)
-) |> 
+) |>
   head(1)
 ```
 
@@ -204,12 +194,12 @@ callr::r(
   \(nc_rds, is_sf_loaded) {
     readRDS(nc_rds)
     is_sf_loaded()
-  }, 
+  },
   args = list(nc_rds = nc_rds, is_sf_loaded = is_sf_loaded)
 )
 ```
 
-The trick here is that sf objects now have an attribute, `.sf_namespace`, that's a simple stub function defined in the sf namespace:
+The magic here is that sf objects now have an attribute, `.sf_namespace`, that's a simple stub function defined in the sf namespace:
 
 ```{r}
 nc_from_rds <- readRDS(nc_rds)
@@ -223,11 +213,11 @@ What if sf isn't installed? Then it doesn't get loaded. But that means objects f
 ```{r}
 run_isolated(
   \(nc_rds) {
-    readRDS(nc_rds) |> 
-      head(1) |> 
+    readRDS(nc_rds) |>
+      head(1) |>
       print()
     invisible(NULL)
-  }, 
+  },
   args = list(nc_rds = nc_rds),
   libpath = "/dev/null"
 )
