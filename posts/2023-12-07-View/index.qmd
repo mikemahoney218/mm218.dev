@@ -37,7 +37,22 @@ These functions all follow one of three patterns:
 + Functions that start with URL;
 + `View()` _by itself_!
 
-So `View()` is weird; it's the only function that starts with a capital letter that's not named after a proper noun.^[[Merriam-Webster calls "URL" a noun](https://www.merriam-webster.com/dictionary/URL), even if it originated as an acronym, get out of my comments.] And it's been weird for a long time. The original version of the function was also capitalized when it was added by Professor Brian D Ripley way back in 2007:
+**Update:**
+
+A few minutes after publishing, [Konrad Rudolph points out on Mastodon](https://fosstodon.org/@klmr@mastodon.social/111540097245999105) that there are plenty of functions in the base package _itself_ that are capitalized and don't match these rules:
+
+```{r}
+ls("package:base") |> 
+  strsplit("") |> 
+  Filter(f = \(x) x[[1]] %in% LETTERS) |> 
+  vapply(paste0, character(1), collapse = "")
+```
+
+One of those is `Filter()`, which I _literally used in the original code chunk_ and somehow didn't notice started with a capital letter.
+
+< / update >
+
+But even with that said, `View()` is the only function _in recommended packages_ that starts with a capital letter that's not named after a proper noun.^[[Merriam-Webster calls "URL" a noun](https://www.merriam-webster.com/dictionary/URL), even if it originated as an acronym, get out of my comments.] And it's been weird for a long time. The original version of the function was also capitalized when it was added by Professor Brian D Ripley way back in 2007:
 
 ![](commit.png){fig-alt="Commit by Prof. Brian D Ripley on Feb 19 2007, adding the capitalized `View()` function."}
 
