@@ -57,7 +57,7 @@ Now, here's a decent piece of evidence _against_ this conjecture: the details se
 
 ![](ViewDetails.png){fig-alt="The details section of the `View()` documentation. Data viewer is not capitalized."}
 
-That said, this is also not unique. That same [Rstudio user guide also sometimes writes "data viewer" in lowercase](https://docs.posit.co/ide/user/ide/guide/data/data-viewer.html#scrolling), though in _most_ of the guide it's treated as a proper noun.
+That said, this is also not unique. That same [RStudio user guide also sometimes writes "data viewer" in lowercase](https://docs.posit.co/ide/user/ide/guide/data/data-viewer.html#scrolling), though in _most_ of the guide it's treated as a proper noun.
 
 So there's one guess: maybe `View()` is capitalized because, like the functions starting with R and S and URL, it's named after a proper noun. Things are the way they are because they are the way they are, yet again.
 
