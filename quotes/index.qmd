@@ -2,6 +2,14 @@
 title: Quotes
 ---
 
+<hr id = "ZitronAdvice">
+
+I only really give two pieces of career advice. The first is that you should be super easy to work with, the second is that you should get really good at something you also find as easy as possible.
+
+--- [Ed Zitron on BlueSky](https://bsky.app/profile/zitron.bsky.social/post/3kfvryoesyk25)
+
+<hr id = "KazemiLottery">
+
 There are two kinds of creative advice that I think you can get from creative people. The first is how to buy more lottery tickets, and the second is how to win the lottery. And I think the former can be extremely useful, and I think the latter is nonsense.
 
 --- [Darius Kazemi: How I Won The Lottery](https://www.youtube.com/watch?v=l_F9jxsfGCw)
