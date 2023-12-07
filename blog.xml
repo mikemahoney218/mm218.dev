@@ -186,6 +186,7 @@ font-style: inherit;">""</span>)</span></code></pre></div>
 </div>
 </div>
 <p>One of those is <code>Filter()</code>, which I <em>literally used in the original code chunk</em> and somehow didn’t notice started with a capital letter.</p>
+<p>These functions fall into a number of other groups – functions for working with complex numbers, for functional programming and recursion, for setting and getting system information and variables, group generic functions, and a few proper nouns and acronyms like “C” and “RNG”. It’s still not <em>common</em> – 77 out of 1268 objects in the base namespace start with a capital letter – but it’s more common than in recommended packages.</p>
 <p>&lt; / update &gt;</p>
 <p>But even with that said, <code>View()</code> is the only function <em>in recommended packages</em> that starts with a capital letter that’s not named after a proper noun.<sup>1</sup> And it’s been weird for a long time. The original version of the function was also capitalized when it was added by Professor Brian D Ripley way back in 2007:</p>
 <p><img src="https://mm218.dev/posts/2023-12-07-View/commit.png" class="img-fluid" alt="Commit by Prof. Brian D Ripley on Feb 19 2007, adding the capitalized `View()` function."></p>
