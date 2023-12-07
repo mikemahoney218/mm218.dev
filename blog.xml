@@ -10,7 +10,131 @@
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Mon, 27 Nov 2023 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Thu, 07 Dec 2023 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Why is View() capitalized, anyway?</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2023-12-07-View/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p><a href="https://bsky.app/profile/davidjohnbaker.bsky.social/post/3kfxbci3ji22h">Over on BlueSky, David John Baker asks</a>:</p>
+<p><img src="https://mm218.dev/posts/2023-12-07-View/post.png" class="img-fluid" alt="Post from David John Baker on BlueSky: Why is does the  `View()` function in R start with a capital V? I have no idea why. Does this have to do with functions that are not just dealing with some sort of standard output? #rstats"></p>
+<p>My first thought on reading this was that <code>View()</code> in RStudio is built to mask the <code>View()</code> function from utils, and so capitalizes the V because utils capitalized the V. Things are the way they are because they are the way they are, yet again.</p>
+<p>But of course, that’s not the actual question – not only did David specify he’s talking about the function in <em>R</em>, not in <em>RStudio</em>, but of course someone decided that utils should capitalize the <code>View()</code> function as well. And this is weird! There are not that many functions in base R that start with a capital letter:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">getOption</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"defaultPackages"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">setdiff</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"datasets"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vapply</span>(\(x) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">paste0</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"package:"</span>, x), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">character</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ls</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">strsplit</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">""</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-6">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">Filter</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">f =</span> \(x) x[[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>]] <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">%in%</span> LETTERS) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb1-7">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vapply</span>(paste0, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">character</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>), <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">collapse =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">""</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Rprof"               "Rprofmem"            "RShowDoc"           
+ [4] "RSiteSearch"         "Rtangle"             "RtangleFinish"      
+ [7] "RtangleRuncode"      "RtangleSetup"        "RtangleWritedoc"    
+[10] "RweaveChunkPrefix"   "RweaveEvalWithOpt"   "RweaveLatex"        
+[13] "RweaveLatexFinish"   "RweaveLatexOptions"  "RweaveLatexSetup"   
+[16] "RweaveLatexWritedoc" "RweaveTryStop"       "Stangle"            
+[19] "Sweave"              "SweaveHooks"         "SweaveSyntaxLatex"  
+[22] "SweaveSyntaxNoweb"   "SweaveSyntConv"      "URLdecode"          
+[25] "URLencode"           "View"               </code></pre>
+</div>
+</div>
+<p>These functions all follow one of three patterns:</p>
+<ul>
+<li>Functions that start with <code>R</code> or <code>S</code>, capitalized because it’s the name of a programming language;</li>
+<li>Functions that start with URL;</li>
+<li><code>View()</code> <em>by itself</em>!</li>
+</ul>
+<p>So <code>View()</code> is weird; it’s the only function that starts with a capital letter that’s not named after a proper noun.<sup>1</sup> And it’s been weird for a long time. The original version of the function was also capitalized when it was added by Professor Brian D Ripley way back in 2007:</p>
+<p><img src="https://mm218.dev/posts/2023-12-07-View/commit.png" class="img-fluid" alt="Commit by Prof. Brian D Ripley on Feb 19 2007, adding the capitalized `View()` function."></p>
+<p>Now here’s where we enter the world of wild speculation. Because if we look at the documentation for <code>View()</code>, we can see that this function is meant to “Invoke a Data Viewer”, with “Data Viewer” capitalized like a proper noun in both the function title and description:</p>
+<p><img src="https://mm218.dev/posts/2023-12-07-View/ViewDoc.png" class="img-fluid" alt="The rd documentation file for `View()`. Notably, the Description field capitalizes the phrase Data Viewer."></p>
+<p>This isn’t a universal style. If we look for instance at the documentation for <code>edit()</code>, which pre-dates <code>View()</code>,<sup>2</sup> we can see that “text editor” is capitalized in the title but not in the description:</p>
+<p><img src="https://mm218.dev/posts/2023-12-07-View/EditDoc.png" class="img-fluid" alt="The rd documentation file for `edit()`. Notably, the Description field _does not_ capitalize the phrase text editor."></p>
+<p>So this makes me suspect that Data Viewer here is being used as a proper noun. This wouldn’t be a unique usage; for instance, the <a href="https://docs.posit.co/ide/user/ide/guide/data/data-viewer.html">RStudio user guide also describes its viewer as a Data Viewer, capitalized</a>, and a search for “Data Viewer” suggests the phrase is capitalized something like 2/3 of the time on public websites. I have absolutely no knowledge of the tech jargon of 2007, or of the proper styling of “data viewer”,<sup>3</sup> but it does seem like it’s <em>sometimes</em> a proper noun.</p>
+<p>So, to wildly speculate just a little further: is <code>View()</code> capitalized because “Viewer” was capitalized, at least back in 2007?</p>
+<p>Now, here’s a decent piece of evidence <em>against</em> this conjecture: the details section of the <code>View()</code> documentation, added at the same time as the title and description,<sup>4</sup> doesn’t capitalize the phrase “data viewer”:</p>
+<p><img src="https://mm218.dev/posts/2023-12-07-View/ViewDetails.png" class="img-fluid" alt="The details section of the `View()` documentation. Data viewer is not capitalized."></p>
+<p>That said, this is also not unique. That same <a href="https://docs.posit.co/ide/user/ide/guide/data/data-viewer.html#scrolling">Rstudio user guide also sometimes writes “data viewer” in lowercase</a>, though in <em>most</em> of the guide it’s treated as a proper noun.</p>
+<p>So there’s one guess: maybe <code>View()</code> is capitalized because, like the functions starting with R and S and URL, it’s named after a proper noun. Things are the way they are because they are the way they are, yet again.</p>
+<p>If anyone knows more, though – or feels like asking Professor Ripley – please drop me a line. I’d love to know the actual answer.</p>
+
+
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p><a href="https://www.merriam-webster.com/dictionary/URL">Merriam-Webster calls “URL” a noun</a>, even if it originated as an acronym, get out of my comments.↩︎</p></li>
+<li id="fn2"><p>Though I’m not sure who originally wrote it; I get a bit lost in the VCS logs from before base functions were split into sub-packages.↩︎</p></li>
+<li id="fn3"><p>And I assume these two things are related!↩︎</p></li>
+<li id="fn4"><p>And the function itself; all of this documentation is also still in the official help file.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>R</category>
+  <guid>https://mm218.dev/posts/2023-12-07-View/index.html</guid>
+  <pubDate>Thu, 07 Dec 2023 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2023-12-07-View/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Helping R find the right methods for unserialized complex objects.</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -6236,56 +6360,6 @@ font-style: inherit;">autoplot</span>()</span></code></pre></div>
   <guid>https://mm218.dev/posts/2023-01-17-spatialsample/index.html</guid>
   <pubDate>Tue, 17 Jan 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-01-17-spatialsample/map.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Classification and mapping of low-statured shrubland cover types in post-agricultural landscapes of the US Northeast</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2022-12-21-shrubland/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<p>I have a new paper, “Classification and mapping of low-statured shrubland cover types in post-agricultural landscapes of the US Northeast”, out today in the International Journal of Remote Sensing! This project was a fantastic collaboration with with Lucas Johnson, Abigail Guinan, and Colin Beier, and I’m thrilled to see it in print.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-12-21-shrubland/map.jpg" class="img-fluid figure-img" alt="A map of predicted shrubland probabilities for all of New York State."></p>
-<figcaption class="figure-caption">Predicted probability of shrubland for 2019 across all mapped areas within New York State, from the logistic ensemble model. Pixels in non-vegetated LCPRI land cover classes (developed, water, ice/snow, and barren) or above 1067 meters in elevation were not mapped and are shown in white.</figcaption>
-</figure>
-</div>
-<p>Shrublands – which we roughly define as “vegetation that’s too tall to be a grassland, but too short to be a forest” – are a pretty rare land cover class in the northeastern United States. In part, that’s because our forests out here are generally pretty stable, and don’t get completely wiped out in the same way as forests in the western US, which means there’s just not a ton of land reforesting after some major disturbance. But also, most forests in the Northeast got their start by taking over abandoned farmland, which was generally left unplowed following major bank runs in the late 1800s and early 1900s.<sup>1</sup> Because the first trees to establish on a field all grow up at more or less the same rate,<sup>2</sup> that means that older forests are taller forests. With most of our forests pushing 100,<sup>3</sup> we don’t have a ton of low-statured vegetation to go around in the region.</p>
-<p>And this is a problem! A ton of wildlife species really prefer shrublands, and depend on denser understories and lower branches than 100 year-old forests really provide; a turkey isn’t going to be able to hide from predators in a stately grove of 80 foot tall pines. New York is <a href="https://www.dec.ny.gov/outdoor/104218.html">intentionally managing its public lands</a> to try and increase the prevalence of shrublands for this reason. Shrublands also are promising targets for conservation efforts designed to increase carbon sequestration in the landscape, as they represent potentially unproductive (from a carbon sequestation standpoint) lands returning to forest. While there’s a lot of ink spilled about the sequestration potentials of young forests versus older forests, everyone is generally agreed that we want <em>more</em> protected forestlands to improve carbon sequestration, and being able to identify and preserve current shrublands would likely mean increasing the amount of forestlands in the future.</p>
-<p>And as such, there’s a lot of interest in being able to map shrubland prevalence in the Northeast. Unfortunately, that’s easier said than done. Because shrublands are so rare in this region, they’re generally not well-represented in most land cover mapping projects; shrublands make up about 2% of the landscape, and so a model can be wrong about shrublands 100% of the time and still be 98% accurate if it nails everything else. Shrublands also look different in the Northeast than they do elsewhere in the country; whereas much of the western United States has semi-permanent shrubland biomes with different species and structure than forestlands, in the Northeast shrublands are generally composed of the same species as forests, just shorter. Add to this the fact that from space northeastern shrublands look more or less just like forests – it’s hard to gauge the height of vegetation based on the satellite images usually used to train land cover models – and it makes sense that shrublands are usually one of, if not <em>the</em> worst-represented class in land cover models.</p>
-<p>So, we set out to try and improve our ability to identify shrublands across New York State. We took the same basic approach as <a href="2022-11-07-agb/">our AGB mapping project</a>, used LiDAR data and national land cover maps to identify areas that were <em>probably</em><sup>4</sup> shrublands, and trained models against satellite imagery to try and ID shrublands in areas and years where we don’t have LiDAR data to work with. I think it’s a pretty cool project, and I’m excited to see where Abigail takes this line of work in years to come – as I understand it, she’s currently using the map to help her pick field sites, to try and investigate the dynamics of invasive species in shrublands across the state.</p>
-<p>I’m also incredibly proud of the tech stack backing this project, which does <em>not</em> make it into the paper but really enabled this project from start to finish. In summer 2021, my lab invested heavily in standing up data-sharing infrastructure to make it easy to access pretty much any data that anyone in the lab had ever cared about, be it relatively raw remote sensing data, heavily-engineered predictor suites, or the outputs from past models.<sup>5</sup> The original gains from this data platform were pretty incremental; we were already pretty deep in the weeds on our AGB work, so while it was <em>nice</em> that Lucas and I could easily send each other new data<sup>6</sup>, it just didn’t come up that often.</p>
-<p>This shrubland project was then the first time we had a new, greenfield project that could take advantage of the data platform. And thanks to our internal infrastructure<sup>7</sup> obviating out a lot of the rote busywork involved with collecting, processing, and generally marshaling spatial data from disparate sources, we were able to stand up the first proof-of-concept models <em>much</em> faster than with our past AGB modeling work.</p>
-<p>This project wound up being quite the hairy beast by the time it actually went to print – the total archive contains ~640GB of data, uncompressed, plus a mix of R, Python, and shell scripts to actually process it all. I learned a lot from pulling this all together, and I’m very excited to see it out in print!</p>
-
-
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>Including obviously the Great Depression, but also a great number of other panics such as the <a href="https://en.wikipedia.org/wiki/Panic_of_1857">Panic of 1857</a>. An interesting thing about living in the East is that practically all land in the region was, at one point or another, in private ownership; almost all state or federal lands were either purchased back from private owners or, more often, reclaimed when the owner defaulted on their taxes. A fun activity, for a certain value of fun, is looking up the date your local park was established, and then looking up the closest bank panic to guess if the two are related.↩︎</p></li>
-<li id="fn2"><p>This is one of those things that <em>feels</em> like it should be made up, but if you think about it makes sense: trees more-or-less attempt to maximize sunlight intake, and can only get more sun by being taller than their neighbors, and, crucially, by <em>not being shorter</em> and therefore shaded out by competitors. As such, less competitive individuals from ruderal species will grow <em>out</em> more slowly than their neighbors, but either grow <em>up</em> with the rest of the neighborhood or get killed off altogether.↩︎</p></li>
-<li id="fn3"><p>Which is not <em>old</em> for a forest by any extent, but is certainly <em>older</em> than most shrublands.↩︎</p></li>
-<li id="fn4"><p>But not definitely, and we talk about this as a limitation! Maybe LCMAP thinks 5-foot tall wood post fences look like shrublands; if so, we’d be labeling our training data incorrectly. But our validation against 2019 imagery more or less agreed with our validation against the LiDAR-labeled map, which suggests this wasn’t that big of a problem in the end.↩︎</p></li>
-<li id="fn5"><p>This infrastructure is one of my favorite projects I’ve been a part of in my PhD; I need to write about it publicly at some point.↩︎</p></li>
-<li id="fn6"><p>Or, if I’m being honest, that Lucas could send <em>me</em>; if memory serves, while I wrote a lot of the code for how people could get data <em>from</em> the platform, it took over a year for me to learn how to send data <em>to</em> the platform for others.↩︎</p></li>
-<li id="fn7"><p>The data platform and other internal model tools, though the data platform is <em>much</em> better than our internal model tooling. Part of that is because we don’t feel the need to <em>keep</em> a lot of our model tooling internal; we can open-source tools for dealing with common modeling problems much more easily than tools for dealing with our particular approach to cloud data storage. Speaking of which, <a href="https://github.com/mikemahoney218/waywiser/">go star waywiser on GitHub.</a>↩︎</p></li>
-</ol>
-</section></div> ]]></description>
-  <category>ecology</category>
-  <category>papers</category>
-  <category>remote sensing</category>
-  <category>machine learning</category>
-  <category>earth science</category>
-  <category>environmental science</category>
-  <category>shrubland</category>
-  <guid>https://mm218.dev/posts/2022-12-21-shrubland/index.html</guid>
-  <pubDate>Wed, 21 Dec 2022 00:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2022-12-21-shrubland/map.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>

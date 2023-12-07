@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/2023-12-07-View/index.html",
       "/posts/2023-11-27-objects-loading-namespaces/index.html",
       "/posts/2023-11-21-rsi-null/index.html",
       "/posts/2023-11-07-classed-errors/index.html",
