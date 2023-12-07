@@ -239,7 +239,58 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Functions that start with URL;</li>
 <li><code>View()</code> <em>by itself</em>!</li>
 </ul>
-<p>So <code>View()</code> is weird; it’s the only function that starts with a capital letter that’s not named after a proper noun.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> And it’s been weird for a long time. The original version of the function was also capitalized when it was added by Professor Brian D Ripley way back in 2007:</p>
+<p><strong>Update:</strong></p>
+<p>A few minutes after publishing, <a href="https://fosstodon.org/@klmr@mastodon.social/111540097245999105">Konrad Rudolph points out on Mastodon</a> that there are plenty of functions in the base package <em>itself</em> that are capitalized and don’t match these rules:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span>(<span class="st">"package:base"</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">strsplit</span>(<span class="st">""</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Filter</span>(<span class="at">f =</span> \(x) x[[<span class="dv">1</span>]] <span class="sc">%in%</span> LETTERS) <span class="sc">|&gt;</span> </span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vapply</span>(paste0, <span class="fu">character</span>(<span class="dv">1</span>), <span class="at">collapse =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Arg"                     "Conj"                   
+ [3] "Cstack_info"             "Encoding"               
+ [5] "Encoding&lt;-"              "F"                      
+ [7] "Filter"                  "Find"                   
+ [9] "I"                       "Im"                     
+[11] "ISOdate"                 "ISOdatetime"            
+[13] "La_library"              "La_version"             
+[15] "La.svd"                  "LETTERS"                
+[17] "Map"                     "Math.data.frame"        
+[19] "Math.Date"               "Math.difftime"          
+[21] "Math.factor"             "Math.POSIXt"            
+[23] "Mod"                     "NCOL"                   
+[25] "Negate"                  "NextMethod"             
+[27] "NROW"                    "OlsonNames"             
+[29] "Ops.data.frame"          "Ops.Date"               
+[31] "Ops.difftime"            "Ops.factor"             
+[33] "Ops.numeric_version"     "Ops.ordered"            
+[35] "Ops.POSIXt"              "Position"               
+[37] "R_compiled_by"           "R_system_version"       
+[39] "R.home"                  "R.version"              
+[41] "R.Version"               "R.version.string"       
+[43] "Re"                      "Recall"                 
+[45] "Reduce"                  "RNGkind"                
+[47] "RNGversion"              "Summary.data.frame"     
+[49] "Summary.Date"            "Summary.difftime"       
+[51] "Summary.factor"          "Summary.numeric_version"
+[53] "Summary.ordered"         "Summary.POSIXct"        
+[55] "Summary.POSIXlt"         "Sys.chmod"              
+[57] "Sys.Date"                "Sys.getenv"             
+[59] "Sys.getlocale"           "Sys.getpid"             
+[61] "Sys.glob"                "Sys.info"               
+[63] "Sys.localeconv"          "Sys.readlink"           
+[65] "Sys.setenv"              "Sys.setFileTime"        
+[67] "Sys.setLanguage"         "Sys.setlocale"          
+[69] "Sys.sleep"               "Sys.time"               
+[71] "Sys.timezone"            "Sys.umask"              
+[73] "Sys.unsetenv"            "Sys.which"              
+[75] "T"                       "UseMethod"              
+[77] "Vectorize"              </code></pre>
+</div>
+</div>
+<p>One of those is <code>Filter()</code>, which I <em>literally used in the original code chunk</em> and somehow didn’t notice started with a capital letter.</p>
+<p>&lt; / update &gt;</p>
+<p>But even with that said, <code>View()</code> is the only function <em>in recommended packages</em> that starts with a capital letter that’s not named after a proper noun.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> And it’s been weird for a long time. The original version of the function was also capitalized when it was added by Professor Brian D Ripley way back in 2007:</p>
 <p><img src="commit.png" class="img-fluid" alt="Commit by Prof. Brian D Ripley on Feb 19 2007, adding the capitalized `View()` function."></p>
 <p>Now here’s where we enter the world of wild speculation. Because if we look at the documentation for <code>View()</code>, we can see that this function is meant to “Invoke a Data Viewer”, with “Data Viewer” capitalized like a proper noun in both the function title and description:</p>
 <p><img src="ViewDoc.png" class="img-fluid" alt="The rd documentation file for `View()`. Notably, the Description field capitalizes the phrase Data Viewer."></p>
