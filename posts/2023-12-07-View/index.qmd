@@ -48,7 +48,9 @@ ls("package:base") |>
   vapply(paste0, character(1), collapse = "")
 ```
 
-One of those is `Filter()`, which I _literally used in the original code chunk_ and somehow didn't notice started with a capital letter.
+One of those is `Filter()`, which I _literally used in the original code chunk_ and somehow didn't notice started with a capital letter. 
+
+These functions fall into a number of other groups -- functions for working with complex numbers, for functional programming and recursion, for setting and getting system information and variables, group generic functions, and a few proper nouns and acronyms like "C" and "RNG". It's still not _common_ -- 77 out of 1268 objects in the base namespace start with a capital letter -- but it's more common than in recommended packages.
 
 < / update >
 
