@@ -6,9 +6,8 @@ about:
   links:
     - text: LinkedIn
       url: "https://linkedin.com/in/mikemahoney218"
-    - text: Twitter
-      icon: twitter
-      url: "https://twitter.com/mikemahoney218"
+    - text: 🦋 Bluesky
+      url: "https://bsky.app/profile/mikemahoney218.com"
     - text: Mastodon
       icon: mastodon
       url: "https://fosstodon.org/@MikeMahoney218"
