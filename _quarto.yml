@@ -24,8 +24,6 @@ website:
         href: papers
       - text: "Presentations"
         href: presentations
-      - text: "Software citations"
-        href: software_citations.html
       - text: "Blog"
         href: blog.html
       - icon: rss
