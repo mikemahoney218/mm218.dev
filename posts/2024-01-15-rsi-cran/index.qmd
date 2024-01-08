@@ -1,0 +1,132 @@
+---
+title: "rsi is now on CRAN!"
+description: "Your one-stop shop for spatial ML data retrieval and pre-processing."
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2024-01-15"
+categories: [R, Tutorials, Spatial, geospatial data, R packages]
+image: banner.jpg
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+I'm thrilled to announce that version 0.1.0 of rsi, a new package for handling common spatial ML data pre-processing tasks, is [now officially on CRAN](https://cran.r-project.org/package=rsi). rsi helps you download^[(and mask, and rescale, and composite)] data from [STAC APIs](https://stacspec.org/en), calculate spectral indices from that data (with an interface to the [Awesome Spectral Indices project](https://github.com/davemlz/awesome-spectral-indices)), and efficiently stack rasters together to help build predictor bricks.
+
+You can install it from CRAN via:
+```r
+install.packages("rsi")
+```
+
+rsi is motivated by my own work doing landscape-level natural resources mapping, both with [Permian Global Research](https://permianglobal.com/) (who have been incredibly supportive of me open-sourcing this project that originated from my contract work) and with [CAFRI](https://cafri-ny.org/) (see for instance [our newest Landsat-based forest carbon maps](https://doi.org/10.1016/j.foreco.2023.121348)). Most of these projects have a pretty consistent data-processing workflow: I need to go get data from somewhere, calculate indices and other predictors against it, and then glue all those derived products together into a predictor brick I can actually extract my predictor values from. rsi handles every step of that process and does so efficiently, letting you spend less time on your pre-processing and more time on your actual models.
+
+I've written about rsi a few times before, including [about how rsi does sandboxing when running code from untrusted sources](https://www.mm218.dev/posts/2023-10-27-minimal-environments/) and [how to make the most of the `get_stac_data()` family of functions](https://www.mm218.dev/posts/2023-11-21-rsi-null/). This post is going to provide a more holistic introduction to rsi,^[Updating the first post [introducing the first alpha development version](https://www.mm218.dev/posts/2023-10-26-rsi/).] focusing on the main functions in the package and how you might use them as part of your pre-processing workflows.
+
+## Downloading data from STAC APIs
+
+Perhaps the most useful piece of rsi^[And most involved; [cloc](https://github.com/AlDanial/cloc) tells me there are 1300 lines of code in the R directory of this package, with 718 of them in `get_stac_data.R`.] is the `get_stac_data()` family of functions, which help you download data from [STAC APIs](https://stacspec.org/en). As an example, let's say that we've used sf to define some area of interest that we want to download data for:
+
+```{r}
+aoi <- sf::st_point(c(-76.1376841, 43.0351335))
+aoi <- sf::st_set_crs(sf::st_sfc(aoi), 4326)
+aoi <- sf::st_buffer(sf::st_transform(aoi, 5070), 10000)
+```
+
+If we wanted to get land cover data for this area from 2021, using [the USGS LCMAP product from Planetary Computer](https://planetarycomputer.microsoft.com/dataset/usgs-lcmap-conus-v13), we could use the `get_stac_data()` function from rsi like so:
+
+```{r}
+library(rsi)
+future::plan("multisession")
+
+lcpri <- get_stac_data(
+  aoi,
+  start_date = "2021-01-01", # Making sure we only grab data from 2021
+  end_date = "2021-12-31",
+  asset_names = "lcpri", # The name of the primary land cover product in LCMAP
+  stac_source = "https://planetarycomputer.microsoft.com/api/stac/v1/",
+  collection = "usgs-lcmap-conus-v13", # The name of LCMAP on Planetary Computer
+  output_filename = tempfile(fileext = ".tif"),
+)
+
+terra::plot(terra::rast(lcpri))
+```
+
+If our data is split across multiple tiles, `get_stac_data()` will automatically merge them into a single composite output. There's [an article on the rsi website](https://permian-global-research.github.io/rsi/articles/Downloading-data-from-STAC-APIs-using-rsi.html) that gives a brief overview of the STAC family of standards, and how you can use the arguments to `get_stac_data()` to flexibly control exactly what you're downloading and how. 
+
+In addition to `get_stac_data()`, rsi also provides a number of higher-level functions for interacting with popular satellite imagery data sources -- specifically, Landsat, Sentinel-2, and Sentinel-1 (including the Sentinel-1 RTC product). In addition to downloading and merging tiles, these functions will also handle creating composite rasters from multiple separate images, masking out clouds and other low-quality data, and (where possible) automatically rescaling your data using offsets and scaling factors defined in the STAC metadata
+
+```{r}
+landsat <- get_landsat_imagery(
+  aoi,
+  start_date = "2021-06-01",
+  end_date = "2021-08-31",
+  output_filename = tempfile(fileext = ".tif")
+)
+terra::plot(terra::rast(landsat))
+```
+
+Note that the inputs to these functions are normal R objects, and the outputs are the file paths your data was saved to. A key difference of rsi from other packages for downloading data from STAC endpoints is that rsi doesn't introduce a new data model,^[Kinda; the band mapping objects are -- as discussed in the article linked above -- a relatively complex data structure. But _hopefully_ users mostly don't need to think about those.] and instead is focused on getting data onto your local filesystem as quickly as possible. Ideally, you'll be able to let rsi handle all the "cloud-native geospatial" stuff for you, and then use the outputs with whatever tools you're most comfortable with.^[[Carl Boettiger](https://ourenvironment.berkeley.edu/people/carl-boettiger) at AGU this year: "Cloud native just means using HTTP range requests. We've been doing cloud native since the 90s".]
+
+For more information on the `get_stac_data()` family of functions, check out the [corresponding article on the rsi website](https://permian-global-research.github.io/rsi/articles/Downloading-data-from-STAC-APIs-using-rsi.html)!
+
+## Calculate spectral indices
+
+Most other functions in rsi also use the approach of accepting normal R objects as function inputs, and returning file paths to raster outputs. For instance, rsi provides a function, `calculate_indices()`, which can be used to calculate spectral indices from the band values of an input raster.
+
+By default, this function is designed to work with spectral indices from the (awesome) [Awesome Spectral Indices](https://github.com/awesome-spectral-indices/awesome-spectral-indices) project. In fact, the `spectral_indices()` function in rsi will give you a processed tibble containing the full list of indices from that project:
+
+```{r}
+spectral_indices()
+```
+
+The first time you run `spectral_indices()` will attempt to download the current set of spectral indices from GitHub, and then will store that download in a cache file. Future calls to `spectral_indices()` will then be a bit faster, as rsi will only try to update its downloaded indices if the cache is more than a day old.
+
+There are also two functions, `filter_bands()` and `filter_platforms()`, which make it easy to filter the tibble of indices based on what bands or platforms you have available in your data. For instance, if we wanted to get the full set of indices that we could calculate with our downloaded Landsat data, we could pass the names of those bands to the second argument in `filter_bands()`:
+
+```{r}
+spectral_indices() |> 
+  filter_bands(names(terra::rast(landsat)))
+```
+
+And then we can pass this tibble directly to `calculate_indices()` to calculate all 128 of these indices against our downloaded Landsat image:
+
+```{r}
+indices <- calculate_indices(
+  landsat,
+  filter_bands(spectral_indices(), names(terra::rast(landsat))),
+  tempfile(fileext = ".tif")
+)
+
+
+terra::plot(terra::rast(indices))
+```
+
+You should always skim the formulas you're going to run before calling `calculate_indices()` -- these are downloaded from a live GitHub URL and can change over time -- but the actual execution of downloaded code happens in a sandboxed environment, which should make it _harder_ for any untrustworthy code to damage your system. If you're interested, [I wrote post a few months ago with a bit more information about this sandboxing](https://www.mm218.dev/posts/2023-10-27-minimal-environments/).
+
+## Glue it all together
+
+And last, but certainly not least, rsi provides a function called `stack_rasters()` which helps you bind multiple rasters into a single predictor brick. Similar to `calculate_indices()`, the first argument is a (vector of) file paths to the rasters you want to stack together, and the output is a new file path to the raster that was created:
+
+```{r}
+stack_rasters(c(lcpri, indices), tempfile(fileext = ".tif")) |> 
+  terra::rast() |> 
+  terra::plot()
+```
+
+If your output file ends in `vrt`, you can even do this without copying any data thanks to [GDAL's virtual raster format](https://gdal.org/drivers/raster/vrt.html):
+
+```{r}
+stack_rasters(c(lcpri, indices), tempfile(fileext = ".vrt")) |> 
+  terra::rast() |> 
+  terra::plot()
+```
+
+This feels like such a small thing when you say it out loud, but I think is my favorite part of the package. This was a surprisingly hard thing to do with existing tools. If your rasters are different extents or resolutions, `stack_rasters()` will automatically set the extent of your output and your target resolution based on the first raster in your input vector -- or you can override that default behavior using the `extent` and `resolution` argument.
+
+Crucially, `stack_rasters()` relies almost entirely on GDAL's warper and VRT format to do this, meaning it's able to efficiently stack together _much_ larger than memory data sets. And (particularly when using VRT outputs), this means that `stack_rasters()` can be a lot faster than approaches that involve reading the raster into R and then writing it back out.
+
+## Acknowledgments
+
+And that's rsi version 0.1.0! Hopefully this package can be as useful for others as it's already been for me at simplifying my data pre-processing workflows. A huge, huge, _huge_ thank you to the folks who have been involved in testing and improving the alpha release, and helping me reshape it into this first release: [&#x0040;agronomofiorentini](https://github.com/agronomofiorentini), [&#x0040;h-a-graham](https://github.com/h-a-graham), and [&#x0040;mateuszrydzik](https://github.com/mateuszrydzik). It would be a worse package without you!
