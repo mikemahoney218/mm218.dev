@@ -10,7 +10,411 @@
 <atom:link href="https://mm218.dev/blog-r.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
 <generator>quarto-1.3.450</generator>
-<lastBuildDate>Thu, 07 Dec 2023 00:00:00 GMT</lastBuildDate>
+<lastBuildDate>Wed, 10 Jan 2024 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>rsi is now on CRAN!</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2024-01-10-rsi-cran/index.html</link>
+  <description><![CDATA[ 
+
+
+
+
+<p>I’m thrilled to announce that version 0.1.0 of rsi, a new package for handling common spatial ML data pre-processing tasks, is <a href="https://cran.r-project.org/package=rsi">now officially on CRAN</a>. rsi helps you download<sup>1</sup> data from <a href="https://stacspec.org/en">STAC APIs</a>, calculate spectral indices from that data (with an interface to the <a href="https://github.com/davemlz/awesome-spectral-indices">Awesome Spectral Indices project</a>), and efficiently stack rasters together to help build predictor bricks.</p>
+<p>You can install it from CRAN via:</p>
+<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">install.packages</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rsi"</span>)</span></code></pre></div>
+<p>rsi is motivated by my own work doing landscape-level natural resources mapping, both with <a href="https://permianglobal.com/">Permian Global Research</a> (who have been incredibly supportive of me open-sourcing this project that originated from my contract work) and with <a href="https://cafri-ny.org/">CAFRI</a> (see for instance <a href="https://doi.org/10.1016/j.foreco.2023.121348">our newest Landsat-based forest carbon maps</a>). Most of these projects have a pretty consistent data-processing workflow: I need to go get data from somewhere, calculate indices and other predictors against it, and then glue all those derived products together into a predictor brick I can actually extract my predictor values from. rsi handles every step of that process and does so efficiently, letting you spend less time on your pre-processing and more time on your actual models.</p>
+<p>I’ve written about rsi a few times before, including <a href="https://www.mm218.dev/posts/2023-10-27-minimal-environments/">about how rsi does sandboxing when running code from untrusted sources</a> and <a href="https://www.mm218.dev/posts/2023-11-21-rsi-null/">how to make the most of the <code>get_stac_data()</code> family of functions</a>. This post is going to provide a more holistic introduction to rsi,<sup>2</sup> focusing on the main functions in the package and how you might use them as part of your pre-processing workflows.</p>
+<section id="downloading-data-from-stac-apis" class="level2">
+<h2 class="anchored" data-anchor-id="downloading-data-from-stac-apis">Downloading data from STAC APIs</h2>
+<p>Perhaps the most useful piece of rsi<sup>3</sup> is the <code>get_stac_data()</code> family of functions, which help you download data from <a href="https://stacspec.org/en">STAC APIs</a>. As an example, let’s say that we’ve used sf to define some area of interest that we want to download data for:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">aoi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_point</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">76.1376841</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">43.0351335</span>))</span>
+<span id="cb2-2">aoi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_set_crs</span>(sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_sfc</span>(aoi), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4326</span>)</span>
+<span id="cb2-3">aoi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_buffer</span>(sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_transform</span>(aoi, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5070</span>), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>)</span></code></pre></div>
+</div>
+<p>If we wanted to get land cover data for this area from 2021, using <a href="https://planetarycomputer.microsoft.com/dataset/usgs-lcmap-conus-v13">the USGS LCMAP product from Planetary Computer</a>, we could use the <code>get_stac_data()</code> function from rsi like so:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(rsi)</span>
+<span id="cb3-2">future<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plan</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"multisession"</span>)</span>
+<span id="cb3-3"></span>
+<span id="cb3-4">lcpri <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_stac_data</span>(</span>
+<span id="cb3-5">  aoi,</span>
+<span id="cb3-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">start_date =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-01-01"</span>, <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Making sure we only grab data from 2021</span></span>
+<span id="cb3-7">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">end_date =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-12-31"</span>,</span>
+<span id="cb3-8">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">asset_names =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lcpri"</span>, <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># The name of the primary land cover product in LCMAP</span></span>
+<span id="cb3-9">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">stac_source =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"https://planetarycomputer.microsoft.com/api/stac/v1/"</span>,</span>
+<span id="cb3-10">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">collection =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"usgs-lcmap-conus-v13"</span>, <span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># The name of LCMAP on Planetary Computer</span></span>
+<span id="cb3-11">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>),</span>
+<span id="cb3-12">)</span>
+<span id="cb3-13"></span>
+<span id="cb3-14">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(lcpri))</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>If our data is split across multiple tiles, <code>get_stac_data()</code> will automatically merge them into a single composite output. There’s <a href="https://permian-global-research.github.io/rsi/articles/Downloading-data-from-STAC-APIs-using-rsi.html">an article on the rsi website</a> that gives a brief overview of the STAC family of standards, and how you can use the arguments to <code>get_stac_data()</code> to flexibly control exactly what you’re downloading and how.</p>
+<p>In addition to <code>get_stac_data()</code>, rsi also provides a number of higher-level functions for interacting with popular satellite imagery data sources – specifically, Landsat, Sentinel-2, and Sentinel-1 (including the Sentinel-1 RTC product). In addition to downloading and merging tiles, these functions will also handle creating composite rasters from multiple separate images, masking out clouds and other low-quality data, and (where possible) automatically rescaling your data using offsets and scaling factors defined in the STAC metadata</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">landsat <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_landsat_imagery</span>(</span>
+<span id="cb4-2">  aoi,</span>
+<span id="cb4-3">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">start_date =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-06-01"</span>,</span>
+<span id="cb4-4">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">end_date =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-08-31"</span>,</span>
+<span id="cb4-5">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb4-6">)</span>
+<span id="cb4-7">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(landsat))</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Note that the inputs to these functions are normal R objects, and the outputs are the file paths your data was saved to. A key difference of rsi from other packages for downloading data from STAC endpoints is that rsi doesn’t introduce a new data model,<sup>4</sup> and instead is focused on getting data onto your local filesystem as quickly as possible. Ideally, you’ll be able to let rsi handle all the “cloud-native geospatial” stuff for you, and then use the outputs with whatever tools you’re most comfortable with.<sup>5</sup></p>
+<p>For more information on the <code>get_stac_data()</code> family of functions, check out the <a href="https://permian-global-research.github.io/rsi/articles/Downloading-data-from-STAC-APIs-using-rsi.html">corresponding article on the rsi website</a>!</p>
+</section>
+<section id="calculate-spectral-indices" class="level2">
+<h2 class="anchored" data-anchor-id="calculate-spectral-indices">Calculate spectral indices</h2>
+<p>Most other functions in rsi also use the approach of accepting normal R objects as function inputs, and returning file paths to raster outputs. For instance, rsi provides a function, <code>calculate_indices()</code>, which can be used to calculate spectral indices from the band values of an input raster.</p>
+<p>By default, this function is designed to work with spectral indices from the (awesome) <a href="https://github.com/awesome-spectral-indices/awesome-spectral-indices">Awesome Spectral Indices</a> project. In fact, the <code>spectral_indices()</code> function in rsi will give you a processed tibble containing the full list of indices from that project:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spectral_indices</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 231 × 9
+   application_domain bands     contributor   date_of_addition formula long_name
+   &lt;chr&gt;              &lt;list&gt;    &lt;chr&gt;         &lt;chr&gt;            &lt;chr&gt;   &lt;chr&gt;    
+ 1 vegetation         &lt;chr [2]&gt; https://gith… 2021-11-17       (N - 0… Aerosol …
+ 2 vegetation         &lt;chr [2]&gt; https://gith… 2021-11-17       (N - 0… Aerosol …
+ 3 water              &lt;chr [6]&gt; https://gith… 2022-09-22       (B + G… Augmente…
+ 4 vegetation         &lt;chr [2]&gt; https://gith… 2021-09-20       (1 / G… Anthocya…
+ 5 vegetation         &lt;chr [3]&gt; https://gith… 2022-04-08       N * ((… Anthocya…
+ 6 vegetation         &lt;chr [4]&gt; https://gith… 2021-05-11       (N - (… Atmosphe…
+ 7 vegetation         &lt;chr [4]&gt; https://gith… 2021-05-14       sla * … Adjusted…
+ 8 vegetation         &lt;chr [2]&gt; https://gith… 2022-04-08       (N * (… Advanced…
+ 9 water              &lt;chr [4]&gt; https://gith… 2021-09-18       4.0 * … Automate…
+10 water              &lt;chr [5]&gt; https://gith… 2021-09-18       B + 2.… Automate…
+# ℹ 221 more rows
+# ℹ 3 more variables: platforms &lt;list&gt;, reference &lt;chr&gt;, short_name &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>The first time you run <code>spectral_indices()</code> will attempt to download the current set of spectral indices from GitHub, and then will store that download in a cache file. Future calls to <code>spectral_indices()</code> will then be a bit faster, as rsi will only try to update its downloaded indices if the cache is more than a day old.</p>
+<p>There are also two functions, <code>filter_bands()</code> and <code>filter_platforms()</code>, which make it easy to filter the tibble of indices based on what bands or platforms you have available in your data. For instance, if we wanted to get the full set of indices that we could calculate with our downloaded Landsat data, we could pass the names of those bands to the second argument in <code>filter_bands()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spectral_indices</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb7-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter_bands</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(landsat)))</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 128 × 9
+   application_domain bands     contributor   date_of_addition formula long_name
+   &lt;chr&gt;              &lt;list&gt;    &lt;chr&gt;         &lt;chr&gt;            &lt;chr&gt;   &lt;chr&gt;    
+ 1 vegetation         &lt;chr [2]&gt; https://gith… 2021-11-17       (N - 0… Aerosol …
+ 2 vegetation         &lt;chr [2]&gt; https://gith… 2021-11-17       (N - 0… Aerosol …
+ 3 water              &lt;chr [6]&gt; https://gith… 2022-09-22       (B + G… Augmente…
+ 4 vegetation         &lt;chr [2]&gt; https://gith… 2022-04-08       (N * (… Advanced…
+ 5 water              &lt;chr [4]&gt; https://gith… 2021-09-18       4.0 * … Automate…
+ 6 water              &lt;chr [5]&gt; https://gith… 2021-09-18       B + 2.… Automate…
+ 7 burn               &lt;chr [2]&gt; https://gith… 2021-04-07       1.0 / … Burned A…
+ 8 burn               &lt;chr [2]&gt; https://gith… 2022-04-20       1.0/((… Burned A…
+ 9 vegetation         &lt;chr [3]&gt; https://gith… 2022-01-17       B / (R… Blue Chr…
+10 soil               &lt;chr [4]&gt; https://gith… 2022-04-08       ((S1 +… Bare Soi…
+# ℹ 118 more rows
+# ℹ 3 more variables: platforms &lt;list&gt;, reference &lt;chr&gt;, short_name &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>And then we can pass this tibble directly to <code>calculate_indices()</code> to calculate all 128 of these indices against our downloaded Landsat image:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">indices <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb9-2">  landsat,</span>
+<span id="cb9-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter_bands</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spectral_indices</span>(), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(landsat))),</span>
+<span id="cb9-4">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb9-5">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+|---------|---------|---------|---------|
+=========================================
+                                          </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(indices))</span></code></pre></div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>You should always skim the formulas you’re going to run before calling <code>calculate_indices()</code> – these are downloaded from a live GitHub URL and can change over time – but the actual execution of downloaded code happens in a sandboxed environment, which should make it <em>harder</em> for any untrustworthy code to damage your system. If you’re interested, <a href="https://www.mm218.dev/posts/2023-10-27-minimal-environments/">I wrote post a few months ago with a bit more information about this sandboxing</a>.</p>
+</section>
+<section id="glue-it-all-together" class="level2">
+<h2 class="anchored" data-anchor-id="glue-it-all-together">Glue it all together</h2>
+<p>And last, but certainly not least, rsi provides a function called <code>stack_rasters()</code> which helps you bind multiple rasters into a single predictor brick. Similar to <code>calculate_indices()</code>, the first argument is a (vector of) file paths to the rasters you want to stack together, and the output is a new file path to the raster that was created:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stack_rasters</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(lcpri, indices), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb12-2">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb12-3">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in CPL_gdalwarp(source, destination, options, oo, doo, config_options,
+: GDAL Error 6: /tmp/RtmpvJTqGP/file302c19635cbe42.tif, band 1: SetColorTable()
+not supported for multi-sample TIFF files.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in CPL_gdalwarp(source, destination, options, oo, doo, config_options,
+: GDAL Message 1: /tmp/RtmpvJTqGP/file302c19635cbe42.tif, band 2: Setting
+nodata to nan on band 2, but band 1 has nodata at 0. The TIFFTAG_GDAL_NODATA
+only support one value per dataset. This value of nan will be used for all
+bands on re-opening</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>If your output file ends in <code>vrt</code>, you can even do this without copying any data thanks to <a href="https://gdal.org/drivers/raster/vrt.html">GDAL’s virtual raster format</a>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stack_rasters</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(lcpri, indices), <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".vrt"</span>)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb15-2">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb15-3">  terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in x@cpp$sampleRegularRaster(size): GDAL Message 6: Resampling method
+not supported on paletted band. Falling back to nearest neighbour</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This feels like such a small thing when you say it out loud, but I think is my favorite part of the package. This was a surprisingly hard thing to do with existing tools. If your rasters are different extents or resolutions, <code>stack_rasters()</code> will automatically set the extent of your output and your target resolution based on the first raster in your input vector – or you can override that default behavior using the <code>extent</code> and <code>resolution</code> argument.</p>
+<p>Crucially, <code>stack_rasters()</code> relies almost entirely on GDAL’s warper and VRT format to do this, meaning it’s able to efficiently stack together <em>much</em> larger than memory data sets. And (particularly when using VRT outputs), this means that <code>stack_rasters()</code> can be a lot faster than approaches that involve reading the raster into R and then writing it back out.</p>
+</section>
+<section id="acknowledgments" class="level2">
+<h2 class="anchored" data-anchor-id="acknowledgments">Acknowledgments</h2>
+<p>And that’s rsi version 0.1.0! Hopefully this package can be as useful for others as it’s already been for me at simplifying my data pre-processing workflows. A huge, huge, <em>huge</em> thank you to the folks who have been involved in testing and improving the alpha release, and helping me reshape it into this first release: <a href="https://github.com/agronomofiorentini">@agronomofiorentini</a>, <a href="https://github.com/h-a-graham">@h-a-graham</a>, and <a href="https://github.com/mateuszrydzik">@mateuszrydzik</a>. It would be a worse package without you!</p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>(and mask, and rescale, and composite)↩︎</p></li>
+<li id="fn2"><p>Updating the first post <a href="https://www.mm218.dev/posts/2023-10-26-rsi/">introducing the first alpha development version</a>.↩︎</p></li>
+<li id="fn3"><p>And most involved; <a href="https://github.com/AlDanial/cloc">cloc</a> tells me there are 1300 lines of code in the R directory of this package, with 718 of them in <code>get_stac_data.R</code>.↩︎</p></li>
+<li id="fn4"><p>Kinda; the band mapping objects are – as discussed in the article linked above – a relatively complex data structure. But <em>hopefully</em> users mostly don’t need to think about those.↩︎</p></li>
+<li id="fn5"><p><a href="https://ourenvironment.berkeley.edu/people/carl-boettiger">Carl Boettiger</a> at AGU this year: “Cloud native just means using HTTP range requests. We’ve been doing cloud native since the 90s”.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>R</category>
+  <category>Tutorials</category>
+  <category>Spatial</category>
+  <category>geospatial data</category>
+  <category>R packages</category>
+  <guid>https://mm218.dev/posts/2024-01-10-rsi-cran/index.html</guid>
+  <pubDate>Wed, 10 Jan 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2024-01-10-rsi-cran/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Why is View() capitalized, anyway?</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -7470,214 +7874,6 @@ font-style: inherit;">$</span>r.squared)</span>
   <guid>https://mm218.dev/posts/2022-12-12-tools/index.html</guid>
   <pubDate>Mon, 12 Dec 2022 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2022-12-12-tools/favorites.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>How to include sf data in R packages</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2022-12-01-sf-in-packages/index.html</link>
-  <description><![CDATA[ 
-
-
-
-
-<section id="tldr" class="level2">
-<h2 class="anchored" data-anchor-id="tldr">tl;dr</h2>
-<p>Store your sf objects as <a href="https://r-pkgs.org/data.html#sec-data-sysdata">internal data</a>. Add a <code>.R</code> file to <code>data/</code> (probably named <code>your_data.R</code>) containing the following:</p>
-<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">delayedAssign</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"your_data"</span>, <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">local</span>({</span>
-<span id="cb1-2">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">requireNamespace</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"sf"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">quietly =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">TRUE</span>)</span>
-<span id="cb1-3">  your_package<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:::</span>your_data</span>
-<span id="cb1-4">}))</span></code></pre></div>
-<p><a href="https://r-pkgs.org/data.html#sec-documenting-data">Document your data as usual</a>.</p>
-<p>See the update at the bottom of this post for a bit more information.</p>
-</section>
-<section id="the-problem" class="level2">
-<h2 class="anchored" data-anchor-id="the-problem">The Problem</h2>
-<p>If you work with spatial data in R, you’re familiar with <a href="https://r-spatial.github.io/sf/">the sf package</a>. If you write spatially-oriented packages for R, there’s a good chance you think a lot about how to handle and work with sf objects. I think that’s a good thing; sf makes data analysis with spatial data <em>miles</em> easier, and I rely on it throughout my packages.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-12-01-sf-in-packages/sf.jpg" class="img-fluid figure-img" alt="Three cute fuzzy monsters adding spatial geometries to an existing table of attributes using glue and tape, while one cuts out the spatial polygons. Title text reads &quot;sf: spatial data…simplified.&quot; and a caption at the bottom reads &quot;sticky geometries: for people who love their maps and sanity.&quot;"></p>
-<figcaption class="figure-caption">CC-BY 4.0 Artwork by Allison Horst.</figcaption>
-</figure>
-</div>
-<p>If you write spatially-oriented packages, there’s a good chance your examples or tests could benefit from your package including some sf objects as demonstration data. But there’s a few weird edge cases that crop up when including sf objects in package data.</p>
-<p>For instance, let’s look at the <code>guerry</code> data from the <a href="https://spatialanalysis.github.io/geodaData/">geodaData</a> package. On its own, this object seems to load and print perfectly fine:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">geodaData<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>guerry <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">head</span>(<span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1</span>)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>  CODE_DE COUNT AVE_ID_ dept Region Dprtmnt Crm_prs Crm_prp Litercy Donatns
-1      01     1      49    1      E     Ain   28870   15890      37    5098
-  Infants Suicids MainCty Wealth Commerc Clergy Crm_prn Infntcd Dntn_cl Lottery
-1   33120   35039       2     73      58     11      71      60      69      41
-  Desertn Instrct Prsttts Distanc Area Pop1831
-1      55      46      13 218.372 5762  346.03
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          geometry
-1 801150, 800669, 800688, 800780, 800589, 800333, 799095, 799136, 799690, 799329, 797715, 797655, 797410, 797149, 796755, 796738, 796612, 795234, 794905, 794547, 791555, 791465, 791935, 791835, 791670, 790205, 790035, 789304, 788617, 788005, 787670, 786705, 786350, 785720, 785562, 786670, 786930, 787055, 787208, 787367, 786900, 786795, 786830, 786811, 786384, 786550, 786560, 786465, 785956, 787211, 787415, 787600, 787536, 787137, 786610, 786457, 787138, 787365, 787545, 787880, 788198, 788225, 789130, 789370, 789790, 789995, 790445, 790237, 789585, 788993, 788830, 788650, 788638, 788673, 789501, 789510, 789596, 789680, 789845, 790050, 790594, 790750, 790740, 790739, 791139, 791749, 791860, 792199, 792285, 792880, 793615, 793737, 793650, 793618, 793480, 794012, 794347, 794535, 794686, 795135, 796115, 796193, 796250, 796311, 796335, 796324, 796316, 796385, 796495, 797830, 797970, 797959, 797910, 797905, 798850, 798930, 798980, 799122, 799255, 799340, 800295, 800326, 800757, 801505, 802043, 802820, 804846, 805165, 805338, 805485, 808352, 808655, 809605, 809930, 811710, 813076, 814292, 814670, 815189, 816978, 817045, 818290, 819798, 819990, 819753, 820496, 820305, 820810, 821023, 821020, 821753, 822453, 822690, 823263, 823585, 824250, 825284, 825600, 828440, 829372, 828470, 828705, 828395, 827745, 828485, 830445, 831525, 832747, 833030, 833286, 833885, 833687, 832940, 832830, 833866, 833825, 833752, 833675, 835995, 835930, 836194, 836185, 836190, 836405, 836690, 837059, 837545, 838628, 838735, 840056, 840530, 840855, 841371, 841670, 841591, 841093, 840525, 840483, 841576, 841898, 843750, 843973, 844372, 844675, 846805, 848292, 848440, 848651, 850029, 850390, 851184, 851650, 851857, 851710, 852195, 853883, 854050, 854684, 854950, 855010, 854706, 856495, 857425, 857675, 857795, 860115, 860522, 860356, 860868, 861160, 861499, 861800, 863931, 864270, 867954, 868320, 868625, 868940, 870819, 871569, 872099, 872230, 873891, 874080, 875215, 875688, 875836, 876350, 877249, 877575, 877751, 879950, 880577, 882757, 884049, 885600, 886165, 886435, 889069, 889778, 890867, 893000, 894101, 894575, 894622, 893375, 892712, 892540, 891600, 891281, 891245, 891340, 890292, 890080, 890987, 891235, 891560, 891794, 891337, 890413, 889185, 888822, 887853, 887180, 886092, 885735, 885432, 884760, 883760, 883455, 882749, 882058, 881989, 880591, 880422, 879890, 879855, 882197, 882019, 881408, 880810, 880202, 880177, 879600, 879351, 878142, 877449, 876853, 875845, 875089, 874800, 874322, 874925, 874725, 872900, 872100, 871837, 870648, 869972, 869296, 869435, 868710, 868663, 868525, 868760, 868985, 868525, 868617, 868760, 868864, 869034, 868545, 868661, 868975, 868911, 869020, 869215, 870970, 870979, 870925, 871130, 870721, 870455, 870800, 870344, 870311, 870897, 870710, 870615, 869975, 869465, 869314, 869040, 868989, 868710, 868050, 867940, 867995, 867975, 867825, 867736, 867995, 867979, 867788, 868170, 867935, 867643, 867110, 867246, 867588, 866723, 866013, 865294, 864275, 864000, 863659, 861885, 861845, 862185, 862398, 862694, 862533, 860925, 860842, 861160, 861300, 861210, 860973, 860337, 858511, 858205, 858072, 857453, 857320, 857265, 856650, 856355, 856182, 855610, 854744, 854474, 852864, 852620, 852647, 851685, 851354, 850753, 850470, 850320, 850069, 850023, 850741, 851509, 852157, 852073, 850451, 850375, 850111, 849805, 848375, 848150, 847545, 847281, 845980, 845694, 844840, 842895, 842098, 841825, 841604, 841170, 840895, 839825, 839769, 840798, 840745, 840580, 840305, 839320, 839165, 839016, 838200, 836342, 836100, 835840, 834252, 833175, 833017, 832785, 832719, 832433, 831189, 830330, 829565, 829550, 829422, 828638, 827810, 827523, 826955, 826653, 825785, 825487, 824587, 822700, 822339, 821748, 821660, 821459, 820815, 820470, 819281, 818215, 817851, 816405, 815735, 815844, 815501, 814830, 814502, 814175, 813785, 811510, 811202, 810503, 809935, 808612, 808305, 807965, 807085, 806759, 806450, 805480, 804700, 804426, 803230, 802864, 801150, 2092615, 2093190, 2095430, 2095795, 2096112, 2097190, 2098505, 2098838, 2100360, 2100395, 2100950, 2101330, 2102850, 2102788, 2102425, 2102785, 2103487, 2103892, 2104515, 2104359, 2102570, 2102760, 2104075, 2105023, 2105295, 2105555, 2105875, 2107116, 2107148, 2106760, 2106708, 2106990, 2107029, 2107335, 2108399, 2109486, 2109775, 2110010, 2110344, 2111056, 2113550, 2114260, 2114370, 2114751, 2116197, 2116940, 2117563, 2117860, 2119206, 2120474, 2120775, 2121475, 2121809, 2122743, 2123110, 2124100, 2124890, 2125160, 2125377, 2125830, 2126745, 2127075, 2128290, 2128585, 2129209, 2129525, 2131460, 2131793, 2132230, 2132742, 2133100, 2133655, 2134028, 2135142, 2136382, 2137110, 2138174, 2138520, 2139015, 2139590, 2140547, 2142011, 2142380, 2142716, 2143599, 2144456, 2144790, 2147049, 2147420, 2148815, 2150425, 2150782, 2152285, 2152660, 2153400, 2155103, 2155696, 2155980, 2156241, 2157025, 2159030, 2160314, 2160635, 2161408, 2161795, 2162102, 2163021, 2163470, 2163785, 2165380, 2165700, 2167362, 2167695, 2167835, 2169845, 2170117, 2170395, 2171035, 2171335, 2171435, 2171593, 2170924, 2170498, 2170754, 2171611, 2171760, 2171217, 2171380, 2170485, 2170210, 2168729, 2168520, 2168719, 2168735, 2170150, 2169640, 2170568, 2170640, 2171442, 2171075, 2172530, 2171719, 2171534, 2171205, 2170948, 2169812, 2169145, 2168648, 2167568, 2167190, 2167185, 2166355, 2166075, 2166394, 2166285, 2165476, 2165330, 2165160, 2165065, 2163119, 2162490, 2161655, 2161531, 2161519, 2161005, 2159908, 2159915, 2158958, 2158780, 2158494, 2158105, 2157807, 2157040, 2156696, 2155806, 2155445, 2155097, 2154750, 2153047, 2152675, 2151171, 2150780, 2150680, 2150149, 2150070, 2153840, 2154400, 2151187, 2150820, 2151192, 2151708, 2151840, 2151081, 2150965, 2150606, 2148479, 2148155, 2146631, 2145603, 2145394, 2145800, 2146033, 2145523, 2145410, 2146002, 2147688, 2148035, 2148733, 2148841, 2148775, 2149407, 2150710, 2150922, 2151180, 2152638, 2153465, 2153815, 2154550, 2153948, 2153605, 2152546, 2152522, 2151954, 2151680, 2151135, 2150917, 2149401, 2147845, 2145955, 2145690, 2145842, 2146060, 2146529, 2146675, 2146311, 2146245, 2146162, 2146145, 2146227, 2147047, 2147009, 2146655, 2148801, 2149145, 2148900, 2149908, 2151749, 2152270, 2151866, 2151825, 2152160, 2156500, 2157904, 2159490, 2160898, 2163565, 2164270, 2164140, 2163415, 2162493, 2162099, 2160395, 2160083, 2159465, 2158743, 2156340, 2155944, 2155185, 2153375, 2152677, 2152295, 2150917, 2149984, 2149695, 2147869, 2147615, 2147405, 2146272, 2145258, 2144570, 2145445, 2145356, 2144792, 2145110, 2143618, 2143730, 2143963, 2143997, 2143495, 2143280, 2142419, 2142149, 2141782, 2141448, 2140052, 2139555, 2139435, 2138192, 2137078, 2136753, 2134940, 2133632, 2132631, 2132205, 2132001, 2131755, 2131650, 2131962, 2130970, 2130628, 2130520, 2129464, 2128114, 2126982, 2126720, 2126810, 2127080, 2128513, 2128829, 2128495, 2127050, 2125650, 2125275, 2123780, 2123569, 2123070, 2121885, 2121591, 2120685, 2120349, 2119679, 2118760, 2118458, 2117935, 2117610, 2116295, 2115554, 2114005, 2113621, 2112855, 2111817, 2110485, 2110250, 2110165, 2109573, 2108843, 2107500, 2106390, 2106018, 2103410, 2101545, 2101232, 2099875, 2099512, 2098080, 2097320, 2096964, 2094425, 2094056, 2092595, 2092277, 2091670, 2091277, 2090131, 2088645, 2088380, 2088330, 2088110, 2087753, 2086334, 2085607, 2084278, 2084187, 2084575, 2084465, 2084328, 2084450, 2084109, 2083150, 2082820, 2082092, 2081333, 2079632, 2078870, 2078155, 2077808, 2077080, 2076787, 2076386, 2076155, 2075110, 2074811, 2074591, 2073960, 2073584, 2073221, 2073460, 2073797, 2074780, 2075941, 2077758, 2078730, 2079020, 2079386, 2079920, 2080021, 2079717, 2079917, 2080840, 2081131, 2082613, 2082507, 2081230, 2081554, 2082291, 2083206, 2083940, 2084174, 2084350, 2084500, 2084810, 2086215, 2086449, 2087620, 2087856, 2088564, 2091270, 2091898, 2092105, 2092424, 2093065, 2093318, 2094355, 2096198, 2096536, 2096910, 2097185, 2097470, 2098117, 2098880, 2099191, 2099825, 2100899, 2101165, 2101453, 2102554, 2102260, 2102031, 2101525, 2101162, 2100482, 2099710, 2098550, 2095140, 2094745, 2094389, 2093577, 2091920, 2091724, 2091325, 2091135, 2090510, 2090257, 2089517, 2089735, 2089692, 2090044, 2090765, 2091109, 2092110, 2092273, 2093148, 2093260, 2093406, 2093980, 2093715, 2092629, 2092497, 2094120, 2094025, 2093925, 2093907, 2093620, 2093793, 2093796, 2093390, 2093210, 2093030, 2092976, 2093490, 2093370, 2093210, 2092960, 2093105, 2093280, 2093210, 2093269, 2092615</code></pre>
-</div>
-</div>
-<p>But if we cast this object to a <a href="https://tibble.tidyverse.org/">tibble</a>, we get an error:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">try</span>(tibble<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">as_tibble</span>(geodaData<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>guerry))</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Error : All columns in a tibble must be vectors.
-✖ Column `geometry` is a `sfc_MULTIPOLYGON/sfc` object.</code></pre>
-</div>
-</div>
-<p>This is <a href="https://github.com/r-lib/pillar/issues/552">a known bug</a> that packages need to work around themselves, and can be a bit of a pain to figure out solutions for. It tends to crop up when data.frame objects are implicitly casted to tibbles, for instance by <a href="https://dplyr.tidyverse.org/">dplyr</a> functions:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">try</span>(dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">group_by</span>(geodaData<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>guerry, CODE_DE))</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Error : All columns in a tibble must be vectors.
-✖ Column `geometry` is a `sfc_MULTIPOLYGON/sfc` object.</code></pre>
-</div>
-</div>
-<p>But it can happen without casting to tibbles as well, for instance when trying to use <code>dplyr::arrange()</code>:<sup>1</sup></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">try</span>(dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">arrange</span>(geodaData<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>guerry))</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Error in vec_size() : 
-  `x` must be a vector, not a &lt;sfc_MULTIPOLYGON/sfc&gt; object.</code></pre>
-</div>
-</div>
-<p>Any code that calls <code>vctrs::vec_size()</code> will wind up erroring in this situation, which includes a good amount of tidyverse code.</p>
-<p>A final challenge with including sf objects in R packages is that some projected CRS include non-ASCII characters in their WKT, <a href="https://github.com/r-spatial/sf/issues/1341">causing an aggravating warning</a> in R CMD check: <code>Warning: found non-ASCII string</code>. Your package won’t be accepted to CRAN with that warning, and as such, this needs to be fixed.<sup>2</sup></p>
-<p>All three of these problems can be solved by the same approach, which I think is the best way to include sf objects in packages.</p>
-</section>
-<section id="the-solution" class="level2">
-<h2 class="anchored" data-anchor-id="the-solution">The Solution</h2>
-<p>Rather than including sf objects directly as package data in the normal manner, you should store the sf object as internal data and then load it via <code>delayedAssign</code>. This is an approach inspired by <a href="https://allisonhorst.github.io/palmerpenguins/">palmerpenguins</a> (<a href="https://github.com/allisonhorst/palmerpenguins/pull/36">here’s the relevant PR</a>), now in use in the <a href="spatialsample.tidymodels.org/">spatialsample</a> and <a href="https://mikemahoney218.github.io/waywiser/">waywiser</a> packages I maintain.</p>
-<p>To store <a href="https://r-pkgs.org/data.html#sec-data-sysdata">your sf objects as internal data</a>, save them into a file named <code>R/sysdata.rda</code>. If you use <code>usethis::use_data()</code>, set the argument <code>internal = TRUE</code> to make this happen automatically. This solves the third problem for us; something about not exporting the sf object directly means that R CMD check no longer checks the CRS for non-ASCII characters, and the warning is no longer triggered.</p>
-<p>You now need to somehow export this data, in order to let users actually use your newly-internal sf object. To do so, we’re going to write a file in the <code>data/</code> folder, named something like <code>your_data.R</code>, taking advantage of the <code>delayedAssign()</code> function like so:<sup>3</sup></p>
-<div class="sourceCode" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">delayedAssign</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"your_data"</span>, <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">local</span>({</span>
-<span id="cb10-2">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">requireNamespace</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"sf"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">quietly =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">TRUE</span>)</span>
-<span id="cb10-3">  your_package<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">:::</span>your_data</span>
-<span id="cb10-4">}))</span></code></pre></div>
-<p>This function makes it so that, whenever a user calls your data object for the first time in a session, you quietly load the sf package before assigning your internal data to the exported object. <a href="https://adv-r.hadley.nz/environments.html#search-path">This doesn’t <em>attach</em> the sf package</a>, meaning that your users won’t accidentally have the entire sf package dumped into their search path. Loading the sf package, however, is enough to fix both problems 1 and 2; your data will now play happily with tibbles, dplyr functions, and the broader R ecosystem.</p>
-<p>You then need to <a href="https://r-pkgs.org/data.html#sec-documenting-data">document your data</a> in a file under <code>R/</code> the same way you always would.</p>
-<p>And that’s it! Your package will now be more user-friendly and CRAN-acceptable. I’ve been using this approach for months with no side effects<sup>4</sup> and am planning to keep using it going forward.</p>
-</section>
-<section id="update" class="level2">
-<h2 class="anchored" data-anchor-id="update">Update</h2>
-<p><a href="https://fosstodon.org/@edzer@mastodon.social/109439029871771876">Edzer points out on Mastodon</a> that, in order to <a href="https://www.tidyverse.org/blog/2022/09/playing-on-the-same-team-as-your-dependecy/">play nicely with potential changes in sf</a>, you can <a href="https://r-pkgs.org/data.html#sec-data-extdata">include your data as an external file</a> instead. The steps here are broadly similar: save your sf object to a file in <code>inst/extdata</code>, and write a file in <code>R/</code> that looks something like this:</p>
-<div class="sourceCode" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">delayedAssign</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"your_data"</span>, <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">local</span>({</span>
-<span id="cb11-2">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">try</span>(</span>
-<span id="cb11-3">    sf<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">read_sf</span>(</span>
-<span id="cb11-4">      <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"extdata/your_data.gpkg"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"your_package"</span>)</span>
-<span id="cb11-5">    ),</span>
-<span id="cb11-6">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">silent =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">TRUE</span></span>
-<span id="cb11-7">  )</span>
-<span id="cb11-8">}))</span></code></pre></div>
-<p>We need to wrap the call in <code>try()</code> in order to make this approach work with tooling like <code>devtools::document()</code>, which will otherwise complain about trying to read a file that isn’t there.</p>
-<p>In my tests, this was enough to fix issues 1 and 2; calling <code>sf::read_sf()</code> will load the sf package and should fix any interoperability issues. However, this approach doesn’t necessarily fix the non-ASCII character WARNING given off by R CMD check.</p>
-<p>Of course, you can also include external files in <code>inst/</code> and then have your users read it themselves using <code>system.file()</code>, like <a href="https://r-spatial.github.io/sf/articles/sf1.html">the sf vignettes do themselves</a>!</p>
-
-
-</section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>This section was edited on 2022-12-01; thanks to <a href="https://fosstodon.org/@geospacedman@mastodon.social/109439358830660533">Barry Rowlingson</a> for pointing out a mistake in the original draft.↩︎</p></li>
-<li id="fn2"><p>Theoretically this <em>should</em> be fixed by setting <code>Encoding: UTF8</code> in your package DESCRIPTION, but <a href="https://github.com/r-spatial/sf/issues/1341#issuecomment-609645514">that rarely seems to help</a>.↩︎</p></li>
-<li id="fn3"><p>Just in case it’s not clear: make sure to change <code>your_data</code> and <code>your_package</code> below to, well, the name of your data and the name of your package.↩︎</p></li>
-<li id="fn4"><p>Knock on wood for me, I’ve tempted the gods.↩︎</p></li>
-</ol>
-</section></div> ]]></description>
-  <category>R</category>
-  <category>Tutorials</category>
-  <category>Spatial</category>
-  <category>Data science</category>
-  <guid>https://mm218.dev/posts/2022-12-01-sf-in-packages/index.html</guid>
-  <pubDate>Thu, 01 Dec 2022 00:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2022-12-01-sf-in-packages/sf.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>

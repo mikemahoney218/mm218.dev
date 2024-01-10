@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.450">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Mike Mahoney">
+<meta name="dcterms.date" content="2024-01-10">
+<meta name="description" content="Your one-stop shop for spatial ML data retrieval and pre-processing.">
+
+<title>Mike Mahoney - rsi is now on CRAN!</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+<meta property="og:title" content="Mike Mahoney - rsi is now on CRAN!">
+<meta property="og:description" content="Your one-stop shop for spatial ML data retrieval and pre-processing.">
+<meta property="og:image" content="https://mm218.dev/posts/2024-01-10-rsi-cran/banner.jpg">
+<meta property="og:site-name" content="Mike Mahoney">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:title" content="Mike Mahoney - rsi is now on CRAN!">
+<meta name="twitter:description" content="Your one-stop shop for spatial ML data retrieval and pre-processing.">
+<meta name="twitter:image" content="https://mm218.dev/posts/2024-01-10-rsi-cran/banner.jpg">
+<meta name="twitter:creator" content="@MikeMahoney218">
+<meta name="twitter:card" content="summary_large_image">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Mike Mahoney</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html" rel="" target="">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../papers" rel="" target="">
+ <span class="menu-text">Papers</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../presentations" rel="" target="">
+ <span class="menu-text">Presentations</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../blog.html" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="../../blog.xml" rel="" target=""><i class="bi bi-rss" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">rsi is now on CRAN!</h1>
+                  <div>
+        <div class="description">
+          Your one-stop shop for spatial ML data retrieval and pre-processing.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">R</div>
+                <div class="quarto-category">Tutorials</div>
+                <div class="quarto-category">Spatial</div>
+                <div class="quarto-category">geospatial data</div>
+                <div class="quarto-category">R packages</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><a href="true">Mike Mahoney</a> </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">January 10, 2024</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#downloading-data-from-stac-apis" id="toc-downloading-data-from-stac-apis" class="nav-link active" data-scroll-target="#downloading-data-from-stac-apis">Downloading data from STAC APIs</a></li>
+  <li><a href="#calculate-spectral-indices" id="toc-calculate-spectral-indices" class="nav-link" data-scroll-target="#calculate-spectral-indices">Calculate spectral indices</a></li>
+  <li><a href="#glue-it-all-together" id="toc-glue-it-all-together" class="nav-link" data-scroll-target="#glue-it-all-together">Glue it all together</a></li>
+  <li><a href="#acknowledgments" id="toc-acknowledgments" class="nav-link" data-scroll-target="#acknowledgments">Acknowledgments</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>I’m thrilled to announce that version 0.1.0 of rsi, a new package for handling common spatial ML data pre-processing tasks, is <a href="https://cran.r-project.org/package=rsi">now officially on CRAN</a>. rsi helps you download<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> data from <a href="https://stacspec.org/en">STAC APIs</a>, calculate spectral indices from that data (with an interface to the <a href="https://github.com/davemlz/awesome-spectral-indices">Awesome Spectral Indices project</a>), and efficiently stack rasters together to help build predictor bricks.</p>
+<p>You can install it from CRAN via:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"rsi"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>rsi is motivated by my own work doing landscape-level natural resources mapping, both with <a href="https://permianglobal.com/">Permian Global Research</a> (who have been incredibly supportive of me open-sourcing this project that originated from my contract work) and with <a href="https://cafri-ny.org/">CAFRI</a> (see for instance <a href="https://doi.org/10.1016/j.foreco.2023.121348">our newest Landsat-based forest carbon maps</a>). Most of these projects have a pretty consistent data-processing workflow: I need to go get data from somewhere, calculate indices and other predictors against it, and then glue all those derived products together into a predictor brick I can actually extract my predictor values from. rsi handles every step of that process and does so efficiently, letting you spend less time on your pre-processing and more time on your actual models.</p>
+<p>I’ve written about rsi a few times before, including <a href="https://www.mm218.dev/posts/2023-10-27-minimal-environments/">about how rsi does sandboxing when running code from untrusted sources</a> and <a href="https://www.mm218.dev/posts/2023-11-21-rsi-null/">how to make the most of the <code>get_stac_data()</code> family of functions</a>. This post is going to provide a more holistic introduction to rsi,<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> focusing on the main functions in the package and how you might use them as part of your pre-processing workflows.</p>
+<section id="downloading-data-from-stac-apis" class="level2">
+<h2 class="anchored" data-anchor-id="downloading-data-from-stac-apis">Downloading data from STAC APIs</h2>
+<p>Perhaps the most useful piece of rsi<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> is the <code>get_stac_data()</code> family of functions, which help you download data from <a href="https://stacspec.org/en">STAC APIs</a>. As an example, let’s say that we’ve used sf to define some area of interest that we want to download data for:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>aoi <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_point</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="fl">76.1376841</span>, <span class="fl">43.0351335</span>))</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>aoi <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_set_crs</span>(sf<span class="sc">::</span><span class="fu">st_sfc</span>(aoi), <span class="dv">4326</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>aoi <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_buffer</span>(sf<span class="sc">::</span><span class="fu">st_transform</span>(aoi, <span class="dv">5070</span>), <span class="dv">10000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>If we wanted to get land cover data for this area from 2021, using <a href="https://planetarycomputer.microsoft.com/dataset/usgs-lcmap-conus-v13">the USGS LCMAP product from Planetary Computer</a>, we could use the <code>get_stac_data()</code> function from rsi like so:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rsi)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">"multisession"</span>)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>lcpri <span class="ot">&lt;-</span> <span class="fu">get_stac_data</span>(</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  aoi,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">start_date =</span> <span class="st">"2021-01-01"</span>, <span class="co"># Making sure we only grab data from 2021</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">end_date =</span> <span class="st">"2021-12-31"</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">asset_names =</span> <span class="st">"lcpri"</span>, <span class="co"># The name of the primary land cover product in LCMAP</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">stac_source =</span> <span class="st">"https://planetarycomputer.microsoft.com/api/stac/v1/"</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">collection =</span> <span class="st">"usgs-lcmap-conus-v13"</span>, <span class="co"># The name of LCMAP on Planetary Computer</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_filename =</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">".tif"</span>),</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">plot</span>(terra<span class="sc">::</span><span class="fu">rast</span>(lcpri))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>If our data is split across multiple tiles, <code>get_stac_data()</code> will automatically merge them into a single composite output. There’s <a href="https://permian-global-research.github.io/rsi/articles/Downloading-data-from-STAC-APIs-using-rsi.html">an article on the rsi website</a> that gives a brief overview of the STAC family of standards, and how you can use the arguments to <code>get_stac_data()</code> to flexibly control exactly what you’re downloading and how.</p>
+<p>In addition to <code>get_stac_data()</code>, rsi also provides a number of higher-level functions for interacting with popular satellite imagery data sources – specifically, Landsat, Sentinel-2, and Sentinel-1 (including the Sentinel-1 RTC product). In addition to downloading and merging tiles, these functions will also handle creating composite rasters from multiple separate images, masking out clouds and other low-quality data, and (where possible) automatically rescaling your data using offsets and scaling factors defined in the STAC metadata</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>landsat <span class="ot">&lt;-</span> <span class="fu">get_landsat_imagery</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  aoi,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">start_date =</span> <span class="st">"2021-06-01"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">end_date =</span> <span class="st">"2021-08-31"</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_filename =</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">".tif"</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">plot</span>(terra<span class="sc">::</span><span class="fu">rast</span>(landsat))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Note that the inputs to these functions are normal R objects, and the outputs are the file paths your data was saved to. A key difference of rsi from other packages for downloading data from STAC endpoints is that rsi doesn’t introduce a new data model,<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> and instead is focused on getting data onto your local filesystem as quickly as possible. Ideally, you’ll be able to let rsi handle all the “cloud-native geospatial” stuff for you, and then use the outputs with whatever tools you’re most comfortable with.<a href="#fn5" class="footnote-ref" id="fnref5" role="doc-noteref"><sup>5</sup></a></p>
+<p>For more information on the <code>get_stac_data()</code> family of functions, check out the <a href="https://permian-global-research.github.io/rsi/articles/Downloading-data-from-STAC-APIs-using-rsi.html">corresponding article on the rsi website</a>!</p>
+</section>
+<section id="calculate-spectral-indices" class="level2">
+<h2 class="anchored" data-anchor-id="calculate-spectral-indices">Calculate spectral indices</h2>
+<p>Most other functions in rsi also use the approach of accepting normal R objects as function inputs, and returning file paths to raster outputs. For instance, rsi provides a function, <code>calculate_indices()</code>, which can be used to calculate spectral indices from the band values of an input raster.</p>
+<p>By default, this function is designed to work with spectral indices from the (awesome) <a href="https://github.com/awesome-spectral-indices/awesome-spectral-indices">Awesome Spectral Indices</a> project. In fact, the <code>spectral_indices()</code> function in rsi will give you a processed tibble containing the full list of indices from that project:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spectral_indices</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 231 × 9
+   application_domain bands     contributor   date_of_addition formula long_name
+   &lt;chr&gt;              &lt;list&gt;    &lt;chr&gt;         &lt;chr&gt;            &lt;chr&gt;   &lt;chr&gt;    
+ 1 vegetation         &lt;chr [2]&gt; https://gith… 2021-11-17       (N - 0… Aerosol …
+ 2 vegetation         &lt;chr [2]&gt; https://gith… 2021-11-17       (N - 0… Aerosol …
+ 3 water              &lt;chr [6]&gt; https://gith… 2022-09-22       (B + G… Augmente…
+ 4 vegetation         &lt;chr [2]&gt; https://gith… 2021-09-20       (1 / G… Anthocya…
+ 5 vegetation         &lt;chr [3]&gt; https://gith… 2022-04-08       N * ((… Anthocya…
+ 6 vegetation         &lt;chr [4]&gt; https://gith… 2021-05-11       (N - (… Atmosphe…
+ 7 vegetation         &lt;chr [4]&gt; https://gith… 2021-05-14       sla * … Adjusted…
+ 8 vegetation         &lt;chr [2]&gt; https://gith… 2022-04-08       (N * (… Advanced…
+ 9 water              &lt;chr [4]&gt; https://gith… 2021-09-18       4.0 * … Automate…
+10 water              &lt;chr [5]&gt; https://gith… 2021-09-18       B + 2.… Automate…
+# ℹ 221 more rows
+# ℹ 3 more variables: platforms &lt;list&gt;, reference &lt;chr&gt;, short_name &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>The first time you run <code>spectral_indices()</code> will attempt to download the current set of spectral indices from GitHub, and then will store that download in a cache file. Future calls to <code>spectral_indices()</code> will then be a bit faster, as rsi will only try to update its downloaded indices if the cache is more than a day old.</p>
+<p>There are also two functions, <code>filter_bands()</code> and <code>filter_platforms()</code>, which make it easy to filter the tibble of indices based on what bands or platforms you have available in your data. For instance, if we wanted to get the full set of indices that we could calculate with our downloaded Landsat data, we could pass the names of those bands to the second argument in <code>filter_bands()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">spectral_indices</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter_bands</span>(<span class="fu">names</span>(terra<span class="sc">::</span><span class="fu">rast</span>(landsat)))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 128 × 9
+   application_domain bands     contributor   date_of_addition formula long_name
+   &lt;chr&gt;              &lt;list&gt;    &lt;chr&gt;         &lt;chr&gt;            &lt;chr&gt;   &lt;chr&gt;    
+ 1 vegetation         &lt;chr [2]&gt; https://gith… 2021-11-17       (N - 0… Aerosol …
+ 2 vegetation         &lt;chr [2]&gt; https://gith… 2021-11-17       (N - 0… Aerosol …
+ 3 water              &lt;chr [6]&gt; https://gith… 2022-09-22       (B + G… Augmente…
+ 4 vegetation         &lt;chr [2]&gt; https://gith… 2022-04-08       (N * (… Advanced…
+ 5 water              &lt;chr [4]&gt; https://gith… 2021-09-18       4.0 * … Automate…
+ 6 water              &lt;chr [5]&gt; https://gith… 2021-09-18       B + 2.… Automate…
+ 7 burn               &lt;chr [2]&gt; https://gith… 2021-04-07       1.0 / … Burned A…
+ 8 burn               &lt;chr [2]&gt; https://gith… 2022-04-20       1.0/((… Burned A…
+ 9 vegetation         &lt;chr [3]&gt; https://gith… 2022-01-17       B / (R… Blue Chr…
+10 soil               &lt;chr [4]&gt; https://gith… 2022-04-08       ((S1 +… Bare Soi…
+# ℹ 118 more rows
+# ℹ 3 more variables: platforms &lt;list&gt;, reference &lt;chr&gt;, short_name &lt;chr&gt;</code></pre>
+</div>
+</div>
+<p>And then we can pass this tibble directly to <code>calculate_indices()</code> to calculate all 128 of these indices against our downloaded Landsat image:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>indices <span class="ot">&lt;-</span> <span class="fu">calculate_indices</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  landsat,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter_bands</span>(<span class="fu">spectral_indices</span>(), <span class="fu">names</span>(terra<span class="sc">::</span><span class="fu">rast</span>(landsat))),</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">".tif"</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+|---------|---------|---------|---------|
+=========================================
+                                          </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">plot</span>(terra<span class="sc">::</span><span class="fu">rast</span>(indices))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>You should always skim the formulas you’re going to run before calling <code>calculate_indices()</code> – these are downloaded from a live GitHub URL and can change over time – but the actual execution of downloaded code happens in a sandboxed environment, which should make it <em>harder</em> for any untrustworthy code to damage your system. If you’re interested, <a href="https://www.mm218.dev/posts/2023-10-27-minimal-environments/">I wrote post a few months ago with a bit more information about this sandboxing</a>.</p>
+</section>
+<section id="glue-it-all-together" class="level2">
+<h2 class="anchored" data-anchor-id="glue-it-all-together">Glue it all together</h2>
+<p>And last, but certainly not least, rsi provides a function called <code>stack_rasters()</code> which helps you bind multiple rasters into a single predictor brick. Similar to <code>calculate_indices()</code>, the first argument is a (vector of) file paths to the rasters you want to stack together, and the output is a new file path to the raster that was created:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stack_rasters</span>(<span class="fu">c</span>(lcpri, indices), <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">".tif"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>  terra<span class="sc">::</span><span class="fu">rast</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>  terra<span class="sc">::</span><span class="fu">plot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in CPL_gdalwarp(source, destination, options, oo, doo, config_options,
+: GDAL Error 6: /tmp/RtmpvJTqGP/file302c19635cbe42.tif, band 1: SetColorTable()
+not supported for multi-sample TIFF files.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in CPL_gdalwarp(source, destination, options, oo, doo, config_options,
+: GDAL Message 1: /tmp/RtmpvJTqGP/file302c19635cbe42.tif, band 2: Setting
+nodata to nan on band 2, but band 1 has nodata at 0. The TIFFTAG_GDAL_NODATA
+only support one value per dataset. This value of nan will be used for all
+bands on re-opening</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>If your output file ends in <code>vrt</code>, you can even do this without copying any data thanks to <a href="https://gdal.org/drivers/raster/vrt.html">GDAL’s virtual raster format</a>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="fu">stack_rasters</span>(<span class="fu">c</span>(lcpri, indices), <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">".vrt"</span>)) <span class="sc">|&gt;</span> </span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  terra<span class="sc">::</span><span class="fu">rast</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  terra<span class="sc">::</span><span class="fu">plot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in x@cpp$sampleRegularRaster(size): GDAL Message 6: Resampling method
+not supported on paletted band. Falling back to nearest neighbour</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This feels like such a small thing when you say it out loud, but I think is my favorite part of the package. This was a surprisingly hard thing to do with existing tools. If your rasters are different extents or resolutions, <code>stack_rasters()</code> will automatically set the extent of your output and your target resolution based on the first raster in your input vector – or you can override that default behavior using the <code>extent</code> and <code>resolution</code> argument.</p>
+<p>Crucially, <code>stack_rasters()</code> relies almost entirely on GDAL’s warper and VRT format to do this, meaning it’s able to efficiently stack together <em>much</em> larger than memory data sets. And (particularly when using VRT outputs), this means that <code>stack_rasters()</code> can be a lot faster than approaches that involve reading the raster into R and then writing it back out.</p>
+</section>
+<section id="acknowledgments" class="level2">
+<h2 class="anchored" data-anchor-id="acknowledgments">Acknowledgments</h2>
+<p>And that’s rsi version 0.1.0! Hopefully this package can be as useful for others as it’s already been for me at simplifying my data pre-processing workflows. A huge, huge, <em>huge</em> thank you to the folks who have been involved in testing and improving the alpha release, and helping me reshape it into this first release: <a href="https://github.com/agronomofiorentini">@agronomofiorentini</a>, <a href="https://github.com/h-a-graham">@h-a-graham</a>, and <a href="https://github.com/mateuszrydzik">@mateuszrydzik</a>. It would be a worse package without you!</p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>(and mask, and rescale, and composite)<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>Updating the first post <a href="https://www.mm218.dev/posts/2023-10-26-rsi/">introducing the first alpha development version</a>.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>And most involved; <a href="https://github.com/AlDanial/cloc">cloc</a> tells me there are 1300 lines of code in the R directory of this package, with 718 of them in <code>get_stac_data.R</code>.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn4"><p>Kinda; the band mapping objects are – as discussed in the article linked above – a relatively complex data structure. But <em>hopefully</em> users mostly don’t need to think about those.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn5"><p><a href="https://ourenvironment.berkeley.edu/people/carl-boettiger">Carl Boettiger</a> at AGU this year: “Cloud native just means using HTTP range requests. We’ve been doing cloud native since the 90s”.<a href="#fnref5" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<script src="https://utteranc.es/client.js" repo="mikemahoney218/mm218.dev" issue-term="pathname" theme="github-light" crossorigin="anonymous" async="">
+</script>
+</div> <!-- /content -->
+<footer class="footer">
+  <div class="nav-footer">
+    <div class="nav-footer-left">© Copyright 2024 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</div>   
+    <div class="nav-footer-center">
+      &nbsp;
+    </div>
+    <div class="nav-footer-right">
+      &nbsp;
+    </div>
+  </div>
+</footer>
+
+
+
+</body></html>
