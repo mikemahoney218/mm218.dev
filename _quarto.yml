@@ -29,7 +29,7 @@ website:
       - icon: rss
         href: blog.xml
   page-footer:
-    left: "© Copyright 2022 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0."
+    left: "© Copyright 2024 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0."
 format:
   html:
     theme: [sandstone, _variables.scss]
