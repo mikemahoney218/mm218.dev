@@ -4,7 +4,7 @@ description: "Your one-stop shop for spatial ML data retrieval and pre-processin
 author:
   - name: Mike Mahoney
     url: {}
-date: "2024-01-15"
+date: "2024-01-10"
 categories: [R, Tutorials, Spatial, geospatial data, R packages]
 image: banner.jpg
 format: 
