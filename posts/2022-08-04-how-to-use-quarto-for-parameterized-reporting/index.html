@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.4.550">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -25,7 +25,7 @@ ul.task-list li input[type="checkbox"] {
 }
 /* CSS for syntax highlighting */
 pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span { line-height: 1.25; }
 pre > code.sourceCode > span:empty { height: 1.2em; }
 .sourceCode { overflow: visible; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
@@ -82,7 +82,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -91,12 +97,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
 }</script>
-
 <link href="../../site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
 <script src="../../site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 
@@ -105,7 +111,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <meta property="og:title" content="Mike Mahoney - How to use Quarto for Parameterized Reporting">
 <meta property="og:description" content="You know. If you wanna.">
 <meta property="og:image" content="https://mm218.dev/posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/elevator.jpg">
-<meta property="og:site-name" content="Mike Mahoney">
+<meta property="og:site_name" content="Mike Mahoney">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:title" content="Mike Mahoney - How to use Quarto for Parameterized Reporting">
 <meta name="twitter:description" content="You know. If you wanna.">
@@ -117,10 +123,10 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Mike Mahoney</span>
     </a>
@@ -132,30 +138,30 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../index.html" rel="" target="">
- <span class="menu-text">Home</span></a>
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../papers" rel="" target="">
- <span class="menu-text">Papers</span></a>
+    <a class="nav-link" href="../../papers"> 
+<span class="menu-text">Papers</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../presentations" rel="" target="">
- <span class="menu-text">Presentations</span></a>
+    <a class="nav-link" href="../../presentations"> 
+<span class="menu-text">Presentations</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../blog.html" rel="" target="">
- <span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="../../blog.xml" rel="" target=""><i class="bi bi-rss" role="img">
+    <a class="nav-link" href="../../blog.xml"> <i class="bi bi-rss" role="img">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
 </ul>
-            <div class="quarto-navbar-tools">
-</div>
           </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -219,6 +225,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
+
 <p>There’s a lot of conversations around about <a href="https://quarto.org/">Quarto</a> as a new system for technical communication. And that’s well deserved! Quarto, the successor to the R Markdown system, extends and improves upon its predecessor and produces downright beautiful documents (including this very website).</p>
 <p>But as a recovering data analyst, the thing that I’m most excited about with Quarto is its ability to generate reports based on a document template and a handful of parameter values. A whole lot of my professional career has amounted to “report out the same handful of KPIs every day (or month, or quarter), aggregated to each relevant business unit and a handful of combined groups.” R Markdown’s parameterized reporting let me automate that boring stuff and spend my time on more fun (and higher impact) projects, and Quarto supports more or less the same style of templating. As such, this blog post walks through how you can use parameterization to automate your own reporting with Quarto.</p>
 <section id="a-simple-script" class="level1">
@@ -233,7 +240,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>elevators<span class="sc">::</span>elevators <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
 {"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["device_number"],"name":[1],"type":["chr"],"align":["left"]},{"label":["bin"],"name":[2],"type":["chr"],"align":["left"]},{"label":["tax_block"],"name":[3],"type":["chr"],"align":["left"]},{"label":["tax_lot"],"name":[4],"type":["chr"],"align":["left"]},{"label":["house_number"],"name":[5],"type":["chr"],"align":["left"]},{"label":["street_name"],"name":[6],"type":["chr"],"align":["left"]},{"label":["zip_code"],"name":[7],"type":["chr"],"align":["left"]},{"label":["borough"],"name":[8],"type":["fct"],"align":["left"]},{"label":["device_type"],"name":[9],"type":["chr"],"align":["left"]},{"label":["lastper_insp_date"],"name":[10],"type":["date"],"align":["right"]},{"label":["approval_date"],"name":[11],"type":["date"],"align":["right"]},{"label":["manufacturer"],"name":[12],"type":["chr"],"align":["left"]},{"label":["travel_distance"],"name":[13],"type":["chr"],"align":["left"]},{"label":["speed_fpm"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["capacity_lbs"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["car_buffer_type"],"name":[16],"type":["chr"],"align":["left"]},{"label":["governor_type"],"name":[17],"type":["chr"],"align":["left"]},{"label":["machine_type"],"name":[18],"type":["chr"],"align":["left"]},{"label":["safety_type"],"name":[19],"type":["chr"],"align":["left"]},{"label":["mode_operation"],"name":[20],"type":["chr"],"align":["left"]},{"label":["floor_from"],"name":[21],"type":["chr"],"align":["left"]},{"label":["floor_to"],"name":[22],"type":["chr"],"align":["left"]},{"label":["latitude"],"name":[23],"type":["dbl"],"align":["right"]},{"label":["longitude"],"name":[24],"type":["dbl"],"align":["right"]},{"label":["elevators_per_building"],"name":[25],"type":["int"],"align":["right"]}],"data":[{"1":"1D10028","2":"1024795","3":"1021","4":"26","5":"1614","6":"BROADWAY","7":"10019","8":"Manhattan","9":"Dumbwaiter","10":"2015-09-18","11":"2006-03-07","12":"NA","13":"16'4\"","14":"50","15":"500","16":"Spring","17":"NA","18":"NA","19":"I","20":"A","21":"B","22":"1","23":"40.76088","24":"-73.98391","25":"11","_rn_":"1"},{"1":"1D10094","2":"1041822","3":"1392","4":"25","5":"53","6":"E 77TH ST","7":"10021","8":"Manhattan","9":"Dumbwaiter","10":"2015-08-07","11":"2006-05-15","12":"NA","13":"NA","14":"25","15":"500","16":"NA","17":"NA","18":"OD","19":"NA","20":"P","21":"SB","22":"3","23":"40.77502","24":"-73.96256","25":"2","_rn_":"2"},{"1":"1D10097","2":"1038223","3":"1323","4":"1","5":"201","6":"E 49 ST","7":"10017","8":"Manhattan","9":"Dumbwaiter","10":"2015-04-02","11":"1998-09-21","12":"NA","13":"23","14":"50","15":"500","16":"NA","17":"NA","18":"BD","19":"I","20":"A","21":"B","22":"2","23":"40.75518","24":"-73.97079","25":"1","_rn_":"3"},{"1":"1D10146","2":"1080443","3":"1274","4":"6","5":"40","6":"CENTRAL PARK SOUTH","7":"NA","8":"Manhattan","9":"Dumbwaiter","10":"2014-10-15","11":"2010-08-02","12":"NA","13":"8'","14":"50","15":"500","16":"NA","17":"NA","18":"BD","19":"NA","20":"A","21":"B","22":"1","23":"40.76500","24":"-73.97573","25":"1","_rn_":"4"},{"1":"1D10200","2":"1085777","3":"1074","4":"24","5":"651","6":"TENTH AVENUE","7":"NA","8":"Manhattan","9":"Dumbwaiter","10":"2015-06-15","11":"2001-04-24","12":"NA","13":"24 FT","14":"50","15":"NA","16":"NA","17":"NA","18":"NA","19":"NA","20":"NA","21":"C","22":"G","23":"40.76221","24":"-73.99434","25":"2","_rn_":"5"},{"1":"1D10301","2":"1002075","3":"181","4":"16","5":"179","6":"FRANKLIN STREET","7":"10013","8":"Manhattan","9":"Dumbwaiter","10":"2015-02-25","11":"2002-11-06","12":"NA","13":"9'0","14":"50","15":"500","16":"NA","17":"NA","18":"OD","19":"I","20":"A","21":"BAS","22":"1","23":"40.71918","24":"-74.00962","25":"2","_rn_":"6"},{"1":"1D10302","2":"1010518","3":"606","4":"4","5":"121","6":"WEST 10 STREET","7":"10011","8":"Manhattan","9":"Dumbwaiter","10":"2014-04-14","11":"2003-01-22","12":"NA","13":"12'0\"","14":"50","15":"300","16":"Spring","17":"NA","18":"OD","19":"I","20":"A","21":"B","22":"1","23":"40.73486","24":"-73.99974","25":"1","_rn_":"7"},{"1":"1D10303","2":"1085955","3":"1329","4":"1","5":"915","6":"3 AVENUE","7":"10022","8":"Manhattan","9":"Dumbwaiter","10":"2015-03-26","11":"2002-12-11","12":"NA","13":"23'1\"","14":"50","15":"500","16":"NA","17":"NA","18":"BD","19":"NA","20":"A","21":"C","22":"2","23":"40.75896","24":"-73.96759","25":"1","_rn_":"8"},{"1":"1D10304","2":"1044058","3":"1430","4":"5","5":"220","6":"E. 76 ST","7":"10021","8":"Manhattan","9":"Dumbwaiter","10":"2015-09-09","11":"2002-12-10","12":"NA","13":"49'","14":"50","15":"500","16":"NA","17":"NA","18":"OG","19":"I","20":"A","21":"BMT","22":"4","23":"40.77154","24":"-73.95782","25":"1","_rn_":"9"},{"1":"1D10305","2":"1087468","3":"1951","4":"4","5":"133","6":"MORNINGSIDE AVENUE","7":"NA","8":"Manhattan","9":"Dumbwaiter","10":"2014-11-25","11":"2003-12-01","12":"NA","13":"73-10","14":"100","15":"500","16":"NA","17":"NA","18":"OG","19":"NA","20":"P","21":"C","22":"5","23":"40.81095","24":"-73.95376","25":"5","_rn_":"10"},{"1":"1D10306","2":"1087468","3":"1951","4":"4","5":"133","6":"MORNINGSIDE AVENUE","7":"NA","8":"Manhattan","9":"Dumbwaiter","10":"2014-11-25","11":"2003-12-01","12":"NA","13":"73-10","14":"100","15":"500","16":"NA","17":"NA","18":"OG","19":"NA","20":"A","21":"C","22":"5","23":"40.81095","24":"-73.95376","25":"5","_rn_":"11"},{"1":"1D10308","2":"1041820","3":"1392","4":"12","5":"19","6":"E 77TH ST","7":"10021","8":"Manhattan","9":"Dumbwaiter","10":"2013-06-18","11":"2004-03-25","12":"NA","13":"20\"8\"","14":"50","15":"200","16":"NA","17":"NA","18":"NA","19":"NA","20":"A","21":"B,1","22":"2","23":"40.77542","24":"-73.96348","25":"1","_rn_":"12"},{"1":"1D10309","2":"1003919","3":"304","4":"2","5":"97","6":"BOWERY","7":"10002","8":"Manhattan","9":"Dumbwaiter","10":"2014-04-23","11":"2003-05-05","12":"NA","13":"16'1\"","14":"50","15":"500","16":"NA","17":"NA","18":"OD","19":"I","20":"P","21":"B","22":"2","23":"40.71733","24":"-73.99503","25":"2","_rn_":"13"},{"1":"1D10310","2":"1085024","3":"1041","4":"44","5":"324","6":"WEST   51 STREET","7":"NA","8":"Manhattan","9":"Dumbwaiter","10":"2015-06-09","11":"2003-03-10","12":"NA","13":"9'2'","14":"50","15":"300","16":"Spring","17":"NA","18":"BD","19":"I","20":"C","21":"B","22":"1","23":"40.76320","24":"-73.98689","25":"1","_rn_":"14"},{"1":"1D10311","2":"1001486","3":"136","4":"27","5":"110","6":"CHAMBERS ST","7":"10007","8":"Manhattan","9":"Dumbwaiter","10":"2015-02-19","11":"2003-06-20","12":"NA","13":"24'10","14":"50","15":"500","16":"NA","17":"NA","18":"OD","19":"I","20":"P","21":"B","22":"2","23":"40.71488","24":"-74.00833","25":"1","_rn_":"15"},{"1":"1D10313","2":"1041283","3":"1383","4":"60","5":"16","6":"EAST 69 STREET","7":"10021","8":"Manhattan","9":"Dumbwaiter","10":"2013-06-10","11":"2004-06-29","12":"NA","13":"11","14":"50","15":"500","16":"NA","17":"NA","18":"NA","19":"I","20":"A","21":"1F","22":"2R","23":"40.76985","24":"-73.96744","25":"2","_rn_":"16"},{"1":"1D10314","2":"1046656","3":"1492","4":"146","5":"40","6":"EAST 81 STREET","7":"10028","8":"Manhattan","9":"Dumbwaiter","10":"2012-12-06","11":"2003-12-23","12":"NA","13":"9.75","14":"25","15":"75","16":"NA","17":"NA","18":"OD","19":"NA","20":"A","21":"1","22":"2","23":"40.77718","24":"-73.96068","25":"1","_rn_":"17"},{"1":"1D10315","2":"1001480","3":"136","4":"7503","5":"60","6":"WARREN STREET","7":"10007","8":"Manhattan","9":"Dumbwaiter","10":"2015-02-24","11":"2007-01-09","12":"NA","13":"37.6","14":"50","15":"75","16":"Spring","17":"NA","18":"BG","19":"NA","20":"A","21":"6","22":"9","23":"40.71501","24":"-74.00933","25":"1","_rn_":"18"},{"1":"1D10316","2":"1024656","3":"1013","4":"29","5":"592","6":"SEVENTH AVE","7":"10036","8":"Manhattan","9":"Dumbwaiter","10":"2015-09-16","11":"2003-06-09","12":"NA","13":"23\"0","14":"50","15":"500","16":"NA","17":"NA","18":"OD","19":"NA","20":"A","21":"1MZ","22":"2","23":"40.75586","24":"-73.98757","25":"4","_rn_":"19"},{"1":"1D10323","2":"1053310","3":"1718","4":"159","5":"58","6":"WEST 120 STREET","7":"10027","8":"Manhattan","9":"Dumbwaiter","10":"2014-12-16","11":"2003-08-01","12":"NA","13":"9'6\"","14":"50","15":"3000","16":"Spring","17":"NA","18":"BD","19":"I","20":"C","21":"C","22":"1","23":"40.80388","24":"-73.94674","25":"1","_rn_":"20"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
@@ -253,43 +259,43 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(elevators)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>())</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="in">library(elevators)</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggplot2)</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="in">theme_set(theme_minimal())</span></span>
 <span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="fu">## Speed over time</span></span>
 <span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>elevators <span class="sc">|&gt;</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(approval_date, speed_fpm)) <span class="sc">+</span></span>
-<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.05</span>) <span class="sc">+</span></span>
-<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span></span>
-<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a><span class="in">#| warning: false</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="in">elevators |&gt;</span></span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(approval_date, speed_fpm)) +</span></span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point(alpha = 0.05) +</span></span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth() +</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a><span class="in">  scale_y_log10()</span></span>
 <span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a><span class="fu">## Speed versus capacity</span></span>
 <span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>elevators <span class="sc">|&gt;</span></span>
-<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(capacity_lbs, speed_fpm)) <span class="sc">+</span></span>
-<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.05</span>) <span class="sc">+</span></span>
-<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span></span>
-<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="in">#| warning: false</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="in">elevators |&gt;</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(capacity_lbs, speed_fpm)) +</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point(alpha = 0.05) +</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth() +</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="in">  scale_y_log10()</span></span>
 <span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="fu">## Where in the world did all my elevators go</span></span>
 <span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>elevators <span class="sc">|&gt;</span></span>
-<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(longitude, latitude)) <span class="sc">+</span> </span>
-<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.05</span>) <span class="sc">+</span></span>
-<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>()</span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="in">elevators |&gt;</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(longitude, latitude)) + </span></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point(alpha = 0.05) +</span></span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a><span class="in">  coord_sf()</span></span>
 <span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>(You can see what this looks like when rendered over at <a href="../../junkdrawer/a-simple-script/">this link</a>.)</p>
 <p>With your small example all set, you rush off to show it to friends and family before officially publishing it to the web.</p>
@@ -311,51 +317,51 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(elevators)</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="in">library(elevators)</span></span>
 <span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.na</span>(params<span class="sc">$</span>borough) <span class="sc">&amp;&amp;</span> params<span class="sc">$</span>borough <span class="sc">!=</span> <span class="st">"NA"</span>) {</span>
-<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  elevators <span class="ot">&lt;-</span> elevators[elevators<span class="sc">$</span>borough <span class="sc">==</span> params<span class="sc">$</span>borough, ]</span>
-<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(elevators) <span class="sc">==</span> <span class="dv">0</span>) {</span>
-<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stop</span>(<span class="st">"No elevators were selected. Did you misspell `borough`?"</span>)</span>
-<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="in">if (!is.na(params$borough) &amp;&amp; params$borough != "NA") {</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="in">  elevators &lt;- elevators[elevators$borough == params$borough, ]</span></span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="in">if (nrow(elevators) == 0) {</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="in">  stop("No elevators were selected. Did you misspell `borough`?")</span></span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
 <span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>())</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggplot2)</span></span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a><span class="in">theme_set(theme_minimal())</span></span>
 <span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a><span class="fu">## Speed over time</span></span>
 <span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>elevators <span class="sc">|&gt;</span> </span>
-<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(approval_date, speed_fpm)) <span class="sc">+</span> </span>
-<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.05</span>) <span class="sc">+</span> </span>
-<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span> </span>
-<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a><span class="in">#| warning: false</span></span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a><span class="in">elevators |&gt; </span></span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(approval_date, speed_fpm)) + </span></span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point(alpha = 0.05) + </span></span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth() + </span></span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a><span class="in">  scale_y_log10()</span></span>
 <span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-40"><a href="#cb4-40" aria-hidden="true" tabindex="-1"></a><span class="fu">## Speed versus capacity</span></span>
 <span id="cb4-41"><a href="#cb4-41" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-42"><a href="#cb4-42" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a>elevators <span class="sc">|&gt;</span> </span>
-<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(capacity_lbs, speed_fpm)) <span class="sc">+</span> </span>
-<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.05</span>) <span class="sc">+</span> </span>
-<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span> </span>
-<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()</span>
+<span id="cb4-43"><a href="#cb4-43" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb4-44"><a href="#cb4-44" aria-hidden="true" tabindex="-1"></a><span class="in">#| warning: false</span></span>
+<span id="cb4-45"><a href="#cb4-45" aria-hidden="true" tabindex="-1"></a><span class="in">elevators |&gt; </span></span>
+<span id="cb4-46"><a href="#cb4-46" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(capacity_lbs, speed_fpm)) + </span></span>
+<span id="cb4-47"><a href="#cb4-47" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point(alpha = 0.05) + </span></span>
+<span id="cb4-48"><a href="#cb4-48" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth() + </span></span>
+<span id="cb4-49"><a href="#cb4-49" aria-hidden="true" tabindex="-1"></a><span class="in">  scale_y_log10()</span></span>
 <span id="cb4-50"><a href="#cb4-50" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb4-51"><a href="#cb4-51" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-52"><a href="#cb4-52" aria-hidden="true" tabindex="-1"></a><span class="fu">## Where in the world did all my elevators go</span></span>
 <span id="cb4-53"><a href="#cb4-53" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb4-54"><a href="#cb4-54" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a>elevators <span class="sc">|&gt;</span> </span>
-<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(longitude, latitude)) <span class="sc">+</span> </span>
-<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.05</span>) <span class="sc">+</span> </span>
-<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>()</span>
+<span id="cb4-55"><a href="#cb4-55" aria-hidden="true" tabindex="-1"></a><span class="in">elevators |&gt; </span></span>
+<span id="cb4-56"><a href="#cb4-56" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(longitude, latitude)) + </span></span>
+<span id="cb4-57"><a href="#cb4-57" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point(alpha = 0.05) + </span></span>
+<span id="cb4-58"><a href="#cb4-58" aria-hidden="true" tabindex="-1"></a><span class="in">  coord_sf()</span></span>
 <span id="cb4-59"><a href="#cb4-59" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Now, by default, this output looks <a href="../../junkdrawer/parameterized-reports/">the same as the last time</a>. However, when we run <code>quarto render</code> now, we can either pass parameters on the command line, for instance using:</p>
 <div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">quarto</span> render elevators.qmd <span class="at">-P</span> borough:Manhattan</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -420,7 +426,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <div class="cell">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>elevators<span class="sc">::</span>md_elevators <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
 {"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["location_name"],"name":[1],"type":["chr"],"align":["left"]},{"label":["location_type"],"name":[2],"type":["chr"],"align":["left"]},{"label":["county"],"name":[3],"type":["chr"],"align":["left"]},{"label":["location_address"],"name":[4],"type":["chr"],"align":["left"]},{"label":["registration_number"],"name":[5],"type":["chr"],"align":["left"]},{"label":["status"],"name":[6],"type":["chr"],"align":["left"]},{"label":["certificate_expiration_date"],"name":[7],"type":["chr"],"align":["left"]},{"label":["equipment_type"],"name":[8],"type":["chr"],"align":["left"]},{"label":["equipment_capacity"],"name":[9],"type":["chr"],"align":["left"]},{"label":["equipment_speed"],"name":[10],"type":["chr"],"align":["left"]},{"label":["equipment_travel"],"name":[11],"type":["chr"],"align":["left"]},{"label":["owner_contact"],"name":[12],"type":["chr"],"align":["left"]},{"label":["owner_contact_2"],"name":[13],"type":["chr"],"align":["left"]},{"label":["inspection_type"],"name":[14],"type":["chr"],"align":["left"]},{"label":["last_inspection_date"],"name":[15],"type":["chr"],"align":["left"]}],"data":[{"1":"111 Cathedral Street","2":"Private","3":"Anne Arundel","4":"111 Cathedral St , Annapolis , MD , 21401-2701 , Anne Arundel","5":"AA1000","6":"Active","7":"2023-03-01","8":"Hydraulic Basement (HB)","9":"1500","10":"100","11":"22 feet 3 inches","12":"[{:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Annapolis\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21401\", :phoneUnlisted nil, :line2 \"\", :privacyWaiver nil, :cell nil, :line1 \"111 Cathedral St Suite 100\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e88adb8d2b5e2d7fc843a\", :name \"Mailing\"}, :email nil, :additionalData {}, :phone \"\", :name \"111 Cathedral Street LLC\", :title \"\", :id \"4564608\", :company \"111 Cathedral Street LLC\"} {:id \"4564609\", :name \"STURSA FAMILY, LTD., PTN.\", :company \"STURSA FAMILY, LTD., PTN.\", :title nil, :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"ANNAPOLIS\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21401\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"2525 RIVA ROAD, SUITE 110\", :country nil, :faxUnlisted nil}, :phone \"410-268-8400\", :fax \"410-268-9592\", :email nil} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Annapolis\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21403\", :phoneUnlisted nil, :line2 \"435 4th St\", :privacyWaiver nil, :cell nil, :line1 \"\", :country nil, :faxUnlisted nil}, :fax \"410-268-9592\", :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email nil, :additionalData {}, :phone \"410-268-8400\", :name \"Sandra Friedman\", :title \"Property Manager\", :id \"4978893\", :company \"Stursa Family LP c/o Innovative Properties Inc\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Annapolis\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21403\", :phoneUnlisted nil, :line2 \"435 4th St\", :privacyWaiver nil, :cell nil, :line1 \"\", :country nil, :faxUnlisted nil}, :fax \"410-268-9592\", :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email nil, :additionalData {}, :phone \"410-268-8400\", :name \"Sandra Friedman\", :title \"Property Manager\", :id \"4978893\", :company \"Stursa Family LP c/o Innovative Properties Inc\"}]","13":"Clayton Ruttcauslcas Maryland State Education Association Headquarters 410-263-6600","14":"Periodic (Elevator)","15":"2021-09-01","_rn_":"1"},{"1":"Maryland State Education Association Headquarters","2":"Private","3":"Anne Arundel","4":"140 Main St , Annapolis , MD , 21401-2003 , Anne Arundel","5":"AA1001","6":"Active","7":"2022-09-01","8":"Hydraulic Basement (HB)","9":"2500","10":"100","11":"40 feet 0 inches","12":"[{:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Annapolis\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21401-2003\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"140 Main St\", :country nil, :faxUnlisted nil}, :fax \"410-263-3605\", :contactType nil, :email nil, :additionalData nil, :phone \"410-263-6600\", :name \"Wayne Frees\", :title \"Facilities Supervisor\", :id \"4559607\", :company \"Maryland State Education Association\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Annapolis\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21401\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"140 MAIN STREET\", :country nil, :faxUnlisted nil}, :fax nil, :contactType nil, :email nil, :additionalData nil, :phone \"410-263-6600\", :name \"MARYLAND STATE TEACHER ASSOCIATION\", :title \"Wayne Frees\", :id \"4559608\", :company \"MARYLAND STATE TEACHER ASSOCIATION\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Annapolis\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21401-2003\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"140 Main St\", :country nil, :faxUnlisted nil}, :fax nil, :contactType nil, :email nil, :additionalData nil, :phone \"410-263-6600\", :name \"Clayton Ruttcauslcas\", :title \"Network Specialist\", :id \"5978925\", :company \"Maryland State Education Association Headquarters\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Annapolis\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21401-2003\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"140 Main St\", :country nil, :faxUnlisted nil}, :fax nil, :contactType nil, :email nil, :additionalData nil, :phone \"410-263-6600\", :name \"Clayton Ruttcauslcas\", :title \"Network Specialist\", :id \"5978925\", :company \"Maryland State Education Association Headquarters\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Annapolis\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21401-2003\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"140 Main St.\", :country nil, :faxUnlisted nil}, :fax \"410-263-3605\", :contactType nil, :email \"nmilline@mseanea.org\", :additionalData nil, :phone \"410-263-6600\", :name \"Neven Milline\", :title \"Facility Supervisor\", :id \"60e603af20241f0036fde6a9\", :company \"Maryland State Education Association Headquarters\"}]","13":"Michael Blouder More Goodies Mall 410-269-0071","14":"Periodic Reinspection (Elevator)","15":"2022-03-18","_rn_":"2"},{"1":"More Goodies Mall","2":"Private","3":"Anne Arundel","4":"112 Main St , Annapolis , MD , 21401-2026 , Anne Arundel","5":"AA1002","6":"Active","7":"2022-10-11","8":"Hydraulic Basement (HB)","9":"2500","10":"125","11":"40 feet 4 inches","12":"[{:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Annapolis\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21401\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"112 Maine St\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email nil, :phone \"410-269-0071\", :name \"Michael Blouder\", :title \"Vice President\", :id \"4560348\", :company \"More Goodies Mall\"}]","13":"Carol Kelly Chase Home Inc 410-263-2723 ck.05103@yahoo.com","14":"Periodic (Elevator)","15":"2022-06-01","_rn_":"3"},{"1":"Chase/Lloyd House","2":"Private","3":"Anne Arundel","4":"22 Maryland Ave , Annapolis , MD , 21401-1628 , Anne Arundel","5":"AA1003","6":"Active","7":"2023-06-01","8":"Hydraulic Basement (HB)","9":"750","10":"30","11":"34 feet 0 inches","12":"[{:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Annapolis\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21401-1628\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"22 Maryland Ave\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email \"ck.05103@yahoo.com\", :additionalData {}, :phone \"410-263-2723  (cell)410-268-1733\", :name \"Carol Kelly\", :title \"Manager\", :id \"4552424\", :company \"Chase Home Inc\"}]","13":"Harry Brocato Raven Power, LLC 410-787-5088 harry.brocato@talenenergy.com","14":"Periodic (Elevator)","15":"2021-09-28","_rn_":"4"},{"1":"Brandon Shores Power Plant","2":"Private","3":"Anne Arundel","4":"2030 Brandon Shores Rd , Baltimore , MD , 21226-1748 , Anne Arundel","5":"AA1004","6":"Active","7":"2022-09-28","8":"Rack & Pinion (R&P)","9":"900","10":"150","11":"750 feet 0 inches","12":"[{:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"2030 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType nil, :email nil, :additionalData nil, :phone \"410-787-6928\", :name \"Brandon Shores Engineering Projects\", :title nil, :id \"4551419\", :company \"Brandon Shores Engineering Projects\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"BALTIMORE\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21202\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"750 E Pratt St\", :country nil, :faxUnlisted nil}, :fax nil, :contactType nil, :email nil, :additionalData nil, :phone \"410-783-2800\", :name \"EDWARD J. WEDELMEYER\", :title \"E & C SUPERVISOR\", :id \"4553188\", :company \"CONSTELLATION POWER SOURCE GENERATION, INC.\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"2030 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax \"443-213-3439\", :contactType nil, :email nil, :additionalData nil, :phone \"410-787-5088\", :name \"Carnell Williams\", :title \"Principal Engineer\", :id \"4711479\", :company \"Constellation Power Source Generation Inc\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1748\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"2030 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType nil, :email nil, :additionalData nil, :phone \"410-787-5251\", :name \"Mark Kostewik\", :title \"Project Manager\", :id \"5603406\", :company \"Raven Power/Brandon Shores LLC\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Pasadena\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21122-2256\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"8115 Evening Star Dr\", :country nil, :faxUnlisted nil}, :fax nil, :contactType nil, :email nil, :additionalData nil, :phone \"888-305-3022\", :name \"Creekstone Village\", :title nil, :id \"5605177\", :company \"Creekstone Village\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1748\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"2030 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email \"harry.brocato@talenenergy.com\", :additionalData {}, :phone \"410-787-5088\", :name \"Harry Brocato\", :title \"Engineer Manager\", :id \"5615653\", :company \"Raven Power, LLC\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"2030 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType nil, :email nil, :additionalData nil, :phone \"410-787-5088 (cell)410-971-7346\", :name \"Harry Brocato\", :title \"Engineer Manager\", :id \"5930500\", :company nil} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"2030 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax \"443-213-3439\", :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :additionalData nil, :phone \"410-787-5088\", :name \"Carnell Williams\", :title \"Principal Engineer\", :id \"4711479\", :company \"Constellation Power Source Generation Inc\"}]","13":"James Hoover Anne Arundel County Governement 410-222-8100","14":"Periodic (Elevator)","15":"2022-05-12","_rn_":"5"},{"1":"Arundel Center South","2":"Public","3":"Anne Arundel","4":"44 Calvert South , Annapolis , MD , 21401-1930 , Anne Arundel","5":"AA1005","6":"Active","7":"2021-12-03","8":"Traction Basement (TB)","9":"2000","10":"200","11":"48 feet 0 inches","12":"[{:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Millersville\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21108-2599\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"8313 Grover Rd\", :country nil, :faxUnlisted nil}, :fax \"410-222-8108\", :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email nil, :phone \"410-222-8100\", :name \"James Hoover\", :title \"Facilities Administrator\", :id \"4549995\", :company \"Anne Arundel County Governement\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Millersville\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21108-2599\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"8313 Grover Rd\", :country nil, :faxUnlisted nil}, :fax \"410-222-8108\", :contactType nil, :email nil, :phone \"410-222-8100\", :name \"Lisa Edwards\", :title \"County Facilities\", :id \"5012916\", :company \"Anne Arundel County Government\"}]","13":"James Hoover Anne Arundel County Governement 410-222-8100","14":"Periodic (Elevator)","15":"2022-05-12","_rn_":"6"},{"1":"Arundel Center South","2":"Public","3":"Anne Arundel","4":"44 Calvert South , Annapolis , MD , 21401-1930 , Anne Arundel","5":"AA1006","6":"Active","7":"2021-12-03","8":"Traction Basement (TB)","9":"2000","10":"200","11":"48 feet 0 inches","12":"[{:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Millersville\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21108-2599\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"8313 Grover Rd\", :country nil, :faxUnlisted nil}, :fax \"410-222-8108\", :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email nil, :phone \"410-222-8100\", :name \"James Hoover\", :title \"Facilities Administrator\", :id \"4549995\", :company \"Anne Arundel County Governement\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Millersville\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21108-2599\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"8313 Grover Rd\", :country nil, :faxUnlisted nil}, :fax \"410-222-8108\", :contactType nil, :email nil, :phone \"410-222-8100\", :name \"Lisa Edwards\", :title \"County Facilities\", :id \"5012916\", :company \"Anne Arundel County Government\"}]","13":"Kelli Rivera UMMS c/o JLL 410-910-7370","14":"Periodic (Elevator)","15":"2022-03-03","_rn_":"7"},{"1":"University of MD Medical System Corp (Shipley's Choice)","2":"Private","3":"Anne Arundel","4":"8601 Veterans Hwy , Millersville , MD , 21108-1547 , Anne Arundel","5":"AA1007","6":"Active","7":"2023-03-03","8":"Hydraulic Basement (HB)","9":"4500","10":"125","11":"12 feet 10 inches","12":"[{:id \"4549995\", :name \"James Hoover\", :company \"Anne Arundel County Governement\", :title \"Facilities Administrator\", :address {:line1 \"8313 Grover Rd\", :city \"Millersville\", :state \"MD\", :zipcode \"21108-2599\"}, :phone \"410-222-8100\", :fax \"410-222-8108\"} {:id \"4565992\", :name \"University of Maryland Medical Center\", :company \"University of Maryland Medical Center\", :address {:line1 \"Attn: Mary Anne Siwinski\", :line2 \"22 S Greene St\", :city \"Baltimore\", :state \"MD\", :zipcode \"21201-1544\"}, :phone \"410-328-8122\", :fax \"410-328-1920\", :email \"maryannesiwinski@umm.edu\"} {:id \"4566004\", :name \"Richie Stever\", :company \"University of Maryland Medical Center\", :title \"Director\", :address {:line1 \"22 S Greene St\", :city \"Baltimore\", :state \"MD\", :zipcode \"21201-1544\"}, :phone \"410-328-3787\", :fax \"410-328-7283\", :email \"rstever@umm.edu\"} {:id \"5012916\", :name \"Lisa Edwards\", :company \"Anne Arundel County Government\", :title \"County Facilities\", :address {:line1 \"8313 Grover Rd\", :city \"Millersville\", :state \"MD\", :zipcode \"21108-2599\"}, :phone \"410-222-8100\", :fax \"410-222-8108\"} {:id \"5106153\", :name \"Laurie Marino\", :company \"Shipley's Choice Medical Park Inc\", :title \"Senior Vice President/PM\", :address {:line1 \"c/o CIB Management LLC DBA Colliers Int'l\", :line2 \"8601 Robert Fulton Dr Suite 200\", :city \"Columbia\", :state \"MD\", :zipcode \"21046-2573\"}, :phone \"410-297-7000\", :fax \"443-543-0191\", :email \"Laurie.Marino@Colliers.com\"} {:id \"5818539\", :contactType nil, :name \"Kelli Rivera\", :company \"UMMS c/o JLL\", :title \"Senior General Manager\", :address {:line1 \"8601 Robert Fulton Dr Suite 220\", :city \"Columbia\", :state \"MD\", :zipcode \"21046-2573\"}, :phone \"410-910-7370  (cell)410-253-6919\"} {:address {:line1 \"c/o CIB Management LLC DBA Colliers Int'l\", :line2 \"8601 Robert Fulton Dr Suite 200\", :city \"Columbia\", :state \"MD\", :zipcode \"21046-2573\"}, :fax \"443-543-0191\", :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email \"Laurie.Marino@Colliers.com\", :phone \"410-297-7000\", :name \"Laurie Marino\", :title \"Senior Vice President/PM\", :id \"5106153\", :company \"Shipley's Choice Medical Park Inc\"}]","13":"H.A. Wagner 410-787-6939","14":"Periodic (Elevator)","15":"2021-08-20","_rn_":"8"},{"1":"H.A. Wagner Power Plant","2":"Private","3":"Anne Arundel","4":"3000 Brandon Shores Rd , Baltimore , MD , 21226-1757 , Anne Arundel","5":"AA1018","6":"Active","7":"2022-08-20","8":"Traction Overhead (TO)","9":"3500","10":"250","11":"122 feet 6 inches","12":"[{:id \"4553188\", :name \"EDWARD J. WEDELMEYER\", :company \"CONSTELLATION POWER SOURCE GENERATION, INC.\", :title \"E & C SUPERVISOR\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"BALTIMORE\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21202\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"750 E Pratt St\", :country nil, :faxUnlisted nil}, :phone \"410-783-2800\", :fax nil, :email nil} {:id \"5007139\", :name \"Steve Waller\", :company \"H A WAGNER POWER PLANT\", :title \"DIRECTOR OF SAFETY\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"1005 Brandon Shores Rd 2nd Floor\", :country nil, :faxUnlisted nil}, :phone \"410-787-5324\", :fax nil, :email nil} {:id \"5267168\", :name \"Joyhn Lang\", :company \"H.A. Wagner Power Plant\", :title \"E&C Supervisor\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 \"3000 Brandon Shores Rd\", :privacyWaiver nil, :cell nil, :line1 \"c/o Raven Power LLC\", :country nil, :faxUnlisted nil}, :phone \"410-787-5515\", :fax nil, :email \"jlang@raven-power.com\"} {:id \"5268133\", :name \"Raven Power LLC\", :company \"Raven Power LLC\", :title nil, :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :phone \"410-787-5515\", :fax nil, :email nil} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email nil, :phone \"410-787-6939\", :name \"H.A. Wagner\", :title nil, :id \"5789502\", :company \"H.A. Wagner\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"1005 Brandon Shores Rd 2nd Floor\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-787-5324\", :name \"Steve Waller\", :title \"DIRECTOR OF SAFETY\", :id \"5007139\", :company \"H A WAGNER POWER PLANT\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-787-5515\", :name \"Raven Power LLC\", :title nil, :id \"5268133\", :company \"Raven Power LLC\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-787-6939\", :name \"H.A. Wagner\", :title nil, :id \"5789502\", :company \"H.A. Wagner\"}]","13":"H.A. Wagner 410-787-6939","14":"Periodic (Elevator)","15":"2021-08-20","_rn_":"9"},{"1":"H.A. Wagner Power Plant","2":"Private","3":"Anne Arundel","4":"3000 Brandon Shores Rd , Baltimore , MD , 21226-1757 , Anne Arundel","5":"AA1019","6":"Active","7":"2022-08-20","8":"Traction Overhead (TO)","9":"3500","10":"300","11":"142 feet 6 inches","12":"[{:id \"4553188\", :name \"EDWARD J. WEDELMEYER\", :company \"CONSTELLATION POWER SOURCE GENERATION, INC.\", :title \"E & C SUPERVISOR\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"BALTIMORE\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21202\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"750 E Pratt St\", :country nil, :faxUnlisted nil}, :phone \"410-783-2800\", :fax nil, :email nil} {:id \"5007139\", :name \"Steve Waller\", :company \"H A WAGNER POWER PLANT\", :title \"DIRECTOR OF SAFETY\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"1005 Brandon Shores Rd 2nd Floor\", :country nil, :faxUnlisted nil}, :phone \"410-787-5324\", :fax nil, :email nil} {:id \"5267168\", :name \"Joyhn Lang\", :company \"H.A. Wagner Power Plant\", :title \"E&C Supervisor\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 \"3000 Brandon Shores Rd\", :privacyWaiver nil, :cell nil, :line1 \"c/o Raven Power LLC\", :country nil, :faxUnlisted nil}, :phone \"410-787-5515\", :fax nil, :email \"jlang@raven-power.com\"} {:id \"5268133\", :name \"Raven Power LLC\", :company \"Raven Power LLC\", :title nil, :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :phone \"410-787-5515\", :fax nil, :email nil} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email nil, :phone \"410-787-6939\", :name \"H.A. Wagner\", :title nil, :id \"5789502\", :company \"H.A. Wagner\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"1005 Brandon Shores Rd 2nd Floor\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-787-5324\", :name \"Steve Waller\", :title \"DIRECTOR OF SAFETY\", :id \"5007139\", :company \"H A WAGNER POWER PLANT\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-787-5515\", :name \"Raven Power LLC\", :title nil, :id \"5268133\", :company \"Raven Power LLC\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-787-6939\", :name \"H.A. Wagner\", :title nil, :id \"5789502\", :company \"H.A. Wagner\"}]","13":"H.A. Wagner 410-787-6939","14":"Periodic (Elevator)","15":"2022-06-30","_rn_":"10"},{"1":"H.A. Wagner Power Plant","2":"Private","3":"Anne Arundel","4":"3000 Brandon Shores Rd , Baltimore , MD , 21226-1757 , Anne Arundel","5":"AA1022","6":"Active","7":"2022-08-20","8":"Rack & Pinion (R&P)","9":"900","10":"150","11":"137 feet 7 inches","12":"[{:id \"4553188\", :name \"EDWARD J. WEDELMEYER\", :company \"CONSTELLATION POWER SOURCE GENERATION, INC.\", :title \"E & C SUPERVISOR\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"BALTIMORE\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21202\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"750 E Pratt St\", :country nil, :faxUnlisted nil}, :phone \"410-783-2800\", :fax nil, :email nil} {:id \"5007139\", :name \"Steve Waller\", :company \"H A WAGNER POWER PLANT\", :title \"DIRECTOR OF SAFETY\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"1005 Brandon Shores Rd 2nd Floor\", :country nil, :faxUnlisted nil}, :phone \"410-787-5324\", :fax nil, :email nil} {:id \"5267168\", :name \"Joyhn Lang\", :company \"H.A. Wagner Power Plant\", :title \"E&C Supervisor\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 \"3000 Brandon Shores Rd\", :privacyWaiver nil, :cell nil, :line1 \"c/o Raven Power LLC\", :country nil, :faxUnlisted nil}, :phone \"410-787-5515\", :fax nil, :email \"jlang@raven-power.com\"} {:id \"5268133\", :name \"Raven Power LLC\", :company \"Raven Power LLC\", :title nil, :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :phone \"410-787-5515\", :fax nil, :email nil} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email nil, :phone \"410-787-6939\", :name \"H.A. Wagner\", :title nil, :id \"5789502\", :company \"H.A. Wagner\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"1005 Brandon Shores Rd 2nd Floor\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-787-5324\", :name \"Steve Waller\", :title \"DIRECTOR OF SAFETY\", :id \"5007139\", :company \"H A WAGNER POWER PLANT\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-787-5515\", :name \"Raven Power LLC\", :title nil, :id \"5268133\", :company \"Raven Power LLC\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-787-6939\", :name \"H.A. Wagner\", :title nil, :id \"5789502\", :company \"H.A. Wagner\"}]","13":"H.A. Wagner 410-787-6939","14":"Periodic (Elevator)","15":"2022-06-29","_rn_":"11"},{"1":"H.A. Wagner Power Plant","2":"Private","3":"Anne Arundel","4":"3000 Brandon Shores Rd , Baltimore , MD , 21226-1757 , Anne Arundel","5":"AA1023","6":"Active","7":"2022-08-20","8":"Rack & Pinion (R&P)","9":"900","10":"150","11":"137 feet 7 inches","12":"[{:id \"4553188\", :name \"EDWARD J. WEDELMEYER\", :company \"CONSTELLATION POWER SOURCE GENERATION, INC.\", :title \"E & C SUPERVISOR\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"BALTIMORE\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21202\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"750 E Pratt St\", :country nil, :faxUnlisted nil}, :phone \"410-783-2800\", :fax nil, :email nil} {:id \"5007139\", :name \"Steve Waller\", :company \"H A WAGNER POWER PLANT\", :title \"DIRECTOR OF SAFETY\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"1005 Brandon Shores Rd 2nd Floor\", :country nil, :faxUnlisted nil}, :phone \"410-787-5324\", :fax nil, :email nil} {:id \"5267168\", :name \"Joyhn Lang\", :company \"H.A. Wagner Power Plant\", :title \"E&C Supervisor\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 \"3000 Brandon Shores Rd\", :privacyWaiver nil, :cell nil, :line1 \"c/o Raven Power LLC\", :country nil, :faxUnlisted nil}, :phone \"410-787-5515\", :fax nil, :email \"jlang@raven-power.com\"} {:id \"5268133\", :name \"Raven Power LLC\", :company \"Raven Power LLC\", :title nil, :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :phone \"410-787-5515\", :fax nil, :email nil} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email nil, :phone \"410-787-6939\", :name \"H.A. Wagner\", :title nil, :id \"5789502\", :company \"H.A. Wagner\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"1005 Brandon Shores Rd 2nd Floor\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-787-5324\", :name \"Steve Waller\", :title \"DIRECTOR OF SAFETY\", :id \"5007139\", :company \"H A WAGNER POWER PLANT\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-787-5515\", :name \"Raven Power LLC\", :title nil, :id \"5268133\", :company \"Raven Power LLC\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21226-1757\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"3000 Brandon Shores Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-787-6939\", :name \"H.A. Wagner\", :title nil, :id \"5789502\", :company \"H.A. Wagner\"}]","13":"Crystal Webb Anne Arundel County Public Schools Facilities 410-255-2535 clwebb@aacps.org","14":"Periodic (Elevator)","15":"2021-11-19","_rn_":"12"},{"1":"Broadneck Senior High School (AACPS)","2":"Public","3":"Anne Arundel","4":"1265 Green Holly Dr , Annapolis , MD , 21409-4676 , Anne Arundel","5":"AA1024","6":"Active","7":"2022-11-19","8":"Hydraulic Basement (HB)","9":"3500","10":"150","11":"13 feet 4 inches","12":"[{:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Pasadena\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21122-3223\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"9034 Fort Smallwood Rd\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e88adb8d2b5e2d7fc843a\", :name \"Mailing\"}, :email \"clwebb@aacps.org\", :phone \"410-255-2535  (cell)443-770-5915\", :name \"Crystal Webb\", :title \"Specialist-Maintenance Planning\", :id \"4549444\", :company \"Anne Arundel County Public Schools Facilities\"} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Pasadena\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21122-3223\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"9034 Fort Smallwood Rd\", :country nil, :faxUnlisted nil}, :fax \"410-437-6947\", :contactType nil, :email \"clwebb@aacps.org\", :phone \"410-255-2535  (cell)443-770-5915\", :name \"Crystal Webb\", :title \"Specialist-Maintenance Planning\", :id \"4550003\", :company \"Anne Arundel County Public Schools\"}]","13":"Edie Resuta Brooklyn Community United Methodist Church 410-789-3688","14":"Periodic (Elevator)","15":"2020-12-08","_rn_":"13"},{"1":"Brooklyn Community United Methodist Church","2":"Private","3":"Anne Arundel","4":"110 Townsend Ave , Baltimore , MD , 21225-3052 , Anne Arundel","5":"AA1025","6":"Active","7":"2021-12-08","8":"Drum Basement (DB)","9":"500","10":"28","11":"12 feet 4 inches","12":"[{:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Baltimore\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21225\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"110 Townsend Ave\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email nil, :additionalData {}, :phone \"410-789-3688  (cell)410-303-3923\", :name \"Edie Resuta\", :title \"Trustee Chair\", :id \"4551571\", :company \"Brooklyn Community United Methodist Church\"}]","13":"JEFFREY MULLER, ESA. PANOLAM INDUSTRIES INTERNATIONAL, INC 800-672-6652","14":"Periodic (Elevator)","15":"2008-04-24","_rn_":"14"},{"1":"NEVAMAR COMPANY, LLC","2":"Private","3":"Anne Arundel","4":"8339 Telegraph Rd , Odenton , MD , 21113-1322 , Anne Arundel","5":"AA1026","6":"Active / Sealed","7":"2010-04-24","8":"Traction Overhead (TO)","9":"8000","10":"50","11":"14 feet 0 inches","12":"[{:id \"4560725\", :contactType nil, :company \"NEVAMAR COMPANY, LLC\", :address {:line1 \"20 PROGRESS DRIVE\", :city \"Shelton\", :state \"CT\", :zipcode \"06484\"}, :phone \"410-519-2165\", :name \"NEVAMAR COMPANY, LLC\"} {:id \"4561352\", :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :company \"PANOLAM INDUSTRIES INTERNATIONAL, INC\", :address {:line1 \"20 Progress Dr\", :city \"Shelton\", :state \"CT\", :zipcode \"06484\"}, :phone \"800-672-6652\", :name \"PANOLAM INDUSTRIES INTERNATIONAL, INC\"}]","13":"JEFFREY MULLER, ESA. PANOLAM INDUSTRIES INTERNATIONAL, INC 800-672-6652","14":"Periodic (Elevator)","15":"2008-04-24","_rn_":"15"},{"1":"NEVAMAR COMPANY, LLC","2":"Private","3":"Anne Arundel","4":"8339 Telegraph Rd , Odenton , MD , 21113-1322 , Anne Arundel","5":"AA1027","6":"Active / Sealed","7":"2010-04-24","8":"Traction Overhead (TO)","9":"8000","10":"50","11":"47 feet 0 inches","12":"[{:id \"4560725\", :contactType nil, :company \"NEVAMAR COMPANY, LLC\", :address {:line1 \"20 PROGRESS DRIVE\", :city \"Shelton\", :state \"CT\", :zipcode \"06484\"}, :phone \"410-519-2165\", :name \"NEVAMAR COMPANY, LLC\"} {:id \"4561352\", :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :company \"PANOLAM INDUSTRIES INTERNATIONAL, INC\", :address {:line1 \"20 Progress Dr\", :city \"Shelton\", :state \"CT\", :zipcode \"06484\"}, :phone \"800-672-6652\", :name \"PANOLAM INDUSTRIES INTERNATIONAL, INC\"}]","13":"Dennis Coll Archbishop Spalding High School Inc 410-969-9105 ext 249 colld@archbishopspalding.org","14":"Periodic Reinspection (Elevator)","15":"2021-08-23","_rn_":"16"},{"1":"Archbishop Spalding High School","2":"Private","3":"Anne Arundel","4":"8080 New Cut Rd , Severn , MD , 21144-2301 , Anne Arundel","5":"AA1031","6":"Active","7":"2022-07-01","8":"Drum Basement (DB)","9":"350","10":"30","11":"7 feet 2 inches","12":"[{:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Severn\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21144-2301\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"8080 New Cut Rd\", :country nil, :faxUnlisted nil}, :fax \"410-969-1026\", :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email \"colld@archbishopspalding.org\", :additionalData nil, :phone \"410-969-9105 ext 249\", :name \"Dennis Coll\", :title \"Facilities Director\", :id \"4550078\", :company \"Archbishop Spalding High School Inc\"}]","13":"Cherie Sampson Shaw Street Development LLC 443-926-5110","14":"Alt/Mod (Elevator)","15":"2022-05-23","_rn_":"17"},{"1":"Shaw Street Development LLC","2":"Private","3":"Anne Arundel","4":"25 Shaw St , Annapolis , MD , 21401-2717 , Anne Arundel","5":"AA1032","6":"Active","7":"2022-01-13","8":"Hydraulic Overhead (HO)","9":"2500","10":"125","11":"20 feet 3 inches","12":"[{:id \"4563552\", :contactType {:id \"609e88adb8d2b5e2d7fc843a\", :name \"Mailing\"}, :name \"Deanna Kauffman\", :company \"Shaw Street Development LLC\", :title \"Executive Administrator\", :address {:line1 \"1750 Forest Dr Suite 205\", :city \"Annapolis\", :state \"MD\", :zipcode \"21401-4211\"}, :phone \"301-261-1202\", :email \"dkauffman@diplomatfreight.com\"} {:address {:line1 \"25 Shaw St 2nd Floor\", :city \"Annapolis\", :state \"MD\", :zipcode \"21401-2717\"}, :fax \"410-263-2572\", :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :additionalData {}, :phone \"443-926-5110  (cell)443-926-5134\", :name \"Cherie Sampson\", :title \"Facility Manager\", :id \"4563553\", :company \"Shaw Street Development LLC\"}]","13":"Gina Gibson Housing Commission of Anne Arundel County 410-222-6200 ext 2120 gmgibson@hcaac.org","14":"Alt/Mod (Elevator)","15":"2021-05-18","_rn_":"18"},{"1":"Pinewood Village 2","2":"Public","3":"Anne Arundel","4":"7900 Benesch Cir , Glen Burnie , MD , 21060-7928 , Anne Arundel","5":"AA1033","6":"Active","7":"2019-09-17","8":"Hydraulic Basement (HB)","9":"2500","10":"125","11":"31 feet 4 inches","12":"[{:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Glen Burnie\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21061-9401\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"102 Crain Hwy N\", :country nil, :faxUnlisted nil}, :fax \"410-222-6214\", :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email \"gmgibson@hcaac.org\", :phone \"410-222-6200 ext 2120\", :name \"Gina Gibson\", :title \"Director of Property Mgmt.\", :id \"4557165\", :company \"Housing Commission of Anne Arundel County\"} {:id \"4557166\", :name \"Gina Gibson\", :company \"Housing Commission of Anne Arundel County\", :title \"Director of Property Management\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Glen Burnie\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21061-3504\", :phoneUnlisted nil, :line2 \"P O Box 817\", :privacyWaiver nil, :cell nil, :line1 \"7477 Baltimore Annapolis Blvd, 3rd Floor\", :country nil, :faxUnlisted nil}, :phone \"410-222-6200 x2120\", :fax \"410-222-6214, 410-768-3889\", :email \"gmgibson@hcaac.org\"} {:id \"5964025\", :name \"Gina Gibson\", :company \"Pinewood Village 2\", :title \"Director of Property Management\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Glen Burnie\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21060-7928\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"7900 Benesch Cir\", :country nil, :faxUnlisted nil}, :phone \"410-222-6210\", :fax nil, :email nil} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Glen Burnie\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21060-7928\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"7900 Benesch Cir\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-222-6210\", :name \"Gina Gibson\", :title \"Director of Property Management\", :id \"5964025\", :company \"Pinewood Village 2\"}]","13":"Gina Gibson Housing Commission of Anne Arundel County 410-222-6200 ext 2120 gmgibson@hcaac.org","14":"Alt/Mod (Elevator)","15":"2021-05-10","_rn_":"19"},{"1":"Pinewood Village 2","2":"Public","3":"Anne Arundel","4":"7900 Benesch Cir , Glen Burnie , MD , 21060-7928 , Anne Arundel","5":"AA1034","6":"Active","7":"2019-09-17","8":"Hydraulic Basement (HB)","9":"2500","10":"125","11":"31 feet 4 inches","12":"[{:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Glen Burnie\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21061-9401\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"102 Crain Hwy N\", :country nil, :faxUnlisted nil}, :fax \"410-222-6214\", :contactType {:id \"609e88bbb8d2b5e2d7fc843b\", :name \"Owner\"}, :email \"gmgibson@hcaac.org\", :phone \"410-222-6200 ext 2120\", :name \"Gina Gibson\", :title \"Director of Property Mgmt.\", :id \"4557165\", :company \"Housing Commission of Anne Arundel County\"} {:id \"4557166\", :name \"Gina Gibson\", :company \"Housing Commission of Anne Arundel County\", :title \"Director of Property Management\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Glen Burnie\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21061-3504\", :phoneUnlisted nil, :line2 \"P O Box 817\", :privacyWaiver nil, :cell nil, :line1 \"7477 Baltimore Annapolis Blvd, 3rd Floor\", :country nil, :faxUnlisted nil}, :phone \"410-222-6200 x2120\", :fax \"410-222-6214, 410-768-3889\", :email \"gmgibson@hcaac.org\"} {:id \"5964025\", :name \"Gina Gibson\", :company \"Pinewood Village 2\", :title \"Director of Property Management\", :address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Glen Burnie\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21060-7928\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"7900 Benesch Cir\", :country nil, :faxUnlisted nil}, :phone \"410-222-6210\", :fax nil, :email nil} {:address {:fax nil, :email nil, :jurisdiction nil, :phone nil, :city \"Glen Burnie\", :county nil, :state \"MD\", :placeOfResidence nil, :zipcode \"21060-7928\", :phoneUnlisted nil, :line2 nil, :privacyWaiver nil, :cell nil, :line1 \"7900 Benesch Cir\", :country nil, :faxUnlisted nil}, :fax nil, :contactType {:id \"609e889fb8d2b5e2d7fc8439\", :name \"Billing\"}, :email nil, :phone \"410-222-6210\", :name \"Gina Gibson\", :title \"Director of Property Management\", :id \"5964025\", :company \"Pinewood Village 2\"}]","13":"Kenny Cresswell Fitzgerald Oldsmobile Cadillac Inc 410-224-3480","14":"TPM (Elevator)","15":"2020-10-05","_rn_":"20"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
@@ -445,88 +450,88 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(elevators)</span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a><span class="in">library(elevators)</span></span>
 <span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>())</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggplot2)</span></span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a><span class="in">theme_set(theme_minimal())</span></span>
 <span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (params<span class="sc">$</span>state <span class="sc">==</span> <span class="st">"MD"</span>) {</span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>  elevators <span class="ot">&lt;-</span> md_elevators</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.na</span>(params<span class="sc">$</span>region) <span class="sc">&amp;&amp;</span> params<span class="sc">$</span>region <span class="sc">!=</span> <span class="st">"NA"</span>) {</span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a>    elevators <span class="ot">&lt;-</span> elevators[elevators<span class="sc">$</span>county <span class="sc">==</span> params<span class="sc">$</span>region, ]</span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a>  elevators <span class="ot">&lt;-</span> elevators[<span class="fu">c</span>(<span class="st">"equipment_capacity"</span>, <span class="st">"equipment_speed"</span>)]</span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">names</span>(elevators) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"capacity_lbs"</span>, <span class="st">"speed_fpm"</span>)</span>
-<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>  elevators<span class="sc">$</span>capacity_lbs <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(elevators<span class="sc">$</span>capacity_lbs)</span>
-<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>  elevators<span class="sc">$</span>speed_fpm <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(elevators<span class="sc">$</span>speed_fpm)</span>
-<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.na</span>(params<span class="sc">$</span>region) <span class="sc">&amp;&amp;</span> params<span class="sc">$</span>region <span class="sc">!=</span> <span class="st">"NA"</span>) {</span>
-<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>    elevators <span class="ot">&lt;-</span> elevators[elevators<span class="sc">$</span>borough <span class="sc">==</span> params<span class="sc">$</span>region, ]</span>
-<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>  }</span>
-<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="in">#| warning: false</span></span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="in">if (params$state == "MD") {</span></span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="in">  elevators &lt;- md_elevators</span></span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="in">  </span></span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="in">  if (!is.na(params$region) &amp;&amp; params$region != "NA") {</span></span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="in">    elevators &lt;- elevators[elevators$county == params$region, ]</span></span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="in">  }</span></span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="in">  </span></span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="in">  elevators &lt;- elevators[c("equipment_capacity", "equipment_speed")]</span></span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a><span class="in">  names(elevators) &lt;- c("capacity_lbs", "speed_fpm")</span></span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a><span class="in">  elevators$capacity_lbs &lt;- as.numeric(elevators$capacity_lbs)</span></span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a><span class="in">  elevators$speed_fpm &lt;- as.numeric(elevators$speed_fpm)</span></span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a><span class="in">  </span></span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a><span class="in">} else {</span></span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a><span class="in">  </span></span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a><span class="in">  if (!is.na(params$region) &amp;&amp; params$region != "NA") {</span></span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a><span class="in">    elevators &lt;- elevators[elevators$borough == params$region, ]</span></span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a><span class="in">  }</span></span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a><span class="in">  </span></span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
 <span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">nrow</span>(elevators) <span class="sc">==</span> <span class="dv">0</span>) {</span>
-<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>  <span class="fu">stop</span>(<span class="st">"No elevators were selected. Did you misspell `region`?"</span>)</span>
-<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a><span class="in">if (nrow(elevators) == 0) {</span></span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a><span class="in">  stop("No elevators were selected. Did you misspell `region`?")</span></span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
 <span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: !expr params$state == "NY"</span></span>
-<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: asis</span></span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: !expr params$state == "NY"</span></span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a><span class="in">#| results: asis</span></span>
 <span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"## Speed over time"</span>)</span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a><span class="in">cat("## Speed over time")</span></span>
 <span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb10-56"><a href="#cb10-56" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-57"><a href="#cb10-57" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: !expr params$state == "NY"</span></span>
-<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: asis</span></span>
-<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a>elevators <span class="sc">|&gt;</span> </span>
-<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(approval_date, speed_fpm)) <span class="sc">+</span> </span>
-<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.05</span>) <span class="sc">+</span> </span>
-<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span> </span>
-<span id="cb10-66"><a href="#cb10-66" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()</span>
+<span id="cb10-58"><a href="#cb10-58" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb10-59"><a href="#cb10-59" aria-hidden="true" tabindex="-1"></a><span class="in">#| warning: false</span></span>
+<span id="cb10-60"><a href="#cb10-60" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: !expr params$state == "NY"</span></span>
+<span id="cb10-61"><a href="#cb10-61" aria-hidden="true" tabindex="-1"></a><span class="in">#| results: asis</span></span>
+<span id="cb10-62"><a href="#cb10-62" aria-hidden="true" tabindex="-1"></a><span class="in">elevators |&gt; </span></span>
+<span id="cb10-63"><a href="#cb10-63" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(approval_date, speed_fpm)) + </span></span>
+<span id="cb10-64"><a href="#cb10-64" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point(alpha = 0.05) + </span></span>
+<span id="cb10-65"><a href="#cb10-65" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth() + </span></span>
+<span id="cb10-66"><a href="#cb10-66" aria-hidden="true" tabindex="-1"></a><span class="in">  scale_y_log10()</span></span>
 <span id="cb10-67"><a href="#cb10-67" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb10-68"><a href="#cb10-68" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-69"><a href="#cb10-69" aria-hidden="true" tabindex="-1"></a><span class="fu">## Speed versus capacity</span></span>
 <span id="cb10-70"><a href="#cb10-70" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-71"><a href="#cb10-71" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a>elevators <span class="sc">|&gt;</span> </span>
-<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(capacity_lbs, speed_fpm)) <span class="sc">+</span> </span>
-<span id="cb10-76"><a href="#cb10-76" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.05</span>) <span class="sc">+</span> </span>
-<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span> </span>
-<span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()</span>
+<span id="cb10-72"><a href="#cb10-72" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb10-73"><a href="#cb10-73" aria-hidden="true" tabindex="-1"></a><span class="in">#| warning: false</span></span>
+<span id="cb10-74"><a href="#cb10-74" aria-hidden="true" tabindex="-1"></a><span class="in">elevators |&gt; </span></span>
+<span id="cb10-75"><a href="#cb10-75" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(capacity_lbs, speed_fpm)) + </span></span>
+<span id="cb10-76"><a href="#cb10-76" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point(alpha = 0.05) + </span></span>
+<span id="cb10-77"><a href="#cb10-77" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth() + </span></span>
+<span id="cb10-78"><a href="#cb10-78" aria-hidden="true" tabindex="-1"></a><span class="in">  scale_y_log10()</span></span>
 <span id="cb10-79"><a href="#cb10-79" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb10-80"><a href="#cb10-80" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-81"><a href="#cb10-81" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-82"><a href="#cb10-82" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: !expr params$state == "NY"</span></span>
-<span id="cb10-83"><a href="#cb10-83" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: asis</span></span>
+<span id="cb10-82"><a href="#cb10-82" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: !expr params$state == "NY"</span></span>
+<span id="cb10-83"><a href="#cb10-83" aria-hidden="true" tabindex="-1"></a><span class="in">#| results: asis</span></span>
 <span id="cb10-84"><a href="#cb10-84" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-85"><a href="#cb10-85" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"## Where in the world did all my elevators go"</span>)</span>
+<span id="cb10-85"><a href="#cb10-85" aria-hidden="true" tabindex="-1"></a><span class="in">cat("## Where in the world did all my elevators go")</span></span>
 <span id="cb10-86"><a href="#cb10-86" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb10-87"><a href="#cb10-87" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb10-88"><a href="#cb10-88" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb10-89"><a href="#cb10-89" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb10-90"><a href="#cb10-90" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb10-91"><a href="#cb10-91" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: !expr params$state == "NY"</span></span>
+<span id="cb10-89"><a href="#cb10-89" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb10-90"><a href="#cb10-90" aria-hidden="true" tabindex="-1"></a><span class="in">#| warning: false</span></span>
+<span id="cb10-91"><a href="#cb10-91" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: !expr params$state == "NY"</span></span>
 <span id="cb10-92"><a href="#cb10-92" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-93"><a href="#cb10-93" aria-hidden="true" tabindex="-1"></a>elevators <span class="sc">|&gt;</span> </span>
-<span id="cb10-94"><a href="#cb10-94" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(latitude, longitude)) <span class="sc">+</span> </span>
-<span id="cb10-95"><a href="#cb10-95" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.05</span>) <span class="sc">+</span> </span>
-<span id="cb10-96"><a href="#cb10-96" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>()</span>
+<span id="cb10-93"><a href="#cb10-93" aria-hidden="true" tabindex="-1"></a><span class="in">elevators |&gt; </span></span>
+<span id="cb10-94"><a href="#cb10-94" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(latitude, longitude)) + </span></span>
+<span id="cb10-95"><a href="#cb10-95" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point(alpha = 0.05) + </span></span>
+<span id="cb10-96"><a href="#cb10-96" aria-hidden="true" tabindex="-1"></a><span class="in">  coord_sf()</span></span>
 <span id="cb10-97"><a href="#cb10-97" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Our New York report looks the same as ever, while the Maryland report <a href="../../junkdrawer/more-complicated-logic/">has a little less content</a>. As it deserves.</p>
 </section>
@@ -567,115 +572,115 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="co">---</span></span>
 <span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(elevators)</span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="in">library(elevators)</span></span>
 <span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_minimal</span>())</span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="in">library(ggplot2)</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="in">theme_set(theme_minimal())</span></span>
 <span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>con <span class="ot">&lt;-</span> DBI<span class="sc">::</span><span class="fu">dbConnect</span>(RSQLite<span class="sc">::</span><span class="fu">SQLite</span>(), <span class="st">"elevators.db"</span>)</span>
-<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> <span class="st">"SELECT </span></span>
-<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="st">    ?capacity_column AS capacity_lbs, </span></span>
-<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="st">    ?speed_column    AS speed_fpm,</span></span>
-<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="st">    ?approval_date   AS approval_date,</span></span>
-<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="st">    ?latitude        AS latitude, </span></span>
-<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a><span class="st">    ?longitude       AS longitude</span></span>
-<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="st">  FROM ?table"</span></span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a><span class="in">#| warning: false</span></span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a><span class="in">con &lt;- DBI::dbConnect(RSQLite::SQLite(), "elevators.db")</span></span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a><span class="in">query &lt;- "SELECT </span></span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a><span class="in">    ?capacity_column AS capacity_lbs, </span></span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a><span class="in">    ?speed_column    AS speed_fpm,</span></span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a><span class="in">    ?approval_date   AS approval_date,</span></span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a><span class="in">    ?latitude        AS latitude, </span></span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a><span class="in">    ?longitude       AS longitude</span></span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="in">  FROM ?table"</span></span>
 <span id="cb12-33"><a href="#cb12-33" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (params<span class="sc">$</span>state <span class="sc">==</span> <span class="st">"NY"</span>) {</span>
-<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a>  query_args <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">capacity_column =</span> DBI<span class="sc">::</span><span class="fu">dbQuoteIdentifier</span>(con, <span class="st">"capacity_lbs"</span>),</span>
-<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a>    <span class="at">speed_column =</span> DBI<span class="sc">::</span><span class="fu">dbQuoteIdentifier</span>(con, <span class="st">"speed_fpm"</span>),</span>
-<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a>    <span class="at">approval_date =</span> DBI<span class="sc">::</span><span class="fu">dbQuoteIdentifier</span>(con, <span class="st">"approval_date"</span>),</span>
-<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a>    <span class="at">latitude =</span> DBI<span class="sc">::</span><span class="fu">dbQuoteIdentifier</span>(con, <span class="st">"latitude"</span>),</span>
-<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a>    <span class="at">longitude =</span> DBI<span class="sc">::</span><span class="fu">dbQuoteIdentifier</span>(con, <span class="st">"longitude"</span>),</span>
-<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a>    <span class="at">region_column =</span> DBI<span class="sc">::</span><span class="fu">dbQuoteIdentifier</span>(con, <span class="st">"borough"</span>),</span>
-<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> params<span class="sc">$</span>region</span>
-<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a>  query_args <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a>    <span class="at">capacity_column =</span> DBI<span class="sc">::</span><span class="fu">dbQuoteIdentifier</span>(con, <span class="st">"equipment_capacity"</span>),</span>
-<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a>    <span class="at">speed_column =</span> DBI<span class="sc">::</span><span class="fu">dbQuoteIdentifier</span>(con, <span class="st">"equipment_speed"</span>),</span>
-<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a>    <span class="at">approval_date =</span> <span class="dv">0</span>,</span>
-<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a>    <span class="at">latitude =</span> <span class="dv">0</span>,</span>
-<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a>    <span class="at">longitude =</span> <span class="dv">0</span>,</span>
-<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a>    <span class="at">region_column =</span> DBI<span class="sc">::</span><span class="fu">dbQuoteIdentifier</span>(con, <span class="st">"county"</span>),</span>
-<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a>    <span class="at">region =</span> params<span class="sc">$</span>region</span>
-<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb12-34"><a href="#cb12-34" aria-hidden="true" tabindex="-1"></a><span class="in">if (params$state == "NY") {</span></span>
+<span id="cb12-35"><a href="#cb12-35" aria-hidden="true" tabindex="-1"></a><span class="in">  query_args &lt;- list(</span></span>
+<span id="cb12-36"><a href="#cb12-36" aria-hidden="true" tabindex="-1"></a><span class="in">    capacity_column = DBI::dbQuoteIdentifier(con, "capacity_lbs"),</span></span>
+<span id="cb12-37"><a href="#cb12-37" aria-hidden="true" tabindex="-1"></a><span class="in">    speed_column = DBI::dbQuoteIdentifier(con, "speed_fpm"),</span></span>
+<span id="cb12-38"><a href="#cb12-38" aria-hidden="true" tabindex="-1"></a><span class="in">    approval_date = DBI::dbQuoteIdentifier(con, "approval_date"),</span></span>
+<span id="cb12-39"><a href="#cb12-39" aria-hidden="true" tabindex="-1"></a><span class="in">    latitude = DBI::dbQuoteIdentifier(con, "latitude"),</span></span>
+<span id="cb12-40"><a href="#cb12-40" aria-hidden="true" tabindex="-1"></a><span class="in">    longitude = DBI::dbQuoteIdentifier(con, "longitude"),</span></span>
+<span id="cb12-41"><a href="#cb12-41" aria-hidden="true" tabindex="-1"></a><span class="in">    region_column = DBI::dbQuoteIdentifier(con, "borough"),</span></span>
+<span id="cb12-42"><a href="#cb12-42" aria-hidden="true" tabindex="-1"></a><span class="in">    region = params$region</span></span>
+<span id="cb12-43"><a href="#cb12-43" aria-hidden="true" tabindex="-1"></a><span class="in">  )</span></span>
+<span id="cb12-44"><a href="#cb12-44" aria-hidden="true" tabindex="-1"></a><span class="in">} else {</span></span>
+<span id="cb12-45"><a href="#cb12-45" aria-hidden="true" tabindex="-1"></a><span class="in">  query_args &lt;- list(</span></span>
+<span id="cb12-46"><a href="#cb12-46" aria-hidden="true" tabindex="-1"></a><span class="in">    capacity_column = DBI::dbQuoteIdentifier(con, "equipment_capacity"),</span></span>
+<span id="cb12-47"><a href="#cb12-47" aria-hidden="true" tabindex="-1"></a><span class="in">    speed_column = DBI::dbQuoteIdentifier(con, "equipment_speed"),</span></span>
+<span id="cb12-48"><a href="#cb12-48" aria-hidden="true" tabindex="-1"></a><span class="in">    approval_date = 0,</span></span>
+<span id="cb12-49"><a href="#cb12-49" aria-hidden="true" tabindex="-1"></a><span class="in">    latitude = 0,</span></span>
+<span id="cb12-50"><a href="#cb12-50" aria-hidden="true" tabindex="-1"></a><span class="in">    longitude = 0,</span></span>
+<span id="cb12-51"><a href="#cb12-51" aria-hidden="true" tabindex="-1"></a><span class="in">    region_column = DBI::dbQuoteIdentifier(con, "county"),</span></span>
+<span id="cb12-52"><a href="#cb12-52" aria-hidden="true" tabindex="-1"></a><span class="in">    region = params$region</span></span>
+<span id="cb12-53"><a href="#cb12-53" aria-hidden="true" tabindex="-1"></a><span class="in">  )</span></span>
+<span id="cb12-54"><a href="#cb12-54" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
 <span id="cb12-55"><a href="#cb12-55" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.na</span>(params<span class="sc">$</span>region) <span class="sc">&amp;&amp;</span> params<span class="sc">$</span>region <span class="sc">!=</span> <span class="st">"NA"</span>) {</span>
-<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a>  query <span class="ot">&lt;-</span> <span class="fu">paste</span>(query, <span class="st">"</span></span>
-<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a><span class="st">  WHERE </span></span>
-<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a><span class="st">    ?region_column == ?region"</span>)</span>
-<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
-<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a>  query_args <span class="ot">&lt;-</span> <span class="fu">head</span>(query_args, <span class="sc">-</span><span class="dv">2</span>)</span>
-<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a>query <span class="ot">&lt;-</span> DBI<span class="sc">::</span><span class="fu">sqlInterpolate</span>(</span>
-<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a>  con, </span>
-<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a>  query, </span>
-<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a>  <span class="at">table =</span> DBI<span class="sc">::</span><span class="fu">dbQuoteIdentifier</span>(con, <span class="st">"md_elevators"</span>),</span>
-<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a>  <span class="at">.dots =</span> query_args</span>
-<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a>elevators <span class="ot">&lt;-</span> DBI<span class="sc">::</span><span class="fu">dbGetQuery</span>(con, query)</span>
-<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a>elevators<span class="sc">$</span>capacity_lbs <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(elevators<span class="sc">$</span>capacity_lbs)</span>
-<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a>elevators<span class="sc">$</span>speed_fpm <span class="ot">&lt;-</span> <span class="fu">as.numeric</span>(elevators<span class="sc">$</span>speed_fpm)</span>
-<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a>DBI<span class="sc">::</span><span class="fu">dbDisconnect</span>(con)</span>
+<span id="cb12-56"><a href="#cb12-56" aria-hidden="true" tabindex="-1"></a><span class="in">if (!is.na(params$region) &amp;&amp; params$region != "NA") {</span></span>
+<span id="cb12-57"><a href="#cb12-57" aria-hidden="true" tabindex="-1"></a><span class="in">  query &lt;- paste(query, "</span></span>
+<span id="cb12-58"><a href="#cb12-58" aria-hidden="true" tabindex="-1"></a><span class="in">  WHERE </span></span>
+<span id="cb12-59"><a href="#cb12-59" aria-hidden="true" tabindex="-1"></a><span class="in">    ?region_column == ?region")</span></span>
+<span id="cb12-60"><a href="#cb12-60" aria-hidden="true" tabindex="-1"></a><span class="in">} else {</span></span>
+<span id="cb12-61"><a href="#cb12-61" aria-hidden="true" tabindex="-1"></a><span class="in">  query_args &lt;- head(query_args, -2)</span></span>
+<span id="cb12-62"><a href="#cb12-62" aria-hidden="true" tabindex="-1"></a><span class="in">}</span></span>
+<span id="cb12-63"><a href="#cb12-63" aria-hidden="true" tabindex="-1"></a><span class="in">  </span></span>
+<span id="cb12-64"><a href="#cb12-64" aria-hidden="true" tabindex="-1"></a><span class="in">query &lt;- DBI::sqlInterpolate(</span></span>
+<span id="cb12-65"><a href="#cb12-65" aria-hidden="true" tabindex="-1"></a><span class="in">  con, </span></span>
+<span id="cb12-66"><a href="#cb12-66" aria-hidden="true" tabindex="-1"></a><span class="in">  query, </span></span>
+<span id="cb12-67"><a href="#cb12-67" aria-hidden="true" tabindex="-1"></a><span class="in">  table = DBI::dbQuoteIdentifier(con, "md_elevators"),</span></span>
+<span id="cb12-68"><a href="#cb12-68" aria-hidden="true" tabindex="-1"></a><span class="in">  .dots = query_args</span></span>
+<span id="cb12-69"><a href="#cb12-69" aria-hidden="true" tabindex="-1"></a><span class="in">)</span></span>
+<span id="cb12-70"><a href="#cb12-70" aria-hidden="true" tabindex="-1"></a><span class="in">elevators &lt;- DBI::dbGetQuery(con, query)</span></span>
+<span id="cb12-71"><a href="#cb12-71" aria-hidden="true" tabindex="-1"></a><span class="in">elevators$capacity_lbs &lt;- as.numeric(elevators$capacity_lbs)</span></span>
+<span id="cb12-72"><a href="#cb12-72" aria-hidden="true" tabindex="-1"></a><span class="in">elevators$speed_fpm &lt;- as.numeric(elevators$speed_fpm)</span></span>
+<span id="cb12-73"><a href="#cb12-73" aria-hidden="true" tabindex="-1"></a><span class="in">DBI::dbDisconnect(con)</span></span>
 <span id="cb12-74"><a href="#cb12-74" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb12-75"><a href="#cb12-75" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-76"><a href="#cb12-76" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: !expr params$state == "NY"</span></span>
-<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: asis</span></span>
+<span id="cb12-77"><a href="#cb12-77" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: !expr params$state == "NY"</span></span>
+<span id="cb12-78"><a href="#cb12-78" aria-hidden="true" tabindex="-1"></a><span class="in">#| results: asis</span></span>
 <span id="cb12-79"><a href="#cb12-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"## Speed over time"</span>)</span>
+<span id="cb12-80"><a href="#cb12-80" aria-hidden="true" tabindex="-1"></a><span class="in">cat("## Speed over time")</span></span>
 <span id="cb12-81"><a href="#cb12-81" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb12-82"><a href="#cb12-82" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-83"><a href="#cb12-83" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: !expr params$state == "NY"</span></span>
-<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: asis</span></span>
-<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a>elevators <span class="sc">|&gt;</span> </span>
-<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(approval_date, speed_fpm)) <span class="sc">+</span> </span>
-<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.05</span>) <span class="sc">+</span> </span>
-<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span> </span>
-<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()</span>
+<span id="cb12-84"><a href="#cb12-84" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb12-85"><a href="#cb12-85" aria-hidden="true" tabindex="-1"></a><span class="in">#| warning: false</span></span>
+<span id="cb12-86"><a href="#cb12-86" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: !expr params$state == "NY"</span></span>
+<span id="cb12-87"><a href="#cb12-87" aria-hidden="true" tabindex="-1"></a><span class="in">#| results: asis</span></span>
+<span id="cb12-88"><a href="#cb12-88" aria-hidden="true" tabindex="-1"></a><span class="in">elevators |&gt; </span></span>
+<span id="cb12-89"><a href="#cb12-89" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(approval_date, speed_fpm)) + </span></span>
+<span id="cb12-90"><a href="#cb12-90" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point(alpha = 0.05) + </span></span>
+<span id="cb12-91"><a href="#cb12-91" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth() + </span></span>
+<span id="cb12-92"><a href="#cb12-92" aria-hidden="true" tabindex="-1"></a><span class="in">  scale_y_log10()</span></span>
 <span id="cb12-93"><a href="#cb12-93" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb12-94"><a href="#cb12-94" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-95"><a href="#cb12-95" aria-hidden="true" tabindex="-1"></a><span class="fu">## Speed versus capacity</span></span>
 <span id="cb12-96"><a href="#cb12-96" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-97"><a href="#cb12-97" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a>elevators <span class="sc">|&gt;</span> </span>
-<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(capacity_lbs, speed_fpm)) <span class="sc">+</span> </span>
-<span id="cb12-102"><a href="#cb12-102" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.05</span>) <span class="sc">+</span> </span>
-<span id="cb12-103"><a href="#cb12-103" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>() <span class="sc">+</span> </span>
-<span id="cb12-104"><a href="#cb12-104" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>()</span>
+<span id="cb12-98"><a href="#cb12-98" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb12-99"><a href="#cb12-99" aria-hidden="true" tabindex="-1"></a><span class="in">#| warning: false</span></span>
+<span id="cb12-100"><a href="#cb12-100" aria-hidden="true" tabindex="-1"></a><span class="in">elevators |&gt; </span></span>
+<span id="cb12-101"><a href="#cb12-101" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(capacity_lbs, speed_fpm)) + </span></span>
+<span id="cb12-102"><a href="#cb12-102" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point(alpha = 0.05) + </span></span>
+<span id="cb12-103"><a href="#cb12-103" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_smooth() + </span></span>
+<span id="cb12-104"><a href="#cb12-104" aria-hidden="true" tabindex="-1"></a><span class="in">  scale_y_log10()</span></span>
 <span id="cb12-105"><a href="#cb12-105" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb12-106"><a href="#cb12-106" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-107"><a href="#cb12-107" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-108"><a href="#cb12-108" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: !expr params$state == "NY"</span></span>
-<span id="cb12-109"><a href="#cb12-109" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: asis</span></span>
+<span id="cb12-108"><a href="#cb12-108" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: !expr params$state == "NY"</span></span>
+<span id="cb12-109"><a href="#cb12-109" aria-hidden="true" tabindex="-1"></a><span class="in">#| results: asis</span></span>
 <span id="cb12-110"><a href="#cb12-110" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-111"><a href="#cb12-111" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"## Where in the world did all my elevators go"</span>)</span>
+<span id="cb12-111"><a href="#cb12-111" aria-hidden="true" tabindex="-1"></a><span class="in">cat("## Where in the world did all my elevators go")</span></span>
 <span id="cb12-112"><a href="#cb12-112" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span>
 <span id="cb12-113"><a href="#cb12-113" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb12-114"><a href="#cb12-114" aria-hidden="true" tabindex="-1"></a><span class="in">```{r}</span></span>
-<span id="cb12-115"><a href="#cb12-115" aria-hidden="true" tabindex="-1"></a><span class="co">#| message: false</span></span>
-<span id="cb12-116"><a href="#cb12-116" aria-hidden="true" tabindex="-1"></a><span class="co">#| warning: false</span></span>
-<span id="cb12-117"><a href="#cb12-117" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: !expr params$state == "NY"</span></span>
-<span id="cb12-118"><a href="#cb12-118" aria-hidden="true" tabindex="-1"></a><span class="co">#| results: asis</span></span>
+<span id="cb12-115"><a href="#cb12-115" aria-hidden="true" tabindex="-1"></a><span class="in">#| message: false</span></span>
+<span id="cb12-116"><a href="#cb12-116" aria-hidden="true" tabindex="-1"></a><span class="in">#| warning: false</span></span>
+<span id="cb12-117"><a href="#cb12-117" aria-hidden="true" tabindex="-1"></a><span class="in">#| eval: !expr params$state == "NY"</span></span>
+<span id="cb12-118"><a href="#cb12-118" aria-hidden="true" tabindex="-1"></a><span class="in">#| results: asis</span></span>
 <span id="cb12-119"><a href="#cb12-119" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb12-120"><a href="#cb12-120" aria-hidden="true" tabindex="-1"></a>elevators <span class="sc">|&gt;</span> </span>
-<span id="cb12-121"><a href="#cb12-121" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(latitude, longitude)) <span class="sc">+</span> </span>
-<span id="cb12-122"><a href="#cb12-122" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.05</span>) <span class="sc">+</span> </span>
-<span id="cb12-123"><a href="#cb12-123" aria-hidden="true" tabindex="-1"></a>  <span class="fu">coord_sf</span>()</span>
+<span id="cb12-120"><a href="#cb12-120" aria-hidden="true" tabindex="-1"></a><span class="in">elevators |&gt; </span></span>
+<span id="cb12-121"><a href="#cb12-121" aria-hidden="true" tabindex="-1"></a><span class="in">  ggplot(aes(latitude, longitude)) + </span></span>
+<span id="cb12-122"><a href="#cb12-122" aria-hidden="true" tabindex="-1"></a><span class="in">  geom_point(alpha = 0.05) + </span></span>
+<span id="cb12-123"><a href="#cb12-123" aria-hidden="true" tabindex="-1"></a><span class="in">  coord_sf()</span></span>
 <span id="cb12-124"><a href="#cb12-124" aria-hidden="true" tabindex="-1"></a><span class="in">```</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <p>Note that I’m using <code>DBI::sqlInterpolate()</code> and <code>DBI::dbQuoteIdentifier()</code>, to make sure we’re protecting our database from SQL injection attacks. And for this toy example, I’m hard-coding the database connection in. If your organization has a smart way to manage credentials, you’ll probably want to plug into that system (and should <em>definitely</em> not be storing passwords as plaintext in the file).</p>
 <p>And to step out of the bit for a minute, there’s no reason that your Quarto document actually needs to generate a meaningful report. Sure, automatically updating a website (or emailing a PDF) is nice, but Quarto documents are able to run SQL queries, write out files, and do any other task you can do with any of the languages supported by knitr or jupyter. This makes it really easy to write powerful scripts that your colleagues can use to access and understand whatever data you’re working with.</p>
@@ -763,10 +768,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -776,8 +780,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -790,6 +803,125 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -833,6 +965,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -858,6 +991,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -922,7 +1081,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">© Copyright 2024 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</div>   
+    <div class="nav-footer-left">
+<p>© Copyright 2024 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</p>
+</div>   
     <div class="nav-footer-center">
       &nbsp;
     </div>
@@ -931,6 +1092,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
+
 
 
 

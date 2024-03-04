@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.4.550">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -48,7 +48,13 @@ ul.task-list li input[type="checkbox"] {
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -57,12 +63,12 @@ ul.task-list li input[type="checkbox"] {
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
   }
 }</script>
-
 <link href="../../site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet">
 <script src="../../site_libs/pagedtable-1.1/js/pagedtable.js"></script>
 
@@ -71,7 +77,7 @@ ul.task-list li input[type="checkbox"] {
 <meta property="og:title" content="Mike Mahoney - Fine-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages">
 <meta property="og:description" content="New (open-access!) article out in International Journal of Applied Earth Observation and Geoinformation!">
 <meta property="og:image" content="https://mm218.dev/posts/2022-11-07-agb/map.jpg">
-<meta property="og:site-name" content="Mike Mahoney">
+<meta property="og:site_name" content="Mike Mahoney">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:title" content="Mike Mahoney - Fine-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages">
 <meta name="twitter:description" content="New (open-access!) article out in International Journal of Applied Earth Observation and Geoinformation!">
@@ -83,10 +89,10 @@ ul.task-list li input[type="checkbox"] {
 <body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
-  <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+  <header id="quarto-header" class="headroom fixed-top quarto-banner">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="../../index.html">
     <span class="navbar-title">Mike Mahoney</span>
     </a>
@@ -98,30 +104,30 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="../../index.html" rel="" target="">
- <span class="menu-text">Home</span></a>
+    <a class="nav-link" href="../../index.html"> 
+<span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../papers" rel="" target="">
- <span class="menu-text">Papers</span></a>
+    <a class="nav-link" href="../../papers"> 
+<span class="menu-text">Papers</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../presentations" rel="" target="">
- <span class="menu-text">Presentations</span></a>
+    <a class="nav-link" href="../../presentations"> 
+<span class="menu-text">Presentations</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../blog.html" rel="" target="">
- <span class="menu-text">Blog</span></a>
+    <a class="nav-link" href="../../blog.html"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="../../blog.xml" rel="" target=""><i class="bi bi-rss" role="img">
+    <a class="nav-link" href="../../blog.xml"> <i class="bi bi-rss" role="img">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
 </ul>
-            <div class="quarto-navbar-tools">
-</div>
           </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -179,11 +185,12 @@ ul.task-list li input[type="checkbox"] {
 
 
 
+
 <p>I’m part of the team behind a new open-access article, “<a href="https://doi.org/10.1016/j.jag.2022.103059">Fine-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages</a>”, newly out in International Journal of Applied Earth Observation and Geoinformation.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> The paper was lead by my incredible coworker <a href="https://www.lucaskjohnson.com/">Lucas Johnson</a>, and is his first first-author paper – and what a powerful way to enter the field!</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="map.jpg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">A map, showing the AGB prediction surfaces reflecting a temporal patchwork of conditions across the 17 component LiDAR coverages in the GPO-LiDAR area with New York State.</figcaption>
+<figcaption>A map, showing the AGB prediction surfaces reflecting a temporal patchwork of conditions across the 17 component LiDAR coverages in the GPO-LiDAR area with New York State.</figcaption>
 </figure>
 </div>
 <p>This paper is, plain and simple, the first public documentation we’ve released about how we’re helping New York State track how much carbon is stored in its forests statewide. Using a patchwork of LiDAR collections and FIA field measurements, we use a stacked ensemble (a linear regression combining a random forest, LightGBM-based gradient boosting machine, and support vector machine) to estimate forest aboveground biomass (all the woody non-root bits of a tree, which<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> are made out of carbon pulled out of the atmosphere) at a 30 meter resolution across New York State. This data is already being used to identify high-priority areas across the state where the most carbon is currently stored and where a- and re-forestation might have the greatest impacts in the future.</p>
@@ -191,7 +198,7 @@ ul.task-list li input[type="checkbox"] {
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="validation.jpg" class="img-fluid figure-img"></p>
-<figcaption class="figure-caption">Plot-to-pixel residuals summarized at units spaced 50 km apart. Hexagons with only one reference plot were removed. (a) RMSE Mg ha−1; (b) MAE Mg ha−1; (c) ME Mg ha−1; (d) Mean FIA AGB value Mg ha−1; (e) Hex-level % RMSE as a function of mean reference value; (f) Hex-level % MAE as a function of mean reference value; (g) Hex-level ME as a function of mean reference value. 1 observation excluded from (e) and (f) where 0 FIA AGB makes % RMSE impossible to compute. Trend lines in (e) and (f) produced using logarithmic regression. Trend line in g produced using least-squares regression.</figcaption>
+<figcaption>Plot-to-pixel residuals summarized at units spaced 50 km apart. Hexagons with only one reference plot were removed. (a) RMSE Mg ha−1; (b) MAE Mg ha−1; (c) ME Mg ha−1; (d) Mean FIA AGB value Mg ha−1; (e) Hex-level % RMSE as a function of mean reference value; (f) Hex-level % MAE as a function of mean reference value; (g) Hex-level ME as a function of mean reference value. 1 observation excluded from (e) and (f) where 0 FIA AGB makes % RMSE impossible to compute. Trend lines in (e) and (f) produced using logarithmic regression. Trend line in g produced using least-squares regression.</figcaption>
 </figure>
 </div>
 <p>In addition to <a href="https://www.lucaskjohnson.com/">Lucas</a> (who, I cannot stress enough, did a <em>fantastic</em> job leading this paper), I was lucky enough to get to work with <a href="https://www.esf.edu/faculty/bevilacqua/">Eddie Bevilacqua</a>, <a href="https://www.esf.edu/faculty/stehman/">Steve Stehman</a>, <a href="https://www.fs.usda.gov/research/about/people/gmdomke">Grant Domke</a>, and <a href="https://www.esf.edu/faculty/beier/">Colin Beier</a> on this one. It’s a great team and a great project, and I’m very excited for the things we’ve got coming down the pipeline next.</p>
@@ -285,10 +292,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -298,8 +304,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -312,6 +327,125 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -355,6 +489,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -380,6 +515,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -444,7 +605,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">© Copyright 2024 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</div>   
+    <div class="nav-footer-left">
+<p>© Copyright 2024 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</p>
+</div>   
     <div class="nav-footer-center">
       &nbsp;
     </div>
@@ -453,6 +616,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
+
 
 
 

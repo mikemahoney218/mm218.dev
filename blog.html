@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.3.450">
+<meta name="generator" content="quarto-1.4.550">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -47,7 +47,13 @@ ul.task-list li input[type="checkbox"] {
   "collapse-after": 3,
   "panel-placement": "end",
   "type": "overlay",
-  "limit": 20,
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
   "language": {
     "search-no-results-text": "No results",
     "search-matching-documents-text": "matching documents",
@@ -56,6 +62,7 @@ ul.task-list li input[type="checkbox"] {
     "search-more-match-text": "more match in this document",
     "search-more-matches-text": "more matches in this document",
     "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
     "search-detached-cancel-button-title": "Cancel",
     "search-submit-button-title": "Submit",
     "search-label": "Search"
@@ -95,24 +102,49 @@ ul.task-list li input[type="checkbox"] {
   <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
   <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
 
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
 <link rel="stylesheet" href="styles.css">
-<link rel="alternate" type="application/rss+xml" title="Mike Mahoney" href="blog.xml"><meta property="og:title" content="Mike Mahoney - Getting Good">
-<meta property="og:image" content="https://mm218.dev/posts/2024-01-10-rsi-cran/banner.jpg">
-<meta property="og:site-name" content="Mike Mahoney">
+<link rel="alternate" type="application/rss+xml" title="Mike Mahoney" href="blog.xml" data-external="1"><meta property="og:title" content="Mike Mahoney - Getting Good">
+<meta property="og:site_name" content="Mike Mahoney">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:title" content="Mike Mahoney - Getting Good">
-<meta name="twitter:image" content="https://mm218.dev/posts/2024-01-10-rsi-cran/banner.jpg">
 <meta name="twitter:creator" content="@MikeMahoney218">
-<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:card" content="summary">
 </head>
 
 <body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top">
-    <nav class="navbar navbar-expand-lg navbar-dark ">
+    <nav class="navbar navbar-expand-lg " data-bs-theme="dark">
       <div class="navbar-container container-fluid">
-      <div class="navbar-brand-container">
+      <div class="navbar-brand-container mx-auto">
     <a class="navbar-brand" href="./index.html">
     <span class="navbar-title">Mike Mahoney</span>
     </a>
@@ -124,30 +156,30 @@ ul.task-list li input[type="checkbox"] {
           <div class="collapse navbar-collapse" id="navbarCollapse">
             <ul class="navbar-nav navbar-nav-scroll ms-auto">
   <li class="nav-item">
-    <a class="nav-link" href="./index.html" rel="" target="">
- <span class="menu-text">Home</span></a>
+    <a class="nav-link" href="./index.html"> 
+<span class="menu-text">Home</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./papers" rel="" target="">
- <span class="menu-text">Papers</span></a>
+    <a class="nav-link" href="./papers"> 
+<span class="menu-text">Papers</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="./presentations" rel="" target="">
- <span class="menu-text">Presentations</span></a>
+    <a class="nav-link" href="./presentations"> 
+<span class="menu-text">Presentations</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link active" href="./blog.html" rel="" target="" aria-current="page">
- <span class="menu-text">Blog</span></a>
+    <a class="nav-link active" href="./blog.html" aria-current="page"> 
+<span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item compact">
-    <a class="nav-link" href="./blog.xml" rel="" target=""><i class="bi bi-rss" role="img">
+    <a class="nav-link" href="./blog.xml"> <i class="bi bi-rss" role="img">
 </i> 
- <span class="menu-text"></span></a>
+<span class="menu-text"></span></a>
   </li>  
 </ul>
-            <div class="quarto-navbar-tools">
-</div>
           </div> <!-- /navcollapse -->
+          <div class="quarto-navbar-tools">
+</div>
       </div> <!-- /container-fluid -->
     </nav>
 </header>
@@ -168,7 +200,7 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<div class="quarto-title-meta">
+<div class="quarto-title-meta column-body">
 
     
   
@@ -176,7 +208,9 @@ ul.task-list li input[type="checkbox"] {
   </div>
   
 
+
 </header>
+
 
 <div class="column-page">
 
@@ -187,19 +221,19 @@ ul.task-list li input[type="checkbox"] {
 
 <div class="quarto-listing quarto-listing-container-default" id="listing-listing">
 <div class="list quarto-listing-default">
-<div class="quarto-post image-right" data-index="0" data-categories="R,Tutorials,Spatial,geospatial data,R packages" data-listing-date-sort="1704844800000" data-listing-file-modified-sort="1705701586169" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7">
+<div class="quarto-post image-right" data-index="0" data-categories="R,Tutorials,Spatial,geospatial data,R packages" data-listing-date-sort="1704844800000" data-listing-file-modified-sort="1709581989957" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1338">
 <div class="thumbnail">
-<p><a href="./posts/2024-01-10-rsi-cran/index.html"> <img src="./posts/2024-01-10-rsi-cran/banner.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2024-01-10-rsi-cran/index.html" class="no-external"></a></p><a href="./posts/2024-01-10-rsi-cran/index.html" class="no-external">
+<p><img src="./posts/2024-01-10-rsi-cran/banner.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2024-01-10-rsi-cran/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2024-01-10-rsi-cran/index.html">
 <h3 class="no-anchor listing-title">
-rsi is now on CRAN!
+<a href="./posts/2024-01-10-rsi-cran/index.html" class="no-external">rsi is now on CRAN!</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2024-01-10-rsi-cran/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -217,14 +251,12 @@ geospatial data
 R packages
 </div>
 </div>
-<a href="./posts/2024-01-10-rsi-cran/index.html">
 <div class="listing-description">
-<p>Your one-stop shop for spatial ML data retrieval and pre-processing.</p>
+<a href="./posts/2024-01-10-rsi-cran/index.html" class="no-external">Your one-stop shop for spatial ML data retrieval and pre-processing.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2024-01-10-rsi-cran/index.html">
+<a href="./posts/2024-01-10-rsi-cran/index.html" class="no-external">
 <div class="listing-date">
 Jan 10, 2024
 </div>
@@ -234,32 +266,30 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="1" data-categories="R" data-listing-date-sort="1701907200000" data-listing-file-modified-sort="1705701586169" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5">
+<div class="quarto-post image-right" data-index="1" data-categories="R" data-listing-date-sort="1701907200000" data-listing-file-modified-sort="1709581989957" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="845">
 <div class="thumbnail">
-<p><a href="./posts/2023-12-07-View/index.html"> <img src="./posts/2023-12-07-View/banner.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-12-07-View/index.html" class="no-external"></a></p><a href="./posts/2023-12-07-View/index.html" class="no-external">
+<p><img src="./posts/2023-12-07-View/banner.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-12-07-View/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-12-07-View/index.html">
 <h3 class="no-anchor listing-title">
-Why is <code>View()</code> capitalized, anyway?
+<a href="./posts/2023-12-07-View/index.html" class="no-external">Why is <code>View()</code> capitalized, anyway?</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-12-07-View/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
 </div>
 </div>
-<a href="./posts/2023-12-07-View/index.html">
 <div class="listing-description">
-<p>And down the rabbit hole we go.</p>
+<a href="./posts/2023-12-07-View/index.html" class="no-external">And down the rabbit hole we go.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-12-07-View/index.html">
+<a href="./posts/2023-12-07-View/index.html" class="no-external">
 <div class="listing-date">
 Dec 7, 2023
 </div>
@@ -269,19 +299,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="2" data-categories="R,Tutorials,Spatial,geospatial data,R packages" data-listing-date-sort="1701043200000" data-listing-file-modified-sort="1705701586169" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7">
+<div class="quarto-post image-right" data-index="2" data-categories="R,Tutorials,Spatial,geospatial data,R packages" data-listing-date-sort="1701043200000" data-listing-file-modified-sort="1709581989957" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1250">
 <div class="thumbnail">
-<p><a href="./posts/2023-11-27-objects-loading-namespaces/index.html"> <img src="./posts/2023-11-27-objects-loading-namespaces/banner.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-11-27-objects-loading-namespaces/index.html" class="no-external"></a></p><a href="./posts/2023-11-27-objects-loading-namespaces/index.html" class="no-external">
+<p><img src="./posts/2023-11-27-objects-loading-namespaces/banner.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-11-27-objects-loading-namespaces/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-11-27-objects-loading-namespaces/index.html">
 <h3 class="no-anchor listing-title">
-Helping R find the right methods for unserialized complex objects.
+<a href="./posts/2023-11-27-objects-loading-namespaces/index.html" class="no-external">Helping R find the right methods for unserialized complex objects.</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-11-27-objects-loading-namespaces/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -299,14 +329,12 @@ geospatial data
 R packages
 </div>
 </div>
-<a href="./posts/2023-11-27-objects-loading-namespaces/index.html">
 <div class="listing-description">
-<p>Automatically load package namespaces when reading serialized objects with this One Quick Trick.</p>
+<a href="./posts/2023-11-27-objects-loading-namespaces/index.html" class="no-external">Automatically load package namespaces when reading serialized objects with this One Quick Trick.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-11-27-objects-loading-namespaces/index.html">
+<a href="./posts/2023-11-27-objects-loading-namespaces/index.html" class="no-external">
 <div class="listing-date">
 Nov 27, 2023
 </div>
@@ -316,19 +344,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="3" data-categories="R,Tutorials,Spatial,geospatial data,R packages" data-listing-date-sort="1700524800000" data-listing-file-modified-sort="1705701586169" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3">
+<div class="quarto-post image-right" data-index="3" data-categories="R,Tutorials,Spatial,geospatial data,R packages" data-listing-date-sort="1700524800000" data-listing-file-modified-sort="1709581989953" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="443">
 <div class="thumbnail">
-<p><a href="./posts/2023-11-21-rsi-null/index.html"> <img src="./posts/2023-11-21-rsi-null/banner.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-11-21-rsi-null/index.html" class="no-external"></a></p><a href="./posts/2023-11-21-rsi-null/index.html" class="no-external">
+<p><img src="./posts/2023-11-21-rsi-null/banner.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-11-21-rsi-null/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-11-21-rsi-null/index.html">
 <h3 class="no-anchor listing-title">
-Downloading STAC data using rsi when you’ve got a geographic CRS or don’t want a composite.
+<a href="./posts/2023-11-21-rsi-null/index.html" class="no-external">Downloading STAC data using rsi when you’ve got a geographic CRS or don’t want a composite.</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-11-21-rsi-null/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -346,14 +374,12 @@ geospatial data
 R packages
 </div>
 </div>
-<a href="./posts/2023-11-21-rsi-null/index.html">
 <div class="listing-description">
-<p>Methods for straying <em>slightly</em> off the happy path: just say <code>NULL</code>.</p>
+<a href="./posts/2023-11-21-rsi-null/index.html" class="no-external">Methods for straying <em>slightly</em> off the happy path: just say <code>NULL</code>.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-11-21-rsi-null/index.html">
+<a href="./posts/2023-11-21-rsi-null/index.html" class="no-external">
 <div class="listing-date">
 Nov 21, 2023
 </div>
@@ -363,19 +389,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="4" data-categories="R,Tutorials" data-listing-date-sort="1699315200000" data-listing-file-modified-sort="1705701586165" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4">
+<div class="quarto-post image-right" data-index="4" data-categories="R,Tutorials" data-listing-date-sort="1699315200000" data-listing-file-modified-sort="1709581989953" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="641">
 <div class="thumbnail">
-<p><a href="./posts/2023-11-07-classed-errors/index.html"> <img src="./posts/2023-11-07-classed-errors/banner.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-11-07-classed-errors/index.html" class="no-external"></a></p><a href="./posts/2023-11-07-classed-errors/index.html" class="no-external">
+<p><img src="./posts/2023-11-07-classed-errors/banner.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-11-07-classed-errors/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-11-07-classed-errors/index.html">
 <h3 class="no-anchor listing-title">
-Classed conditions from rlang functions
+<a href="./posts/2023-11-07-classed-errors/index.html" class="no-external">Classed conditions from rlang functions</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-11-07-classed-errors/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -384,14 +410,12 @@ R
 Tutorials
 </div>
 </div>
-<a href="./posts/2023-11-07-classed-errors/index.html">
 <div class="listing-description">
-<p>Improve your testing, your control flow, your programming life.</p>
+<a href="./posts/2023-11-07-classed-errors/index.html" class="no-external">Improve your testing, your control flow, your programming life.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-11-07-classed-errors/index.html">
+<a href="./posts/2023-11-07-classed-errors/index.html" class="no-external">
 <div class="listing-date">
 Nov 7, 2023
 </div>
@@ -401,19 +425,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="5" data-categories="R,Spatial,geospatial data,spatialsample,R packages" data-listing-date-sort="1698969600000" data-listing-file-modified-sort="1705701586165" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2">
+<div class="quarto-post image-right" data-index="5" data-categories="R,Spatial,geospatial data,spatialsample,R packages" data-listing-date-sort="1698969600000" data-listing-file-modified-sort="1709581989953" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="386">
 <div class="thumbnail">
-<p><a href="./posts/2023-11-03-spatialsample/index.html"> <img src="./posts/2023-11-03-spatialsample/banner.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-11-03-spatialsample/index.html" class="no-external"></a></p><a href="./posts/2023-11-03-spatialsample/index.html" class="no-external">
+<p><img src="./posts/2023-11-03-spatialsample/banner.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-11-03-spatialsample/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-11-03-spatialsample/index.html">
 <h3 class="no-anchor listing-title">
-spatialsample 0.5.0 is now on CRAN
+<a href="./posts/2023-11-03-spatialsample/index.html" class="no-external">spatialsample 0.5.0 is now on CRAN</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-11-03-spatialsample/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -431,14 +455,12 @@ spatialsample
 R packages
 </div>
 </div>
-<a href="./posts/2023-11-03-spatialsample/index.html">
 <div class="listing-description">
-<p>Bug fixes and reexports, oh my</p>
+<a href="./posts/2023-11-03-spatialsample/index.html" class="no-external">Bug fixes and reexports, oh my</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-11-03-spatialsample/index.html">
+<a href="./posts/2023-11-03-spatialsample/index.html" class="no-external">
 <div class="listing-date">
 Nov 3, 2023
 </div>
@@ -448,19 +470,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="6" data-categories="R,Tutorials,Spatial,geospatial data" data-listing-date-sort="1698710400000" data-listing-file-modified-sort="1705701586165" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4">
+<div class="quarto-post image-right" data-index="6" data-categories="R,Tutorials,Spatial,geospatial data" data-listing-date-sort="1698710400000" data-listing-file-modified-sort="1709581989953" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="667">
 <div class="thumbnail">
-<p><a href="./posts/2023-10-31-map-context/index.html"> <img src="./posts/2023-10-31-map-context/banner.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-10-31-map-context/index.html" class="no-external"></a></p><a href="./posts/2023-10-31-map-context/index.html" class="no-external">
+<p><img src="./posts/2023-10-31-map-context/banner.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-10-31-map-context/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-10-31-map-context/index.html">
 <h3 class="no-anchor listing-title">
-Adding context to maps made with ggplot2
+<a href="./posts/2023-10-31-map-context/index.html" class="no-external">Adding context to maps made with ggplot2</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-10-31-map-context/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -475,14 +497,12 @@ Spatial
 geospatial data
 </div>
 </div>
-<a href="./posts/2023-10-31-map-context/index.html">
 <div class="listing-description">
-<p>How to set the extent of a map based upon a single layer.</p>
+<a href="./posts/2023-10-31-map-context/index.html" class="no-external">How to set the extent of a map based upon a single layer.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-10-31-map-context/index.html">
+<a href="./posts/2023-10-31-map-context/index.html" class="no-external">
 <div class="listing-date">
 Oct 31, 2023
 </div>
@@ -492,19 +512,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="7" data-categories="R,Tutorials" data-listing-date-sort="1698364800000" data-listing-file-modified-sort="1705701586165" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11">
+<div class="quarto-post image-right" data-index="7" data-categories="R,Tutorials" data-listing-date-sort="1698364800000" data-listing-file-modified-sort="1709581989953" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="11" data-listing-word-count-sort="2191">
 <div class="thumbnail">
-<p><a href="./posts/2023-10-27-minimal-environments/index.html"> <img src="./posts/2023-10-27-minimal-environments/banner.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-10-27-minimal-environments/index.html" class="no-external"></a></p><a href="./posts/2023-10-27-minimal-environments/index.html" class="no-external">
+<p><img src="./posts/2023-10-27-minimal-environments/banner.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-10-27-minimal-environments/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-10-27-minimal-environments/index.html">
 <h3 class="no-anchor listing-title">
-Executing R code from untrusted sources in minimal environments
+<a href="./posts/2023-10-27-minimal-environments/index.html" class="no-external">Executing R code from untrusted sources in minimal environments</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-10-27-minimal-environments/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -513,14 +533,12 @@ R
 Tutorials
 </div>
 </div>
-<a href="./posts/2023-10-27-minimal-environments/index.html">
 <div class="listing-description">
-<p>Security improvements, if not fixes, by restricting what potentially-malicious code gets access to.</p>
+<a href="./posts/2023-10-27-minimal-environments/index.html" class="no-external">Security improvements, if not fixes, by restricting what potentially-malicious code gets access to.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-10-27-minimal-environments/index.html">
+<a href="./posts/2023-10-27-minimal-environments/index.html" class="no-external">
 <div class="listing-date">
 Oct 27, 2023
 </div>
@@ -530,19 +548,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="8" data-categories="R,Tutorials,Spatial,geospatial data,R packages" data-listing-date-sort="1698278400000" data-listing-file-modified-sort="1705701586165" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7">
+<div class="quarto-post image-right" data-index="8" data-categories="R,Tutorials,Spatial,geospatial data,R packages" data-listing-date-sort="1698278400000" data-listing-file-modified-sort="1709581989953" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1233">
 <div class="thumbnail">
-<p><a href="./posts/2023-10-26-rsi/index.html"> <img src="./posts/2023-10-26-rsi/banner.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-10-26-rsi/index.html" class="no-external"></a></p><a href="./posts/2023-10-26-rsi/index.html" class="no-external">
+<p><img src="./posts/2023-10-26-rsi/banner.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-10-26-rsi/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-10-26-rsi/index.html">
 <h3 class="no-anchor listing-title">
-Introducing rsi
+<a href="./posts/2023-10-26-rsi/index.html" class="no-external">Introducing rsi</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-10-26-rsi/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -560,14 +578,12 @@ geospatial data
 R packages
 </div>
 </div>
-<a href="./posts/2023-10-26-rsi/index.html">
 <div class="listing-description">
-<p>Download imagery from STAC APIs, compute awesome spectral indices, spend less time fussing with spatial nuisances.</p>
+<a href="./posts/2023-10-26-rsi/index.html" class="no-external">Download imagery from STAC APIs, compute awesome spectral indices, spend less time fussing with spatial nuisances.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-10-26-rsi/index.html">
+<a href="./posts/2023-10-26-rsi/index.html" class="no-external">
 <div class="listing-date">
 Oct 26, 2023
 </div>
@@ -577,19 +593,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="9" data-categories="R,Tutorials" data-listing-date-sort="1698105600000" data-listing-file-modified-sort="1705701586165" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4">
+<div class="quarto-post image-right" data-index="9" data-categories="R,Tutorials" data-listing-date-sort="1698105600000" data-listing-file-modified-sort="1709581989949" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="777">
 <div class="thumbnail">
-<p><a href="./posts/2023-10-24-fun-r-funcs/index.html"> <img src="./posts/2023-10-24-fun-r-funcs/banner.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-10-24-fun-r-funcs/index.html" class="no-external"></a></p><a href="./posts/2023-10-24-fun-r-funcs/index.html" class="no-external">
+<p><img src="./posts/2023-10-24-fun-r-funcs/banner.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-10-24-fun-r-funcs/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-10-24-fun-r-funcs/index.html">
 <h3 class="no-anchor listing-title">
-Three fun R functions
+<a href="./posts/2023-10-24-fun-r-funcs/index.html" class="no-external">Three fun R functions</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-10-24-fun-r-funcs/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -598,14 +614,12 @@ R
 Tutorials
 </div>
 </div>
-<a href="./posts/2023-10-24-fun-r-funcs/index.html">
 <div class="listing-description">
-<p>All the cool kids were jumping off the bridge!</p>
+<a href="./posts/2023-10-24-fun-r-funcs/index.html" class="no-external">All the cool kids were jumping off the bridge!</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-10-24-fun-r-funcs/index.html">
+<a href="./posts/2023-10-24-fun-r-funcs/index.html" class="no-external">
 <div class="listing-date">
 Oct 24, 2023
 </div>
@@ -615,19 +629,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="10" data-categories="R,Spatial,geospatial data" data-listing-date-sort="1695168000000" data-listing-file-modified-sort="1705701586165" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2">
+<div class="quarto-post image-right" data-index="10" data-categories="R,Spatial,geospatial data" data-listing-date-sort="1695168000000" data-listing-file-modified-sort="1709581989949" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="315">
 <div class="thumbnail">
-<p><a href="./posts/2023-09-20-cngf/index.html"> <img src="./posts/2023-09-20-cngf/banner.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-09-20-cngf/index.html" class="no-external"></a></p><a href="./posts/2023-09-20-cngf/index.html" class="no-external">
+<p><img src="./posts/2023-09-20-cngf/banner.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-09-20-cngf/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-09-20-cngf/index.html">
 <h3 class="no-anchor listing-title">
-Cloud-Native Geospatial If You Don’t Speak Snake
+<a href="./posts/2023-09-20-cngf/index.html" class="no-external">Cloud-Native Geospatial If You Don’t Speak Snake</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-09-20-cngf/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -639,14 +653,12 @@ Spatial
 geospatial data
 </div>
 </div>
-<a href="./posts/2023-09-20-cngf/index.html">
 <div class="listing-description">
-<p>New post on the Cloud-Native Geospatial Foundation’s blog</p>
+<a href="./posts/2023-09-20-cngf/index.html" class="no-external">New post on the Cloud-Native Geospatial Foundation’s blog</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-09-20-cngf/index.html">
+<a href="./posts/2023-09-20-cngf/index.html" class="no-external">
 <div class="listing-date">
 Sep 20, 2023
 </div>
@@ -656,19 +668,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="11" data-categories="R,Tutorials" data-listing-date-sort="1693267200000" data-listing-file-modified-sort="1705701586161" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5">
+<div class="quarto-post image-right" data-index="11" data-categories="R,Tutorials" data-listing-date-sort="1693267200000" data-listing-file-modified-sort="1709581989949" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="899">
 <div class="thumbnail">
-<p><a href="./posts/2023-08-29-allocations/index.html"> <img src="./posts/2023-08-29-allocations/banner.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-08-29-allocations/index.html" class="no-external"></a></p><a href="./posts/2023-08-29-allocations/index.html" class="no-external">
+<p><img src="./posts/2023-08-29-allocations/banner.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-08-29-allocations/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-08-29-allocations/index.html">
 <h3 class="no-anchor listing-title">
-Pre-allocating vectors is for nerds
+<a href="./posts/2023-08-29-allocations/index.html" class="no-external">Pre-allocating vectors is for nerds</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-08-29-allocations/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -677,14 +689,12 @@ R
 Tutorials
 </div>
 </div>
-<a href="./posts/2023-08-29-allocations/index.html">
 <div class="listing-description">
-<p>Or rather: growing objects is inefficient. But it’s maybe not as big a deal as I’d believed.</p>
+<a href="./posts/2023-08-29-allocations/index.html" class="no-external">Or rather: growing objects is inefficient. But it’s maybe not as big a deal as I’d believed.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-08-29-allocations/index.html">
+<a href="./posts/2023-08-29-allocations/index.html" class="no-external">
 <div class="listing-date">
 Aug 29, 2023
 </div>
@@ -694,19 +704,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="12" data-categories="R,geospatial data,Tutorials" data-listing-date-sort="1692835200000" data-listing-file-modified-sort="1705701586161" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2">
+<div class="quarto-post image-right" data-index="12" data-categories="R,geospatial data,Tutorials" data-listing-date-sort="1692835200000" data-listing-file-modified-sort="1709581989949" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="369">
 <div class="thumbnail">
-<p><a href="./posts/2023-08-24-landsat-scaling/index.html"> <img src="./posts/2023-08-24-landsat-scaling/landsat.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-08-24-landsat-scaling/index.html" class="no-external"></a></p><a href="./posts/2023-08-24-landsat-scaling/index.html" class="no-external">
+<p><img src="./posts/2023-08-24-landsat-scaling/landsat.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-08-24-landsat-scaling/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-08-24-landsat-scaling/index.html">
 <h3 class="no-anchor listing-title">
-Yes, you can rescale Landsat images after compositing them
+<a href="./posts/2023-08-24-landsat-scaling/index.html" class="no-external">Yes, you can rescale Landsat images after compositing them</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-08-24-landsat-scaling/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -718,14 +728,12 @@ geospatial data
 Tutorials
 </div>
 </div>
-<a href="./posts/2023-08-24-landsat-scaling/index.html">
 <div class="listing-description">
-<p>A note about something I keep needing to figure out.</p>
+<a href="./posts/2023-08-24-landsat-scaling/index.html" class="no-external">A note about something I keep needing to figure out.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-08-24-landsat-scaling/index.html">
+<a href="./posts/2023-08-24-landsat-scaling/index.html" class="no-external">
 <div class="listing-date">
 Aug 24, 2023
 </div>
@@ -735,19 +743,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="13" data-categories="R,Tutorials" data-listing-date-sort="1691366400000" data-listing-file-modified-sort="1705701586161" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9">
+<div class="quarto-post image-right" data-index="13" data-categories="R,Tutorials" data-listing-date-sort="1691366400000" data-listing-file-modified-sort="1709581989949" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="9" data-listing-word-count-sort="1744">
 <div class="thumbnail">
-<p><a href="./posts/2023-08-07-vector/index.html"> <img src="./posts/2023-08-07-vector/banner.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-08-07-vector/index.html" class="no-external"></a></p><a href="./posts/2023-08-07-vector/index.html" class="no-external">
+<p><img src="./posts/2023-08-07-vector/banner.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-08-07-vector/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-08-07-vector/index.html">
 <h3 class="no-anchor listing-title">
-A long digression about the word ‘vector’
+<a href="./posts/2023-08-07-vector/index.html" class="no-external">A long digression about the word ‘vector’</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-08-07-vector/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -756,14 +764,12 @@ R
 Tutorials
 </div>
 </div>
-<a href="./posts/2023-08-07-vector/index.html">
 <div class="listing-description">
-<p>Sharing an ‘aha’ moment from a few years ago.</p>
+<a href="./posts/2023-08-07-vector/index.html" class="no-external">Sharing an ‘aha’ moment from a few years ago.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-08-07-vector/index.html">
+<a href="./posts/2023-08-07-vector/index.html" class="no-external">
 <div class="listing-date">
 Aug 7, 2023
 </div>
@@ -773,19 +779,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="14" data-categories="R,spatialsample,tidymodels,R packages,geospatial data,Tutorials" data-listing-date-sort="1686009600000" data-listing-file-modified-sort="1705701586161" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3">
+<div class="quarto-post image-right" data-index="14" data-categories="R,spatialsample,tidymodels,R packages,geospatial data,Tutorials" data-listing-date-sort="1686009600000" data-listing-file-modified-sort="1709581989949" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="479">
 <div class="thumbnail">
-<p><a href="./posts/2023-06-06-spatialsample_splits/index.html"> <img src="./posts/2023-06-06-spatialsample_splits/map.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-06-06-spatialsample_splits/index.html" class="no-external"></a></p><a href="./posts/2023-06-06-spatialsample_splits/index.html" class="no-external">
+<p><img src="./posts/2023-06-06-spatialsample_splits/map.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-06-06-spatialsample_splits/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-06-06-spatialsample_splits/index.html">
 <h3 class="no-anchor listing-title">
-From the inbox: How can I get fold assignments from spatialsample?
+<a href="./posts/2023-06-06-spatialsample_splits/index.html" class="no-external">From the inbox: How can I get fold assignments from spatialsample?</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-06-06-spatialsample_splits/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -806,14 +812,12 @@ geospatial data
 Tutorials
 </div>
 </div>
-<a href="./posts/2023-06-06-spatialsample_splits/index.html">
 <div class="listing-description">
-<p>Straightforward methods for answering a straightforward question.</p>
+<a href="./posts/2023-06-06-spatialsample_splits/index.html" class="no-external">Straightforward methods for answering a straightforward question.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-06-06-spatialsample_splits/index.html">
+<a href="./posts/2023-06-06-spatialsample_splits/index.html" class="no-external">
 <div class="listing-date">
 Jun 6, 2023
 </div>
@@ -823,19 +827,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="15" data-categories="Quarto,Tutorials,Data science" data-listing-date-sort="1681084800000" data-listing-file-modified-sort="1705701586161" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3">
+<div class="quarto-post image-right" data-index="15" data-categories="Quarto,Tutorials,Data science" data-listing-date-sort="1681084800000" data-listing-file-modified-sort="1709581989949" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="430">
 <div class="thumbnail">
-<p><a href="./posts/2023-04-10-quarto_citation_use_count/index.html"> <img src="./posts/2023-04-10-quarto_citation_use_count/books.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-04-10-quarto_citation_use_count/index.html" class="no-external"></a></p><a href="./posts/2023-04-10-quarto_citation_use_count/index.html" class="no-external">
+<p><img src="./posts/2023-04-10-quarto_citation_use_count/books.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-04-10-quarto_citation_use_count/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-04-10-quarto_citation_use_count/index.html">
 <h3 class="no-anchor listing-title">
-Counting the number of times each citation is used in a Quarto document
+<a href="./posts/2023-04-10-quarto_citation_use_count/index.html" class="no-external">Counting the number of times each citation is used in a Quarto document</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-04-10-quarto_citation_use_count/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('Quarto'); return false;">
 Quarto
@@ -847,14 +851,12 @@ Tutorials
 Data science
 </div>
 </div>
-<a href="./posts/2023-04-10-quarto_citation_use_count/index.html">
 <div class="listing-description">
-<p>Documenting this trick here for future me, six months from now.</p>
+<a href="./posts/2023-04-10-quarto_citation_use_count/index.html" class="no-external">Documenting this trick here for future me, six months from now.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-04-10-quarto_citation_use_count/index.html">
+<a href="./posts/2023-04-10-quarto_citation_use_count/index.html" class="no-external">
 <div class="listing-date">
 Apr 10, 2023
 </div>
@@ -864,19 +866,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="16" data-categories="R,Tutorials,Data science" data-listing-date-sort="1680307200000" data-listing-file-modified-sort="1705701586161" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3">
+<div class="quarto-post image-right" data-index="16" data-categories="R,Tutorials,Data science" data-listing-date-sort="1680307200000" data-listing-file-modified-sort="1709581989949" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="500">
 <div class="thumbnail">
-<p><a href="./posts/2023-04-01-fitting_models/index.html"> <img src="./posts/2023-04-01-fitting_models/nests.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-04-01-fitting_models/index.html" class="no-external"></a></p><a href="./posts/2023-04-01-fitting_models/index.html" class="no-external">
+<p><img src="./posts/2023-04-01-fitting_models/nests.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-04-01-fitting_models/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-04-01-fitting_models/index.html">
 <h3 class="no-anchor listing-title">
-Using in-line grouping to fit many models
+<a href="./posts/2023-04-01-fitting_models/index.html" class="no-external">Using in-line grouping to fit many models</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-04-01-fitting_models/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -888,14 +890,12 @@ Tutorials
 Data science
 </div>
 </div>
-<a href="./posts/2023-04-01-fitting_models/index.html">
 <div class="listing-description">
-<p>An alternative to nesting for fitting separate models to multiple groups.</p>
+<a href="./posts/2023-04-01-fitting_models/index.html" class="no-external">An alternative to nesting for fitting separate models to multiple groups.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-04-01-fitting_models/index.html">
+<a href="./posts/2023-04-01-fitting_models/index.html" class="no-external">
 <div class="listing-date">
 Apr 1, 2023
 </div>
@@ -905,19 +905,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="17" data-categories="R,waywiser,Spatial,Data science,R packages" data-listing-date-sort="1679529600000" data-listing-file-modified-sort="1705701586161" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2">
+<div class="quarto-post image-right" data-index="17" data-categories="R,waywiser,Spatial,Data science,R packages" data-listing-date-sort="1679529600000" data-listing-file-modified-sort="1709581989949" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="358">
 <div class="thumbnail">
-<p><a href="./posts/2023-03-21-waywiser-ropensci/index.html"> <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div> </a></p>
+<p><a href="./posts/2023-03-21-waywiser-ropensci/index.html" class="no-external"></a></p><a href="./posts/2023-03-21-waywiser-ropensci/index.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./posts/2023-03-21-waywiser-ropensci/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-03-21-waywiser-ropensci/index.html">
 <h3 class="no-anchor listing-title">
-waywiser is now a part of rOpenSci
+<a href="./posts/2023-03-21-waywiser-ropensci/index.html" class="no-external">waywiser is now a part of rOpenSci</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-03-21-waywiser-ropensci/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -935,14 +935,12 @@ Data science
 R packages
 </div>
 </div>
-<a href="./posts/2023-03-21-waywiser-ropensci/index.html">
 <div class="listing-description">
-<p>Plus version 0.3.0 now on CRAN, and a new preprint</p>
+<a href="./posts/2023-03-21-waywiser-ropensci/index.html" class="no-external">Plus version 0.3.0 now on CRAN, and a new preprint</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-03-21-waywiser-ropensci/index.html">
+<a href="./posts/2023-03-21-waywiser-ropensci/index.html" class="no-external">
 <div class="listing-date">
 Mar 23, 2023
 </div>
@@ -952,19 +950,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="18" data-categories="R,Tutorials,Spatial,Data science" data-listing-date-sort="1677801600000" data-listing-file-modified-sort="1705701586161" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3">
+<div class="quarto-post image-right" data-index="18" data-categories="R,Tutorials,Spatial,Data science" data-listing-date-sort="1677801600000" data-listing-file-modified-sort="1709581989949" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="472">
 <div class="thumbnail">
-<p><a href="./posts/2023-03-03-parallel/index.html"> <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div> </a></p>
+<p><a href="./posts/2023-03-03-parallel/index.html" class="no-external"></a></p><a href="./posts/2023-03-03-parallel/index.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./posts/2023-03-03-parallel/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-03-03-parallel/index.html">
 <h3 class="no-anchor listing-title">
-How to run R jobs across multiple (local) computers
+<a href="./posts/2023-03-03-parallel/index.html" class="no-external">How to run R jobs across multiple (local) computers</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-03-03-parallel/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -979,14 +977,12 @@ Spatial
 Data science
 </div>
 </div>
-<a href="./posts/2023-03-03-parallel/index.html">
 <div class="listing-description">
-<p>TIL this extremely, extremely easy thing</p>
+<a href="./posts/2023-03-03-parallel/index.html" class="no-external">TIL this extremely, extremely easy thing</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-03-03-parallel/index.html">
+<a href="./posts/2023-03-03-parallel/index.html" class="no-external">
 <div class="listing-date">
 Mar 3, 2023
 </div>
@@ -996,32 +992,30 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="19" data-categories="shell" data-listing-date-sort="1676851200000" data-listing-file-modified-sort="1705701586161" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2">
+<div class="quarto-post image-right" data-index="19" data-categories="shell" data-listing-date-sort="1676851200000" data-listing-file-modified-sort="1709581989945" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="263">
 <div class="thumbnail">
-<p><a href="./posts/2023-02-20-tools/index.html"> <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div> </a></p>
+<p><a href="./posts/2023-02-20-tools/index.html" class="no-external"></a></p><a href="./posts/2023-02-20-tools/index.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./posts/2023-02-20-tools/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-02-20-tools/index.html">
 <h3 class="no-anchor listing-title">
-Commands I Use
+<a href="./posts/2023-02-20-tools/index.html" class="no-external">Commands I Use</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-02-20-tools/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('shell'); return false;">
 shell
 </div>
 </div>
-<a href="./posts/2023-02-20-tools/index.html">
 <div class="listing-description">
-<p>Everyone else was jumping off the bridge, so I did too.</p>
+<a href="./posts/2023-02-20-tools/index.html" class="no-external">Everyone else was jumping off the bridge, so I did too.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-02-20-tools/index.html">
+<a href="./posts/2023-02-20-tools/index.html" class="no-external">
 <div class="listing-date">
 Feb 20, 2023
 </div>
@@ -1031,19 +1025,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="20" data-categories="R,spatialsample,tidymodels,R packages,geospatial data" data-listing-date-sort="1673913600000" data-listing-file-modified-sort="1705701586161" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3">
+<div class="quarto-post image-right" data-index="20" data-categories="R,spatialsample,tidymodels,R packages,geospatial data" data-listing-date-sort="1673913600000" data-listing-file-modified-sort="1709581989945" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="462">
 <div class="thumbnail">
-<p><a href="./posts/2023-01-17-spatialsample/index.html"> <img src="./posts/2023-01-17-spatialsample/map.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2023-01-17-spatialsample/index.html" class="no-external"></a></p><a href="./posts/2023-01-17-spatialsample/index.html" class="no-external">
+<p><img src="./posts/2023-01-17-spatialsample/map.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2023-01-17-spatialsample/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2023-01-17-spatialsample/index.html">
 <h3 class="no-anchor listing-title">
-spatialsample 0.3.0 is now on CRAN
+<a href="./posts/2023-01-17-spatialsample/index.html" class="no-external">spatialsample 0.3.0 is now on CRAN</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2023-01-17-spatialsample/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -1061,14 +1055,12 @@ R packages
 geospatial data
 </div>
 </div>
-<a href="./posts/2023-01-17-spatialsample/index.html">
 <div class="listing-description">
-<p>Repeats, standardization, repeats, spatial clustering, repeats, and more.</p>
+<a href="./posts/2023-01-17-spatialsample/index.html" class="no-external">Repeats, standardization, repeats, spatial clustering, repeats, and more.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2023-01-17-spatialsample/index.html">
+<a href="./posts/2023-01-17-spatialsample/index.html" class="no-external">
 <div class="listing-date">
 Jan 17, 2023
 </div>
@@ -1078,19 +1070,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="21" data-categories="ecology,papers,remote sensing,machine learning,earth science,environmental science,shrubland" data-listing-date-sort="1671580800000" data-listing-file-modified-sort="1705701586157" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7">
+<div class="quarto-post image-right" data-index="21" data-categories="ecology,papers,remote sensing,machine learning,earth science,environmental science,shrubland" data-listing-date-sort="1671580800000" data-listing-file-modified-sort="1709581989945" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1349">
 <div class="thumbnail">
-<p><a href="./posts/2022-12-21-shrubland/index.html"> <img src="./posts/2022-12-21-shrubland/map.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2022-12-21-shrubland/index.html" class="no-external"></a></p><a href="./posts/2022-12-21-shrubland/index.html" class="no-external">
+<p><img src="./posts/2022-12-21-shrubland/map.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2022-12-21-shrubland/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2022-12-21-shrubland/index.html">
 <h3 class="no-anchor listing-title">
-Classification and mapping of low-statured shrubland cover types in post-agricultural landscapes of the US Northeast
+<a href="./posts/2022-12-21-shrubland/index.html" class="no-external">Classification and mapping of low-statured shrubland cover types in post-agricultural landscapes of the US Northeast</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2022-12-21-shrubland/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('ecology'); return false;">
 ecology
@@ -1114,14 +1106,12 @@ environmental science
 shrubland
 </div>
 </div>
-<a href="./posts/2022-12-21-shrubland/index.html">
 <div class="listing-description">
-<p>New article out in the International Journal of Remote Sensing!</p>
+<a href="./posts/2022-12-21-shrubland/index.html" class="no-external">New article out in the International Journal of Remote Sensing! </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2022-12-21-shrubland/index.html">
+<a href="./posts/2022-12-21-shrubland/index.html" class="no-external">
 <div class="listing-date">
 Dec 21, 2022
 </div>
@@ -1131,19 +1121,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="22" data-categories="Data science,ecology,earth science" data-listing-date-sort="1671148800000" data-listing-file-modified-sort="1705701586157" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8">
+<div class="quarto-post image-right" data-index="22" data-categories="Data science,ecology,earth science" data-listing-date-sort="1671148800000" data-listing-file-modified-sort="1709581989945" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1557">
 <div class="thumbnail">
-<p><a href="./posts/2022-12-16-femc/index.html"> <img src="./posts/2022-12-16-femc/forest.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2022-12-16-femc/index.html" class="no-external"></a></p><a href="./posts/2022-12-16-femc/index.html" class="no-external">
+<p><img src="./posts/2022-12-16-femc/forest.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2022-12-16-femc/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2022-12-16-femc/index.html">
 <h3 class="no-anchor listing-title">
-Legibility and seats at the table
+<a href="./posts/2022-12-16-femc/index.html" class="no-external">Legibility and seats at the table</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2022-12-16-femc/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('Data science'); return false;">
 Data science
@@ -1155,14 +1145,12 @@ ecology
 earth science
 </div>
 </div>
-<a href="./posts/2022-12-16-femc/index.html">
 <div class="listing-description">
-<p>Reflections on FEMC 2022.</p>
+<a href="./posts/2022-12-16-femc/index.html" class="no-external">Reflections on FEMC 2022. </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2022-12-16-femc/index.html">
+<a href="./posts/2022-12-16-femc/index.html" class="no-external">
 <div class="listing-date">
 Dec 16, 2022
 </div>
@@ -1172,19 +1160,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="23" data-categories="R,Spatial,Data science" data-listing-date-sort="1670803200000" data-listing-file-modified-sort="1705701586153" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="26">
+<div class="quarto-post image-right" data-index="23" data-categories="R,Spatial,Data science" data-listing-date-sort="1670803200000" data-listing-file-modified-sort="1709581989941" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="26" data-listing-word-count-sort="5194">
 <div class="thumbnail">
-<p><a href="./posts/2022-12-12-tools/index.html"> <img src="./posts/2022-12-12-tools/favorites.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2022-12-12-tools/index.html" class="no-external"></a></p><a href="./posts/2022-12-12-tools/index.html" class="no-external">
+<p><img src="./posts/2022-12-12-tools/favorites.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2022-12-12-tools/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2022-12-12-tools/index.html">
 <h3 class="no-anchor listing-title">
-The tools I loved this year
+<a href="./posts/2022-12-12-tools/index.html" class="no-external">The tools I loved this year</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2022-12-12-tools/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -1196,14 +1184,12 @@ Spatial
 Data science
 </div>
 </div>
-<a href="./posts/2022-12-12-tools/index.html">
 <div class="listing-description">
-<p>The void yells back.</p>
+<a href="./posts/2022-12-12-tools/index.html" class="no-external">The void yells back. </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2022-12-12-tools/index.html">
+<a href="./posts/2022-12-12-tools/index.html" class="no-external">
 <div class="listing-date">
 Dec 12, 2022
 </div>
@@ -1213,19 +1199,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="24" data-categories="R,Tutorials,Spatial,Data science" data-listing-date-sort="1669852800000" data-listing-file-modified-sort="1705701586153" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5">
+<div class="quarto-post image-right" data-index="24" data-categories="R,Tutorials,Spatial,Data science" data-listing-date-sort="1669852800000" data-listing-file-modified-sort="1709581989941" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="936">
 <div class="thumbnail">
-<p><a href="./posts/2022-12-01-sf-in-packages/index.html"> <img src="./posts/2022-12-01-sf-in-packages/sf.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2022-12-01-sf-in-packages/index.html" class="no-external"></a></p><a href="./posts/2022-12-01-sf-in-packages/index.html" class="no-external">
+<p><img src="./posts/2022-12-01-sf-in-packages/sf.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2022-12-01-sf-in-packages/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2022-12-01-sf-in-packages/index.html">
 <h3 class="no-anchor listing-title">
-How to include sf data in R packages
+<a href="./posts/2022-12-01-sf-in-packages/index.html" class="no-external">How to include sf data in R packages</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2022-12-01-sf-in-packages/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -1240,14 +1226,12 @@ Spatial
 Data science
 </div>
 </div>
-<a href="./posts/2022-12-01-sf-in-packages/index.html">
 <div class="listing-description">
-<p>An extremely opinionated guide for an extremely common problem.</p>
+<a href="./posts/2022-12-01-sf-in-packages/index.html" class="no-external">An extremely opinionated guide for an extremely common problem. </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2022-12-01-sf-in-packages/index.html">
+<a href="./posts/2022-12-01-sf-in-packages/index.html" class="no-external">
 <div class="listing-date">
 Dec 1, 2022
 </div>
@@ -1257,19 +1241,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="25" data-categories="ecology,papers,remote sensing,machine learning,earth science,AGB" data-listing-date-sort="1667779200000" data-listing-file-modified-sort="1705701586153" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3">
+<div class="quarto-post image-right" data-index="25" data-categories="ecology,papers,remote sensing,machine learning,earth science,AGB" data-listing-date-sort="1667779200000" data-listing-file-modified-sort="1709581989941" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="559">
 <div class="thumbnail">
-<p><a href="./posts/2022-11-07-agb/index.html"> <img data-src="./posts/2022-11-07-agb/map.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2022-11-07-agb/index.html" class="no-external"></a></p><a href="./posts/2022-11-07-agb/index.html" class="no-external">
+<p><img data-src="./posts/2022-11-07-agb/map.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2022-11-07-agb/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2022-11-07-agb/index.html">
 <h3 class="no-anchor listing-title">
-Fine-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages
+<a href="./posts/2022-11-07-agb/index.html" class="no-external">Fine-resolution landscape-scale biomass mapping using a spatiotemporal patchwork of LiDAR coverages</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2022-11-07-agb/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('ecology'); return false;">
 ecology
@@ -1290,14 +1274,12 @@ earth science
 AGB
 </div>
 </div>
-<a href="./posts/2022-11-07-agb/index.html">
 <div class="listing-description">
-<p>New (open-access!) article out in International Journal of Applied Earth Observation and Geoinformation!</p>
+<a href="./posts/2022-11-07-agb/index.html" class="no-external">New (open-access!) article out in International Journal of Applied Earth Observation and Geoinformation! </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2022-11-07-agb/index.html">
+<a href="./posts/2022-11-07-agb/index.html" class="no-external">
 <div class="listing-date">
 Nov 7, 2022
 </div>
@@ -1307,19 +1289,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="26" data-categories="R,rsample,tidymodels" data-listing-date-sort="1664841600000" data-listing-file-modified-sort="1705701586153" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5">
+<div class="quarto-post image-right" data-index="26" data-categories="R,rsample,tidymodels" data-listing-date-sort="1664841600000" data-listing-file-modified-sort="1709581989937" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="895">
 <div class="thumbnail">
-<p><a href="./posts/2022-10-04-rsample/index.html"> <img data-src="./posts/2022-10-04-rsample/splash.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2022-10-04-rsample/index.html" class="no-external"></a></p><a href="./posts/2022-10-04-rsample/index.html" class="no-external">
+<p><img data-src="./posts/2022-10-04-rsample/splash.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2022-10-04-rsample/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2022-10-04-rsample/index.html">
 <h3 class="no-anchor listing-title">
-How rsample keeps memory usage low
+<a href="./posts/2022-10-04-rsample/index.html" class="no-external">How rsample keeps memory usage low</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2022-10-04-rsample/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -1331,14 +1313,12 @@ rsample
 tidymodels
 </div>
 </div>
-<a href="./posts/2022-10-04-rsample/index.html">
 <div class="listing-description">
-<p>Copy-on-modify is pretty neat.</p>
+<a href="./posts/2022-10-04-rsample/index.html" class="no-external">Copy-on-modify is pretty neat.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2022-10-04-rsample/index.html">
+<a href="./posts/2022-10-04-rsample/index.html" class="no-external">
 <div class="listing-date">
 Oct 4, 2022
 </div>
@@ -1348,19 +1328,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="27" data-categories="R,Internship,Quarto" data-listing-date-sort="1660262400000" data-listing-file-modified-sort="1705701586149" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7">
+<div class="quarto-post image-right" data-index="27" data-categories="R,Internship,Quarto" data-listing-date-sort="1660262400000" data-listing-file-modified-sort="1709581989937" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1335">
 <div class="thumbnail">
-<p><a href="./posts/2022-08-15-last-summer/index.html"> <img data-src="./posts/2022-08-15-last-summer/autoplot.png" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2022-08-15-last-summer/index.html" class="no-external"></a></p><a href="./posts/2022-08-15-last-summer/index.html" class="no-external">
+<p><img data-src="./posts/2022-08-15-last-summer/autoplot.png" class="thumbnail-image"></p>
+</a><p><a href="./posts/2022-08-15-last-summer/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2022-08-15-last-summer/index.html">
 <h3 class="no-anchor listing-title">
-I know what I did last summer
+<a href="./posts/2022-08-15-last-summer/index.html" class="no-external">I know what I did last summer</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2022-08-15-last-summer/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -1372,14 +1352,12 @@ Internship
 Quarto
 </div>
 </div>
-<a href="./posts/2022-08-15-last-summer/index.html">
 <div class="listing-description">
-<p>An RStudio internship retrospective</p>
+<a href="./posts/2022-08-15-last-summer/index.html" class="no-external">An RStudio internship retrospective</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2022-08-15-last-summer/index.html">
+<a href="./posts/2022-08-15-last-summer/index.html" class="no-external">
 <div class="listing-date">
 Aug 12, 2022
 </div>
@@ -1389,19 +1367,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="28" data-categories="R,waywiser,tidymodels,R packages,geospatial data" data-listing-date-sort="1660176000000" data-listing-file-modified-sort="1705701586149" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3">
+<div class="quarto-post image-right" data-index="28" data-categories="R,waywiser,tidymodels,R packages,geospatial data" data-listing-date-sort="1660176000000" data-listing-file-modified-sort="1709581989937" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="420">
 <div class="thumbnail">
-<p><a href="./posts/2022-08-11-waywiser-010-is-now-on-cran/index.html"> <p class="card-img-top"><img data-src="posts/2022-08-11-waywiser-010-is-now-on-cran/waywiser.svg"  class="thumbnail-image card-img"/></p> </a></p>
+<p><a href="./posts/2022-08-11-waywiser-010-is-now-on-cran/index.html" class="no-external"></a></p><a href="./posts/2022-08-11-waywiser-010-is-now-on-cran/index.html" class="no-external">
+<p class="card-img-top"><img data-src="posts/2022-08-11-waywiser-010-is-now-on-cran/waywiser.svg"  class="thumbnail-image card-img"/></p>
+</a><p><a href="./posts/2022-08-11-waywiser-010-is-now-on-cran/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2022-08-11-waywiser-010-is-now-on-cran/index.html">
 <h3 class="no-anchor listing-title">
-Waywiser version 0.1.0 is now on CRAN!
+<a href="./posts/2022-08-11-waywiser-010-is-now-on-cran/index.html" class="no-external">Waywiser version 0.1.0 is now on CRAN!</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2022-08-11-waywiser-010-is-now-on-cran/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -1419,14 +1397,12 @@ R packages
 geospatial data
 </div>
 </div>
-<a href="./posts/2022-08-11-waywiser-010-is-now-on-cran/index.html">
 <div class="listing-description">
-<p>A new {yardstick} extension package for calculating spatial autocorrelation in model residuals.</p>
+<a href="./posts/2022-08-11-waywiser-010-is-now-on-cran/index.html" class="no-external">A new {yardstick} extension package for calculating spatial autocorrelation in model residuals. </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2022-08-11-waywiser-010-is-now-on-cran/index.html">
+<a href="./posts/2022-08-11-waywiser-010-is-now-on-cran/index.html" class="no-external">
 <div class="listing-date">
 Aug 11, 2022
 </div>
@@ -1436,19 +1412,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="29" data-categories="ecology,papers,remote sensing,machine learning" data-listing-date-sort="1660089600000" data-listing-file-modified-sort="1705701586149" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2">
+<div class="quarto-post image-right" data-index="29" data-categories="ecology,papers,remote sensing,machine learning" data-listing-date-sort="1660089600000" data-listing-file-modified-sort="1709581989937" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="333">
 <div class="thumbnail">
-<p><a href="./posts/2022-08-10-ground-filtering/index.html"> <img data-src="./posts/2022-08-10-ground-filtering/distributions.jpeg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2022-08-10-ground-filtering/index.html" class="no-external"></a></p><a href="./posts/2022-08-10-ground-filtering/index.html" class="no-external">
+<p><img data-src="./posts/2022-08-10-ground-filtering/distributions.jpeg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2022-08-10-ground-filtering/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2022-08-10-ground-filtering/index.html">
 <h3 class="no-anchor listing-title">
-Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass in heterogenous landscapes
+<a href="./posts/2022-08-10-ground-filtering/index.html" class="no-external">Filtering ground noise from LiDAR returns produces inferior models of forest aboveground biomass in heterogenous landscapes</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2022-08-10-ground-filtering/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('ecology'); return false;">
 ecology
@@ -1463,14 +1439,12 @@ remote sensing
 machine learning
 </div>
 </div>
-<a href="./posts/2022-08-10-ground-filtering/index.html">
 <div class="listing-description">
-<p>New article out in GIScience &amp; Remote Sensing</p>
+<a href="./posts/2022-08-10-ground-filtering/index.html" class="no-external">New article out in GIScience &amp; Remote Sensing </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2022-08-10-ground-filtering/index.html">
+<a href="./posts/2022-08-10-ground-filtering/index.html" class="no-external">
 <div class="listing-date">
 Aug 10, 2022
 </div>
@@ -1480,19 +1454,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="30" data-categories="R,Tutorials,Quarto" data-listing-date-sort="1659657600000" data-listing-file-modified-sort="1705701586149" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7">
+<div class="quarto-post image-right" data-index="30" data-categories="R,Tutorials,Quarto" data-listing-date-sort="1659657600000" data-listing-file-modified-sort="1709581989933" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="7" data-listing-word-count-sort="1285">
 <div class="thumbnail">
-<p><a href="./posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html"> <img data-src="./posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/elevator.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html" class="no-external"></a></p><a href="./posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html" class="no-external">
+<p><img data-src="./posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/elevator.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html">
 <h3 class="no-anchor listing-title">
-How to use Quarto for Parameterized Reporting
+<a href="./posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html" class="no-external">How to use Quarto for Parameterized Reporting</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -1504,14 +1478,12 @@ Tutorials
 Quarto
 </div>
 </div>
-<a href="./posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html">
 <div class="listing-description">
-<p>You know. If you wanna.</p>
+<a href="./posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html" class="no-external">You know. If you wanna. </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html">
+<a href="./posts/2022-08-04-how-to-use-quarto-for-parameterized-reporting/index.html" class="no-external">
 <div class="listing-date">
 Aug 5, 2022
 </div>
@@ -1521,25 +1493,25 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="31" data-listing-date-sort="1645142400000" data-listing-file-modified-sort="1705701586145" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3">
+<div class="quarto-post image-right" data-index="31" data-listing-date-sort="1645142400000" data-listing-file-modified-sort="1709581989933" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="3" data-listing-word-count-sort="504">
 <div class="thumbnail">
-<p><a href="./posts/2022-02-18-progress-purpose-process/index.html"> <img data-src="./posts/2022-02-18-progress-purpose-process/pano.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2022-02-18-progress-purpose-process/index.html" class="no-external"></a></p><a href="./posts/2022-02-18-progress-purpose-process/index.html" class="no-external">
+<p><img data-src="./posts/2022-02-18-progress-purpose-process/pano.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2022-02-18-progress-purpose-process/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2022-02-18-progress-purpose-process/index.html">
 <h3 class="no-anchor listing-title">
-Progress, Purpose, Process
+<a href="./posts/2022-02-18-progress-purpose-process/index.html" class="no-external">Progress, Purpose, Process</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2022-02-18-progress-purpose-process/index.html" class="no-external"></a>
 </div>
 <div class="listing-description">
-<p>Reflecting on another year.</p>
+<a href="./posts/2022-02-18-progress-purpose-process/index.html" class="no-external">Reflecting on another year. </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2022-02-18-progress-purpose-process/index.html">
+<a href="./posts/2022-02-18-progress-purpose-process/index.html" class="no-external">
 <div class="listing-date">
 Feb 18, 2022
 </div>
@@ -1549,25 +1521,25 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="32" data-listing-date-sort="1642118400000" data-listing-file-modified-sort="1705701586145" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2">
+<div class="quarto-post image-right" data-index="32" data-listing-date-sort="1642118400000" data-listing-file-modified-sort="1709581989933" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="206">
 <div class="thumbnail">
-<p><a href="./posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html"> <img data-src="./posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/fig1.png" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html" class="no-external"></a></p><a href="./posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html" class="no-external">
+<p><img data-src="./posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/fig1.png" class="thumbnail-image"></p>
+</a><p><a href="./posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html">
 <h3 class="no-anchor listing-title">
-terrainr: An R package for creating immersive virtual environments
+<a href="./posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html" class="no-external">terrainr: An R package for creating immersive virtual environments</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html" class="no-external"></a>
 </div>
 <div class="listing-description">
-<p>New open-access paper published in the Journal of Open Source Science.</p>
+<a href="./posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html" class="no-external">New open-access paper published in the Journal of Open Source Science. </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html">
+<a href="./posts/2022-01-13-terrainr-an-r-package-for-creating-immersive-virtual-environments/index.html" class="no-external">
 <div class="listing-date">
 Jan 14, 2022
 </div>
@@ -1577,19 +1549,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="33" data-categories="R,Tutorials,CI,CD,GitHub Actions" data-listing-date-sort="1632355200000" data-listing-file-modified-sort="1705701586109" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8">
+<div class="quarto-post image-right" data-index="33" data-categories="R,Tutorials,CI,CD,GitHub Actions" data-listing-date-sort="1632355200000" data-listing-file-modified-sort="1709581989897" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1540">
 <div class="thumbnail">
-<p><a href="./posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html"> <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div> </a></p>
+<p><a href="./posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html" class="no-external"></a></p><a href="./posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html">
 <h3 class="no-anchor listing-title">
-Automated {drat} uploads with GitHub Actions
+<a href="./posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html" class="no-external">Automated {drat} uploads with GitHub Actions</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -1607,14 +1579,12 @@ CD
 GitHub Actions
 </div>
 </div>
-<a href="./posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html">
 <div class="listing-description">
-<p>Continuously deploy your code to personal CRAN-like repos, automatically and for free!</p>
+<a href="./posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html" class="no-external">Continuously deploy your code to personal CRAN-like repos, automatically and for free! </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html">
+<a href="./posts/2021-09-22-automated-drat-uploads-with-github-actions/index.html" class="no-external">
 <div class="listing-date">
 Sep 23, 2021
 </div>
@@ -1624,25 +1594,25 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="34" data-listing-date-sort="1623628800000" data-listing-file-modified-sort="1705701586109" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1">
+<div class="quarto-post image-right" data-index="34" data-listing-date-sort="1623628800000" data-listing-file-modified-sort="1709581989897" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="129">
 <div class="thumbnail">
-<p><a href="./posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/index.html"> <img data-src="./posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/closer.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/index.html" class="no-external"></a></p><a href="./posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/index.html" class="no-external">
+<p><img data-src="./posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/closer.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/index.html">
 <h3 class="no-anchor listing-title">
-Interactive landscape simulations for visual resource assessment
+<a href="./posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/index.html" class="no-external">Interactive landscape simulations for visual resource assessment</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/index.html" class="no-external"></a>
 </div>
 <div class="listing-description">
-<p>New preprint for the 2021 Visual Resources Stewardship Conference.</p>
+<a href="./posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/index.html" class="no-external">New preprint for the 2021 Visual Resources Stewardship Conference. </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/index.html">
+<a href="./posts/2021-06-14-interactive-landscape-simulations-for-visual-resource-assessment/index.html" class="no-external">
 <div class="listing-date">
 Jun 14, 2021
 </div>
@@ -1652,25 +1622,25 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="35" data-listing-date-sort="1623456000000" data-listing-file-modified-sort="1705701586105" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1">
+<div class="quarto-post image-right" data-index="35" data-listing-date-sort="1623456000000" data-listing-file-modified-sort="1709581989897" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="118">
 <div class="thumbnail">
-<p><a href="./posts/2021-06-12-virtual-environments-talk-at-user-2021/index.html"> <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div> </a></p>
+<p><a href="./posts/2021-06-12-virtual-environments-talk-at-user-2021/index.html" class="no-external"></a></p><a href="./posts/2021-06-12-virtual-environments-talk-at-user-2021/index.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./posts/2021-06-12-virtual-environments-talk-at-user-2021/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2021-06-12-virtual-environments-talk-at-user-2021/index.html">
 <h3 class="no-anchor listing-title">
-Virtual environments talk at useR! 2021
+<a href="./posts/2021-06-12-virtual-environments-talk-at-user-2021/index.html" class="no-external">Virtual environments talk at useR! 2021</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2021-06-12-virtual-environments-talk-at-user-2021/index.html" class="no-external"></a>
 </div>
 <div class="listing-description">
-<p>With slides and a rough outline available on GitHub.</p>
+<a href="./posts/2021-06-12-virtual-environments-talk-at-user-2021/index.html" class="no-external">With slides and a rough outline available on GitHub. </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2021-06-12-virtual-environments-talk-at-user-2021/index.html">
+<a href="./posts/2021-06-12-virtual-environments-talk-at-user-2021/index.html" class="no-external">
 <div class="listing-date">
 Jun 12, 2021
 </div>
@@ -1680,25 +1650,25 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="36" data-listing-date-sort="1619049600000" data-listing-file-modified-sort="1705701586105" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4">
+<div class="quarto-post image-right" data-index="36" data-listing-date-sort="1619049600000" data-listing-file-modified-sort="1709581989897" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="4" data-listing-word-count-sort="601">
 <div class="thumbnail">
-<p><a href="./posts/2021-04-22-terrainr-version-040-is-now-on-cran/index.html"> <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div> </a></p>
+<p><a href="./posts/2021-04-22-terrainr-version-040-is-now-on-cran/index.html" class="no-external"></a></p><a href="./posts/2021-04-22-terrainr-version-040-is-now-on-cran/index.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./posts/2021-04-22-terrainr-version-040-is-now-on-cran/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2021-04-22-terrainr-version-040-is-now-on-cran/index.html">
 <h3 class="no-anchor listing-title">
-What’s new in terrainr 0.4.0?
+<a href="./posts/2021-04-22-terrainr-version-040-is-now-on-cran/index.html" class="no-external">What’s new in terrainr 0.4.0?</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2021-04-22-terrainr-version-040-is-now-on-cran/index.html" class="no-external"></a>
 </div>
 <div class="listing-description">
-<p>The new CRAN release of terrainr improves consistency, CRS logic, and fixes some bugs.</p>
+<a href="./posts/2021-04-22-terrainr-version-040-is-now-on-cran/index.html" class="no-external">The new CRAN release of terrainr improves consistency, CRS logic, and fixes some bugs. </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2021-04-22-terrainr-version-040-is-now-on-cran/index.html">
+<a href="./posts/2021-04-22-terrainr-version-040-is-now-on-cran/index.html" class="no-external">
 <div class="listing-date">
 Apr 22, 2021
 </div>
@@ -1708,19 +1678,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="37" data-categories="R,Data science,terrainr" data-listing-date-sort="1613520000000" data-listing-file-modified-sort="1705701586141" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5">
+<div class="quarto-post image-right" data-index="37" data-categories="R,Data science,terrainr" data-listing-date-sort="1613520000000" data-listing-file-modified-sort="1709581989929" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="5" data-listing-word-count-sort="947">
 <div class="thumbnail">
-<p><a href="./posts/2021/02/terrainr/index.html"> <p class="card-img-top"><img data-src="posts/2021/02/terrainr/index_files/figure-html/unnamed-chunk-4-1.png"  class="thumbnail-image card-img"/></p> </a></p>
+<p><a href="./posts/2021/02/terrainr/index.html" class="no-external"></a></p><a href="./posts/2021/02/terrainr/index.html" class="no-external">
+<p class="card-img-top"><img data-src="posts/2021/02/terrainr/index_files/figure-html/unnamed-chunk-4-1.png"  class="thumbnail-image card-img"/></p>
+</a><p><a href="./posts/2021/02/terrainr/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2021/02/terrainr/index.html">
 <h3 class="no-anchor listing-title">
-terrainr 0.3.0 is out today
+<a href="./posts/2021/02/terrainr/index.html" class="no-external">terrainr 0.3.0 is out today</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2021/02/terrainr/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -1732,14 +1702,12 @@ Data science
 terrainr
 </div>
 </div>
-<a href="./posts/2021/02/terrainr/index.html">
 <div class="listing-description">
-<p>New version, who this?</p>
+<a href="./posts/2021/02/terrainr/index.html" class="no-external">New version, who this? </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2021/02/terrainr/index.html">
+<a href="./posts/2021/02/terrainr/index.html" class="no-external">
 <div class="listing-date">
 Feb 17, 2021
 </div>
@@ -1749,19 +1717,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="38" data-categories="R,Data science" data-listing-date-sort="1610928000000" data-listing-file-modified-sort="1705701586129" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15">
+<div class="quarto-post image-right" data-index="38" data-categories="R,Data science" data-listing-date-sort="1610928000000" data-listing-file-modified-sort="1709581989917" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="15" data-listing-word-count-sort="2831">
 <div class="thumbnail">
-<p><a href="./posts/2021/01/model-averaging/index.html"> <img data-src="./posts/2021/01/model-averaging/model_avg.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2021/01/model-averaging/index.html" class="no-external"></a></p><a href="./posts/2021/01/model-averaging/index.html" class="no-external">
+<p><img data-src="./posts/2021/01/model-averaging/model_avg.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2021/01/model-averaging/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2021/01/model-averaging/index.html">
 <h3 class="no-anchor listing-title">
-Model averaging methods: how and why to build ensemble models
+<a href="./posts/2021/01/model-averaging/index.html" class="no-external">Model averaging methods: how and why to build ensemble models</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2021/01/model-averaging/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -1770,14 +1738,12 @@ R
 Data science
 </div>
 </div>
-<a href="./posts/2021/01/model-averaging/index.html">
 <div class="listing-description">
-<p>Averaging predictions for fun and profit – and for dealing with the uncertainty of model selection. With examples in R!</p>
+<a href="./posts/2021/01/model-averaging/index.html" class="no-external">Averaging predictions for fun and profit – and for dealing with the uncertainty of model selection. With examples in R! </a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2021/01/model-averaging/index.html">
+<a href="./posts/2021/01/model-averaging/index.html" class="no-external">
 <div class="listing-date">
 Jan 18, 2021
 </div>
@@ -1787,19 +1753,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="39" data-categories="R,Twitter,phd,terrainr,beaver" data-listing-date-sort="1602806400000" data-listing-file-modified-sort="1705701586105" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2">
+<div class="quarto-post image-right" data-index="39" data-categories="R,Twitter,phd,terrainr,beaver" data-listing-date-sort="1602806400000" data-listing-file-modified-sort="1709581989897" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="321">
 <div class="thumbnail">
-<p><a href="./posts/2020/10/index.html"> <img data-src="./posts/2020/10/terrainr.jpg" class="thumbnail-image"> </a></p>
+<p><a href="./posts/2020/10/index.html" class="no-external"></a></p><a href="./posts/2020/10/index.html" class="no-external">
+<p><img data-src="./posts/2020/10/terrainr.jpg" class="thumbnail-image"></p>
+</a><p><a href="./posts/2020/10/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2020/10/index.html">
 <h3 class="no-anchor listing-title">
-Some Updates
+<a href="./posts/2020/10/index.html" class="no-external">Some Updates</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2020/10/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -1817,14 +1783,12 @@ terrainr
 beaver
 </div>
 </div>
-<a href="./posts/2020/10/index.html">
 <div class="listing-description">
-<p>Where Do We Come From? What Are We? Where Are We Going?</p>
+<a href="./posts/2020/10/index.html" class="no-external">Where Do We Come From? What Are We? Where Are We Going?</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2020/10/index.html">
+<a href="./posts/2020/10/index.html" class="no-external">
 <div class="listing-date">
 Oct 16, 2020
 </div>
@@ -1834,19 +1798,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="40" data-categories="R,Twitter,ecology_tweets" data-listing-date-sort="1592611200000" data-listing-file-modified-sort="1705701586105" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1">
+<div class="quarto-post image-right" data-index="40" data-categories="R,Twitter,ecology_tweets" data-listing-date-sort="1592611200000" data-listing-file-modified-sort="1709581989897" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="136">
 <div class="thumbnail">
-<p><a href="./posts/2020/06/index.html"> <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div> </a></p>
+<p><a href="./posts/2020/06/index.html" class="no-external"></a></p><a href="./posts/2020/06/index.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./posts/2020/06/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2020/06/index.html">
 <h3 class="no-anchor listing-title">
-Make a Retweet Bot in R
+<a href="./posts/2020/06/index.html" class="no-external">Make a Retweet Bot in R</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2020/06/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -1858,14 +1822,12 @@ Twitter
 ecology_tweets
 </div>
 </div>
-<a href="./posts/2020/06/index.html">
 <div class="listing-description">
-<p>Y’know. If you wanna.</p>
+<a href="./posts/2020/06/index.html" class="no-external">Y’know. If you wanna.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2020/06/index.html">
+<a href="./posts/2020/06/index.html" class="no-external">
 <div class="listing-date">
 Jun 20, 2020
 </div>
@@ -1875,19 +1837,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="41" data-categories="Raspberry Pi,Tutorials,Data Visualization,Monitoring,Telegraf,InfluxDB,Grafana" data-listing-date-sort="1588464000000" data-listing-file-modified-sort="1705701586105" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10">
+<div class="quarto-post image-right" data-index="41" data-categories="Raspberry Pi,Tutorials,Data Visualization,Monitoring,Telegraf,InfluxDB,Grafana" data-listing-date-sort="1588464000000" data-listing-file-modified-sort="1709581989897" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="10" data-listing-word-count-sort="1887">
 <div class="thumbnail">
-<p><a href="./posts/2020/05/index.html"> <p class="card-img-top"><img data-src="posts/2020/05/grafana_dash.webp"  class="thumbnail-image card-img"/></p> </a></p>
+<p><a href="./posts/2020/05/index.html" class="no-external"></a></p><a href="./posts/2020/05/index.html" class="no-external">
+<p class="card-img-top"><img data-src="posts/2020/05/grafana_dash.webp"  class="thumbnail-image card-img"/></p>
+</a><p><a href="./posts/2020/05/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2020/05/index.html">
 <h3 class="no-anchor listing-title">
-Installing the TIG stack on Raspberry Pi
+<a href="./posts/2020/05/index.html" class="no-external">Installing the TIG stack on Raspberry Pi</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2020/05/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('Raspberry Pi'); return false;">
 Raspberry Pi
@@ -1911,14 +1873,12 @@ InfluxDB
 Grafana
 </div>
 </div>
-<a href="./posts/2020/05/index.html">
 <div class="listing-description">
-<p>A guide to installing InfluxDB, Telegraf, and Grafana on a Raspberry Pi 4 running Raspbian Buster. Unlike every other guide like this on the internet, this one works.</p>
+<a href="./posts/2020/05/index.html" class="no-external">A guide to installing InfluxDB, Telegraf, and Grafana on a Raspberry Pi 4 running Raspbian Buster. Unlike every other guide like this on the internet, this one works.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2020/05/index.html">
+<a href="./posts/2020/05/index.html" class="no-external">
 <div class="listing-date">
 May 3, 2020
 </div>
@@ -1928,32 +1888,30 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="42" data-categories="R" data-listing-date-sort="1587945600000" data-listing-file-modified-sort="1705701586097" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1">
+<div class="quarto-post image-right" data-index="42" data-categories="R" data-listing-date-sort="1587945600000" data-listing-file-modified-sort="1709581989885" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="106">
 <div class="thumbnail">
-<p><a href="./posts/2020/04/corona-viz/index.html"> <p class="card-img-top"><img data-src="posts/2020/04/corona-viz/covid.png"  class="thumbnail-image card-img"/></p> </a></p>
+<p><a href="./posts/2020/04/corona-viz/index.html" class="no-external"></a></p><a href="./posts/2020/04/corona-viz/index.html" class="no-external">
+<p class="card-img-top"><img data-src="posts/2020/04/corona-viz/covid.png"  class="thumbnail-image card-img"/></p>
+</a><p><a href="./posts/2020/04/corona-viz/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2020/04/corona-viz/index.html">
 <h3 class="no-anchor listing-title">
-A minimalist visualization of Coronavirus rates
+<a href="./posts/2020/04/corona-viz/index.html" class="no-external">A minimalist visualization of Coronavirus rates</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2020/04/corona-viz/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
 </div>
 </div>
-<a href="./posts/2020/04/corona-viz/index.html">
 <div class="listing-description">
-<p>Made with Shiny and R</p>
+<a href="./posts/2020/04/corona-viz/index.html" class="no-external">Made with Shiny and R</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2020/04/corona-viz/index.html">
+<a href="./posts/2020/04/corona-viz/index.html" class="no-external">
 <div class="listing-date">
 Apr 27, 2020
 </div>
@@ -1963,19 +1921,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="43" data-categories="Data Visualization,Tutorials" data-listing-date-sort="1587513600000" data-listing-file-modified-sort="1705701586097" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8">
+<div class="quarto-post image-right" data-index="43" data-categories="Data Visualization,Tutorials" data-listing-date-sort="1587513600000" data-listing-file-modified-sort="1709581989885" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="8" data-listing-word-count-sort="1527">
 <div class="thumbnail">
-<p><a href="./posts/2020/04/making-excellent-viz/index.html"> <p class="card-img-top"><img data-src="posts/2020/04/making-excellent-viz/making-1-1.png"  class="thumbnail-image card-img"/></p> </a></p>
+<p><a href="./posts/2020/04/making-excellent-viz/index.html" class="no-external"></a></p><a href="./posts/2020/04/making-excellent-viz/index.html" class="no-external">
+<p class="card-img-top"><img data-src="posts/2020/04/making-excellent-viz/making-1-1.png"  class="thumbnail-image card-img"/></p>
+</a><p><a href="./posts/2020/04/making-excellent-viz/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2020/04/making-excellent-viz/index.html">
 <h3 class="no-anchor listing-title">
-Making Excellent Visualizations
+<a href="./posts/2020/04/making-excellent-viz/index.html" class="no-external">Making Excellent Visualizations</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2020/04/making-excellent-viz/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('Data Visualization'); return false;">
 Data Visualization
@@ -1984,14 +1942,12 @@ Data Visualization
 Tutorials
 </div>
 </div>
-<a href="./posts/2020/04/making-excellent-viz/index.html">
 <div class="listing-description">
-<p>Part 3 in the data visualization series</p>
+<a href="./posts/2020/04/making-excellent-viz/index.html" class="no-external">Part 3 in the data visualization series</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2020/04/making-excellent-viz/index.html">
+<a href="./posts/2020/04/making-excellent-viz/index.html" class="no-external">
 <div class="listing-date">
 Apr 22, 2020
 </div>
@@ -2001,19 +1957,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="44" data-categories="Data Visualization,Tutorials" data-listing-date-sort="1587427200000" data-listing-file-modified-sort="1705701586101" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="21">
+<div class="quarto-post image-right" data-index="44" data-categories="Data Visualization,Tutorials" data-listing-date-sort="1587427200000" data-listing-file-modified-sort="1709581989889" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="21" data-listing-word-count-sort="4195">
 <div class="thumbnail">
-<p><a href="./posts/2020/04/mechanics-of-viz/index.html"> <p class="card-img-top"><img data-src="posts/2020/04/mechanics-of-viz/unnamed-chunk-1-1.png"  class="thumbnail-image card-img"/></p> </a></p>
+<p><a href="./posts/2020/04/mechanics-of-viz/index.html" class="no-external"></a></p><a href="./posts/2020/04/mechanics-of-viz/index.html" class="no-external">
+<p class="card-img-top"><img data-src="posts/2020/04/mechanics-of-viz/unnamed-chunk-1-1.png"  class="thumbnail-image card-img"/></p>
+</a><p><a href="./posts/2020/04/mechanics-of-viz/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2020/04/mechanics-of-viz/index.html">
 <h3 class="no-anchor listing-title">
-Mechanics of Data Visualizations
+<a href="./posts/2020/04/mechanics-of-viz/index.html" class="no-external">Mechanics of Data Visualizations</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2020/04/mechanics-of-viz/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('Data Visualization'); return false;">
 Data Visualization
@@ -2022,14 +1978,12 @@ Data Visualization
 Tutorials
 </div>
 </div>
-<a href="./posts/2020/04/mechanics-of-viz/index.html">
 <div class="listing-description">
-<p>Part 2 in the data visualization series</p>
+<a href="./posts/2020/04/mechanics-of-viz/index.html" class="no-external">Part 2 in the data visualization series</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2020/04/mechanics-of-viz/index.html">
+<a href="./posts/2020/04/mechanics-of-viz/index.html" class="no-external">
 <div class="listing-date">
 Apr 21, 2020
 </div>
@@ -2039,19 +1993,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="45" data-categories="Data Visualization,Tutorials" data-listing-date-sort="1587340800000" data-listing-file-modified-sort="1705701586105" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6">
+<div class="quarto-post image-right" data-index="45" data-categories="Data Visualization,Tutorials" data-listing-date-sort="1587340800000" data-listing-file-modified-sort="1709581989893" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="6" data-listing-word-count-sort="1044">
 <div class="thumbnail">
-<p><a href="./posts/2020/04/theory-of-data-viz/index.html"> <p class="card-img-top"><img data-src="posts/2020/04/theory-of-data-viz/theory1.png"  class="thumbnail-image card-img"/></p> </a></p>
+<p><a href="./posts/2020/04/theory-of-data-viz/index.html" class="no-external"></a></p><a href="./posts/2020/04/theory-of-data-viz/index.html" class="no-external">
+<p class="card-img-top"><img data-src="posts/2020/04/theory-of-data-viz/theory1.png"  class="thumbnail-image card-img"/></p>
+</a><p><a href="./posts/2020/04/theory-of-data-viz/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2020/04/theory-of-data-viz/index.html">
 <h3 class="no-anchor listing-title">
-Theory of Data Visualizations
+<a href="./posts/2020/04/theory-of-data-viz/index.html" class="no-external">Theory of Data Visualizations</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2020/04/theory-of-data-viz/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('Data Visualization'); return false;">
 Data Visualization
@@ -2060,14 +2014,12 @@ Data Visualization
 Tutorials
 </div>
 </div>
-<a href="./posts/2020/04/theory-of-data-viz/index.html">
 <div class="listing-description">
-<p>Part 1 in the data visualization series</p>
+<a href="./posts/2020/04/theory-of-data-viz/index.html" class="no-external">Part 1 in the data visualization series</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2020/04/theory-of-data-viz/index.html">
+<a href="./posts/2020/04/theory-of-data-viz/index.html" class="no-external">
 <div class="listing-date">
 Apr 20, 2020
 </div>
@@ -2077,19 +2029,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="46" data-categories="R,R Packages,maps,spacey,geospatial data" data-listing-date-sort="1585008000000" data-listing-file-modified-sort="1705701586093" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1">
+<div class="quarto-post image-right" data-index="46" data-categories="R,R Packages,maps,spacey,geospatial data" data-listing-date-sort="1585008000000" data-listing-file-modified-sort="1709581989885" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="48">
 <div class="thumbnail">
-<p><a href="./posts/2020/03/index.html"> <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div> </a></p>
+<p><a href="./posts/2020/03/index.html" class="no-external"></a></p><a href="./posts/2020/03/index.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./posts/2020/03/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2020/03/index.html">
 <h3 class="no-anchor listing-title">
-Announcing {spacey}, now on CRAN!
+<a href="./posts/2020/03/index.html" class="no-external">Announcing {spacey}, now on CRAN!</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2020/03/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -2107,14 +2059,12 @@ spacey
 geospatial data
 </div>
 </div>
-<a href="./posts/2020/03/index.html">
 <div class="listing-description">
-<p>USGS data access and rayshader maps, done cheap.</p>
+<a href="./posts/2020/03/index.html" class="no-external">USGS data access and rayshader maps, done cheap.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2020/03/index.html">
+<a href="./posts/2020/03/index.html" class="no-external">
 <div class="listing-date">
 Mar 24, 2020
 </div>
@@ -2124,19 +2074,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="47" data-categories="R,R Packages,R Markdown" data-listing-date-sort="1579737600000" data-listing-file-modified-sort="1705701586093" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1">
+<div class="quarto-post image-right" data-index="47" data-categories="R,R Packages,R Markdown" data-listing-date-sort="1579737600000" data-listing-file-modified-sort="1709581989885" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="1" data-listing-word-count-sort="126">
 <div class="thumbnail">
-<p><a href="./posts/2020/01/index.html"> <div class="listing-item-img-placeholder card-img-top" >&nbsp;</div> </a></p>
+<p><a href="./posts/2020/01/index.html" class="no-external"></a></p><a href="./posts/2020/01/index.html" class="no-external">
+<div class="listing-item-img-placeholder card-img-top" >&nbsp;</div>
+</a><p><a href="./posts/2020/01/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2020/01/index.html">
 <h3 class="no-anchor listing-title">
-Announcing {heddlr}, now on CRAN!
+<a href="./posts/2020/01/index.html" class="no-external">Announcing {heddlr}, now on CRAN!</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2020/01/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('R'); return false;">
 R
@@ -2148,14 +2098,12 @@ R Packages
 R Markdown
 </div>
 </div>
-<a href="./posts/2020/01/index.html">
 <div class="listing-description">
-<p>Write less boilerplate, get more done.</p>
+<a href="./posts/2020/01/index.html" class="no-external">Write less boilerplate, get more done.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2020/01/index.html">
+<a href="./posts/2020/01/index.html" class="no-external">
 <div class="listing-date">
 Jan 23, 2020
 </div>
@@ -2165,19 +2113,19 @@ Mike Mahoney
 </a>
 </div>
 </div>
-<div class="quarto-post image-right" data-index="48" data-categories="Publications,Beaver" data-listing-date-sort="1553644800000" data-listing-file-modified-sort="1705701586093" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2">
+<div class="quarto-post image-right" data-index="48" data-categories="Publications,Beaver" data-listing-date-sort="1553644800000" data-listing-file-modified-sort="1709581989885" data-listing-date-modified-sort="NaN" data-listing-reading-time-sort="2" data-listing-word-count-sort="269">
 <div class="thumbnail">
-<p><a href="./posts/2019/03/index.html"> <p class="card-img-top"><img data-src="posts/2019/03/Wireframes.png"  class="thumbnail-image card-img"/></p> </a></p>
+<p><a href="./posts/2019/03/index.html" class="no-external"></a></p><a href="./posts/2019/03/index.html" class="no-external">
+<p class="card-img-top"><img data-src="posts/2019/03/Wireframes.png"  class="thumbnail-image card-img"/></p>
+</a><p><a href="./posts/2019/03/index.html" class="no-external"></a></p>
 </div>
 <div class="body">
-<a href="./posts/2019/03/index.html">
 <h3 class="no-anchor listing-title">
-Thesis Now Available in ESF Digital Commons
+<a href="./posts/2019/03/index.html" class="no-external">Thesis Now Available in ESF Digital Commons</a>
 </h3>
 <div class="listing-subtitle">
-
+<a href="./posts/2019/03/index.html" class="no-external"></a>
 </div>
-</a>
 <div class="listing-categories">
 <div class="listing-category" onclick="window.quartoListingCategory('Publications'); return false;">
 Publications
@@ -2186,14 +2134,12 @@ Publications
 Beaver
 </div>
 </div>
-<a href="./posts/2019/03/index.html">
 <div class="listing-description">
-<p>It’s a real humdinger.</p>
+<a href="./posts/2019/03/index.html" class="no-external">It’s a real humdinger.</a>
 </div>
-</a>
 </div>
 <div class="metadata">
-<a href="./posts/2019/03/index.html">
+<a href="./posts/2019/03/index.html" class="no-external">
 <div class="listing-date">
 Mar 27, 2019
 </div>
@@ -2290,10 +2236,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
-  function tippyHover(el, contentFn) {
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
-      content: contentFn,
       maxWidth: 500,
       delay: 100,
       arrow: false,
@@ -2303,8 +2248,17 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       interactive: true,
       interactiveBorder: 10,
       theme: 'quarto',
-      placement: 'bottom-start'
+      placement: 'bottom-start',
     };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
     window.tippy(el, config); 
   }
   const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
@@ -2317,6 +2271,125 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
       return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
     });
   }
       let selectedAnnoteEl;
@@ -2360,6 +2433,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
             }
             div.style.top = top - 2 + "px";
             div.style.height = height + 4 + "px";
+            div.style.left = 0;
             let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
             if (gutterDiv === null) {
               gutterDiv = window.document.createElement("div");
@@ -2385,6 +2459,32 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
         });
         selectedAnnoteEl = undefined;
       };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
       // Attach click handler to the DT
       const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
       for (const annoteDlNode of annoteDls) {
@@ -2449,7 +2549,9 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
 </div> <!-- /content -->
 <footer class="footer">
   <div class="nav-footer">
-    <div class="nav-footer-left">© Copyright 2024 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</div>   
+    <div class="nav-footer-left">
+<p>© Copyright 2024 Mike Mahoney. Except where otherwise noted, all text and images licensed CC-BY-NC 4.0.</p>
+</div>   
     <div class="nav-footer-center">
       &nbsp;
     </div>
@@ -2458,6 +2560,7 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     </div>
   </div>
 </footer>
+
 
 
 

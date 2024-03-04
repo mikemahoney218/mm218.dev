@@ -9,13 +9,14 @@
 <link>https://mm218.dev/blog.html#category=R</link>
 <atom:link href="https://mm218.dev/blog-r.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
-<generator>quarto-1.3.450</generator>
+<generator>quarto-1.4.550</generator>
 <lastBuildDate>Wed, 10 Jan 2024 00:00:00 GMT</lastBuildDate>
 <item>
   <title>rsi is now on CRAN!</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2024-01-10-rsi-cran/index.html</link>
+  <link>https://mm218.dev/posts/2024-01-10-rsi-cran/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -148,7 +149,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rast</span>(lcpri))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>If our data is split across multiple tiles, <code>get_stac_data()</code> will automatically merge them into a single composite output. There’s <a href="https://permian-global-research.github.io/rsi/articles/Downloading-data-from-STAC-APIs-using-rsi.html">an article on the rsi website</a> that gives a brief overview of the STAC family of standards, and how you can use the arguments to <code>get_stac_data()</code> to flexibly control exactly what you’re downloading and how.</p>
@@ -190,7 +195,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rast</span>(landsat))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Note that the inputs to these functions are normal R objects, and the outputs are the file paths your data was saved to. A key difference of rsi from other packages for downloading data from STAC endpoints is that rsi doesn’t introduce a new data model,<sup>4</sup> and instead is focused on getting data onto your local filesystem as quickly as possible. Ideally, you’ll be able to let rsi handle all the “cloud-native geospatial” stuff for you, and then use the outputs with whatever tools you’re most comfortable with.<sup>5</sup></p>
@@ -300,7 +309,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rast</span>(indices))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>You should always skim the formulas you’re going to run before calling <code>calculate_indices()</code> – these are downloaded from a live GitHub URL and can change over time – but the actual execution of downloaded code happens in a sandboxed environment, which should make it <em>harder</em> for any untrustworthy code to damage your system. If you’re interested, <a href="https://www.mm218.dev/posts/2023-10-27-minimal-environments/">I wrote post a few months ago with a bit more information about this sandboxing</a>.</p>
@@ -347,7 +360,11 @@ only support one value per dataset. This value of nan will be used for all
 bands on re-opening</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>If your output file ends in <code>vrt</code>, you can even do this without copying any data thanks to <a href="https://gdal.org/drivers/raster/vrt.html">GDAL’s virtual raster format</a>:</p>
@@ -382,7 +399,11 @@ font-style: inherit;">plot</span>()</span></code></pre></div>
 not supported on paletted band. Falling back to nearest neighbour</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This feels like such a small thing when you say it out loud, but I think is my favorite part of the package. This was a surprisingly hard thing to do with existing tools. If your rasters are different extents or resolutions, <code>stack_rasters()</code> will automatically set the extent of your output and your target resolution based on the first raster in your input vector – or you can override that default behavior using the <code>extent</code> and <code>resolution</code> argument.</p>
@@ -411,15 +432,16 @@ not supported on paletted band. Falling back to nearest neighbour</code></pre>
   <category>Spatial</category>
   <category>geospatial data</category>
   <category>R packages</category>
-  <guid>https://mm218.dev/posts/2024-01-10-rsi-cran/index.html</guid>
+  <guid>https://mm218.dev/posts/2024-01-10-rsi-cran/</guid>
   <pubDate>Wed, 10 Jan 2024 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2024-01-10-rsi-cran/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Why is View() capitalized, anyway?</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-12-07-View/index.html</link>
+  <link>https://mm218.dev/posts/2023-12-07-View/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -619,15 +641,16 @@ font-style: inherit;">""</span>)</span></code></pre></div>
 </ol>
 </section></div> ]]></description>
   <category>R</category>
-  <guid>https://mm218.dev/posts/2023-12-07-View/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-12-07-View/</guid>
   <pubDate>Thu, 07 Dec 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-12-07-View/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Helping R find the right methods for unserialized complex objects.</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-11-27-objects-loading-namespaces/index.html</link>
+  <link>https://mm218.dev/posts/2023-11-27-objects-loading-namespaces/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -1320,15 +1343,16 @@ font-style: inherit;">"/dev/null"</span></span>
   <category>Spatial</category>
   <category>geospatial data</category>
   <category>R packages</category>
-  <guid>https://mm218.dev/posts/2023-11-27-objects-loading-namespaces/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-11-27-objects-loading-namespaces/</guid>
   <pubDate>Mon, 27 Nov 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-11-27-objects-loading-namespaces/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Downloading STAC data using rsi when you’ve got a geographic CRS or don’t want a composite.</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-11-21-rsi-null/index.html</link>
+  <link>https://mm218.dev/posts/2023-11-21-rsi-null/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -1445,7 +1469,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>What if you want to skip some of these steps? For instance, if you try to call <code>get_landsat_imagery()</code> with an AOI in geographic coordinates, you’ll get a warning (likely followed by an error) saying that you’re asking to resample the data to 30 degree pixels, which is probably not what you wanted:</p>
@@ -1578,7 +1606,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This is a pattern throughout the rsi API design: if you want to skip something, pass <code>NULL</code> to the relevant argument. For instance (and this is where <a href="https://github.com/Permian-Global-Research/rsi/issues/6">the GitHub issue comes in</a>), if you want to not composite and instead download all the images within your spatiotemporal area of interest, we can pass <code>NULL</code> to the <code>composite_function</code> argument to skip compositing. I’ll also skip masking by passing <code>NULL</code> to the <code>mask_function</code> argument, because otherwise a handful of these images are entirely masked out:</p>
@@ -1632,13 +1664,25 @@ font-style: inherit;">lapply</span>(terra<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span>plot)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-3.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
@@ -1667,15 +1711,16 @@ NULL</code></pre>
   <category>Spatial</category>
   <category>geospatial data</category>
   <category>R packages</category>
-  <guid>https://mm218.dev/posts/2023-11-21-rsi-null/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-11-21-rsi-null/</guid>
   <pubDate>Tue, 21 Nov 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-11-21-rsi-null/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Classed conditions from rlang functions</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-11-07-classed-errors/index.html</link>
+  <link>https://mm218.dev/posts/2023-11-07-classed-errors/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -1915,15 +1960,16 @@ font-style: inherit;">"wrong_class"</span>))</span></code></pre></div>
 </section></div> ]]></description>
   <category>R</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-11-07-classed-errors/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-11-07-classed-errors/</guid>
   <pubDate>Tue, 07 Nov 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-11-07-classed-errors/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>spatialsample 0.5.0 is now on CRAN</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-11-03-spatialsample/index.html</link>
+  <link>https://mm218.dev/posts/2023-11-03-spatialsample/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -2044,7 +2090,11 @@ font-style: inherit;">spatial_block_cv</span>(drought_sf)</span>
 background-color: null;
 font-style: inherit;">autoplot</span>(folds)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-11-03-spatialsample/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-11-03-spatialsample/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This is a breaking change for data in projected coordinate reference systems. Data in geographic coordinates was actually already using these slightly larger grids, <a href="https://github.com/ropensci/stplanr/pull/467">due to issues with straight-line grids in non-planar CRS</a>, so this change just makes the amount of grid expansion controllable there.</p>
@@ -2059,15 +2109,16 @@ font-style: inherit;">autoplot</span>(folds)</span></code></pre></div>
   <category>geospatial data</category>
   <category>spatialsample</category>
   <category>R packages</category>
-  <guid>https://mm218.dev/posts/2023-11-03-spatialsample/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-11-03-spatialsample/</guid>
   <pubDate>Fri, 03 Nov 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-11-03-spatialsample/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Adding context to maps made with ggplot2</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-10-31-map-context/index.html</link>
+  <link>https://mm218.dev/posts/2023-10-31-map-context/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -2109,7 +2160,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">geom_sf</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>We also need a comparatively smaller data set that we’re interested in visualizing. For this blog, simulate some number of observations inside one of the more central counties:</p>
@@ -2155,7 +2210,11 @@ font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"red"</span>)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Our goal is to add a bit more context to this map by drawing the borders of surrounding counties. The challenge is that ggplot will, by default, expand our visualization to contain the largest layer that we add:</p>
@@ -2182,7 +2241,11 @@ font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"red"</span>)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>We could control this using <code>expansion()</code> inside of <code>scale_*_continuous()</code> functions, in order to restrict the range of our visualization:</p>
@@ -2247,7 +2310,11 @@ font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.28</span>)))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>But these <code>expansion()</code> calls are relative to the scale of our larger data set, which makes them a bit difficult to reason about. We aren’t specifying our extents in terms of the data that we actually care about visualizing, we’re forced to specify them relative to the larger context that we don’t care as much about.</p>
@@ -2320,7 +2387,11 @@ font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.25</span>)))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>But while this <em>reduces</em> the problem, moving the center of the larger layer closer to the center of the layer we care about, it still has the same issue as when we used the entire <code>nc</code> object.</p>
@@ -2361,7 +2432,11 @@ font-style: inherit;">0.1</span>))</span>
 <span id="cb6-5"></span>
 <span id="cb6-6">base_plot</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Defining our boundaries here is a bit easier to reason about – the <code>expansion()</code> calls are centered on our data of interest and are expanding the scales relative to this focal data set. Once we’ve got our level of zoom where we want it, we can build our plot using <code>ggplot_build()</code> and then extract the ranges of our x and y scales from the constructed plot object:</p>
@@ -2432,7 +2507,11 @@ font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #
 background-color: null;
 font-style: inherit;">limits =</span> ylim)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>I have no idea how stable this approach will be – <a href="https://www.tidyverse.org/blog/2022/09/playing-on-the-same-team-as-your-dependecy/">we’re decidedly not playing on the same team as ggplot2</a> with this approach – but it works as of ggplot version 3.4.3, and it’s made making maps a bit easier for us at the moment!</p>
@@ -2444,15 +2523,16 @@ font-style: inherit;">limits =</span> ylim)</span></code></pre></div>
   <category>Tutorials</category>
   <category>Spatial</category>
   <category>geospatial data</category>
-  <guid>https://mm218.dev/posts/2023-10-31-map-context/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-10-31-map-context/</guid>
   <pubDate>Tue, 31 Oct 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-10-31-map-context/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Executing R code from untrusted sources in minimal environments</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-10-27-minimal-environments/index.html</link>
+  <link>https://mm218.dev/posts/2023-10-27-minimal-environments/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -2593,7 +2673,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rast</span>(out))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This is pretty nifty!</p>
@@ -3084,7 +3168,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rast</span>(out))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>But it makes the most obvious malicious code fail:</p>
@@ -3495,15 +3583,16 @@ font-style: inherit;">".tif"</span>)</span>
 </section></div> ]]></description>
   <category>R</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-10-27-minimal-environments/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-10-27-minimal-environments/</guid>
   <pubDate>Fri, 27 Oct 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-10-27-minimal-environments/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Introducing rsi</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-10-26-rsi/index.html</link>
+  <link>https://mm218.dev/posts/2023-10-26-rsi/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -3559,7 +3648,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">st_geometry</span>(middlesex))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This is the area we’re going to download and process data for.</p>
@@ -3610,7 +3703,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Notice that this composite has been cloud-masked (using the QA pixel band) and rescaled<sup>5</sup> (using the scale and offset specified in metadata provided by the STAC endpoint) automatically. You can control these behaviors via function arguments.</p>
@@ -3634,7 +3731,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Under the hood, both of these functions (and their friends, <code>get_sentinel2_data()</code> and <code>get_sentinel1_data()</code>) are powered by a lower-level <code>get_stac_data()</code> function, which should theoretically work with any imagery provided by any STAC API, anywhere. These functions simply provide user-friendly defaults to make it faster to get the data you care about.</p>
@@ -3759,7 +3860,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Note that <code>calculate_indices()</code> is evaluating the formulas in the <code>formula</code> column of the spectral indices data frame as if they were code.<sup>6</sup> These formulas are evaluated inside of a very limited environment, which doesn’t have access to the global environment or most R fixtures, which does <em>reduce</em> the amount of harm malicious code could do:</p>
@@ -3824,7 +3929,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>I’m <em>extremely</em> excited for this package to be out in the open, and for people to start using it. If you find the package useful or interesting, <a href="https://github.com/Permian-Global-Research/rsi/">drop us a star on GitHub</a> – and if you have any questions/comments/concerns about how it does things, please open an issue or a PR! We’re planning a CRAN release in the not-too-distant future, and would love to incorporate any feedback we get into that first released version.</p>
@@ -3849,15 +3958,16 @@ font-style: inherit;">plot</span>()</span></code></pre></div>
   <category>Spatial</category>
   <category>geospatial data</category>
   <category>R packages</category>
-  <guid>https://mm218.dev/posts/2023-10-26-rsi/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-10-26-rsi/</guid>
   <pubDate>Thu, 26 Oct 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-10-26-rsi/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Three fun R functions</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-10-24-fun-r-funcs/index.html</link>
+  <link>https://mm218.dev/posts/2023-10-24-fun-r-funcs/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -4256,15 +4366,16 @@ font-style: inherit;">str2lang</span>(growth_rate)))</span></code></pre></div>
 </section></div> ]]></description>
   <category>R</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-10-24-fun-r-funcs/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-10-24-fun-r-funcs/</guid>
   <pubDate>Tue, 24 Oct 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-10-24-fun-r-funcs/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Cloud-Native Geospatial If You Don’t Speak Snake</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-09-20-cngf/index.html</link>
+  <link>https://mm218.dev/posts/2023-09-20-cngf/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -4292,15 +4403,16 @@ font-style: inherit;">str2lang</span>(growth_rate)))</span></code></pre></div>
   <category>R</category>
   <category>Spatial</category>
   <category>geospatial data</category>
-  <guid>https://mm218.dev/posts/2023-09-20-cngf/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-09-20-cngf/</guid>
   <pubDate>Wed, 20 Sep 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-09-20-cngf/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Pre-allocating vectors is for nerds</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-08-29-allocations/index.html</link>
+  <link>https://mm218.dev/posts/2023-08-29-allocations/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -4753,7 +4865,11 @@ font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Median execution time (s)"</span>)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>But as far as execution speed goes, well, maybe growing objects in general isn’t worthy of its own circle of hell anymore:</p>
@@ -4798,7 +4914,11 @@ font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Median execution time (s)"</span>)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Though of course, <code>vapply()</code> and the pre-allocated methods still win out in terms of memory allocation:<sup>3</sup></p>
@@ -4843,7 +4963,11 @@ font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Memory allocation (bytes)"</span>)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>So: pre-allocate your vectors when you’re able. But maybe it’s fine to grow an object every once in a while, as a treat. It probably won’t get you sent to hell.</p>
@@ -4862,15 +4986,16 @@ font-style: inherit;">"Memory allocation (bytes)"</span>)</span></code></pre></d
 </section></div> ]]></description>
   <category>R</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-08-29-allocations/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-08-29-allocations/</guid>
   <pubDate>Tue, 29 Aug 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-08-29-allocations/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Yes, you can rescale Landsat images after compositing them</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-08-24-landsat-scaling/index.html</link>
+  <link>https://mm218.dev/posts/2023-08-24-landsat-scaling/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -4967,15 +5092,16 @@ font-style: inherit;">all</span>()</span></code></pre></div>
   <category>R</category>
   <category>geospatial data</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-08-24-landsat-scaling/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-08-24-landsat-scaling/</guid>
   <pubDate>Thu, 24 Aug 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-08-24-landsat-scaling/landsat.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>A long digression about the word ‘vector’</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-08-07-vector/index.html</link>
+  <link>https://mm218.dev/posts/2023-08-07-vector/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -5086,7 +5212,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>We’ve got our X axis and our Y axis here, and both meet at the origin – the place where the X coordinate is 0, and the Y coordinate is 0. We’d say that the coordinates at that point are (0, 0).</p>
@@ -5187,7 +5317,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This is how I was taught to think about vectors in those physics classes – arrows on some abstract plane. For instance, we could turn this into an acceleration vector by labeling these axes, so that our line is now charting speed over time:</p>
@@ -5291,7 +5425,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>If you change the axis labels to distance over time, you have a velocity vector instead:</p>
@@ -5395,7 +5533,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>The meaning of the line is defined by the axis labels – by the actual coordinate plane your vector is in. Looking at our velocity vector, we can tell how far we’ve gone (position on the Y axis) for any given time (position on the X axis).</p>
@@ -5477,7 +5619,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>We get vectors in a spatial sense. Rather than showing distance at a given time, we’re now showing the position of our data – in this case, a linestring – in one direction when it’s at a given position in the other direction. Just like in physics, the actual meaning of this line depends on the coordinate plane – on the <em>coordinate reference system</em> of the data. The CRS of your data is a standardized way to define <em>where</em> your origin is, <em>what units</em> your distances are measured in, and <em>which direction</em> away from the origin you’re going.</p>
@@ -5588,7 +5734,11 @@ background-color: null;
 font-style: inherit;">data =</span> our_line</span>
 <span id="cb12-6">  )</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>At each point along this line on our X axis, our line is a single, known position on the Y axis. If we only have one measurement of XY position – say, a single GPS measurement – then our line would be of length 0. We’d have a point instead:</p>
@@ -5662,7 +5812,11 @@ background-color: null;
 font-style: inherit;">50</span>))</span>
 <span id="cb13-6">  )</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>That point represents a single position, which we’d understand through our coordinate reference system as being a certain distance away from a reference point.</p>
@@ -5749,7 +5903,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Just like with sf, we’re representing vectors by the places they start and end. And because we’ve plotted this as a line, we’re able to tell the position of our data at each distance along either the X or Y axis, within this coordinate reference system.</p>
@@ -5823,7 +5981,11 @@ font-style: inherit;">+</span></span>
 background-color: null;
 font-style: inherit;">geom_point</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This graph is using an abstract coordinate system – instead of “meters away from the origin”, one axis is “distance in time from a reference date”, and the other is “distance in length from not existing at all”. But just like our physics vectors, each of these points represents a magnitude in some direction. Our <code>age</code> vector is a set of magnitudes along a time axis; our <code>circumference</code> vector a set of magnitudes along a length axis.</p>
@@ -5841,15 +6003,16 @@ font-style: inherit;">geom_point</span>()</span></code></pre></div>
 </section></div> ]]></description>
   <category>R</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-08-07-vector/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-08-07-vector/</guid>
   <pubDate>Mon, 07 Aug 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-08-07-vector/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>From the inbox: How can I get fold assignments from spatialsample?</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-06-06-spatialsample_splits/index.html</link>
+  <link>https://mm218.dev/posts/2023-06-06-spatialsample_splits/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -6110,15 +6273,16 @@ First 10 features:
   <category>R packages</category>
   <category>geospatial data</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-06-06-spatialsample_splits/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-06-06-spatialsample_splits/</guid>
   <pubDate>Tue, 06 Jun 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-06-06-spatialsample_splits/map.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Using in-line grouping to fit many models</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-04-01-fitting_models/index.html</link>
+  <link>https://mm218.dev/posts/2023-04-01-fitting_models/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -6421,15 +6585,16 @@ font-style: inherit;">.by =</span> status</span>
   <category>R</category>
   <category>Tutorials</category>
   <category>Data science</category>
-  <guid>https://mm218.dev/posts/2023-04-01-fitting_models/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-04-01-fitting_models/</guid>
   <pubDate>Sat, 01 Apr 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-04-01-fitting_models/nests.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>waywiser is now a part of rOpenSci</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-03-21-waywiser-ropensci/index.html</link>
+  <link>https://mm218.dev/posts/2023-03-21-waywiser-ropensci/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -6455,14 +6620,15 @@ font-style: inherit;">.by =</span> status</span>
   <category>Spatial</category>
   <category>Data science</category>
   <category>R packages</category>
-  <guid>https://mm218.dev/posts/2023-03-21-waywiser-ropensci/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-03-21-waywiser-ropensci/</guid>
   <pubDate>Thu, 23 Mar 2023 00:00:00 GMT</pubDate>
 </item>
 <item>
   <title>How to run R jobs across multiple (local) computers</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-03-03-parallel/index.html</link>
+  <link>https://mm218.dev/posts/2023-03-03-parallel/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -6560,14 +6726,15 @@ font-style: inherit;">workers =</span> cl)</span></code></pre></div>
   <category>Tutorials</category>
   <category>Spatial</category>
   <category>Data science</category>
-  <guid>https://mm218.dev/posts/2023-03-03-parallel/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-03-03-parallel/</guid>
   <pubDate>Fri, 03 Mar 2023 00:00:00 GMT</pubDate>
 </item>
 <item>
   <title>spatialsample 0.3.0 is now on CRAN</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-01-17-spatialsample/index.html</link>
+  <link>https://mm218.dev/posts/2023-01-17-spatialsample/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -6575,7 +6742,7 @@ font-style: inherit;">workers =</span> cl)</span></code></pre></div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://mm218.dev/posts/2023-01-17-spatialsample/map.jpg" class="img-fluid figure-img" alt="A pretty map picture. It has no relevance to the article."></p>
-<figcaption class="figure-caption">Photo by <a href="https://unsplash.com/@tjump">Nik Shuliahin 💛💙</a> on <a href="https://unsplash.com/photos/rkFIIE9PxH0">Unsplash</a></figcaption>
+<figcaption>Photo by <a href="https://unsplash.com/@tjump">Nik Shuliahin 💛💙</a> on <a href="https://unsplash.com/photos/rkFIIE9PxH0">Unsplash</a></figcaption>
 </figure>
 </div>
 <p>A new release of <a href="https://spatialsample.tidymodels.org/">spatialsample</a> – an R package extending the <a href="https://rsample.tidymodels.org/">rsample</a> framework to handle spatial resampling and cross-validation – just landed on CRAN. This post will describe the new breaking changes to the <code>spatial_clustering_cv()</code> function, as well as improvements made to how spatialsample handles repeated cross-validation, as well as improvements made to how spatialsample handles repeated cross-validation; for a full list of changes, check out <a href="https://spatialsample.tidymodels.org/news/index.html">this release’s NEWS entry</a></p>
@@ -6633,7 +6800,11 @@ font-style: inherit;">|&gt;</span> </span>
 background-color: null;
 font-style: inherit;">autoplot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-01-17-spatialsample/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-01-17-spatialsample/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -6660,15 +6831,16 @@ font-style: inherit;">autoplot</span>()</span></code></pre></div>
   <category>tidymodels</category>
   <category>R packages</category>
   <category>geospatial data</category>
-  <guid>https://mm218.dev/posts/2023-01-17-spatialsample/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-01-17-spatialsample/</guid>
   <pubDate>Tue, 17 Jan 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-01-17-spatialsample/map.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>The tools I loved this year</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2022-12-12-tools/index.html</link>
+  <link>https://mm218.dev/posts/2022-12-12-tools/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -6693,7 +6865,7 @@ font-style: inherit;">autoplot</span>()</span></code></pre></div>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
 <p><img src="https://mm218.dev/posts/2022-12-12-tools/paperless.png" class="img-fluid figure-img" alt="A screenshot of the Paperless-ng user interface. A search for 'virtual environments' returned 174 results, shown as individual tiles with names and text previews."></p>
-<figcaption class="figure-caption">I swear I’ve read (most of) these, I just am not <em>great</em> at updating my tags.</figcaption>
+<figcaption>I swear I’ve read (most of) these, I just am not <em>great</em> at updating my tags.</figcaption>
 </figure>
 </div>
 <p>Paired with a VPN<sup>6</sup>, this means I can access my entire reference library from anywhere I go, from any device I own, with access to full-text search and any notes I’ve taken. This is one of the outright best hacks I have ever found for literature searches; I have access to a personally-curated Google Scholar filled with the sources that <em>I</em> have found relevant in the past, which makes finding the proper citation or reference document a breeze. If you’re a certain breed of nerdy academic, I can’t recommend it enough.</p>
@@ -7127,7 +7299,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">theme_ggdist</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>ggdist is a late addition to my arsenal; I used it to make graphs while revising a manuscript and was immediately hooked. The toolkit ggdist provides is incredibly flexible, enabling both dozens of radically different representations of the same data as well as the infinite infinitesimal tweaks that we all obsess over to get our graphs <em>just right</em>. I’m a huge fan so far.</p>
@@ -7174,6 +7350,7 @@ background-color: null;
 font-style: inherit;">TRUE</span></span>
 <span id="cb18-7">  )</span></code></pre></div>
 <div class="cell-output-display">
+<div>
 <table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true">
 <thead>
 <tr class="header">
@@ -7282,6 +7459,7 @@ font-style: inherit;">TRUE</span></span>
 
 </div>
 </div>
+</div>
 <p>Column widths! Consistent APIs to control header rows, grouping rows, data rows! Consistent APIs to control columns! Consistent APIs to control individual cells! kableExtra is a well-designed package. Plus, kableExtra ships with <a href="https://haozhu233.github.io/kableExtra/"><em>incredible</em> documentation</a>, which is extremely easy to search; my experience is that this package is written the way that you intuitively <em>want</em> a table-making package to be written. Every table in every paper I’ve written<sup>13</sup> has been run through kableExtra, and I’m expecting that trend to continue going forward.</p>
 </section>
 <section id="ggsflabel-by-hiroaki-yutani" class="level3">
@@ -7335,7 +7513,11 @@ font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">2</span>)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -7391,7 +7573,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">annotation_scale</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -7474,7 +7660,11 @@ font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">8</span>))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Just about all of my multi-panel figures are made with patchwork these days, because I find it to be exactly as flexible as I need for my visuals. Perhaps the best compliment I can give patchwork is that I barely ever need to think about it – when I need to create multi-panel graphs, I load patchwork and then things Just Work from there.</p>
@@ -7575,7 +7765,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 </section>
@@ -7609,7 +7803,6 @@ font-style: inherit;">level =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"patch"</span>)</span></code></pre></div>
 <div class="cell-output-display">
-
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
 {"columns":[{"label":["layer"],"name":[1],"type":["int"],"align":["right"]},{"label":["level"],"name":[2],"type":["chr"],"align":["left"]},{"label":["class"],"name":[3],"type":["int"],"align":["right"]},{"label":["id"],"name":[4],"type":["int"],"align":["right"]},{"label":["metric"],"name":[5],"type":["chr"],"align":["left"]},{"label":["value"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"patch","3":"1","4":"1","5":"area","6":"0.00010000"},{"1":"1","2":"patch","3":"1","4":"2","5":"area","6":"0.00050000"},{"1":"1","2":"patch","3":"1","4":"3","5":"area","6":"0.01480000"},{"1":"1","2":"patch","3":"1","4":"4","5":"area","6":"0.00010000"},{"1":"1","2":"patch","3":"1","4":"5","5":"area","6":"0.00010000"},{"1":"1","2":"patch","3":"1","4":"6","5":"area","6":"0.00140000"},{"1":"1","2":"patch","3":"1","4":"7","5":"area","6":"0.00030000"},{"1":"1","2":"patch","3":"1","4":"8","5":"area","6":"0.00050000"},{"1":"1","2":"patch","3":"1","4":"9","5":"area","6":"0.00010000"},{"1":"1","2":"patch","3":"2","4":"10","5":"area","6":"0.00350000"},{"1":"1","2":"patch","3":"2","4":"11","5":"area","6":"0.00020000"},{"1":"1","2":"patch","3":"2","4":"12","5":"area","6":"0.00020000"},{"1":"1","2":"patch","3":"2","4":"13","5":"area","6":"0.00980000"},{"1":"1","2":"patch","3":"2","4":"14","5":"area","6":"0.00020000"},{"1":"1","2":"patch","3":"2","4":"15","5":"area","6":"0.00010000"},{"1":"1","2":"patch","3":"2","4":"16","5":"area","6":"0.00240000"},{"1":"1","2":"patch","3":"2","4":"17","5":"area","6":"0.00010000"},{"1":"1","2":"patch","3":"2","4":"18","5":"area","6":"0.00030000"},{"1":"1","2":"patch","3":"2","4":"19","5":"area","6":"0.00030000"},{"1":"1","2":"patch","3":"2","4":"20","5":"area","6":"0.00570000"},{"1":"1","2":"patch","3":"2","4":"21","5":"area","6":"0.00040000"},{"1":"1","2":"patch","3":"2","4":"22","5":"area","6":"0.00070000"},{"1":"1","2":"patch","3":"2","4":"23","5":"area","6":"0.00030000"},{"1":"1","2":"patch","3":"3","4":"24","5":"area","6":"0.04570000"},{"1":"1","2":"patch","3":"3","4":"25","5":"area","6":"0.00090000"},{"1":"1","2":"patch","3":"3","4":"26","5":"area","6":"0.00030000"},{"1":"1","2":"patch","3":"3","4":"27","5":"area","6":"0.00100000"},{"1":"1","2":"patch","3":"1","4":"1","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"cai","6":"47.97297297"},{"1":"1","2":"patch","3":"1","4":"4","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"cai","6":"14.28571429"},{"1":"1","2":"patch","3":"1","4":"7","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"8","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"9","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"cai","6":"31.42857143"},{"1":"1","2":"patch","3":"2","4":"11","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"13","5":"cai","6":"44.89795918"},{"1":"1","2":"patch","3":"2","4":"14","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"cai","6":"16.66666667"},{"1":"1","2":"patch","3":"2","4":"17","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"19","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"20","5":"cai","6":"49.12280702"},{"1":"1","2":"patch","3":"2","4":"21","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"cai","6":"14.28571429"},{"1":"1","2":"patch","3":"2","4":"23","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"24","5":"cai","6":"49.23413567"},{"1":"1","2":"patch","3":"3","4":"25","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"26","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"27","5":"cai","6":"10.00000000"},{"1":"1","2":"patch","3":"1","4":"1","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"1","4":"2","5":"circle","6":"0.62551778"},{"1":"1","2":"patch","3":"1","4":"3","5":"circle","6":"0.78050151"},{"1":"1","2":"patch","3":"1","4":"4","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"1","4":"5","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"1","4":"6","5":"circle","6":"0.55436616"},{"1":"1","2":"patch","3":"1","4":"7","5":"circle","6":"0.61802814"},{"1":"1","2":"patch","3":"1","4":"8","5":"circle","6":"0.51029248"},{"1":"1","2":"patch","3":"1","4":"9","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"2","4":"10","5":"circle","6":"0.57959072"},{"1":"1","2":"patch","3":"2","4":"11","5":"circle","6":"0.49070418"},{"1":"1","2":"patch","3":"2","4":"12","5":"circle","6":"0.68169011"},{"1":"1","2":"patch","3":"2","4":"13","5":"circle","6":"0.81122924"},{"1":"1","2":"patch","3":"2","4":"14","5":"circle","6":"0.49070418"},{"1":"1","2":"patch","3":"2","4":"15","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"2","4":"16","5":"circle","6":"0.68497166"},{"1":"1","2":"patch","3":"2","4":"17","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"2","4":"18","5":"circle","6":"0.52253517"},{"1":"1","2":"patch","3":"2","4":"19","5":"circle","6":"0.52253517"},{"1":"1","2":"patch","3":"2","4":"20","5":"circle","6":"0.53165556"},{"1":"1","2":"patch","3":"2","4":"21","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"2","4":"22","5":"circle","6":"0.38296853"},{"1":"1","2":"patch","3":"2","4":"23","5":"circle","6":"0.61802814"},{"1":"1","2":"patch","3":"3","4":"24","5":"circle","6":"0.66587975"},{"1":"1","2":"patch","3":"3","4":"25","5":"circle","6":"0.56859648"},{"1":"1","2":"patch","3":"3","4":"26","5":"circle","6":"0.61802814"},{"1":"1","2":"patch","3":"3","4":"27","5":"circle","6":"0.49370004"},{"1":"1","2":"patch","3":"1","4":"1","5":"contig","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"contig","6":"0.33333333"},{"1":"1","2":"patch","3":"1","4":"3","5":"contig","6":"0.76126126"},{"1":"1","2":"patch","3":"1","4":"4","5":"contig","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"contig","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"contig","6":"0.59523810"},{"1":"1","2":"patch","3":"1","4":"7","5":"contig","6":"0.22222222"},{"1":"1","2":"patch","3":"1","4":"8","5":"contig","6":"0.43333333"},{"1":"1","2":"patch","3":"1","4":"9","5":"contig","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"contig","6":"0.69047619"},{"1":"1","2":"patch","3":"2","4":"11","5":"contig","6":"0.16666667"},{"1":"1","2":"patch","3":"2","4":"12","5":"contig","6":"0.08333333"},{"1":"1","2":"patch","3":"2","4":"13","5":"contig","6":"0.76190476"},{"1":"1","2":"patch","3":"2","4":"14","5":"contig","6":"0.16666667"},{"1":"1","2":"patch","3":"2","4":"15","5":"contig","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"contig","6":"0.62500000"},{"1":"1","2":"patch","3":"2","4":"17","5":"contig","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"contig","6":"0.27777778"},{"1":"1","2":"patch","3":"2","4":"19","5":"contig","6":"0.27777778"},{"1":"1","2":"patch","3":"2","4":"20","5":"contig","6":"0.79239766"},{"1":"1","2":"patch","3":"2","4":"21","5":"contig","6":"0.41666667"},{"1":"1","2":"patch","3":"2","4":"22","5":"contig","6":"0.52380952"},{"1":"1","2":"patch","3":"2","4":"23","5":"contig","6":"0.22222222"},{"1":"1","2":"patch","3":"3","4":"24","5":"contig","6":"0.78482859"},{"1":"1","2":"patch","3":"3","4":"25","5":"contig","6":"0.50000000"},{"1":"1","2":"patch","3":"3","4":"26","5":"contig","6":"0.22222222"},{"1":"1","2":"patch","3":"3","4":"27","5":"contig","6":"0.55000000"},{"1":"1","2":"patch","3":"1","4":"1","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"core","6":"0.00710000"},{"1":"1","2":"patch","3":"1","4":"4","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"core","6":"0.00020000"},{"1":"1","2":"patch","3":"1","4":"7","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"8","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"9","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"core","6":"0.00110000"},{"1":"1","2":"patch","3":"2","4":"11","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"13","5":"core","6":"0.00440000"},{"1":"1","2":"patch","3":"2","4":"14","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"core","6":"0.00040000"},{"1":"1","2":"patch","3":"2","4":"17","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"19","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"20","5":"core","6":"0.00280000"},{"1":"1","2":"patch","3":"2","4":"21","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"core","6":"0.00010000"},{"1":"1","2":"patch","3":"2","4":"23","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"24","5":"core","6":"0.02250000"},{"1":"1","2":"patch","3":"3","4":"25","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"26","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"27","5":"core","6":"0.00010000"},{"1":"1","2":"patch","3":"1","4":"1","5":"enn","6":"7.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"enn","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"enn","6":"2.82842712"},{"1":"1","2":"patch","3":"1","4":"4","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"enn","6":"2.82842712"},{"1":"1","2":"patch","3":"1","4":"7","5":"enn","6":"4.12310563"},{"1":"1","2":"patch","3":"1","4":"8","5":"enn","6":"4.12310563"},{"1":"1","2":"patch","3":"1","4":"9","5":"enn","6":"4.24264069"},{"1":"1","2":"patch","3":"2","4":"10","5":"enn","6":"4.47213595"},{"1":"1","2":"patch","3":"2","4":"11","5":"enn","6":"4.47213595"},{"1":"1","2":"patch","3":"2","4":"12","5":"enn","6":"3.16227766"},{"1":"1","2":"patch","3":"2","4":"13","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"2","4":"14","5":"enn","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"enn","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"17","5":"enn","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"enn","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"19","5":"enn","6":"2.82842712"},{"1":"1","2":"patch","3":"2","4":"20","5":"enn","6":"5.83095189"},{"1":"1","2":"patch","3":"2","4":"21","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"enn","6":"2.82842712"},{"1":"1","2":"patch","3":"2","4":"23","5":"enn","6":"3.16227766"},{"1":"1","2":"patch","3":"3","4":"24","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"3","4":"25","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"3","4":"26","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"3","4":"27","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"1","4":"1","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"frac","6":"1.36521239"},{"1":"1","2":"patch","3":"1","4":"3","5":"frac","6":"1.39327285"},{"1":"1","2":"patch","3":"1","4":"4","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"frac","6":"1.21970667"},{"1":"1","2":"patch","3":"1","4":"7","5":"frac","6":"1.26185951"},{"1":"1","2":"patch","3":"1","4":"8","5":"frac","6":"1.13864688"},{"1":"1","2":"patch","3":"1","4":"9","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"frac","6":"1.26642554"},{"1":"1","2":"patch","3":"2","4":"11","5":"frac","6":"1.16992500"},{"1":"1","2":"patch","3":"2","4":"12","5":"frac","6":"2.00000000"},{"1":"1","2":"patch","3":"2","4":"13","5":"frac","6":"1.31753383"},{"1":"1","2":"patch","3":"2","4":"14","5":"frac","6":"1.16992500"},{"1":"1","2":"patch","3":"2","4":"15","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"frac","6":"1.30862575"},{"1":"1","2":"patch","3":"2","4":"17","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"frac","6":"1.26185951"},{"1":"1","2":"patch","3":"2","4":"19","5":"frac","6":"1.26185951"},{"1":"1","2":"patch","3":"2","4":"20","5":"frac","6":"1.13903334"},{"1":"1","2":"patch","3":"2","4":"21","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"frac","6":"1.12915007"},{"1":"1","2":"patch","3":"2","4":"23","5":"frac","6":"1.26185951"},{"1":"1","2":"patch","3":"3","4":"24","5":"frac","6":"1.45833110"},{"1":"1","2":"patch","3":"3","4":"25","5":"frac","6":"1.26185951"},{"1":"1","2":"patch","3":"3","4":"26","5":"frac","6":"1.26185951"},{"1":"1","2":"patch","3":"3","4":"27","5":"frac","6":"1.20411998"},{"1":"1","2":"patch","3":"1","4":"1","5":"gyrate","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"gyrate","6":"1.00015229"},{"1":"1","2":"patch","3":"1","4":"3","5":"gyrate","6":"8.55192604"},{"1":"1","2":"patch","3":"1","4":"4","5":"gyrate","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"gyrate","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"gyrate","6":"1.63148582"},{"1":"1","2":"patch","3":"1","4":"7","5":"gyrate","6":"0.66666667"},{"1":"1","2":"patch","3":"1","4":"8","5":"gyrate","6":"0.84780148"},{"1":"1","2":"patch","3":"1","4":"9","5":"gyrate","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"gyrate","6":"2.49548945"},{"1":"1","2":"patch","3":"2","4":"11","5":"gyrate","6":"0.50000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"gyrate","6":"0.70710678"},{"1":"1","2":"patch","3":"2","4":"13","5":"gyrate","6":"6.36373298"},{"1":"1","2":"patch","3":"2","4":"14","5":"gyrate","6":"0.50000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"gyrate","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"gyrate","6":"2.51028194"},{"1":"1","2":"patch","3":"2","4":"17","5":"gyrate","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"gyrate","6":"0.65403884"},{"1":"1","2":"patch","3":"2","4":"19","5":"gyrate","6":"0.65403884"},{"1":"1","2":"patch","3":"2","4":"20","5":"gyrate","6":"3.17066816"},{"1":"1","2":"patch","3":"2","4":"21","5":"gyrate","6":"0.70710678"},{"1":"1","2":"patch","3":"2","4":"22","5":"gyrate","6":"0.97479327"},{"1":"1","2":"patch","3":"2","4":"23","5":"gyrate","6":"0.66666667"},{"1":"1","2":"patch","3":"3","4":"24","5":"gyrate","6":"11.23638380"},{"1":"1","2":"patch","3":"3","4":"25","5":"gyrate","6":"1.23682432"},{"1":"1","2":"patch","3":"3","4":"26","5":"gyrate","6":"0.66666667"},{"1":"1","2":"patch","3":"3","4":"27","5":"gyrate","6":"1.24202906"},{"1":"1","2":"patch","3":"1","4":"1","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"ncore","6":"3.00000000"},{"1":"1","2":"patch","3":"1","4":"4","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"ncore","6":"2.00000000"},{"1":"1","2":"patch","3":"1","4":"7","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"8","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"9","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"ncore","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"11","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"13","5":"ncore","6":"2.00000000"},{"1":"1","2":"patch","3":"2","4":"14","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"ncore","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"17","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"19","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"20","5":"ncore","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"21","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"ncore","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"23","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"24","5":"ncore","6":"11.00000000"},{"1":"1","2":"patch","3":"3","4":"25","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"26","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"27","5":"ncore","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"1","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"para","6":"2.40000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"para","6":"0.87837838"},{"1":"1","2":"patch","3":"1","4":"4","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"para","6":"1.42857143"},{"1":"1","2":"patch","3":"1","4":"7","5":"para","6":"2.66666667"},{"1":"1","2":"patch","3":"1","4":"8","5":"para","6":"2.00000000"},{"1":"1","2":"patch","3":"1","4":"9","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"para","6":"1.08571429"},{"1":"1","2":"patch","3":"2","4":"11","5":"para","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"13","5":"para","6":"0.83673469"},{"1":"1","2":"patch","3":"2","4":"14","5":"para","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"para","6":"1.33333333"},{"1":"1","2":"patch","3":"2","4":"17","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"para","6":"2.66666667"},{"1":"1","2":"patch","3":"2","4":"19","5":"para","6":"2.66666667"},{"1":"1","2":"patch","3":"2","4":"20","5":"para","6":"0.70175439"},{"1":"1","2":"patch","3":"2","4":"21","5":"para","6":"2.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"para","6":"1.71428571"},{"1":"1","2":"patch","3":"2","4":"23","5":"para","6":"2.66666667"},{"1":"1","2":"patch","3":"3","4":"24","5":"para","6":"0.76148796"},{"1":"1","2":"patch","3":"3","4":"25","5":"para","6":"1.77777778"},{"1":"1","2":"patch","3":"3","4":"26","5":"para","6":"2.66666667"},{"1":"1","2":"patch","3":"3","4":"27","5":"para","6":"1.60000000"},{"1":"1","2":"patch","3":"1","4":"1","5":"perim","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"perim","6":"12.00000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"perim","6":"130.00000000"},{"1":"1","2":"patch","3":"1","4":"4","5":"perim","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"perim","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"perim","6":"20.00000000"},{"1":"1","2":"patch","3":"1","4":"7","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"1","4":"8","5":"perim","6":"10.00000000"},{"1":"1","2":"patch","3":"1","4":"9","5":"perim","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"perim","6":"38.00000000"},{"1":"1","2":"patch","3":"2","4":"11","5":"perim","6":"6.00000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"2","4":"13","5":"perim","6":"82.00000000"},{"1":"1","2":"patch","3":"2","4":"14","5":"perim","6":"6.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"perim","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"perim","6":"32.00000000"},{"1":"1","2":"patch","3":"2","4":"17","5":"perim","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"2","4":"19","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"2","4":"20","5":"perim","6":"40.00000000"},{"1":"1","2":"patch","3":"2","4":"21","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"perim","6":"12.00000000"},{"1":"1","2":"patch","3":"2","4":"23","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"3","4":"24","5":"perim","6":"348.00000000"},{"1":"1","2":"patch","3":"3","4":"25","5":"perim","6":"16.00000000"},{"1":"1","2":"patch","3":"3","4":"26","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"3","4":"27","5":"perim","6":"16.00000000"},{"1":"1","2":"patch","3":"1","4":"1","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"shape","6":"1.20000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"shape","6":"2.60000000"},{"1":"1","2":"patch","3":"1","4":"4","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"shape","6":"1.25000000"},{"1":"1","2":"patch","3":"1","4":"7","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"8","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"9","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"shape","6":"1.58333333"},{"1":"1","2":"patch","3":"2","4":"11","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"shape","6":"1.33333333"},{"1":"1","2":"patch","3":"2","4":"13","5":"shape","6":"2.05000000"},{"1":"1","2":"patch","3":"2","4":"14","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"shape","6":"1.60000000"},{"1":"1","2":"patch","3":"2","4":"17","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"19","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"20","5":"shape","6":"1.25000000"},{"1":"1","2":"patch","3":"2","4":"21","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"23","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"3","4":"24","5":"shape","6":"4.04651163"},{"1":"1","2":"patch","3":"3","4":"25","5":"shape","6":"1.33333333"},{"1":"1","2":"patch","3":"3","4":"26","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"3","4":"27","5":"shape","6":"1.14285714"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
@@ -7659,7 +7852,6 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rmse</span>(Orange, age, circumference)</span></code></pre></div>
 <div class="cell-output-display">
-
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
 {"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".estimate"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"rmse","2":"standard","3":"915.4996"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
@@ -7675,7 +7867,6 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">mae</span>(Orange, age, circumference)</span></code></pre></div>
 <div class="cell-output-display">
-
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
 {"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".estimate"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"mae","2":"standard","3":"806.2857"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
@@ -7707,7 +7898,6 @@ background-color: null;
 font-style: inherit;">::</span>msd</span>
 <span id="cb26-7">)(Orange, age, circumference)</span></code></pre></div>
 <div class="cell-output-display">
-
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
 {"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".estimate"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"rmse","2":"standard","3":"915.4996138"},{"1":"mae","2":"standard","3":"806.2857143"},{"1":"rsq","2":"standard","3":"0.8345167"},{"1":"mape","2":"standard","3":"85.5436006"},{"1":"msd","2":"standard","3":"806.2857143"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
@@ -7772,7 +7962,6 @@ background-color: null;
 font-style: inherit;">$</span>r.squared)</span>
 <span id="cb27-6">  )</span></code></pre></div>
 <div class="cell-output-display">
-
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
 {"columns":[{"label":["Tree"],"name":[1],"type":["ord"],"align":["right"]},{"label":["data"],"name":[2],"type":["list"],"align":["right"]},{"label":["model"],"name":[3],"type":["list"],"align":["right"]},{"label":["rsq"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"<nfnGrpdD[,2]>","3":"<S3: lm>","4":"0.9711463"},{"1":"2","2":"<nfnGrpdD[,2]>","3":"<S3: lm>","4":"0.9748846"},{"1":"3","2":"<nfnGrpdD[,2]>","3":"<S3: lm>","4":"0.9764930"},{"1":"4","2":"<nfnGrpdD[,2]>","3":"<S3: lm>","4":"0.9691634"},{"1":"5","2":"<nfnGrpdD[,2]>","3":"<S3: lm>","4":"0.9756256"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
@@ -7823,7 +8012,6 @@ background-color: null;
 font-style: inherit;">$</span>r.squared)</span>
 <span id="cb28-6">  )</span></code></pre></div>
 <div class="cell-output-display">
-
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
 {"columns":[{"label":["Tree"],"name":[1],"type":["ord"],"align":["right"]},{"label":["model"],"name":[2],"type":["list"],"align":["right"]},{"label":["rsq"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"3","2":"<S3: lm>","3":"0.9764930"},{"1":"1","2":"<S3: lm>","3":"0.9711463"},{"1":"5","2":"<S3: lm>","3":"0.9756256"},{"1":"2","2":"<S3: lm>","3":"0.9748846"},{"1":"4","2":"<S3: lm>","3":"0.9691634"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
@@ -7871,7 +8059,7 @@ font-style: inherit;">$</span>r.squared)</span>
   <category>R</category>
   <category>Spatial</category>
   <category>Data science</category>
-  <guid>https://mm218.dev/posts/2022-12-12-tools/index.html</guid>
+  <guid>https://mm218.dev/posts/2022-12-12-tools/</guid>
   <pubDate>Mon, 12 Dec 2022 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2022-12-12-tools/favorites.jpg" medium="image" type="image/jpeg"/>
 </item>

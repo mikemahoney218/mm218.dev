@@ -9,13 +9,14 @@
 <link>https://mm218.dev/blog.html</link>
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
-<generator>quarto-1.3.450</generator>
+<generator>quarto-1.4.550</generator>
 <lastBuildDate>Wed, 10 Jan 2024 00:00:00 GMT</lastBuildDate>
 <item>
   <title>rsi is now on CRAN!</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2024-01-10-rsi-cran/index.html</link>
+  <link>https://mm218.dev/posts/2024-01-10-rsi-cran/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -148,7 +149,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rast</span>(lcpri))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>If our data is split across multiple tiles, <code>get_stac_data()</code> will automatically merge them into a single composite output. There’s <a href="https://permian-global-research.github.io/rsi/articles/Downloading-data-from-STAC-APIs-using-rsi.html">an article on the rsi website</a> that gives a brief overview of the STAC family of standards, and how you can use the arguments to <code>get_stac_data()</code> to flexibly control exactly what you’re downloading and how.</p>
@@ -190,7 +195,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rast</span>(landsat))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Note that the inputs to these functions are normal R objects, and the outputs are the file paths your data was saved to. A key difference of rsi from other packages for downloading data from STAC endpoints is that rsi doesn’t introduce a new data model,<sup>4</sup> and instead is focused on getting data onto your local filesystem as quickly as possible. Ideally, you’ll be able to let rsi handle all the “cloud-native geospatial” stuff for you, and then use the outputs with whatever tools you’re most comfortable with.<sup>5</sup></p>
@@ -300,7 +309,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rast</span>(indices))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>You should always skim the formulas you’re going to run before calling <code>calculate_indices()</code> – these are downloaded from a live GitHub URL and can change over time – but the actual execution of downloaded code happens in a sandboxed environment, which should make it <em>harder</em> for any untrustworthy code to damage your system. If you’re interested, <a href="https://www.mm218.dev/posts/2023-10-27-minimal-environments/">I wrote post a few months ago with a bit more information about this sandboxing</a>.</p>
@@ -347,7 +360,11 @@ only support one value per dataset. This value of nan will be used for all
 bands on re-opening</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>If your output file ends in <code>vrt</code>, you can even do this without copying any data thanks to <a href="https://gdal.org/drivers/raster/vrt.html">GDAL’s virtual raster format</a>:</p>
@@ -382,7 +399,11 @@ font-style: inherit;">plot</span>()</span></code></pre></div>
 not supported on paletted band. Falling back to nearest neighbour</code></pre>
 </div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-01-10-rsi-cran/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This feels like such a small thing when you say it out loud, but I think is my favorite part of the package. This was a surprisingly hard thing to do with existing tools. If your rasters are different extents or resolutions, <code>stack_rasters()</code> will automatically set the extent of your output and your target resolution based on the first raster in your input vector – or you can override that default behavior using the <code>extent</code> and <code>resolution</code> argument.</p>
@@ -411,15 +432,16 @@ not supported on paletted band. Falling back to nearest neighbour</code></pre>
   <category>Spatial</category>
   <category>geospatial data</category>
   <category>R packages</category>
-  <guid>https://mm218.dev/posts/2024-01-10-rsi-cran/index.html</guid>
+  <guid>https://mm218.dev/posts/2024-01-10-rsi-cran/</guid>
   <pubDate>Wed, 10 Jan 2024 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2024-01-10-rsi-cran/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Why is View() capitalized, anyway?</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-12-07-View/index.html</link>
+  <link>https://mm218.dev/posts/2023-12-07-View/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -619,15 +641,16 @@ font-style: inherit;">""</span>)</span></code></pre></div>
 </ol>
 </section></div> ]]></description>
   <category>R</category>
-  <guid>https://mm218.dev/posts/2023-12-07-View/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-12-07-View/</guid>
   <pubDate>Thu, 07 Dec 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-12-07-View/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Helping R find the right methods for unserialized complex objects.</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-11-27-objects-loading-namespaces/index.html</link>
+  <link>https://mm218.dev/posts/2023-11-27-objects-loading-namespaces/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -1320,15 +1343,16 @@ font-style: inherit;">"/dev/null"</span></span>
   <category>Spatial</category>
   <category>geospatial data</category>
   <category>R packages</category>
-  <guid>https://mm218.dev/posts/2023-11-27-objects-loading-namespaces/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-11-27-objects-loading-namespaces/</guid>
   <pubDate>Mon, 27 Nov 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-11-27-objects-loading-namespaces/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Downloading STAC data using rsi when you’ve got a geographic CRS or don’t want a composite.</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-11-21-rsi-null/index.html</link>
+  <link>https://mm218.dev/posts/2023-11-21-rsi-null/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -1445,7 +1469,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>What if you want to skip some of these steps? For instance, if you try to call <code>get_landsat_imagery()</code> with an AOI in geographic coordinates, you’ll get a warning (likely followed by an error) saying that you’re asking to resample the data to 30 degree pixels, which is probably not what you wanted:</p>
@@ -1578,7 +1606,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This is a pattern throughout the rsi API design: if you want to skip something, pass <code>NULL</code> to the relevant argument. For instance (and this is where <a href="https://github.com/Permian-Global-Research/rsi/issues/6">the GitHub issue comes in</a>), if you want to not composite and instead download all the images within your spatiotemporal area of interest, we can pass <code>NULL</code> to the <code>composite_function</code> argument to skip compositing. I’ll also skip masking by passing <code>NULL</code> to the <code>mask_function</code> argument, because otherwise a handful of these images are entirely masked out:</p>
@@ -1632,13 +1664,25 @@ font-style: inherit;">lapply</span>(terra<span class="sc" style="color: #5E5E5E;
 background-color: null;
 font-style: inherit;">::</span>plot)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-3.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-11-21-rsi-null/index_files/figure-html/unnamed-chunk-4-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[[1]]
@@ -1667,15 +1711,16 @@ NULL</code></pre>
   <category>Spatial</category>
   <category>geospatial data</category>
   <category>R packages</category>
-  <guid>https://mm218.dev/posts/2023-11-21-rsi-null/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-11-21-rsi-null/</guid>
   <pubDate>Tue, 21 Nov 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-11-21-rsi-null/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Classed conditions from rlang functions</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-11-07-classed-errors/index.html</link>
+  <link>https://mm218.dev/posts/2023-11-07-classed-errors/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -1915,15 +1960,16 @@ font-style: inherit;">"wrong_class"</span>))</span></code></pre></div>
 </section></div> ]]></description>
   <category>R</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-11-07-classed-errors/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-11-07-classed-errors/</guid>
   <pubDate>Tue, 07 Nov 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-11-07-classed-errors/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>spatialsample 0.5.0 is now on CRAN</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-11-03-spatialsample/index.html</link>
+  <link>https://mm218.dev/posts/2023-11-03-spatialsample/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -2044,7 +2090,11 @@ font-style: inherit;">spatial_block_cv</span>(drought_sf)</span>
 background-color: null;
 font-style: inherit;">autoplot</span>(folds)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-11-03-spatialsample/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-11-03-spatialsample/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This is a breaking change for data in projected coordinate reference systems. Data in geographic coordinates was actually already using these slightly larger grids, <a href="https://github.com/ropensci/stplanr/pull/467">due to issues with straight-line grids in non-planar CRS</a>, so this change just makes the amount of grid expansion controllable there.</p>
@@ -2059,15 +2109,16 @@ font-style: inherit;">autoplot</span>(folds)</span></code></pre></div>
   <category>geospatial data</category>
   <category>spatialsample</category>
   <category>R packages</category>
-  <guid>https://mm218.dev/posts/2023-11-03-spatialsample/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-11-03-spatialsample/</guid>
   <pubDate>Fri, 03 Nov 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-11-03-spatialsample/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Adding context to maps made with ggplot2</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-10-31-map-context/index.html</link>
+  <link>https://mm218.dev/posts/2023-10-31-map-context/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -2109,7 +2160,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">geom_sf</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>We also need a comparatively smaller data set that we’re interested in visualizing. For this blog, simulate some number of observations inside one of the more central counties:</p>
@@ -2155,7 +2210,11 @@ font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"red"</span>)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Our goal is to add a bit more context to this map by drawing the borders of surrounding counties. The challenge is that ggplot will, by default, expand our visualization to contain the largest layer that we add:</p>
@@ -2182,7 +2241,11 @@ font-style: inherit;">color =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"red"</span>)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>We could control this using <code>expansion()</code> inside of <code>scale_*_continuous()</code> functions, in order to restrict the range of our visualization:</p>
@@ -2247,7 +2310,11 @@ font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.28</span>)))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>But these <code>expansion()</code> calls are relative to the scale of our larger data set, which makes them a bit difficult to reason about. We aren’t specifying our extents in terms of the data that we actually care about visualizing, we’re forced to specify them relative to the larger context that we don’t care as much about.</p>
@@ -2320,7 +2387,11 @@ font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
 background-color: null;
 font-style: inherit;">0.25</span>)))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>But while this <em>reduces</em> the problem, moving the center of the larger layer closer to the center of the layer we care about, it still has the same issue as when we used the entire <code>nc</code> object.</p>
@@ -2361,7 +2432,11 @@ font-style: inherit;">0.1</span>))</span>
 <span id="cb6-5"></span>
 <span id="cb6-6">base_plot</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Defining our boundaries here is a bit easier to reason about – the <code>expansion()</code> calls are centered on our data of interest and are expanding the scales relative to this focal data set. Once we’ve got our level of zoom where we want it, we can build our plot using <code>ggplot_build()</code> and then extract the ranges of our x and y scales from the constructed plot object:</p>
@@ -2432,7 +2507,11 @@ font-style: inherit;">scale_y_continuous</span>(<span class="at" style="color: #
 background-color: null;
 font-style: inherit;">limits =</span> ylim)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-31-map-context/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>I have no idea how stable this approach will be – <a href="https://www.tidyverse.org/blog/2022/09/playing-on-the-same-team-as-your-dependecy/">we’re decidedly not playing on the same team as ggplot2</a> with this approach – but it works as of ggplot version 3.4.3, and it’s made making maps a bit easier for us at the moment!</p>
@@ -2444,15 +2523,16 @@ font-style: inherit;">limits =</span> ylim)</span></code></pre></div>
   <category>Tutorials</category>
   <category>Spatial</category>
   <category>geospatial data</category>
-  <guid>https://mm218.dev/posts/2023-10-31-map-context/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-10-31-map-context/</guid>
   <pubDate>Tue, 31 Oct 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-10-31-map-context/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Executing R code from untrusted sources in minimal environments</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-10-27-minimal-environments/index.html</link>
+  <link>https://mm218.dev/posts/2023-10-27-minimal-environments/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -2593,7 +2673,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rast</span>(out))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This is pretty nifty!</p>
@@ -3084,7 +3168,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">rast</span>(out))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-27-minimal-environments/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>But it makes the most obvious malicious code fail:</p>
@@ -3495,15 +3583,16 @@ font-style: inherit;">".tif"</span>)</span>
 </section></div> ]]></description>
   <category>R</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-10-27-minimal-environments/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-10-27-minimal-environments/</guid>
   <pubDate>Fri, 27 Oct 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-10-27-minimal-environments/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Introducing rsi</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-10-26-rsi/index.html</link>
+  <link>https://mm218.dev/posts/2023-10-26-rsi/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -3559,7 +3648,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">st_geometry</span>(middlesex))</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This is the area we’re going to download and process data for.</p>
@@ -3610,7 +3703,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Notice that this composite has been cloud-masked (using the QA pixel band) and rescaled<sup>5</sup> (using the scale and offset specified in metadata provided by the STAC endpoint) automatically. You can control these behaviors via function arguments.</p>
@@ -3634,7 +3731,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Under the hood, both of these functions (and their friends, <code>get_sentinel2_data()</code> and <code>get_sentinel1_data()</code>) are powered by a lower-level <code>get_stac_data()</code> function, which should theoretically work with any imagery provided by any STAC API, anywhere. These functions simply provide user-friendly defaults to make it faster to get the data you care about.</p>
@@ -3759,7 +3860,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Note that <code>calculate_indices()</code> is evaluating the formulas in the <code>formula</code> column of the spectral indices data frame as if they were code.<sup>6</sup> These formulas are evaluated inside of a very limited environment, which doesn’t have access to the global environment or most R fixtures, which does <em>reduce</em> the amount of harm malicious code could do:</p>
@@ -3824,7 +3929,11 @@ font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
 background-color: null;
 font-style: inherit;">plot</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-10-26-rsi/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>I’m <em>extremely</em> excited for this package to be out in the open, and for people to start using it. If you find the package useful or interesting, <a href="https://github.com/Permian-Global-Research/rsi/">drop us a star on GitHub</a> – and if you have any questions/comments/concerns about how it does things, please open an issue or a PR! We’re planning a CRAN release in the not-too-distant future, and would love to incorporate any feedback we get into that first released version.</p>
@@ -3849,15 +3958,16 @@ font-style: inherit;">plot</span>()</span></code></pre></div>
   <category>Spatial</category>
   <category>geospatial data</category>
   <category>R packages</category>
-  <guid>https://mm218.dev/posts/2023-10-26-rsi/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-10-26-rsi/</guid>
   <pubDate>Thu, 26 Oct 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-10-26-rsi/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Three fun R functions</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-10-24-fun-r-funcs/index.html</link>
+  <link>https://mm218.dev/posts/2023-10-24-fun-r-funcs/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -4256,15 +4366,16 @@ font-style: inherit;">str2lang</span>(growth_rate)))</span></code></pre></div>
 </section></div> ]]></description>
   <category>R</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-10-24-fun-r-funcs/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-10-24-fun-r-funcs/</guid>
   <pubDate>Tue, 24 Oct 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-10-24-fun-r-funcs/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Cloud-Native Geospatial If You Don’t Speak Snake</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-09-20-cngf/index.html</link>
+  <link>https://mm218.dev/posts/2023-09-20-cngf/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -4292,15 +4403,16 @@ font-style: inherit;">str2lang</span>(growth_rate)))</span></code></pre></div>
   <category>R</category>
   <category>Spatial</category>
   <category>geospatial data</category>
-  <guid>https://mm218.dev/posts/2023-09-20-cngf/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-09-20-cngf/</guid>
   <pubDate>Wed, 20 Sep 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-09-20-cngf/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Pre-allocating vectors is for nerds</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-08-29-allocations/index.html</link>
+  <link>https://mm218.dev/posts/2023-08-29-allocations/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -4753,7 +4865,11 @@ font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Median execution time (s)"</span>)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>But as far as execution speed goes, well, maybe growing objects in general isn’t worthy of its own circle of hell anymore:</p>
@@ -4798,7 +4914,11 @@ font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Median execution time (s)"</span>)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Though of course, <code>vapply()</code> and the pre-allocated methods still win out in terms of memory allocation:<sup>3</sup></p>
@@ -4843,7 +4963,11 @@ font-style: inherit;">y =</span> <span class="st" style="color: #20794D;
 background-color: null;
 font-style: inherit;">"Memory allocation (bytes)"</span>)</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-29-allocations/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>So: pre-allocate your vectors when you’re able. But maybe it’s fine to grow an object every once in a while, as a treat. It probably won’t get you sent to hell.</p>
@@ -4862,15 +4986,16 @@ font-style: inherit;">"Memory allocation (bytes)"</span>)</span></code></pre></d
 </section></div> ]]></description>
   <category>R</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-08-29-allocations/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-08-29-allocations/</guid>
   <pubDate>Tue, 29 Aug 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-08-29-allocations/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Yes, you can rescale Landsat images after compositing them</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-08-24-landsat-scaling/index.html</link>
+  <link>https://mm218.dev/posts/2023-08-24-landsat-scaling/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -4967,15 +5092,16 @@ font-style: inherit;">all</span>()</span></code></pre></div>
   <category>R</category>
   <category>geospatial data</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-08-24-landsat-scaling/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-08-24-landsat-scaling/</guid>
   <pubDate>Thu, 24 Aug 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-08-24-landsat-scaling/landsat.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>A long digression about the word ‘vector’</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-08-07-vector/index.html</link>
+  <link>https://mm218.dev/posts/2023-08-07-vector/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -5086,7 +5212,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>We’ve got our X axis and our Y axis here, and both meet at the origin – the place where the X coordinate is 0, and the Y coordinate is 0. We’d say that the coordinates at that point are (0, 0).</p>
@@ -5187,7 +5317,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This is how I was taught to think about vectors in those physics classes – arrows on some abstract plane. For instance, we could turn this into an acceleration vector by labeling these axes, so that our line is now charting speed over time:</p>
@@ -5291,7 +5425,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>If you change the axis labels to distance over time, you have a velocity vector instead:</p>
@@ -5395,7 +5533,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>The meaning of the line is defined by the axis labels – by the actual coordinate plane your vector is in. Looking at our velocity vector, we can tell how far we’ve gone (position on the Y axis) for any given time (position on the X axis).</p>
@@ -5477,7 +5619,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>We get vectors in a spatial sense. Rather than showing distance at a given time, we’re now showing the position of our data – in this case, a linestring – in one direction when it’s at a given position in the other direction. Just like in physics, the actual meaning of this line depends on the coordinate plane – on the <em>coordinate reference system</em> of the data. The CRS of your data is a standardized way to define <em>where</em> your origin is, <em>what units</em> your distances are measured in, and <em>which direction</em> away from the origin you’re going.</p>
@@ -5588,7 +5734,11 @@ background-color: null;
 font-style: inherit;">data =</span> our_line</span>
 <span id="cb12-6">  )</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>At each point along this line on our X axis, our line is a single, known position on the Y axis. If we only have one measurement of XY position – say, a single GPS measurement – then our line would be of length 0. We’d have a point instead:</p>
@@ -5662,7 +5812,11 @@ background-color: null;
 font-style: inherit;">50</span>))</span>
 <span id="cb13-6">  )</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>That point represents a single position, which we’d understand through our coordinate reference system as being a certain distance away from a reference point.</p>
@@ -5749,7 +5903,11 @@ font-style: inherit;">+</span> </span>
 background-color: null;
 font-style: inherit;">coord_fixed</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>Just like with sf, we’re representing vectors by the places they start and end. And because we’ve plotted this as a line, we’re able to tell the position of our data at each distance along either the X or Y axis, within this coordinate reference system.</p>
@@ -5823,7 +5981,11 @@ font-style: inherit;">+</span></span>
 background-color: null;
 font-style: inherit;">geom_point</span>()</span></code></pre></div>
 <div class="cell-output-display">
-<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2023-08-07-vector/index_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
 </div>
 </div>
 <p>This graph is using an abstract coordinate system – instead of “meters away from the origin”, one axis is “distance in time from a reference date”, and the other is “distance in length from not existing at all”. But just like our physics vectors, each of these points represents a magnitude in some direction. Our <code>age</code> vector is a set of magnitudes along a time axis; our <code>circumference</code> vector a set of magnitudes along a length axis.</p>
@@ -5841,15 +6003,16 @@ font-style: inherit;">geom_point</span>()</span></code></pre></div>
 </section></div> ]]></description>
   <category>R</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-08-07-vector/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-08-07-vector/</guid>
   <pubDate>Mon, 07 Aug 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-08-07-vector/banner.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>From the inbox: How can I get fold assignments from spatialsample?</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-06-06-spatialsample_splits/index.html</link>
+  <link>https://mm218.dev/posts/2023-06-06-spatialsample_splits/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -6110,15 +6273,16 @@ First 10 features:
   <category>R packages</category>
   <category>geospatial data</category>
   <category>Tutorials</category>
-  <guid>https://mm218.dev/posts/2023-06-06-spatialsample_splits/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-06-06-spatialsample_splits/</guid>
   <pubDate>Tue, 06 Jun 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-06-06-spatialsample_splits/map.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Counting the number of times each citation is used in a Quarto document</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-04-10-quarto_citation_use_count/index.html</link>
+  <link>https://mm218.dev/posts/2023-04-10-quarto_citation_use_count/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -6191,15 +6355,16 @@ font-style: inherit;">|</span></span>
   <category>Quarto</category>
   <category>Tutorials</category>
   <category>Data science</category>
-  <guid>https://mm218.dev/posts/2023-04-10-quarto_citation_use_count/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-04-10-quarto_citation_use_count/</guid>
   <pubDate>Mon, 10 Apr 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-04-10-quarto_citation_use_count/books.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>Using in-line grouping to fit many models</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-04-01-fitting_models/index.html</link>
+  <link>https://mm218.dev/posts/2023-04-01-fitting_models/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -6502,15 +6667,16 @@ font-style: inherit;">.by =</span> status</span>
   <category>R</category>
   <category>Tutorials</category>
   <category>Data science</category>
-  <guid>https://mm218.dev/posts/2023-04-01-fitting_models/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-04-01-fitting_models/</guid>
   <pubDate>Sat, 01 Apr 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-04-01-fitting_models/nests.jpg" medium="image" type="image/jpeg"/>
 </item>
 <item>
   <title>waywiser is now a part of rOpenSci</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-03-21-waywiser-ropensci/index.html</link>
+  <link>https://mm218.dev/posts/2023-03-21-waywiser-ropensci/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -6536,14 +6702,15 @@ font-style: inherit;">.by =</span> status</span>
   <category>Spatial</category>
   <category>Data science</category>
   <category>R packages</category>
-  <guid>https://mm218.dev/posts/2023-03-21-waywiser-ropensci/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-03-21-waywiser-ropensci/</guid>
   <pubDate>Thu, 23 Mar 2023 00:00:00 GMT</pubDate>
 </item>
 <item>
   <title>How to run R jobs across multiple (local) computers</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-03-03-parallel/index.html</link>
+  <link>https://mm218.dev/posts/2023-03-03-parallel/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -6641,14 +6808,15 @@ font-style: inherit;">workers =</span> cl)</span></code></pre></div>
   <category>Tutorials</category>
   <category>Spatial</category>
   <category>Data science</category>
-  <guid>https://mm218.dev/posts/2023-03-03-parallel/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-03-03-parallel/</guid>
   <pubDate>Fri, 03 Mar 2023 00:00:00 GMT</pubDate>
 </item>
 <item>
   <title>Commands I Use</title>
   <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-02-20-tools/index.html</link>
+  <link>https://mm218.dev/posts/2023-02-20-tools/</link>
   <description><![CDATA[ 
+
 
 
 
@@ -6745,7 +6913,7 @@ scp</code></pre>
 
  ]]></description>
   <category>shell</category>
-  <guid>https://mm218.dev/posts/2023-02-20-tools/index.html</guid>
+  <guid>https://mm218.dev/posts/2023-02-20-tools/</guid>
   <pubDate>Mon, 20 Feb 2023 00:00:00 GMT</pubDate>
 </item>
 </channel>
