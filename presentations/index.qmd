@@ -5,6 +5,33 @@
     As lead/presenting author:
     <h3>2023</h3>
     <p>
+        <div><strong>Creating Data-Driven Interactive Virtual Environments for Communicating Forest Change.</strong></div>
+        <div>With <a href = 'https://www.esf.edu/faculty/beier/'>Colin M. Beier</a> and <a href = 'https://aidanackerman.com/'>Aidan C. Ackerman</a></div>
+        <div>Regular talk, American Geophysical Union Fall Meeting, San Francisco, CA, December 14 2023.</div>
+        <div>Slides available at <a href="https://mikemahoney218.github.io/2023-12-14-viz/2023-12-14-viz.html">https://mikemahoney218.github.io/2023-12-14-viz/2023-12-14-viz.html</a></div>
+    </p>
+    <p>
+        <div><strong>Consistent Workflows for Assessing Model Performance: Tools and Applications to Natural Climate Solutions.</strong></div>
+        <div>With <a href = "https://www.lucaskjohnson.com/">Lucas K. Johnson</a> and <a href = 'https://www.esf.edu/faculty/beier/'>Colin M. Beier</a></div>
+        <div>Regular talk, American Geophysical Union Fall Meeting, San Francisco, CA, December 12 2023.</div>
+        <div>Slides available at <a href="https://mikemahoney218.github.io/2023-12-12-waywiser/2023-12-12-waywiser.html">https://mikemahoney218.github.io/2023-12-12-waywiser/2023-12-12-waywiser.html</a></div>
+        <div>Recipient of an Outstanding Student Presentation Award.</div>
+    </p>
+    <p>
+        <div><strong>spatialsample: Infrastructure for spatial cross-validation</strong></div>
+        <div>Invited talk, EcoHealth Alliance, New York, NY (Virtual), December 7th 2023.</div>
+    </p>
+    <p>
+        <div><strong>waywiser: An ergonomic toolbox for assesing spatial models</strong></div>
+        <div>Invited talk, EcoHealth Alliance, New York, NY (Virtual), November 2nd 2023.</div>
+    </p>
+    <p>
+        <div><strong>Making Sausage: How open source scientific software gets made -- and what keeps us from making more.</strong></div>
+        <div>Invited talk, Federation of Earth Science Information Partners (ESIP) Open Science Cluster (Virtual), December 7th 2023.</div>
+        <div>Slides available at <a href="https://mikemahoney218.github.io/open-sci-talk/open-sci-talk.html">https://mikemahoney218.github.io/open-sci-talk/open-sci-talk.html</a></div>
+        <div>Video available at <a href="https://youtu.be/sJhP1Bdib-s?si=vld8KWS7WsGG6ZaQ">https://youtu.be/sJhP1Bdib-s?si=vld8KWS7WsGG6ZaQ</a></div>
+    </p>
+    <p>
         <div><strong>Mapping shrublands across New York State: Targeted ML for informing management decisions.</strong></div>
         <div>Invited talk, Federation of Earth Science Information Partners (ESIP) July Meeting, Burlington, VT, July 18 2023.</div>
         <div>Slides available at <a href="https://mm218.dev/esip2023">https://mm218.dev/esip2023</a></div>
@@ -117,6 +144,17 @@ York.</strong></div>
     </p>
     <hr>
     As co-/non-presenting author:
+    <h3>2023</h3>
+    <p>
+        <div><strong>An integrated carbon monitoring framework for stock-change GHG inventory at parcel to landscape scales: approach, outputs and applications.</strong></div>
+        <div>With <a href = 'https://www.esf.edu/faculty/beier/'>Colin M. Beier (lead author),</a> <a href = "https://www.lucaskjohnson.com/">Lucas K. Johnson</a>, Madeleine Desrochers, and Grant Domke.</div>
+        <div>Regular talk, American Geophysical Union Fall Meeting, San Francisco, CA, December 13 2023.</div>
+    </p>
+    <p>
+        <div><strong>Bridging the Gap Between Pixels and Minimum Estimation Units: Small-Area Uncertainty Estimation with Forest Aboveground Biomass Maps.</strong></div>
+        <div>With <a href = "https://www.lucaskjohnson.com/">Lucas K. Johnson (lead author),</a> Grant Domke, and <a href = 'https://www.esf.edu/faculty/beier/'>Colin M. Beier</a></div>
+        <div>Poster presentation, American Geophysical Union Fall Meeting, San Francisco, CA, December 11 2023.</div>
+    </p>
     <h3>2022</h3>
     <p>
         <div><strong>A Map‑based Stock Change Approach for Fine‑scale Biomass
