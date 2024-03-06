@@ -9,7 +9,7 @@
 <link>https://mm218.dev/blog.html#category=R</link>
 <atom:link href="https://mm218.dev/blog-r.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
-<generator>quarto-1.4.550</generator>
+<generator>quarto-1.4.551</generator>
 <lastBuildDate>Wed, 10 Jan 2024 00:00:00 GMT</lastBuildDate>
 <item>
   <title>rsi is now on CRAN!</title>
@@ -6741,7 +6741,7 @@ font-style: inherit;">workers =</span> cl)</span></code></pre></div>
 
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://mm218.dev/posts/2023-01-17-spatialsample/map.jpg" class="img-fluid figure-img" alt="A pretty map picture. It has no relevance to the article."></p>
+<p><img src="https://mm218.dev/posts/2023-01-17-spatialsample/map.jpg" class="img-fluid figure-img"></p>
 <figcaption>Photo by <a href="https://unsplash.com/@tjump">Nik Shuliahin 💛💙</a> on <a href="https://unsplash.com/photos/rkFIIE9PxH0">Unsplash</a></figcaption>
 </figure>
 </div>
@@ -6864,7 +6864,7 @@ font-style: inherit;">autoplot</span>()</span></code></pre></div>
 <p>A docker container runs on a small server in my living room,<sup>5</sup> running my instance of Paperless-ng. When I save a new article to its “input” folder, the container OCR’s the document and moves it to a safe storage location, giving it the appropriate “tags” and making it accessible with the rest of the papers I’ve ever shown an interest in.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/paperless.png" class="img-fluid figure-img" alt="A screenshot of the Paperless-ng user interface. A search for 'virtual environments' returned 174 results, shown as individual tiles with names and text previews."></p>
+<p><img src="https://mm218.dev/posts/2022-12-12-tools/paperless.png" class="img-fluid figure-img"></p>
 <figcaption>I swear I’ve read (most of) these, I just am not <em>great</em> at updating my tags.</figcaption>
 </figure>
 </div>

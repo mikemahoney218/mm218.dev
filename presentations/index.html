@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.4.550">
+<meta name="generator" content="quarto-1.4.551">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -149,6 +149,67 @@ As lead/presenting author:
 <h3 class="anchored">
 2023
 </h3>
+<p>
+</p><div>
+<strong>Creating Data-Driven Interactive Virtual Environments for Communicating Forest Change.</strong>
+</div>
+<div>
+With <a href="https://www.esf.edu/faculty/beier/">Colin M. Beier</a> and <a href="https://aidanackerman.com/">Aidan C. Ackerman</a>
+</div>
+<div>
+Regular talk, American Geophysical Union Fall Meeting, San Francisco, CA, December 14 2023.
+</div>
+<div>
+Slides available at <a href="https://mikemahoney218.github.io/2023-12-14-viz/2023-12-14-viz.html">https://mikemahoney218.github.io/2023-12-14-viz/2023-12-14-viz.html</a>
+</div>
+<p></p>
+<p>
+</p><div>
+<strong>Consistent Workflows for Assessing Model Performance: Tools and Applications to Natural Climate Solutions.</strong>
+</div>
+<div>
+With <a href="https://www.lucaskjohnson.com/">Lucas K. Johnson</a> and <a href="https://www.esf.edu/faculty/beier/">Colin M. Beier</a>
+</div>
+<div>
+Regular talk, American Geophysical Union Fall Meeting, San Francisco, CA, December 12 2023.
+</div>
+<div>
+Slides available at <a href="https://mikemahoney218.github.io/2023-12-12-waywiser/2023-12-12-waywiser.html">https://mikemahoney218.github.io/2023-12-12-waywiser/2023-12-12-waywiser.html</a>
+</div>
+<div>
+Recipient of an Outstanding Student Presentation Award.
+</div>
+<p></p>
+<p>
+</p><div>
+<strong>spatialsample: Infrastructure for spatial cross-validation</strong>
+</div>
+<div>
+Invited talk, EcoHealth Alliance, New York, NY (Virtual), December 7th 2023.
+</div>
+<p></p>
+<p>
+</p><div>
+<strong>waywiser: An ergonomic toolbox for assesing spatial models</strong>
+</div>
+<div>
+Invited talk, EcoHealth Alliance, New York, NY (Virtual), November 2nd 2023.
+</div>
+<p></p>
+<p>
+</p><div>
+<strong>Making Sausage: How open source scientific software gets made – and what keeps us from making more.</strong>
+</div>
+<div>
+Invited talk, Federation of Earth Science Information Partners (ESIP) Open Science Cluster (Virtual), December 7th 2023.
+</div>
+<div>
+Slides available at <a href="https://mikemahoney218.github.io/open-sci-talk/open-sci-talk.html">https://mikemahoney218.github.io/open-sci-talk/open-sci-talk.html</a>
+</div>
+<div>
+Video available at <a href="https://youtu.be/sJhP1Bdib-s?si=vld8KWS7WsGG6ZaQ">https://youtu.be/sJhP1Bdib-s?si=vld8KWS7WsGG6ZaQ</a>
+</div>
+<p></p>
 <p>
 </p><div>
 <strong>Mapping shrublands across New York State: Targeted ML for informing management decisions.</strong>
@@ -399,6 +460,31 @@ Regular talk, Rochester Academy of Sciences Fall Scientific Paper Session, Genes
 <hr>
 As co-/non-presenting author:
 <h3 class="anchored">
+2023
+</h3>
+<p>
+</p><div>
+<strong>An integrated carbon monitoring framework for stock-change GHG inventory at parcel to landscape scales: approach, outputs and applications.</strong>
+</div>
+<div>
+With <a href="https://www.esf.edu/faculty/beier/">Colin M. Beier (lead author),</a> <a href="https://www.lucaskjohnson.com/">Lucas K. Johnson</a>, Madeleine Desrochers, and Grant Domke.
+</div>
+<div>
+Regular talk, American Geophysical Union Fall Meeting, San Francisco, CA, December 13 2023.
+</div>
+<p></p>
+<p>
+</p><div>
+<strong>Bridging the Gap Between Pixels and Minimum Estimation Units: Small-Area Uncertainty Estimation with Forest Aboveground Biomass Maps.</strong>
+</div>
+<div>
+With <a href="https://www.lucaskjohnson.com/">Lucas K. Johnson (lead author),</a> Grant Domke, and <a href="https://www.esf.edu/faculty/beier/">Colin M. Beier</a>
+</div>
+<div>
+Poster presentation, American Geophysical Union Fall Meeting, San Francisco, CA, December 11 2023.
+</div>
+<p></p>
+<h3 class="anchored">
 2022
 </h3>
 <p>
@@ -573,6 +659,24 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
     // clear code selection
     e.clearSelection();
   });
+    var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+    var mailtoRegex = new RegExp(/^mailto:/);
+      var filterRegex = new RegExp("https:\/\/mm218\.dev");
+    var isInternal = (href) => {
+        return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+    }
+    // Inspect non-navigation links and adorn them if external
+ 	var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool)');
+    for (var i=0; i<links.length; i++) {
+      const link = links[i];
+      if (!isInternal(link.href)) {
+        // undo the damage that might have been done by quarto-nav.js in the case of
+        // links that we want to consider external
+        if (link.dataset.originalHref !== undefined) {
+          link.href = link.dataset.originalHref;
+        }
+      }
+    }
   function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
     const config = {
       allowHTML: true,
@@ -607,7 +711,11 @@ window.document.addEventListener("DOMContentLoaded", function (event) {
       try { href = new URL(href).hash; } catch {}
       const id = href.replace(/^#\/?/, "");
       const note = window.document.getElementById(id);
-      return note.innerHTML;
+      if (note) {
+        return note.innerHTML;
+      } else {
+        return "";
+      }
     });
   }
   const xrefs = window.document.querySelectorAll('a.quarto-xref');
