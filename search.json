@@ -284,7 +284,7 @@
     "href": "posts/2024-03-29-rsi-020/index.html#downloading-even-more-data",
     "title": "rsi 0.2.0 is now on CRAN!",
     "section": "Downloading even more data",
-    "text": "Downloading even more data\nTwo new functions\nFirst, thanks to @h-a-graham, the new get_alos_palsar_imagery() function provides a wrapper for accessing data from ALOS PALSAR:\n\nalos &lt;- get_alos_palsar_imagery(\n  aoi,\n  \"2021-06-01\",\n  \"2021-09-01\"\n)\n\nterra::plot(terra::rast(alos))\n\n\n\n\n\n\n\n\nAnd separately, the new get_naip_imagery() function provides access to data from the National Agricultural Imagery Program across the United States:\n\nnaip &lt;- get_naip_imagery(\n  aoi,\n  \"2018-01-01\",\n  \"2021-01-01\",\n  pixel_x_size = 30,\n  pixel_y_size = 30\n)\n\nterra::plotRGB(terra::rast(naip))"
+    "text": "Downloading even more data\nTwo new functions in this release provide friendly wrappers around get_stac_data() to help you access specific data sources.\nFirst, thanks to @h-a-graham, the new get_alos_palsar_imagery() function provides a wrapper for accessing data from ALOS PALSAR:\n\nalos &lt;- get_alos_palsar_imagery(\n  aoi,\n  \"2021-06-01\",\n  \"2021-09-01\"\n)\n\nterra::plot(terra::rast(alos))\n\n\n\n\n\n\n\n\nAnd separately, the new get_naip_imagery() function provides access to data from the National Agricultural Imagery Program across the United States:\n\nnaip &lt;- get_naip_imagery(\n  aoi,\n  \"2018-01-01\",\n  \"2021-01-01\",\n  pixel_x_size = 30,\n  pixel_y_size = 30\n)\n\nterra::plotRGB(terra::rast(naip))"
   },
   {
     "objectID": "posts/2024-03-29-rsi-020/index.html#new-vignette",
