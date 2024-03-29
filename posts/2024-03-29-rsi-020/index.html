@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mike Mahoney">
-<meta name="dcterms.date" content="2023-12-07">
-<meta name="description" content="And down the rabbit hole we go.">
+<meta name="dcterms.date" content="2024-03-29">
+<meta name="description" content="More data products, fewer bugs, less time wasted on data management slop.">
 
-<title>Mike Mahoney - Why is View() capitalized, anyway?</title>
+<title>Mike Mahoney - rsi 0.2.0 is now on CRAN!</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -106,14 +106,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 <link rel="stylesheet" href="../../styles.css">
-<meta property="og:title" content="Mike Mahoney - Why is View() capitalized, anyway?">
-<meta property="og:description" content="And down the rabbit hole we go.">
-<meta property="og:image" content="https://mm218.dev/posts/2023-12-07-View/banner.jpg">
+<meta property="og:title" content="Mike Mahoney - rsi 0.2.0 is now on CRAN!">
+<meta property="og:description" content="More data products, fewer bugs, less time wasted on data management slop.">
+<meta property="og:image" content="https://mm218.dev/posts/2024-03-29-rsi-020/banner.jpg">
 <meta property="og:site_name" content="Mike Mahoney">
 <meta property="og:locale" content="en_US">
-<meta name="twitter:title" content="Mike Mahoney - Why is View() capitalized, anyway?">
-<meta name="twitter:description" content="And down the rabbit hole we go.">
-<meta name="twitter:image" content="https://mm218.dev/posts/2023-12-07-View/banner.jpg">
+<meta name="twitter:title" content="Mike Mahoney - rsi 0.2.0 is now on CRAN!">
+<meta name="twitter:description" content="More data products, fewer bugs, less time wasted on data management slop.">
+<meta name="twitter:image" content="https://mm218.dev/posts/2024-03-29-rsi-020/banner.jpg">
 <meta name="twitter:creator" content="@MikeMahoney218">
 <meta name="twitter:card" content="summary_large_image">
 </head>
@@ -167,14 +167,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Why is <code>View()</code> capitalized, anyway?</h1>
+      <h1 class="title">rsi 0.2.0 is now on CRAN!</h1>
                   <div>
         <div class="description">
-          And down the rabbit hole we go.
+          More data products, fewer bugs, less time wasted on data management slop.
         </div>
       </div>
                           <div class="quarto-categories">
                 <div class="quarto-category">R</div>
+                <div class="quarto-category">Spatial</div>
+                <div class="quarto-category">geospatial data</div>
+                <div class="quarto-category">R packages</div>
               </div>
                   </div>
   </div>
@@ -192,7 +195,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">December 7, 2023</p>
+        <p class="date">March 29, 2024</p>
       </div>
     </div>
     
@@ -204,7 +207,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <!-- sidebar -->
 <!-- margin-sidebar -->
     <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
-        
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#downloading-water-data" id="toc-downloading-water-data" class="nav-link active" data-scroll-target="#downloading-water-data">Downloading water data</a></li>
+  <li><a href="#downloading-even-more-data" id="toc-downloading-even-more-data" class="nav-link" data-scroll-target="#downloading-even-more-data">Downloading even more data</a></li>
+  <li><a href="#new-vignette" id="toc-new-vignette" class="nav-link" data-scroll-target="#new-vignette">New vignette</a></li>
+  <li><a href="#acknowledgments" id="toc-acknowledgments" class="nav-link" data-scroll-target="#acknowledgments">Acknowledgments</a></li>
+  </ul>
+</nav>
     </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
@@ -213,114 +225,111 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 
 
-<p><a href="https://bsky.app/profile/davidjohnbaker.bsky.social/post/3kfxbci3ji22h">Over on BlueSky, David John Baker asks</a>:</p>
-<p><img src="post.png" class="img-fluid" alt="Post from David John Baker on BlueSky: Why is does the  `View()` function in R start with a capital V? I have no idea why. Does this have to do with functions that are not just dealing with some sort of standard output? #rstats"></p>
-<p>My first thought on reading this was that <code>View()</code> in RStudio is built to mask the <code>View()</code> function from utils, and so capitalizes the V because utils capitalized the V. Things are the way they are because they are the way they are, yet again.</p>
-<p>But of course, that’s not the actual question – not only did David specify he’s talking about the function in <em>R</em>, not in <em>RStudio</em>, but of course someone decided that utils should capitalize the <code>View()</code> function as well. And this is weird! There are not that many functions in base R that start with a capital letter:</p>
+<p>I’m deligted to announce that version 0.2.0 of rsi, my package for handling common spatial ML data pre-processing tasks, is <a href="https://cran.r-project.org/package=rsi">now officially on CRAN</a>. rsi aims to handle downloading, masking, rescaling, and compositing data from STAC endpoints, computing spectral indices from that same data, amd wrangling the outputs into bricks ready for modeling workflows – and to do so in a user-friendly and extensible way. This release adds wrappers for more data sources, makes it easier to download high-quality water data from Landsat, and fixes some bugs while simplifying the internals of the package.</p>
+<p>You can install rsi from CRAN via:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">"rsi"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This post will walk through a few of the most user-visible changes, starting with…</p>
+<section id="downloading-water-data" class="level2">
+<h2 class="anchored" data-anchor-id="downloading-water-data">Downloading water data</h2>
+<p>In older versions of rsi, the default <code>landsat_mask_function()</code> would mask your data so that your final files (and composites) only contained the highest quality observations over land. That meant that waterbodies (like the large area in the top left of this image) would always be empty:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">getOption</span>(<span class="st">"defaultPackages"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">setdiff</span>(<span class="st">"datasets"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vapply</span>(\(x) <span class="fu">paste0</span>(<span class="st">"package:"</span>, x), <span class="fu">character</span>(<span class="dv">1</span>)) <span class="sc">|&gt;</span> </span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ls</span>() <span class="sc">|&gt;</span> </span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">strsplit</span>(<span class="st">""</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Filter</span>(<span class="at">f =</span> \(x) x[[<span class="dv">1</span>]] <span class="sc">%in%</span> LETTERS) <span class="sc">|&gt;</span> </span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vapply</span>(paste0, <span class="fu">character</span>(<span class="dv">1</span>), <span class="at">collapse =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code> [1] "Rprof"               "Rprofmem"            "RShowDoc"           
- [4] "RSiteSearch"         "Rtangle"             "RtangleFinish"      
- [7] "RtangleRuncode"      "RtangleSetup"        "RtangleWritedoc"    
-[10] "RweaveChunkPrefix"   "RweaveEvalWithOpt"   "RweaveLatex"        
-[13] "RweaveLatexFinish"   "RweaveLatexOptions"  "RweaveLatexSetup"   
-[16] "RweaveLatexWritedoc" "RweaveTryStop"       "Stangle"            
-[19] "Sweave"              "SweaveHooks"         "SweaveSyntaxLatex"  
-[22] "SweaveSyntaxNoweb"   "SweaveSyntConv"      "URLdecode"          
-[25] "URLencode"           "View"               </code></pre>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rsi)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>future<span class="sc">::</span><span class="fu">plan</span>(<span class="st">"multisession"</span>)</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>aoi <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_point</span>(<span class="fu">c</span>(<span class="sc">-</span><span class="fl">76.1376841</span>, <span class="fl">43.0351335</span>))</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>aoi <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_set_crs</span>(sf<span class="sc">::</span><span class="fu">st_sfc</span>(aoi), <span class="dv">4326</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>aoi <span class="ot">&lt;-</span> sf<span class="sc">::</span><span class="fu">st_buffer</span>(sf<span class="sc">::</span><span class="fu">st_transform</span>(aoi, <span class="dv">5070</span>), <span class="dv">10000</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>landsat <span class="ot">&lt;-</span> <span class="fu">get_landsat_imagery</span>(</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  aoi,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">start_date =</span> <span class="st">"2021-06-01"</span>,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">end_date =</span> <span class="st">"2021-08-31"</span>,</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_filename =</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">".tif"</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">plot</span>(terra<span class="sc">::</span><span class="fu">rast</span>(landsat))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
 </div>
-<p>These functions all follow one of three patterns:</p>
-<ul>
-<li>Functions that start with <code>R</code> or <code>S</code>, capitalized because it’s the name of a programming language;</li>
-<li>Functions that start with URL;</li>
-<li><code>View()</code> <em>by itself</em>!</li>
-</ul>
-<p><strong>Update:</strong></p>
-<p>A few minutes after publishing, <a href="https://fosstodon.org/@klmr@mastodon.social/111540097245999105">Konrad Rudolph points out on Mastodon</a> that there are plenty of functions in the base package <em>itself</em> that are capitalized and don’t match these rules:</p>
+</div>
+<p>This works great if you only care about land observations, but has an obvious flaw otherwise. Thanks to <span class="citation" data-cites="mateuszrydzik">@mateuszrydzik</span>, <code>landsat_mask_function()</code> starting in version 0.2.0 now has an argument, <code>include</code>, which you can use to also include high quality observations over water in your final outputs:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span>(<span class="st">"package:base"</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">strsplit</span>(<span class="st">""</span>) <span class="sc">|&gt;</span> </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">Filter</span>(<span class="at">f =</span> \(x) x[[<span class="dv">1</span>]] <span class="sc">%in%</span> LETTERS) <span class="sc">|&gt;</span> </span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">vapply</span>(paste0, <span class="fu">character</span>(<span class="dv">1</span>), <span class="at">collapse =</span> <span class="st">""</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code> [1] "Arg"                     "Conj"                   
- [3] "Cstack_info"             "Encoding"               
- [5] "Encoding&lt;-"              "F"                      
- [7] "Filter"                  "Find"                   
- [9] "I"                       "Im"                     
-[11] "ISOdate"                 "ISOdatetime"            
-[13] "La_library"              "La_version"             
-[15] "La.svd"                  "LETTERS"                
-[17] "Map"                     "Math.data.frame"        
-[19] "Math.Date"               "Math.difftime"          
-[21] "Math.factor"             "Math.POSIXt"            
-[23] "Mod"                     "NCOL"                   
-[25] "Negate"                  "NextMethod"             
-[27] "NROW"                    "OlsonNames"             
-[29] "Ops.data.frame"          "Ops.Date"               
-[31] "Ops.difftime"            "Ops.factor"             
-[33] "Ops.numeric_version"     "Ops.ordered"            
-[35] "Ops.POSIXt"              "Position"               
-[37] "R_compiled_by"           "R_system_version"       
-[39] "R.home"                  "R.version"              
-[41] "R.Version"               "R.version.string"       
-[43] "Re"                      "Recall"                 
-[45] "Reduce"                  "RNGkind"                
-[47] "RNGversion"              "Summary.data.frame"     
-[49] "Summary.Date"            "Summary.difftime"       
-[51] "Summary.factor"          "Summary.numeric_version"
-[53] "Summary.ordered"         "Summary.POSIXct"        
-[55] "Summary.POSIXlt"         "Sys.chmod"              
-[57] "Sys.Date"                "Sys.getenv"             
-[59] "Sys.getlocale"           "Sys.getpid"             
-[61] "Sys.glob"                "Sys.info"               
-[63] "Sys.localeconv"          "Sys.readlink"           
-[65] "Sys.setenv"              "Sys.setFileTime"        
-[67] "Sys.setLanguage"         "Sys.setlocale"          
-[69] "Sys.sleep"               "Sys.time"               
-[71] "Sys.timezone"            "Sys.umask"              
-[73] "Sys.unsetenv"            "Sys.which"              
-[75] "T"                       "UseMethod"              
-[77] "Vectorize"              </code></pre>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>landsat <span class="ot">&lt;-</span> <span class="fu">get_landsat_imagery</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  aoi,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">start_date =</span> <span class="st">"2021-06-01"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">end_date =</span> <span class="st">"2021-08-31"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">mask_function =</span> \(r) <span class="fu">landsat_mask_function</span>(r, <span class="at">include =</span> <span class="st">"both"</span>),</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">output_filename =</span> <span class="fu">tempfile</span>(<span class="at">fileext =</span> <span class="st">".tif"</span>)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">plot</span>(terra<span class="sc">::</span><span class="fu">rast</span>(landsat))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
 </div>
 </div>
-<p>One of those is <code>Filter()</code>, which I <em>literally used in the original code chunk</em> and somehow didn’t notice started with a capital letter.</p>
-<p>These functions fall into a number of other groups – functions for working with complex numbers, for functional programming and recursion, for setting and getting system information and variables, group generic functions, and a few proper nouns and acronyms like “C” and “RNG”. It’s still not <em>common</em> – 77 out of 1268 objects in the base namespace start with a capital letter – but it’s more common than in recommended packages.</p>
-<p>&lt; / update &gt;</p>
-<p>But even with that said, <code>View()</code> is the only function <em>in recommended packages</em> that starts with a capital letter that’s not named after a proper noun.<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a> And it’s been weird for a long time. The original version of the function was also capitalized when it was added by Professor Brian D Ripley way back in 2007:</p>
-<p><img src="commit.png" class="img-fluid" alt="Commit by Prof. Brian D Ripley on Feb 19 2007, adding the capitalized `View()` function."></p>
-<p>Now here’s where we enter the world of wild speculation. Because if we look at the documentation for <code>View()</code>, we can see that this function is meant to “Invoke a Data Viewer”, with “Data Viewer” capitalized like a proper noun in both the function title and description:</p>
-<p><img src="ViewDoc.png" class="img-fluid" alt="The rd documentation file for `View()`. Notably, the Description field capitalizes the phrase Data Viewer."></p>
-<p>This isn’t a universal style. If we look for instance at the documentation for <code>edit()</code>, which pre-dates <code>View()</code>,<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> we can see that “text editor” is capitalized in the title but not in the description:</p>
-<p><img src="EditDoc.png" class="img-fluid" alt="The rd documentation file for `edit()`. Notably, the Description field _does not_ capitalize the phrase text editor."></p>
-<p>So this makes me suspect that Data Viewer here is being used as a proper noun. This wouldn’t be a unique usage; for instance, the <a href="https://docs.posit.co/ide/user/ide/guide/data/data-viewer.html">RStudio user guide also describes its viewer as a Data Viewer, capitalized</a>, and a search for “Data Viewer” suggests the phrase is capitalized something like 2/3 of the time on public websites. I have absolutely no knowledge of the tech jargon of 2007, or of the proper styling of “data viewer”,<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a> but it does seem like it’s <em>sometimes</em> a proper noun.</p>
-<p>So, to wildly speculate just a little further: is <code>View()</code> capitalized because “Viewer” was capitalized, at least back in 2007?</p>
-<p>Now, here’s a decent piece of evidence <em>against</em> this conjecture: the details section of the <code>View()</code> documentation, added at the same time as the title and description,<a href="#fn4" class="footnote-ref" id="fnref4" role="doc-noteref"><sup>4</sup></a> doesn’t capitalize the phrase “data viewer”:</p>
-<p><img src="ViewDetails.png" class="img-fluid" alt="The details section of the `View()` documentation. Data viewer is not capitalized."></p>
-<p>That said, this is also not unique. That same <a href="https://docs.posit.co/ide/user/ide/guide/data/data-viewer.html#scrolling">RStudio user guide also sometimes writes “data viewer” in lowercase</a>, though in <em>most</em> of the guide it’s treated as a proper noun.</p>
-<p>So there’s one guess: maybe <code>View()</code> is capitalized because, like the functions starting with R and S and URL, it’s named after a proper noun. Things are the way they are because they are the way they are, yet again.</p>
-<p>If anyone knows more, though – or feels like asking Professor Ripley – please drop me a line. I’d love to know the actual answer.</p>
+</div>
+<p>You can also set <code>include = "water"</code> to <em>only</em> include data over waterbodies, and exclude all data over land.</p>
+</section>
+<section id="downloading-even-more-data" class="level2">
+<h2 class="anchored" data-anchor-id="downloading-even-more-data">Downloading even more data</h2>
+<p>Two new functions</p>
+<p>First, thanks to <span class="citation" data-cites="h-a-graham">@h-a-graham</span>, the new <code>get_alos_palsar_imagery()</code> function provides a wrapper for accessing data from ALOS PALSAR:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>alos <span class="ot">&lt;-</span> <span class="fu">get_alos_palsar_imagery</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  aoi,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2021-06-01"</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2021-09-01"</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">plot</span>(terra<span class="sc">::</span><span class="fu">rast</span>(alos))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>And separately, the new <code>get_naip_imagery()</code> function provides access to data from the National Agricultural Imagery Program across the United States:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>naip <span class="ot">&lt;-</span> <span class="fu">get_naip_imagery</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  aoi,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2018-01-01"</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="st">"2021-01-01"</span>,</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">pixel_x_size =</span> <span class="dv">30</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">pixel_y_size =</span> <span class="dv">30</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>terra<span class="sc">::</span><span class="fu">plotRGB</span>(terra<span class="sc">::</span><span class="fu">rast</span>(naip))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="new-vignette" class="level2">
+<h2 class="anchored" data-anchor-id="new-vignette">New vignette</h2>
+<p>One of the last significant user-facing changes is the addition of <a href="https://permian-global-research.github.io/rsi/articles/How-can-I-.html">a new vignette, called “How can I…?”</a>. This vignette is meant to collect common use-cases into a single document, providing users with a “cookbook” containing methods they might use to approach their current problems. If you’ve got a use-case that took you a moment to figure out, or a problem that you think rsi <em>should</em> be able to solve, let me know through an issue on GitHub so I can incorporate it into this vignette!</p>
+<p>The other improvements in this release focus mostly on bug squashing – including a nasty bug where downloading multiple tiles using <code>composite_function = NULL</code> could fail – and simplifying the internals of <code>get_stac_data()</code> to make it more maintainable and extensible into the future.</p>
+</section>
+<section id="acknowledgments" class="level2">
+<h2 class="anchored" data-anchor-id="acknowledgments">Acknowledgments</h2>
+<p>As always, huge thanks to the folks who have been involved in testing and improving this package since our last release: <a href="https://github.com/agronomofiorentini">@agronomofiorentini</a>, <a href="https://github.com/h-a-graham">@h-a-graham</a>, and <a href="https://github.com/mateuszrydzik">@mateuszrydzik</a>. It’s extremely appreciated.</p>
 
 
+</section>
 
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p><a href="https://www.merriam-webster.com/dictionary/URL">Merriam-Webster calls “URL” a noun</a>, even if it originated as an acronym, get out of my comments.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn2"><p>Though I’m not sure who originally wrote it; I get a bit lost in the VCS logs from before base functions were split into sub-packages.<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn3"><p>And I assume these two things are related!<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-<li id="fn4"><p>And the function itself; all of this documentation is also still in the official help file.<a href="#fnref4" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
-</ol>
-</section></div></main> <!-- /main -->
+</main> <!-- /main -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {
   const toggleBodyColorMode = (bsSheetEl) => {

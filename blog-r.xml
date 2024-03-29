@@ -9,8 +9,287 @@
 <link>https://mm218.dev/blog.html#category=R</link>
 <atom:link href="https://mm218.dev/blog-r.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
-<generator>quarto-1.4.551</generator>
-<lastBuildDate>Wed, 10 Jan 2024 00:00:00 GMT</lastBuildDate>
+<generator>quarto-1.4.552</generator>
+<lastBuildDate>Fri, 29 Mar 2024 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>rsi 0.2.0 is now on CRAN!</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2024-03-29-rsi-020/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>I’m deligted to announce that version 0.2.0 of rsi, my package for handling common spatial ML data pre-processing tasks, is <a href="https://cran.r-project.org/package=rsi">now officially on CRAN</a>. rsi aims to handle downloading, masking, rescaling, and compositing data from STAC endpoints, computing spectral indices from that same data, amd wrangling the outputs into bricks ready for modeling workflows – and to do so in a user-friendly and extensible way. This release adds wrappers for more data sources, makes it easier to download high-quality water data from Landsat, and fixes some bugs while simplifying the internals of the package.</p>
+<p>You can install rsi from CRAN via:</p>
+<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">install.packages</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rsi"</span>)</span></code></pre></div>
+<p>This post will walk through a few of the most user-visible changes, starting with…</p>
+<section id="downloading-water-data" class="level2">
+<h2 class="anchored" data-anchor-id="downloading-water-data">Downloading water data</h2>
+<p>In older versions of rsi, the default <code>landsat_mask_function()</code> would mask your data so that your final files (and composites) only contained the highest quality observations over land. That meant that waterbodies (like the large area in the top left of this image) would always be empty:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(rsi)</span>
+<span id="cb2-2">future<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plan</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"multisession"</span>)</span>
+<span id="cb2-3"></span>
+<span id="cb2-4">aoi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_point</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">76.1376841</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">43.0351335</span>))</span>
+<span id="cb2-5">aoi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_set_crs</span>(sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_sfc</span>(aoi), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4326</span>)</span>
+<span id="cb2-6">aoi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_buffer</span>(sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_transform</span>(aoi, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5070</span>), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>)</span>
+<span id="cb2-7"></span>
+<span id="cb2-8">landsat <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_landsat_imagery</span>(</span>
+<span id="cb2-9">  aoi,</span>
+<span id="cb2-10">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">start_date =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-06-01"</span>,</span>
+<span id="cb2-11">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">end_date =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-08-31"</span>,</span>
+<span id="cb2-12">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb2-13">)</span>
+<span id="cb2-14"></span>
+<span id="cb2-15">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(landsat))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-03-29-rsi-020/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This works great if you only care about land observations, but has an obvious flaw otherwise. Thanks to <span class="citation" data-cites="mateuszrydzik">@mateuszrydzik</span>, <code>landsat_mask_function()</code> starting in version 0.2.0 now has an argument, <code>include</code>, which you can use to also include high quality observations over water in your final outputs:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">landsat <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_landsat_imagery</span>(</span>
+<span id="cb3-2">  aoi,</span>
+<span id="cb3-3">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">start_date =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-06-01"</span>,</span>
+<span id="cb3-4">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">end_date =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-08-31"</span>,</span>
+<span id="cb3-5">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mask_function =</span> \(r) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">landsat_mask_function</span>(r, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">include =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"both"</span>),</span>
+<span id="cb3-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb3-7">)</span>
+<span id="cb3-8"></span>
+<span id="cb3-9">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(landsat))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-03-29-rsi-020/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>You can also set <code>include = "water"</code> to <em>only</em> include data over waterbodies, and exclude all data over land.</p>
+</section>
+<section id="downloading-even-more-data" class="level2">
+<h2 class="anchored" data-anchor-id="downloading-even-more-data">Downloading even more data</h2>
+<p>Two new functions</p>
+<p>First, thanks to <span class="citation" data-cites="h-a-graham">@h-a-graham</span>, the new <code>get_alos_palsar_imagery()</code> function provides a wrapper for accessing data from ALOS PALSAR:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">alos <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_alos_palsar_imagery</span>(</span>
+<span id="cb4-2">  aoi,</span>
+<span id="cb4-3">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-06-01"</span>,</span>
+<span id="cb4-4">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-09-01"</span></span>
+<span id="cb4-5">)</span>
+<span id="cb4-6"></span>
+<span id="cb4-7">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(alos))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-03-29-rsi-020/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>And separately, the new <code>get_naip_imagery()</code> function provides access to data from the National Agricultural Imagery Program across the United States:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">naip <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_naip_imagery</span>(</span>
+<span id="cb5-2">  aoi,</span>
+<span id="cb5-3">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2018-01-01"</span>,</span>
+<span id="cb5-4">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-01-01"</span>,</span>
+<span id="cb5-5">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pixel_x_size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">30</span>,</span>
+<span id="cb5-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pixel_y_size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">30</span></span>
+<span id="cb5-7">)</span>
+<span id="cb5-8"></span>
+<span id="cb5-9">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plotRGB</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(naip))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-03-29-rsi-020/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="new-vignette" class="level2">
+<h2 class="anchored" data-anchor-id="new-vignette">New vignette</h2>
+<p>One of the last significant user-facing changes is the addition of <a href="https://permian-global-research.github.io/rsi/articles/How-can-I-.html">a new vignette, called “How can I…?”</a>. This vignette is meant to collect common use-cases into a single document, providing users with a “cookbook” containing methods they might use to approach their current problems. If you’ve got a use-case that took you a moment to figure out, or a problem that you think rsi <em>should</em> be able to solve, let me know through an issue on GitHub so I can incorporate it into this vignette!</p>
+<p>The other improvements in this release focus mostly on bug squashing – including a nasty bug where downloading multiple tiles using <code>composite_function = NULL</code> could fail – and simplifying the internals of <code>get_stac_data()</code> to make it more maintainable and extensible into the future.</p>
+</section>
+<section id="acknowledgments" class="level2">
+<h2 class="anchored" data-anchor-id="acknowledgments">Acknowledgments</h2>
+<p>As always, huge thanks to the folks who have been involved in testing and improving this package since our last release: <a href="https://github.com/agronomofiorentini">@agronomofiorentini</a>, <a href="https://github.com/h-a-graham">@h-a-graham</a>, and <a href="https://github.com/mateuszrydzik">@mateuszrydzik</a>. It’s extremely appreciated.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>Spatial</category>
+  <category>geospatial data</category>
+  <category>R packages</category>
+  <guid>https://mm218.dev/posts/2024-03-29-rsi-020/</guid>
+  <pubDate>Fri, 29 Mar 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2024-03-29-rsi-020/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>rsi is now on CRAN!</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -6834,1234 +7113,6 @@ font-style: inherit;">autoplot</span>()</span></code></pre></div>
   <guid>https://mm218.dev/posts/2023-01-17-spatialsample/</guid>
   <pubDate>Tue, 17 Jan 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-01-17-spatialsample/map.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>The tools I loved this year</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2022-12-12-tools/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p>One of the problems with open source development is that it’s the engineering equivalent of yelling into the void. Once your code is released, it’s really, really hard to know if anyone actually <em>uses</em> your tool. You might be able to track download numbers,<sup>1</sup> but there’s almost no way to tell how many of those downloads are actual users, and how many are from automated webscrapers, unofficial mirrors, or people who will try to use your software once before giving up and moving on to something else.<sup>2</sup> The best information about how many people use your software is, basically, how much you hear people talking about your software.</p>
-<p>The problem is that, for the majority of open source projects, you’ll only hear people talk about your software when it’s pissing someone off. People don’t generally open issues on GitHub to tell you they love your work,<sup>3</sup> but rather to tell you that your work messed up in a big enough way that they’re going to spend time writing you letters about it. On my more meditative days, I’m able to look at issues as “someone cares enough about this project to spend their time telling me what they think would improve it”; on my more human ones, it can feel like someone sharing a public list of my mistakes.<sup>4</sup></p>
-<p>So, with all this in mind and full up on the holiday spirit, I’m putting here a non-exhaustive list of the open-source tools that I loved this year, in no particular order, with a bent towards independent developers and smaller projects. These are <em>primarily</em> R projects, with a few other tools thrown in. Apologies to anyone I’ve forgotten; please know that you would not know I had ever used your software if I didn’t love it.</p>
-<section id="workflow" class="level2">
-<h2 class="anchored" data-anchor-id="workflow">Workflow</h2>
-<section id="targets-by-will-landau" class="level3">
-<h3 class="anchored" data-anchor-id="targets-by-will-landau"><a href="https://books.ropensci.org/targets/">targets</a> by Will Landau</h3>
-<p>Every so often you stumble across a project that makes it obviously, blindingly clear that you’ve been doing things wrong this whole time. Sometimes this means finding out that your efforts have been <em>wrong</em>, and you’ve been doing things <em>incorrectly</em> up until now; more exciting are the times you realize you haven’t been doing anything <em>wrong</em> per se, but could be doing things so much <em>better</em>.</p>
-<p>The targets package is a peak example of the latter. The ways analyses are usually structured – cells of a single notebook, shell scripts that run a smattering of individual files, cludgy Make files – are <em>fine</em>, and serve a purpose, and there’s nothing <em>wrong</em> with them. There’s just a better way. And targets is that better way.</p>
-<p>Rather than making you define the dependencies between your analysis steps yourself, targets will automatically calculate your project’s DAG and run your scripts in the order they need to be executed. If you change a script, or files change on disk, targets will invalidate only the steps that <em>need</em> to be re-run under the new conditions, and will run only those steps on your next go. This alone is incredible.</p>
-<p>But targets does <em>so much more</em> than that. My personal needs have meant I’ve spent a lot of time with targets’ dynamic branching mechanism, where you can tell targets to execute a script against various combinations of input parameters, massively reducing the amount of actual code you need to write. There’s plenty of additional bells and whistles attached for dealing with distributed computing and cloud data environments. Plus, there’s tons of metrics and instrumentation available to watch your DAG as it executes, and the visuals produced by the package are <em>beautiful</em>:</p>
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/dag.png" class="img-fluid" alt="The targets graph for my most recent project. Functions and objects are connected by lines, diagramming the relationships between the steps in the project."></p>
-<p>Part of the joy of targets is just how well-documented the package is. There’s a <a href="https://docs.ropensci.org/targets/">website</a>. There’s <a href="https://books.ropensci.org/targets/">an entire book</a>. Will has set an incredibly high bar for the rest of us.</p>
-</section>
-<section id="paperless-ng-by-jonas-winkler" class="level3">
-<h3 class="anchored" data-anchor-id="paperless-ng-by-jonas-winkler"><a href="https://github.com/jonaswinkler/paperless-ng">Paperless-ng</a> by Jonas Winkler</h3>
-<p>A docker container runs on a small server in my living room,<sup>5</sup> running my instance of Paperless-ng. When I save a new article to its “input” folder, the container OCR’s the document and moves it to a safe storage location, giving it the appropriate “tags” and making it accessible with the rest of the papers I’ve ever shown an interest in.</p>
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/paperless.png" class="img-fluid figure-img"></p>
-<figcaption>I swear I’ve read (most of) these, I just am not <em>great</em> at updating my tags.</figcaption>
-</figure>
-</div>
-<p>Paired with a VPN<sup>6</sup>, this means I can access my entire reference library from anywhere I go, from any device I own, with access to full-text search and any notes I’ve taken. This is one of the outright best hacks I have ever found for literature searches; I have access to a personally-curated Google Scholar filled with the sources that <em>I</em> have found relevant in the past, which makes finding the proper citation or reference document a breeze. If you’re a certain breed of nerdy academic, I can’t recommend it enough.</p>
-</section>
-<section id="future-and-progressr-by-henrik-bengtsson" class="level3">
-<h3 class="anchored" data-anchor-id="future-and-progressr-by-henrik-bengtsson"><a href="https://future.futureverse.org/">future</a> and <a href="https://progressr.futureverse.org/">progressr</a> by Henrik Bengtsson</h3>
-<p>My research group is split across folks who use Windows, MacOs, and Linux, and we need to share code a <em>lot</em>. That makes relying on system features, like multi-core processing via <code>mclapply()</code> in the parallel package, rather fraught.</p>
-<p>Our solution to that problem is the future package, which provides functions for parallel computing which function across OSes. That alone merits a spot on this list. But even more than that, I’m a huge fan of the philosophy behind the future package.</p>
-<p>Say for instance you’re developing a package – or writing a script for a coworker, or generally writing code that you will not be executing yourself. Your code looks something like this:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">intense_function <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">function</span>(...) {</span>
-<span id="cb1-2">  list_to_iterate_over <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">list</span>(...)</span>
-<span id="cb1-3">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lapply</span>(</span>
-<span id="cb1-4">    list_to_iterate_over,</span>
-<span id="cb1-5">    some_intensive_processing_function</span>
-<span id="cb1-6">  )</span>
-<span id="cb1-7">}</span></code></pre></div>
-</div>
-<p>You have no idea what else your user will be doing when you execute this. Maybe they’re busy running a more important job that needs most of their RAM, or maybe your script can safely use all their computing resources; while writing your function, you can’t know. For that reason, you don’t want to enable parallelism by default.</p>
-<p>So what do you do? Let the user decide how parallel they want your code to be. If you write your code using packages from the future family, your users can use the <code>plan()</code> function to specify how much parallelism they’re comfortable with your script using. And gaining that amount of flexibility requires a one-line change:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1">intense_function <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">function</span>(...) {</span>
-<span id="cb2-2">  list_to_iterate_over <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">list</span>(...)</span>
-<span id="cb2-3">  future.apply<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">future_lapply</span>(</span>
-<span id="cb2-4">    list_to_iterate_over,</span>
-<span id="cb2-5">    some_intensive_processing_function</span>
-<span id="cb2-6">  )</span>
-<span id="cb2-7">}</span></code></pre></div>
-</div>
-<p>You don’t need to write any logic around parallelization; all of that work gets outsourced to future.</p>
-<p>For similar reasons, I really like the progressr package that’s part of the future ecosystem. Adding progress bars is as simple as specifying how many iterations you’re expecting to do, and when the bar should update:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">iteration_function <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">function</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">n =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">10</span>) {</span>
-<span id="cb3-2">  p <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> progressr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">progressor</span>(n)</span>
-<span id="cb3-3">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lapply</span>(</span>
-<span id="cb3-4">    <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">seq_len</span>(n),</span>
-<span id="cb3-5">    \(x) {</span>
-<span id="cb3-6">      <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">p</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">message =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sprintf</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"On iteration %f"</span>, x))</span>
-<span id="cb3-7">      <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">Sys.sleep</span>(<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.1</span>)</span>
-<span id="cb3-8">    }</span>
-<span id="cb3-9">  )</span>
-<span id="cb3-10">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">invisible</span>(<span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">NULL</span>)</span>
-<span id="cb3-11">}</span></code></pre></div>
-</div>
-<p>And then all the rest is left to the user. They can use whatever sort of progress bar they find useful, or none at all – you don’t need to be a part of that decision whatsoever:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">progressr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">handlers</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"txtprogressbar"</span>)</span>
-<span id="cb4-2">progressr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">with_progress</span>(</span>
-<span id="cb4-3">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">iteration_function</span>()</span>
-<span id="cb4-4">)</span></code></pre></div>
-</div>
-</section>
-<section id="units-by-edzer-pebesma" class="level3">
-<h3 class="anchored" data-anchor-id="units-by-edzer-pebesma"><a href="https://github.com/r-quantities/units">units</a> by Edzer Pebesma</h3>
-<p>I’m gonna be honest, this is a weird one for the workflow section. But at the same time, the units package has become something I load in almost every project I work on. If you’re doing anything that <em>might</em> have unit conversions, this package can be a lifesaver.</p>
-<p>For instance, let’s take an actual example from a project I worked on last week. Say you’ve run some samples through an <a href="https://en.wikipedia.org/wiki/Inductively_coupled_plasma_mass_spectrometry">ICP</a> machine, and need to calculate how much of a given analyte<sup>7</sup> is in your sample.</p>
-<p>To do that, you’ve got three numbers: the concentration of the analyte in the solution you ran through the ICP in units of milligrams per liter, the amount of solution you used in units of milliliters, and the amount of sample in the solution in grams. Your target is the amount of analyte per amount of sample, in units of milligrams per gram. This is simple dimensional analysis<sup>8</sup>, and you set up your equations like so:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">concentration_mg_per_L <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1.68</span></span>
-<span id="cb5-2">sample_weight_g <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.29</span></span>
-<span id="cb5-3">solution_volume_mL <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">53.54</span></span>
-<span id="cb5-4"></span>
-<span id="cb5-5">solution_volume_L <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> solution_volume_mL <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1000</span></span>
-<span id="cb5-6">concentration_mg <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> concentration_mg_per_L <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> solution_volume_L</span>
-<span id="cb5-7">concentration_mg <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> sample_weight_g</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 108.2014</code></pre>
-</div>
-</div>
-<p>See the bug?</p>
-<p>This is the sort of thing that can kill an analysis; silent logic bugs that <em>execute</em> fine but invalidate all of your results. If we tag our measurements with the units they represent, however, it’s a little bit easier to see what went wrong here:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">concentration_mg_per_L <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> units<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">set_units</span>(<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1.68</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"mg / L"</span>)</span>
-<span id="cb7-2">sample_weight_g <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> units<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">set_units</span>(<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.29</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"g"</span>)</span>
-<span id="cb7-3">solution_volume_mL <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> units<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">set_units</span>(<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">53.54</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"mL"</span>)</span>
-<span id="cb7-4"></span>
-<span id="cb7-5">concentration_mg <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">=</span> concentration_mg_per_L <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> solution_volume_mL</span>
-<span id="cb7-6">concentration_mg <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> sample_weight_g</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>0.0001082014 [1/L/mL]</code></pre>
-</div>
-</div>
-<p>The units package automatically converts between units, which means we can get rid of the manual conversion from milliliters of solution into liters. The package also tells us what units our results are in following calculation. Here we can see that our results aren’t in the units we’re after – we want a concentration (amount of analyte per unit of sample), not something measured in “1 per liter per milliliter”.</p>
-<p>This tips us off that we made a mistake in our conversions somewhere, and indeed we flipped an operand – rather than <em>dividing</em> our concentration by the amount of solution, we need to multiply it:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">concentration_mg <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">=</span> concentration_mg_per_L <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> solution_volume_mL</span>
-<span id="cb9-2">concentration_mg <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> sample_weight_g</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>0.0003101628 [1]</code></pre>
-</div>
-</div>
-<p>That gives us our desired concentration: the number of grams of analyte per gram of sample. We can easily convert that to other forms using the units package; for instance, we tend to work with concentrations in units of milligram of analyte per gram of sample:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1">(concentration_mg <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> sample_weight_g) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> units<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">set_units</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"mg / g"</span>)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>0.3101628 [mg/g]</code></pre>
-</div>
-</div>
-<p>But we can be even more explicit than that. The units package lets us install our own units, which lets us tag what these numbers are a gram <em>of</em>. That means that we can automatically see that our results are natively a ratio of total analyte per unit of sample:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1">units<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">install_unit</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"analyte"</span>)</span>
-<span id="cb13-2">units<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">install_unit</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"sample"</span>)</span>
-<span id="cb13-3">units<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">install_unit</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"solution"</span>)</span>
-<span id="cb13-4"></span>
-<span id="cb13-5">concentration_mg_per_L <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> units<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">set_units</span>(<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">1.68</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"(mg * analyte) / (L * solution)"</span>)</span>
-<span id="cb13-6">sample_weight_g <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> units<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">set_units</span>(<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.29</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"g * sample"</span>)</span>
-<span id="cb13-7">solution_volume_mL <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> units<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">set_units</span>(<span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">53.54</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"mL * solution"</span>)</span>
-<span id="cb13-8"></span>
-<span id="cb13-9">concentration_mg <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">=</span> concentration_mg_per_L <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">*</span> solution_volume_mL</span>
-<span id="cb13-10"></span>
-<span id="cb13-11">(concentration_mg <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> sample_weight_g)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>0.0003101628 [analyte/sample]</code></pre>
-</div>
-</div>
-<p>And we can purposefully convert that to units of miligrams of analyte per grams of sample, in a very explicit way:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb15" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1">(concentration_mg <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">/</span> sample_weight_g) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb15-2">  units<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">set_units</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"(mg * analyte) / (g * sample)"</span>)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>0.3101628 [analyte*mg/g/sample]</code></pre>
-</div>
-</div>
-<p>This erases an entire category of bugs, and has been <em>big</em> for me this year. The <a href="https://www.auckland.ac.nz/en/news/2017/12/05/problem-solving-pits-of-success.html">tidyverse</a> team <a href="https://twitter.com/alice_data/status/748200882043396096">talks a lot</a> about the idea of trying to help people fall into a <a href="https://blog.codinghorror.com/falling-into-the-pit-of-success/">“pit of success”</a> – that tools should make it very easy to do things right, and very hard to do things wrong. The units package feels like a fantastic example of the concept.<sup>9</sup></p>
-</section>
-</section>
-<section id="visualization" class="level2">
-<h2 class="anchored" data-anchor-id="visualization">Visualization</h2>
-<section id="ggdist-by-matthew-kay" class="level3">
-<h3 class="anchored" data-anchor-id="ggdist-by-matthew-kay"><a href="https://mjskay.github.io/ggdist/">ggdist</a> by Matthew Kay</h3>
-<p>I think I am extremely, extremely late to the ggdist party. But that’s okay, because ggdist is extremely, extremely good; there’s plenty to party about.</p>
-<p>I really feel like the best advertisement for this package is the <a href="https://mjskay.github.io/ggdist/">package website</a>; the basic demonstration graphs on that page are <em>beautiful</em>. The toy example plots look better than some<sup>10</sup> of my published figures.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1">dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>starwars <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb17-2">  tidyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">unnest</span>(films) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb17-3">  ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>(</span>
-<span id="cb17-4">    ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> height, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> films, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fill =</span> films)</span>
-<span id="cb17-5">  ) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb17-6">  ggdist<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">stat_slab</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">scale =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.5</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb17-7">  ggdist<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">stat_dotsinterval</span>(</span>
-<span id="cb17-8">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">side =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"bottom"</span>, </span>
-<span id="cb17-9">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">scale =</span> <span class="fl" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0.5</span>, </span>
-<span id="cb17-10">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">interval_alpha =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>, </span>
-<span id="cb17-11">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">point_alpha =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">0</span>, </span>
-<span id="cb17-12">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">slab_size =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">NA</span></span>
-<span id="cb17-13">  ) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span></span>
-<span id="cb17-14">  ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">scale_fill_brewer</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">palette =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Set2"</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb17-15">  ggdist<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme_ggdist</span>()</span></code></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>ggdist is a late addition to my arsenal; I used it to make graphs while revising a manuscript and was immediately hooked. The toolkit ggdist provides is incredibly flexible, enabling both dozens of radically different representations of the same data as well as the infinite infinitesimal tweaks that we all obsess over to get our graphs <em>just right</em>. I’m a huge fan so far.</p>
-</section>
-<section id="kableextra-by-hao-zhu" class="level3">
-<h3 class="anchored" data-anchor-id="kableextra-by-hao-zhu"><a href="https://haozhu233.github.io/kableExtra/">kableExtra</a> by Hao Zhu</h3>
-<p>A confession: every two months<sup>11</sup> I try a new package for making tables,<sup>12</sup> use it for a week, and immediately go back to kableExtra. There’s just really nothing like it for consistent, professional, beautiful, and <em>controllable</em> tables, particularly for PDF documents.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb18" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1">mtcars <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb18-2">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">head</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb18-3">  kableExtra<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">kbl</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb18-4">  kableExtra<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">kable_styling</span>(</span>
-<span id="cb18-5">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">bootstrap_options =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"striped"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"hover"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"condensed"</span>),</span>
-<span id="cb18-6">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">fixed_thead =</span> <span class="cn" style="color: #8f5902;
-background-color: null;
-font-style: inherit;">TRUE</span></span>
-<span id="cb18-7">  )</span></code></pre></div>
-<div class="cell-output-display">
-<div>
-<table class="table table-striped table-hover table-condensed table-sm small" data-quarto-postprocess="true">
-<thead>
-<tr class="header">
-<th data-quarto-table-cell-role="th" style="text-align: left; position: sticky; top: 0; background-color: #FFFFFF;"></th>
-<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">mpg</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">cyl</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">disp</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">hp</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">drat</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">wt</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">qsec</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">vs</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">am</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">gear</th>
-<th data-quarto-table-cell-role="th" style="text-align: right; position: sticky; top: 0; background-color: #FFFFFF;">carb</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td style="text-align: left;">Mazda RX4</td>
-<td style="text-align: right;">21.0</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">160</td>
-<td style="text-align: right;">110</td>
-<td style="text-align: right;">3.90</td>
-<td style="text-align: right;">2.620</td>
-<td style="text-align: right;">16.46</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">4</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Mazda RX4 Wag</td>
-<td style="text-align: right;">21.0</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">160</td>
-<td style="text-align: right;">110</td>
-<td style="text-align: right;">3.90</td>
-<td style="text-align: right;">2.875</td>
-<td style="text-align: right;">17.02</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">4</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Datsun 710</td>
-<td style="text-align: right;">22.8</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">108</td>
-<td style="text-align: right;">93</td>
-<td style="text-align: right;">3.85</td>
-<td style="text-align: right;">2.320</td>
-<td style="text-align: right;">18.61</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">4</td>
-<td style="text-align: right;">1</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Hornet 4 Drive</td>
-<td style="text-align: right;">21.4</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">258</td>
-<td style="text-align: right;">110</td>
-<td style="text-align: right;">3.08</td>
-<td style="text-align: right;">3.215</td>
-<td style="text-align: right;">19.44</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">1</td>
-</tr>
-<tr class="odd">
-<td style="text-align: left;">Hornet Sportabout</td>
-<td style="text-align: right;">18.7</td>
-<td style="text-align: right;">8</td>
-<td style="text-align: right;">360</td>
-<td style="text-align: right;">175</td>
-<td style="text-align: right;">3.15</td>
-<td style="text-align: right;">3.440</td>
-<td style="text-align: right;">17.02</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">2</td>
-</tr>
-<tr class="even">
-<td style="text-align: left;">Valiant</td>
-<td style="text-align: right;">18.1</td>
-<td style="text-align: right;">6</td>
-<td style="text-align: right;">225</td>
-<td style="text-align: right;">105</td>
-<td style="text-align: right;">2.76</td>
-<td style="text-align: right;">3.460</td>
-<td style="text-align: right;">20.22</td>
-<td style="text-align: right;">1</td>
-<td style="text-align: right;">0</td>
-<td style="text-align: right;">3</td>
-<td style="text-align: right;">1</td>
-</tr>
-</tbody>
-</table>
-
-
-</div>
-</div>
-</div>
-<p>Column widths! Consistent APIs to control header rows, grouping rows, data rows! Consistent APIs to control columns! Consistent APIs to control individual cells! kableExtra is a well-designed package. Plus, kableExtra ships with <a href="https://haozhu233.github.io/kableExtra/"><em>incredible</em> documentation</a>, which is extremely easy to search; my experience is that this package is written the way that you intuitively <em>want</em> a table-making package to be written. Every table in every paper I’ve written<sup>13</sup> has been run through kableExtra, and I’m expecting that trend to continue going forward.</p>
-</section>
-<section id="ggsflabel-by-hiroaki-yutani" class="level3">
-<h3 class="anchored" data-anchor-id="ggsflabel-by-hiroaki-yutani"><a href="https://github.com/yutannihilation/ggsflabel">ggsflabel</a> by Hiroaki Yutani</h3>
-<p><a href="https://twitter.com/TheMapAddict/status/1514056934407774216">Putting labels</a> on <a href="https://twitter.com/MatthewHMalone/status/1524369593632014336">maps</a> is a <a href="https://twitter.com/MatthewHMalone/status/1529170399640133633">recurring meme</a> among <a href="https://twitter.com/pokateo_/status/1526885811651612672">GIS users</a>. This is one of those things that feels like it should not be that hard, and turns out to actually be impossible.</p>
-<p>But somehow, ggsflabel gets it… right? Almost every time? It’s magic. There’s literally no other explanation than magic. You could sell this to any university with an ArcMap subscription for thousands of dollars, but instead I installed it for free from GitHub.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1">nc <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">read_sf</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"shape/nc.shp"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"sf"</span>))</span>
-<span id="cb19-2"></span>
-<span id="cb19-3">ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>(nc) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb19-4">  ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_sf</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb19-5">  ggsflabel<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_sf_label_repel</span>(ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">label =</span> NAME), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>)</span></code></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="ggspatial-by-dewey-dunnington" class="level3">
-<h3 class="anchored" data-anchor-id="ggspatial-by-dewey-dunnington"><a href="https://github.com/paleolimbot/ggspatial">ggspatial</a> by Dewey Dunnington</h3>
-<p>Just like label placement, every other part of making a map is surprisingly hard. Making coordinate reference systems play nicely with plotting libraries is hard, adding directionally-aware elements to a map is hard, adding scale bars and other distance-aware elements to a map is hard.</p>
-<p>The ggspatial package makes it easier. My research group uses it extensively for our north arrows and scale bars, but the entire package is a gem. It solves a problem and does it well.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1">nc <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">read_sf</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">system.file</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"shape/nc.shp"</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">package =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"sf"</span>))</span>
-<span id="cb20-2"></span>
-<span id="cb20-3">ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>(nc) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb20-4">  ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_sf</span>() <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb20-5">  ggspatial<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">annotation_north_arrow</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">location =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"br"</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb20-6">  ggspatial<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">annotation_scale</span>()</span></code></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="patchwork-by-thomas-lin-pedersen" class="level3">
-<h3 class="anchored" data-anchor-id="patchwork-by-thomas-lin-pedersen"><a href="https://patchwork.data-imaginist.com/">patchwork</a> by Thomas Lin Pedersen</h3>
-<p>For the longest time, it was surprisingly tricky to create multi-panel plots in R. The implementations that did exist required you to think a <em>little</em> bit too much about how R thinks about drawing graphics, which has never been a strong suit of mine. Dealing with legends and other annotations was also often a pain.</p>
-<p>Enter patchwork, which makes combining plot objects together an absolute breeze:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(patchwork)</span>
-<span id="cb21-2"></span>
-<span id="cb21-3">p1 <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>(Orange, ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">aes</span>(age, circumference, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">color =</span> Tree)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb21-4">  ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_line</span>()</span>
-<span id="cb21-5"></span>
-<span id="cb21-6">p2 <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">ggplot</span>(mtcars, ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">aes</span>(wt, drat)) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb21-7">  ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geom_point</span>()</span>
-<span id="cb21-8"></span>
-<span id="cb21-9">p1 <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> p2 <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">+</span> </span>
-<span id="cb21-10">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">plot_annotation</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">tag_levels =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'A'</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">&amp;</span> </span>
-<span id="cb21-11">  ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">theme</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">plot.tag =</span> ggplot2<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">element_text</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">size =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">8</span>))</span></code></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>Just about all of my multi-panel figures are made with patchwork these days, because I find it to be exactly as flexible as I need for my visuals. Perhaps the best compliment I can give patchwork is that I barely ever need to think about it – when I need to create multi-panel graphs, I load patchwork and then things Just Work from there.</p>
-</section>
-</section>
-<section id="spatial" class="level2">
-<h2 class="anchored" data-anchor-id="spatial">Spatial</h2>
-<section id="terra-by-robert-hijmans" class="level3">
-<h3 class="anchored" data-anchor-id="terra-by-robert-hijmans"><a href="https://github.com/rspatial/terra">terra</a> by Robert Hijmans</h3>
-<p>I’m not going to lie: I was dreading <a href="https://r-spatial.org//r/2022/04/12/evolution.html">the R spatial migration</a>. I have <em>so many</em> legacy projects relying on raster and friends,<sup>14</sup> and was expecting the transition to be an incredible headache without bringing any real benefits to my work.</p>
-<p>I could not have been more wrong. Switching workloads to terra has been a <em>fantastic</em> investment across our research group. The terra package is faster than raster, and benefits from over a decade<sup>15</sup> of lessons learned from the raster package. The breadth of operations implemented is incredible as well; a weekly conversation in my lab involves someone<sup>16</sup> asking “how do I do X?”, where X is some complex calculation that would be incredibly difficult to implement, and someone<sup>17</sup> answering “oh, use this one-liner from terra.”</p>
-<p>The terra package implements the functions you <em>expect</em> for a raster toolkit, with the names you <em>expect</em> for a raster toolkit, which work in the way you <em>expect</em> for a raster toolkit. For a relatively new package (the first CRAN release was in 2020), terra <em>feels</em> incredibly mature, and is an absolute joy to work with.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1">loi <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> tmaptools<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">geocode_OSM</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"Hyampom California"</span>)<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>coords</span>
-<span id="cb22-2">loi <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">data.frame</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">x =</span> loi[[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"x"</span>]], <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">y =</span> loi[[<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"y"</span>]])</span>
-<span id="cb22-3">loi <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">st_as_sf</span>(loi, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">coords =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"x"</span>, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"y"</span>), <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">crs =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">4326</span>)</span>
-<span id="cb22-4">loi_file <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">tempfile</span>()</span>
-<span id="cb22-5">output_tiles <span class="ot" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">&lt;-</span> terrainr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">get_tiles</span>(</span>
-<span id="cb22-6">  terrainr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">set_bbox_side_length</span>(loi, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">8000</span>),</span>
-<span id="cb22-7">  <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">resolution =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">30</span>,</span>
-<span id="cb22-8">  <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">output_prefix =</span> loi_file</span>
-<span id="cb22-9">)</span>
-<span id="cb22-10"></span>
-<span id="cb22-11">terra<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">rast</span>(output_tiles<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>elevation) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb22-12">  terra<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">plot</span>()</span></code></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/index_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="gdal-by-frank-warmerdam-even-rouault-and-others" class="level3">
-<h3 class="anchored" data-anchor-id="gdal-by-frank-warmerdam-even-rouault-and-others"><a href="https://gdal.org/">GDAL</a> by Frank Warmerdam, Even Rouault, and others</h3>
-<p>For me, 2022 was the year of CLI GDAL commands. I have now written two papers entirely on the back of shell scripts calling <code>gdal_calc</code> and <code>gdalwarp</code>.</p>
-<p>For those with normal hobbies, GDAL is a software library that describes itself as a “translator library” between raster and vector formats. In practice, however, GDAL is a full-featured raster toolkit with pretty decent vector support; a huge amount of common raster operations can be run by chaining together GDAL commands. And that’s huge, because GDAL is <em>fast</em> and can handle much, much larger data than R can.</p>
-<p>Recommending GDAL to people who work with spatial data is a little bit like recommending breathing air,<sup>18</sup> given its dominant position in the spatial software ecosystem. But still, this year in particular, I found myself really, really appreciating having this tool at my disposal.</p>
-</section>
-<section id="sf-by-edzer-pebesma" class="level3">
-<h3 class="anchored" data-anchor-id="sf-by-edzer-pebesma"><a href="https://r-spatial.github.io/sf/">sf</a> by Edzer Pebesma</h3>
-<p>Perhaps unsurprisingly, the sf package continues to be an absolute delight. sf is the 14th most popular package when counting CRAN downloads; if you work with spatial data, you know about sf. Heck, odds are, if you don’t work with spatial data, you probably also know about sf. I used it in the last three code examples, because it is that core to how I think about doing spatial data analysis in R.</p>
-<p>sf is another package that has, with shocking regularity, already implemented the thing you’re trying to do. The dplyr integration is fantastic; the ggplot2 integration is fantastic; the ability to call directly to GDAL is fantastic. I remain a huge fan.</p>
-</section>
-<section id="landscapemetrics-by-maximilian-hesselbarth-et-al." class="level3">
-<h3 class="anchored" data-anchor-id="landscapemetrics-by-maximilian-hesselbarth-et-al."><a href="https://r-spatialecology.github.io/landscapemetrics/">landscapemetrics</a> by Maximilian Hesselbarth et al.</h3>
-<p>Imagine, if you will, that everyone – quite literally every single person – in your field uses tool X. X is mostly focused on calculating statistics, and because of its dominance most of those statistics are known primarily as “the X set of statistics”. Most people in your field don’t know how to calculate the statistics without X and aren’t particularly interested in trying; a “correct” statistic is one that agrees with tool X.</p>
-<p>Now, imagine tool X is closed-source, only runs on Windows, and was first released in 1995, so doesn’t exactly integrate with other software. In order to address those drawbacks, a team of scientists develop an R package that calculates the same statistics as X. This is already incredibly impressive; I cannot stress enough that <em>everyone</em> uses X and expects your results to match it <em>exactly</em>, and sometimes you just can’t figure out how to precisely match the closed-source Windows-only software. This was a big job.</p>
-<p>Now imagine that two years later, the person who wrote tool X retires and every trace of tool X is erased from the internet. This suddenly becomes a <em>much bigger job</em>.</p>
-<p>That’s, as best as I can tell from the outside, what happened to the team behind landscapemetrics. FRAGSTATS existed and was <em>the</em> standard reference for a whole boat of statistics;<sup>19</sup> landscapemetrics provided an open-source implementation; FRAGSTATS suddenly no longer existed. I don’t want to sound like I’m criticizing FRAGSTATS here – for a very long time, that software provided an incredible service for free to a huge number of researchers, and I don’t think releasing something on the Internet creates an infinite obligation to make sure the download links never expire.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1">landscapemetrics<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">calculate_lsm</span>(landscapemetrics<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>landscape, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">level =</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"patch"</span>)</span></code></pre></div>
-<div class="cell-output-display">
-<div data-pagedtable="false">
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["layer"],"name":[1],"type":["int"],"align":["right"]},{"label":["level"],"name":[2],"type":["chr"],"align":["left"]},{"label":["class"],"name":[3],"type":["int"],"align":["right"]},{"label":["id"],"name":[4],"type":["int"],"align":["right"]},{"label":["metric"],"name":[5],"type":["chr"],"align":["left"]},{"label":["value"],"name":[6],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"patch","3":"1","4":"1","5":"area","6":"0.00010000"},{"1":"1","2":"patch","3":"1","4":"2","5":"area","6":"0.00050000"},{"1":"1","2":"patch","3":"1","4":"3","5":"area","6":"0.01480000"},{"1":"1","2":"patch","3":"1","4":"4","5":"area","6":"0.00010000"},{"1":"1","2":"patch","3":"1","4":"5","5":"area","6":"0.00010000"},{"1":"1","2":"patch","3":"1","4":"6","5":"area","6":"0.00140000"},{"1":"1","2":"patch","3":"1","4":"7","5":"area","6":"0.00030000"},{"1":"1","2":"patch","3":"1","4":"8","5":"area","6":"0.00050000"},{"1":"1","2":"patch","3":"1","4":"9","5":"area","6":"0.00010000"},{"1":"1","2":"patch","3":"2","4":"10","5":"area","6":"0.00350000"},{"1":"1","2":"patch","3":"2","4":"11","5":"area","6":"0.00020000"},{"1":"1","2":"patch","3":"2","4":"12","5":"area","6":"0.00020000"},{"1":"1","2":"patch","3":"2","4":"13","5":"area","6":"0.00980000"},{"1":"1","2":"patch","3":"2","4":"14","5":"area","6":"0.00020000"},{"1":"1","2":"patch","3":"2","4":"15","5":"area","6":"0.00010000"},{"1":"1","2":"patch","3":"2","4":"16","5":"area","6":"0.00240000"},{"1":"1","2":"patch","3":"2","4":"17","5":"area","6":"0.00010000"},{"1":"1","2":"patch","3":"2","4":"18","5":"area","6":"0.00030000"},{"1":"1","2":"patch","3":"2","4":"19","5":"area","6":"0.00030000"},{"1":"1","2":"patch","3":"2","4":"20","5":"area","6":"0.00570000"},{"1":"1","2":"patch","3":"2","4":"21","5":"area","6":"0.00040000"},{"1":"1","2":"patch","3":"2","4":"22","5":"area","6":"0.00070000"},{"1":"1","2":"patch","3":"2","4":"23","5":"area","6":"0.00030000"},{"1":"1","2":"patch","3":"3","4":"24","5":"area","6":"0.04570000"},{"1":"1","2":"patch","3":"3","4":"25","5":"area","6":"0.00090000"},{"1":"1","2":"patch","3":"3","4":"26","5":"area","6":"0.00030000"},{"1":"1","2":"patch","3":"3","4":"27","5":"area","6":"0.00100000"},{"1":"1","2":"patch","3":"1","4":"1","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"cai","6":"47.97297297"},{"1":"1","2":"patch","3":"1","4":"4","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"cai","6":"14.28571429"},{"1":"1","2":"patch","3":"1","4":"7","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"8","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"9","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"cai","6":"31.42857143"},{"1":"1","2":"patch","3":"2","4":"11","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"13","5":"cai","6":"44.89795918"},{"1":"1","2":"patch","3":"2","4":"14","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"cai","6":"16.66666667"},{"1":"1","2":"patch","3":"2","4":"17","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"19","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"20","5":"cai","6":"49.12280702"},{"1":"1","2":"patch","3":"2","4":"21","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"cai","6":"14.28571429"},{"1":"1","2":"patch","3":"2","4":"23","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"24","5":"cai","6":"49.23413567"},{"1":"1","2":"patch","3":"3","4":"25","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"26","5":"cai","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"27","5":"cai","6":"10.00000000"},{"1":"1","2":"patch","3":"1","4":"1","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"1","4":"2","5":"circle","6":"0.62551778"},{"1":"1","2":"patch","3":"1","4":"3","5":"circle","6":"0.78050151"},{"1":"1","2":"patch","3":"1","4":"4","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"1","4":"5","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"1","4":"6","5":"circle","6":"0.55436616"},{"1":"1","2":"patch","3":"1","4":"7","5":"circle","6":"0.61802814"},{"1":"1","2":"patch","3":"1","4":"8","5":"circle","6":"0.51029248"},{"1":"1","2":"patch","3":"1","4":"9","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"2","4":"10","5":"circle","6":"0.57959072"},{"1":"1","2":"patch","3":"2","4":"11","5":"circle","6":"0.49070418"},{"1":"1","2":"patch","3":"2","4":"12","5":"circle","6":"0.68169011"},{"1":"1","2":"patch","3":"2","4":"13","5":"circle","6":"0.81122924"},{"1":"1","2":"patch","3":"2","4":"14","5":"circle","6":"0.49070418"},{"1":"1","2":"patch","3":"2","4":"15","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"2","4":"16","5":"circle","6":"0.68497166"},{"1":"1","2":"patch","3":"2","4":"17","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"2","4":"18","5":"circle","6":"0.52253517"},{"1":"1","2":"patch","3":"2","4":"19","5":"circle","6":"0.52253517"},{"1":"1","2":"patch","3":"2","4":"20","5":"circle","6":"0.53165556"},{"1":"1","2":"patch","3":"2","4":"21","5":"circle","6":"0.36338023"},{"1":"1","2":"patch","3":"2","4":"22","5":"circle","6":"0.38296853"},{"1":"1","2":"patch","3":"2","4":"23","5":"circle","6":"0.61802814"},{"1":"1","2":"patch","3":"3","4":"24","5":"circle","6":"0.66587975"},{"1":"1","2":"patch","3":"3","4":"25","5":"circle","6":"0.56859648"},{"1":"1","2":"patch","3":"3","4":"26","5":"circle","6":"0.61802814"},{"1":"1","2":"patch","3":"3","4":"27","5":"circle","6":"0.49370004"},{"1":"1","2":"patch","3":"1","4":"1","5":"contig","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"contig","6":"0.33333333"},{"1":"1","2":"patch","3":"1","4":"3","5":"contig","6":"0.76126126"},{"1":"1","2":"patch","3":"1","4":"4","5":"contig","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"contig","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"contig","6":"0.59523810"},{"1":"1","2":"patch","3":"1","4":"7","5":"contig","6":"0.22222222"},{"1":"1","2":"patch","3":"1","4":"8","5":"contig","6":"0.43333333"},{"1":"1","2":"patch","3":"1","4":"9","5":"contig","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"contig","6":"0.69047619"},{"1":"1","2":"patch","3":"2","4":"11","5":"contig","6":"0.16666667"},{"1":"1","2":"patch","3":"2","4":"12","5":"contig","6":"0.08333333"},{"1":"1","2":"patch","3":"2","4":"13","5":"contig","6":"0.76190476"},{"1":"1","2":"patch","3":"2","4":"14","5":"contig","6":"0.16666667"},{"1":"1","2":"patch","3":"2","4":"15","5":"contig","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"contig","6":"0.62500000"},{"1":"1","2":"patch","3":"2","4":"17","5":"contig","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"contig","6":"0.27777778"},{"1":"1","2":"patch","3":"2","4":"19","5":"contig","6":"0.27777778"},{"1":"1","2":"patch","3":"2","4":"20","5":"contig","6":"0.79239766"},{"1":"1","2":"patch","3":"2","4":"21","5":"contig","6":"0.41666667"},{"1":"1","2":"patch","3":"2","4":"22","5":"contig","6":"0.52380952"},{"1":"1","2":"patch","3":"2","4":"23","5":"contig","6":"0.22222222"},{"1":"1","2":"patch","3":"3","4":"24","5":"contig","6":"0.78482859"},{"1":"1","2":"patch","3":"3","4":"25","5":"contig","6":"0.50000000"},{"1":"1","2":"patch","3":"3","4":"26","5":"contig","6":"0.22222222"},{"1":"1","2":"patch","3":"3","4":"27","5":"contig","6":"0.55000000"},{"1":"1","2":"patch","3":"1","4":"1","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"core","6":"0.00710000"},{"1":"1","2":"patch","3":"1","4":"4","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"core","6":"0.00020000"},{"1":"1","2":"patch","3":"1","4":"7","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"8","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"9","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"core","6":"0.00110000"},{"1":"1","2":"patch","3":"2","4":"11","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"13","5":"core","6":"0.00440000"},{"1":"1","2":"patch","3":"2","4":"14","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"core","6":"0.00040000"},{"1":"1","2":"patch","3":"2","4":"17","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"19","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"20","5":"core","6":"0.00280000"},{"1":"1","2":"patch","3":"2","4":"21","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"core","6":"0.00010000"},{"1":"1","2":"patch","3":"2","4":"23","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"24","5":"core","6":"0.02250000"},{"1":"1","2":"patch","3":"3","4":"25","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"26","5":"core","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"27","5":"core","6":"0.00010000"},{"1":"1","2":"patch","3":"1","4":"1","5":"enn","6":"7.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"enn","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"enn","6":"2.82842712"},{"1":"1","2":"patch","3":"1","4":"4","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"enn","6":"2.82842712"},{"1":"1","2":"patch","3":"1","4":"7","5":"enn","6":"4.12310563"},{"1":"1","2":"patch","3":"1","4":"8","5":"enn","6":"4.12310563"},{"1":"1","2":"patch","3":"1","4":"9","5":"enn","6":"4.24264069"},{"1":"1","2":"patch","3":"2","4":"10","5":"enn","6":"4.47213595"},{"1":"1","2":"patch","3":"2","4":"11","5":"enn","6":"4.47213595"},{"1":"1","2":"patch","3":"2","4":"12","5":"enn","6":"3.16227766"},{"1":"1","2":"patch","3":"2","4":"13","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"2","4":"14","5":"enn","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"enn","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"17","5":"enn","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"enn","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"19","5":"enn","6":"2.82842712"},{"1":"1","2":"patch","3":"2","4":"20","5":"enn","6":"5.83095189"},{"1":"1","2":"patch","3":"2","4":"21","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"enn","6":"2.82842712"},{"1":"1","2":"patch","3":"2","4":"23","5":"enn","6":"3.16227766"},{"1":"1","2":"patch","3":"3","4":"24","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"3","4":"25","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"3","4":"26","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"3","4":"27","5":"enn","6":"2.00000000"},{"1":"1","2":"patch","3":"1","4":"1","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"frac","6":"1.36521239"},{"1":"1","2":"patch","3":"1","4":"3","5":"frac","6":"1.39327285"},{"1":"1","2":"patch","3":"1","4":"4","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"frac","6":"1.21970667"},{"1":"1","2":"patch","3":"1","4":"7","5":"frac","6":"1.26185951"},{"1":"1","2":"patch","3":"1","4":"8","5":"frac","6":"1.13864688"},{"1":"1","2":"patch","3":"1","4":"9","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"frac","6":"1.26642554"},{"1":"1","2":"patch","3":"2","4":"11","5":"frac","6":"1.16992500"},{"1":"1","2":"patch","3":"2","4":"12","5":"frac","6":"2.00000000"},{"1":"1","2":"patch","3":"2","4":"13","5":"frac","6":"1.31753383"},{"1":"1","2":"patch","3":"2","4":"14","5":"frac","6":"1.16992500"},{"1":"1","2":"patch","3":"2","4":"15","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"frac","6":"1.30862575"},{"1":"1","2":"patch","3":"2","4":"17","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"frac","6":"1.26185951"},{"1":"1","2":"patch","3":"2","4":"19","5":"frac","6":"1.26185951"},{"1":"1","2":"patch","3":"2","4":"20","5":"frac","6":"1.13903334"},{"1":"1","2":"patch","3":"2","4":"21","5":"frac","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"frac","6":"1.12915007"},{"1":"1","2":"patch","3":"2","4":"23","5":"frac","6":"1.26185951"},{"1":"1","2":"patch","3":"3","4":"24","5":"frac","6":"1.45833110"},{"1":"1","2":"patch","3":"3","4":"25","5":"frac","6":"1.26185951"},{"1":"1","2":"patch","3":"3","4":"26","5":"frac","6":"1.26185951"},{"1":"1","2":"patch","3":"3","4":"27","5":"frac","6":"1.20411998"},{"1":"1","2":"patch","3":"1","4":"1","5":"gyrate","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"gyrate","6":"1.00015229"},{"1":"1","2":"patch","3":"1","4":"3","5":"gyrate","6":"8.55192604"},{"1":"1","2":"patch","3":"1","4":"4","5":"gyrate","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"gyrate","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"gyrate","6":"1.63148582"},{"1":"1","2":"patch","3":"1","4":"7","5":"gyrate","6":"0.66666667"},{"1":"1","2":"patch","3":"1","4":"8","5":"gyrate","6":"0.84780148"},{"1":"1","2":"patch","3":"1","4":"9","5":"gyrate","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"gyrate","6":"2.49548945"},{"1":"1","2":"patch","3":"2","4":"11","5":"gyrate","6":"0.50000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"gyrate","6":"0.70710678"},{"1":"1","2":"patch","3":"2","4":"13","5":"gyrate","6":"6.36373298"},{"1":"1","2":"patch","3":"2","4":"14","5":"gyrate","6":"0.50000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"gyrate","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"gyrate","6":"2.51028194"},{"1":"1","2":"patch","3":"2","4":"17","5":"gyrate","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"gyrate","6":"0.65403884"},{"1":"1","2":"patch","3":"2","4":"19","5":"gyrate","6":"0.65403884"},{"1":"1","2":"patch","3":"2","4":"20","5":"gyrate","6":"3.17066816"},{"1":"1","2":"patch","3":"2","4":"21","5":"gyrate","6":"0.70710678"},{"1":"1","2":"patch","3":"2","4":"22","5":"gyrate","6":"0.97479327"},{"1":"1","2":"patch","3":"2","4":"23","5":"gyrate","6":"0.66666667"},{"1":"1","2":"patch","3":"3","4":"24","5":"gyrate","6":"11.23638380"},{"1":"1","2":"patch","3":"3","4":"25","5":"gyrate","6":"1.23682432"},{"1":"1","2":"patch","3":"3","4":"26","5":"gyrate","6":"0.66666667"},{"1":"1","2":"patch","3":"3","4":"27","5":"gyrate","6":"1.24202906"},{"1":"1","2":"patch","3":"1","4":"1","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"ncore","6":"3.00000000"},{"1":"1","2":"patch","3":"1","4":"4","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"ncore","6":"2.00000000"},{"1":"1","2":"patch","3":"1","4":"7","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"8","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"1","4":"9","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"ncore","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"11","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"13","5":"ncore","6":"2.00000000"},{"1":"1","2":"patch","3":"2","4":"14","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"ncore","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"17","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"19","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"20","5":"ncore","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"21","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"ncore","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"23","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"24","5":"ncore","6":"11.00000000"},{"1":"1","2":"patch","3":"3","4":"25","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"26","5":"ncore","6":"0.00000000"},{"1":"1","2":"patch","3":"3","4":"27","5":"ncore","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"1","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"para","6":"2.40000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"para","6":"0.87837838"},{"1":"1","2":"patch","3":"1","4":"4","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"para","6":"1.42857143"},{"1":"1","2":"patch","3":"1","4":"7","5":"para","6":"2.66666667"},{"1":"1","2":"patch","3":"1","4":"8","5":"para","6":"2.00000000"},{"1":"1","2":"patch","3":"1","4":"9","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"para","6":"1.08571429"},{"1":"1","2":"patch","3":"2","4":"11","5":"para","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"13","5":"para","6":"0.83673469"},{"1":"1","2":"patch","3":"2","4":"14","5":"para","6":"3.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"para","6":"1.33333333"},{"1":"1","2":"patch","3":"2","4":"17","5":"para","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"para","6":"2.66666667"},{"1":"1","2":"patch","3":"2","4":"19","5":"para","6":"2.66666667"},{"1":"1","2":"patch","3":"2","4":"20","5":"para","6":"0.70175439"},{"1":"1","2":"patch","3":"2","4":"21","5":"para","6":"2.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"para","6":"1.71428571"},{"1":"1","2":"patch","3":"2","4":"23","5":"para","6":"2.66666667"},{"1":"1","2":"patch","3":"3","4":"24","5":"para","6":"0.76148796"},{"1":"1","2":"patch","3":"3","4":"25","5":"para","6":"1.77777778"},{"1":"1","2":"patch","3":"3","4":"26","5":"para","6":"2.66666667"},{"1":"1","2":"patch","3":"3","4":"27","5":"para","6":"1.60000000"},{"1":"1","2":"patch","3":"1","4":"1","5":"perim","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"perim","6":"12.00000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"perim","6":"130.00000000"},{"1":"1","2":"patch","3":"1","4":"4","5":"perim","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"perim","6":"4.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"perim","6":"20.00000000"},{"1":"1","2":"patch","3":"1","4":"7","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"1","4":"8","5":"perim","6":"10.00000000"},{"1":"1","2":"patch","3":"1","4":"9","5":"perim","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"perim","6":"38.00000000"},{"1":"1","2":"patch","3":"2","4":"11","5":"perim","6":"6.00000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"2","4":"13","5":"perim","6":"82.00000000"},{"1":"1","2":"patch","3":"2","4":"14","5":"perim","6":"6.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"perim","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"perim","6":"32.00000000"},{"1":"1","2":"patch","3":"2","4":"17","5":"perim","6":"4.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"2","4":"19","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"2","4":"20","5":"perim","6":"40.00000000"},{"1":"1","2":"patch","3":"2","4":"21","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"perim","6":"12.00000000"},{"1":"1","2":"patch","3":"2","4":"23","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"3","4":"24","5":"perim","6":"348.00000000"},{"1":"1","2":"patch","3":"3","4":"25","5":"perim","6":"16.00000000"},{"1":"1","2":"patch","3":"3","4":"26","5":"perim","6":"8.00000000"},{"1":"1","2":"patch","3":"3","4":"27","5":"perim","6":"16.00000000"},{"1":"1","2":"patch","3":"1","4":"1","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"2","5":"shape","6":"1.20000000"},{"1":"1","2":"patch","3":"1","4":"3","5":"shape","6":"2.60000000"},{"1":"1","2":"patch","3":"1","4":"4","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"5","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"6","5":"shape","6":"1.25000000"},{"1":"1","2":"patch","3":"1","4":"7","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"8","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"1","4":"9","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"10","5":"shape","6":"1.58333333"},{"1":"1","2":"patch","3":"2","4":"11","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"12","5":"shape","6":"1.33333333"},{"1":"1","2":"patch","3":"2","4":"13","5":"shape","6":"2.05000000"},{"1":"1","2":"patch","3":"2","4":"14","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"15","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"16","5":"shape","6":"1.60000000"},{"1":"1","2":"patch","3":"2","4":"17","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"18","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"19","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"20","5":"shape","6":"1.25000000"},{"1":"1","2":"patch","3":"2","4":"21","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"22","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"2","4":"23","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"3","4":"24","5":"shape","6":"4.04651163"},{"1":"1","2":"patch","3":"3","4":"25","5":"shape","6":"1.33333333"},{"1":"1","2":"patch","3":"3","4":"26","5":"shape","6":"1.00000000"},{"1":"1","2":"patch","3":"3","4":"27","5":"shape","6":"1.14285714"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-</div>
-<p>But it still creates big shoes for landscapemetrics to fill – and landscapemetrics fills them admirably. This package was the engine behind <a href="../2022-08-10-ground-filtering">the landscape structure section of my ground filtering paper this year</a>, and is so user-friendly. I’m very grateful that this tool exists <em>at all</em> now that FRAGSTATS is no longer with us; that the package is <em>good</em> is more than we deserve.</p>
-</section>
-</section>
-<section id="devops" class="level2">
-<h2 class="anchored" data-anchor-id="devops">DevOps</h2>
-<section id="pi-hole" class="level3">
-<h3 class="anchored" data-anchor-id="pi-hole"><a href="https://pi-hole.net/">Pi-hole</a></h3>
-<p>If you’re nerdy enough to have a sever kicking around, you owe it to yourself to set up a Pi-hole. A <em>comical</em> amount of the total payload size for any website is made up of advertisements and tracking code that is annoying at best and actively malicious at worst; letting that unwanted data into your network and onto your machine is a real security risk. You should use an ad blocker in your browser for this reason (I personally use <a href="https://adnauseam.io/">Ad Nauseum</a>), but adding an extra layer of security to your network is also a great idea.</p>
-<p>Pi-holes are relatively easy to set up (in comparison to, let’s say, Python), will help your websites load faster, and will help prevent malicious code from affecting your machines. I can’t recommend them enough.</p>
-</section>
-<section id="plumber-by-barret-schloerke-pool-by-joe-cheng-and-memoise-by-hadley-wickham-and-jim-hester-among-others" class="level3">
-<h3 class="anchored" data-anchor-id="plumber-by-barret-schloerke-pool-by-joe-cheng-and-memoise-by-hadley-wickham-and-jim-hester-among-others"><a href="https://www.rplumber.io/">plumber</a> by Barret Schloerke, <a href="https://rstudio.github.io/pool/index.html">pool</a> by Joe Cheng, and <a href="https://memoise.r-lib.org/index.html">memoise</a> by Hadley Wickham and Jim Hester (among others)</h3>
-<p>I’m cheating, because technically these next three packages belong in the next section, but also a <em>huge</em> amount of my work this year has been helped by having these packages around. The plumber package makes it comically easy to set up a REST API using R, and we lean on it to run the data delivery infrastructure for our research group. I don’t know how they did it, but the team behind plumber managed to make it so writing API code <em>feels</em> like writing analysis or processing code, even though it’s a completely different problem space. It’s fantastic.</p>
-<p>This year in particular we’ve been focused on speeding up our API. For that purpose, we’ve turned to pool and memoise: the pool package caches database connections so that you don’t need to spend the time re-establishing connections for each new request that comes through; the memoise package caches function calls, so that you don’t need to spend the time re-calculating the results of a function that you recently executed. By making our data retrieval API lean heavily on these two packages, we were able to cut our average download times in <em>half</em> – not the server time, not the individual function calls we altered, but time from user making a request to having all of the data they required. And the changes required were painless – we were already using DBI, so using pool took roughly no work; using memoise took maybe an hour of my time. These packages make working with APIs a treat, even in a “statistical computing and graphics” language.</p>
-</section>
-<section id="openmetrics-by-aaron-jacobs-and-logger-by-gergely-daróczi" class="level3">
-<h3 class="anchored" data-anchor-id="openmetrics-by-aaron-jacobs-and-logger-by-gergely-daróczi"><a href="https://github.com/atheriel/openmetrics/">openmetrics</a> by Aaron Jacobs and <a href="https://daroczig.github.io/logger/">logger</a> by Gergely Daróczi</h3>
-<p>Speaking of APIs, these two packages have been absolute workhorses for us over the past year. The openmetrics package writes metrics about your API to a format that’s understandable by <a href="https://prometheus.io/">Prometheus</a>, which in turn is easily queried via <a href="https://grafana.com/">Grafana</a>; combined, these tools have formed our main observability stack for our data retrieval API ever since we stood it up. The logger package, meanwhile, does exactly what you’d expect: it emits logs, of various levels, to wherever you direct it. Having good tooling for monitoring and logging has been incredibly helpful as we need to debug and otherwise alter our production API, and I’ve been extremely happy with our setup.</p>
-</section>
-</section>
-<section id="the-posit-empire" class="level2">
-<h2 class="anchored" data-anchor-id="the-posit-empire">The Posit Empire</h2>
-<p>Last, but certainly not least, there’s a huge suite of tools I use nearly every day from <a href="https://posit.co/">Posit, PBC</a> (née RStudio). Because this post is rather long, and I wanted to focus on smaller projects, I’m going to write a bit less about each; that is not because I like them any less.</p>
-<p><img src="https://mm218.dev/posts/2022-12-12-tools/favorites.jpg" class="img-fluid" alt="An image of a book cover, with three bears holding hands; the book is called 'You're All My Favorites'"></p>
-<section id="quarto" class="level3">
-<h3 class="anchored" data-anchor-id="quarto"><a href="https://quarto.org/">Quarto</a></h3>
-<p>I’ve been a huge Quarto booster since it was released; heck, I went to (I think) the first public Quarto talk at the Boston RUG meetup. This site is written in Quarto; my last three papers have been written in Quarto; the talk I’m giving Wednesday is written in Quarto. I’ve written <a href="https://github.com/mikemahoney218/quarto-arxiv">three</a> <a href="https://github.com/mikemahoney218/quarto-tandf">Quarto</a> <a href="https://github.com/mikemahoney218/quarto-agu">formats</a>. A huge amount of my job is “writing” – writing code, papers, talks, and so on – and being able to treat each form of writing in the same way, without needing to switch my tooling up is a <em>huge</em> help when I need to switch across tasks.</p>
-</section>
-<section id="recipes" class="level3">
-<h3 class="anchored" data-anchor-id="recipes"><a href="https://recipes.tidymodels.org/">recipes</a></h3>
-<p>I think I need to write a longer post about recipes at some point, because this package is <em>great</em>. In isolation, recipes makes it extremely easy to do feature engineering in a clean, ergonomic way; I teach with it even when I’m not teaching with tidymodels. But when combined with the rest of the tidymodels ecosystem, recipes really shines, helping you avoid data leakage and keeping your data preprocessing pipelines consistent across iterations.</p>
-</section>
-<section id="yardstick" class="level3">
-<h3 class="anchored" data-anchor-id="yardstick"><a href="https://yardstick.tidymodels.org/">yardstick</a></h3>
-<p>Want to calculate RMSE of two numeric columns in a data frame?</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1">yardstick<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">rmse</span>(Orange, age, circumference)</span></code></pre></div>
-<div class="cell-output-display">
-<div data-pagedtable="false">
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".estimate"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"rmse","2":"standard","3":"915.4996"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-</div>
-<p>Decide you want to calculate MAE instead?</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb25" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1">yardstick<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mae</span>(Orange, age, circumference)</span></code></pre></div>
-<div class="cell-output-display">
-<div data-pagedtable="false">
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".estimate"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"mae","2":"standard","3":"806.2857"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-</div>
-<p>Want to calculate a <em>ton</em> of metrics all at once?</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1">yardstick<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">metric_set</span>(</span>
-<span id="cb26-2">  yardstick<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>rmse, </span>
-<span id="cb26-3">  yardstick<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>mae,</span>
-<span id="cb26-4">  yardstick<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>rsq,</span>
-<span id="cb26-5">  yardstick<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>mape,</span>
-<span id="cb26-6">  yardstick<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>msd</span>
-<span id="cb26-7">)(Orange, age, circumference)</span></code></pre></div>
-<div class="cell-output-display">
-<div data-pagedtable="false">
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":[".metric"],"name":[1],"type":["chr"],"align":["left"]},{"label":[".estimator"],"name":[2],"type":["chr"],"align":["left"]},{"label":[".estimate"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"rmse","2":"standard","3":"915.4996138"},{"1":"mae","2":"standard","3":"806.2857143"},{"1":"rsq","2":"standard","3":"0.8345167"},{"1":"mape","2":"standard","3":"85.5436006"},{"1":"msd","2":"standard","3":"806.2857143"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-</div>
-<p>yardstick is consistent in inputs and outputs, extremely clean, and a joy to work with. I’ve been extending it recently in <a href="https://github.com/mikemahoney218/waywiser/">waywiser</a> and enjoying the process a lot. Plus, just like with recipes, it integrates beautifully with the rest of tidymodels. Fantastic.</p>
-</section>
-<section id="ggplot2" class="level3">
-<h3 class="anchored" data-anchor-id="ggplot2"><a href="https://ggplot2.tidyverse.org/">ggplot2</a></h3>
-<p>I mean, come on.</p>
-</section>
-<section id="dplyr" class="level3">
-<h3 class="anchored" data-anchor-id="dplyr"><a href="https://dplyr.tidyverse.org/">dplyr</a></h3>
-<p>I mean, come <em>on</em>.</p>
-</section>
-<section id="tidyr" class="level3">
-<h3 class="anchored" data-anchor-id="tidyr">tidyr</h3>
-<p>I fell in love with tidyr back in 2017,<sup>20</sup> because it let me do things like this:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1">Orange <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb27-2">  tidyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nest</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">-</span>Tree) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb27-3">  dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mutate</span>(</span>
-<span id="cb27-4">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">model =</span> purrr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">map</span>(data, \(x) <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(circumference <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> age, x)),</span>
-<span id="cb27-5">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">rsq =</span> purrr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">map_dbl</span>(model, \(x) <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summary</span>(x)<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>r.squared)</span>
-<span id="cb27-6">  )</span></code></pre></div>
-<div class="cell-output-display">
-<div data-pagedtable="false">
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["Tree"],"name":[1],"type":["ord"],"align":["right"]},{"label":["data"],"name":[2],"type":["list"],"align":["right"]},{"label":["model"],"name":[3],"type":["list"],"align":["right"]},{"label":["rsq"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"1","2":"<nfnGrpdD[,2]>","3":"<S3: lm>","4":"0.9711463"},{"1":"2","2":"<nfnGrpdD[,2]>","3":"<S3: lm>","4":"0.9748846"},{"1":"3","2":"<nfnGrpdD[,2]>","3":"<S3: lm>","4":"0.9764930"},{"1":"4","2":"<nfnGrpdD[,2]>","3":"<S3: lm>","4":"0.9691634"},{"1":"5","2":"<nfnGrpdD[,2]>","3":"<S3: lm>","4":"0.9756256"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-</div>
-<p>I don’t know if dplyr has changed since then or if I’ve just gotten more familiar with it, but I’ve since realized I can use dplyr for this sort of thing instead:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1">Orange <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb28-2">  dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">group_by</span>(Tree) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb28-3">  dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summarise</span>(</span>
-<span id="cb28-4">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">model =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">list</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(circumference <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> age, dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">cur_data</span>())),</span>
-<span id="cb28-5">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">rsq =</span> purrr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">map_dbl</span>(model, \(x) <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summary</span>(x)<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">$</span>r.squared)</span>
-<span id="cb28-6">  )</span></code></pre></div>
-<div class="cell-output-display">
-<div data-pagedtable="false">
-  <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":["Tree"],"name":[1],"type":["ord"],"align":["right"]},{"label":["model"],"name":[2],"type":["list"],"align":["right"]},{"label":["rsq"],"name":[3],"type":["dbl"],"align":["right"]}],"data":[{"1":"3","2":"<S3: lm>","3":"0.9764930"},{"1":"1","2":"<S3: lm>","3":"0.9711463"},{"1":"5","2":"<S3: lm>","3":"0.9756256"},{"1":"2","2":"<S3: lm>","3":"0.9748846"},{"1":"4","2":"<S3: lm>","3":"0.9691634"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
-  </script>
-</div>
-</div>
-</div>
-<p>But for my more complicated split-apply-combine workflows, tidyr still reigns supreme.</p>
-</section>
-<section id="devtools-testthat-pkgdown" class="level3">
-<h3 class="anchored" data-anchor-id="devtools-testthat-pkgdown">devtools, testthat, pkgdown</h3>
-<p>Last but not least, the tools I probably use more than any other package. It is <em>incredible</em> how effectively devtools and testthat speed up package development; it’s hard to imagine any other tools being a greater force multiplier than these. I can count the number of times I have run <code>R CMD check</code> on one hand, and the number of times I’ve run <code>devtools::check()</code> on the atoms of the universe.</p>
-<p>Similarly, pkgdown is an <em>incredible</em> tool for the entire community. The fact that it is now easy – I mean, <em>trivial</em> – to have a nice-looking HTML documentation website for any package, so long as it has a README and man pages, is incredible. It makes the software we write more accessible to users, and incentivizes writing <em>good</em> documentation by turning man pages and vignettes into marketing material and a public-facing homepage.</p>
-
-
-</section>
-</section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>And that’s a big “might”. For the R packages I maintain, I’m able to track the number of downloads I get each day from the RStudio CRAN mirror. As I write this, this site is one of 103 mirrors, and while I <em>suspect</em> it’s the most popular one, I’m pretty confident that no one but CRAN actually <em>knows</em> – and to make matters worse, the people using the other 102 mirrors directly rather than the RStudio redirect are <em>most certainly</em> not a random sample. That means I’m only capturing some % of total downloads, but just about no one knows what % that might be, and it’s probably a different number for different packages. I can also track the number of clones each of my repos gets, but this is even less useful; <a href="https://github.com/tidymodels/spatialsample">spatialsample’s repo</a> was cloned 28 times yesterday, by a total of 4 people. Who are you people? Why are you cloning this repo so much?↩︎</p></li>
-<li id="fn2"><p>To again use the RStudio download numbers as an example, a fun game is to check how many downloads even the least popular packages get each day. I have never, using <a href="https://hadley.shinyapps.io/cran-downloads/">Hadley’s app</a>, found a package with an average lower than ~5 downloads per day (see for instance my <a href="https://github.com/mikemahoney218/heddlr/">heddlr</a> package as a benchmark). Of course, if you have a stable userbase your users presumably <em>won’t</em> need to download your packages unless they get a new computer, a new version of R, or you release an update – which often causes spikes in the download numbers – so “number of downloads” is a pretty bad metric, even before we get into all the downloads from non-users or all the ways this number can be gamed.↩︎</p></li>
-<li id="fn3"><p>And frankly, I don’t think most maintainers would actually like this; issues on a bug tracker are meant to be individual tasks to be tackled, and so positive feedback sent through this channel is probably the right message in the wrong place.↩︎</p></li>
-<li id="fn4"><p>Which, don’t get me wrong, is still very appreciated. Even at my least meditative, I’d rather <em>stop</em> making the mistake :)↩︎</p></li>
-<li id="fn5"><p>A <a href="https://www.intel.com/content/www/us/en/products/details/nuc.html">NUC</a> running Ubuntu, which is really the perfect machine for “an inexpensive always-on computer that won’t deafen me with fans or beep really loudly when I’m asleep”.↩︎</p></li>
-<li id="fn6"><p>I use <a href="https://tailscale.com/">tailscale</a>, which is <em>not</em> open source but would otherwise make this list.↩︎</p></li>
-<li id="fn7"><p>“Element”; in this case, we’re measuring how much phosphorous is in each gram of a wood sample.↩︎</p></li>
-<li id="fn8"><p>There is no such thing.↩︎</p></li>
-<li id="fn9"><p>One example here: units objects are not numeric vectors, in the normal sense. You can’t do, for instance, <code>units::set_units(2, "m") + 1</code>; without knowing what units <code>1</code> is in, it’s impossible to say what the return value would be. A whole class of bugs, eliminated by <em>not</em> letting you do something.↩︎</p></li>
-<li id="fn10"><p>(most)↩︎</p></li>
-<li id="fn11"><p>Read: “Whenever I see people posting about a new package on Twitter”↩︎</p></li>
-<li id="fn12"><p>Mostly in LaTeX. Another confession: I don’t entirely <em>understand</em> the point of HTML tables. This is probably because I do not write statistical analyses for the internet. For the types of content I consume via HTML, I want you to either give me a graph of the important message of your data, or to give me a CSV so I can go figure out the message for myself. The sorts of things I consume via PDF, or write for PDF formats, usually have a higher evidence bar.↩︎</p></li>
-<li id="fn13"><p>Minus <a href="https://www.mm218.dev/papers/mahoney_stella_2020.pdf">Mahoney and Stella 2020</a>, which was written in Word; the horrors of formatting tables for that paper in Word is actually what got me into R Markdown in the first place.↩︎</p></li>
-<li id="fn14"><p>I didn’t use rgeos or rgdal directly, other than as part of functions in the raster package; I’m also new enough to the space that I’ve <em>always</em> used sf, and never really touched sp or maptools.↩︎</p></li>
-<li id="fn15"><p>The first version of raster hit CRAN in 2010. That we should all be so long-lasting and so useful!↩︎</p></li>
-<li id="fn16"><p>Pretty often, though not always, me.↩︎</p></li>
-<li id="fn17"><p>Pretty often, though not always, <a href="https://www.lucaskjohnson.com/">Lucas</a>.↩︎</p></li>
-<li id="fn18"><p>The original draft, written very late at night, said “a little bit like recommending not being on fire” here. I changed that, because it did not make any sense, but I also found it really funny, hence this note.↩︎</p></li>
-<li id="fn19"><p>As in, “I had more than one college course that was, in no small part, <em>on</em> FRAGSTATS”.↩︎</p></li>
-<li id="fn20"><p>Which means yes, I do sometimes still use <code>gather()</code>, though weirdly never <code>spread()</code>.↩︎</p></li>
-</ol>
-</section></div> ]]></description>
-  <category>R</category>
-  <category>Spatial</category>
-  <category>Data science</category>
-  <guid>https://mm218.dev/posts/2022-12-12-tools/</guid>
-  <pubDate>Mon, 12 Dec 2022 00:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2022-12-12-tools/favorites.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>

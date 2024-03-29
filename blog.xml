@@ -9,8 +9,287 @@
 <link>https://mm218.dev/blog.html</link>
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
-<generator>quarto-1.4.551</generator>
-<lastBuildDate>Wed, 10 Jan 2024 00:00:00 GMT</lastBuildDate>
+<generator>quarto-1.4.552</generator>
+<lastBuildDate>Fri, 29 Mar 2024 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>rsi 0.2.0 is now on CRAN!</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2024-03-29-rsi-020/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>I’m deligted to announce that version 0.2.0 of rsi, my package for handling common spatial ML data pre-processing tasks, is <a href="https://cran.r-project.org/package=rsi">now officially on CRAN</a>. rsi aims to handle downloading, masking, rescaling, and compositing data from STAC endpoints, computing spectral indices from that same data, amd wrangling the outputs into bricks ready for modeling workflows – and to do so in a user-friendly and extensible way. This release adds wrappers for more data sources, makes it easier to download high-quality water data from Landsat, and fixes some bugs while simplifying the internals of the package.</p>
+<p>You can install rsi from CRAN via:</p>
+<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">install.packages</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rsi"</span>)</span></code></pre></div>
+<p>This post will walk through a few of the most user-visible changes, starting with…</p>
+<section id="downloading-water-data" class="level2">
+<h2 class="anchored" data-anchor-id="downloading-water-data">Downloading water data</h2>
+<p>In older versions of rsi, the default <code>landsat_mask_function()</code> would mask your data so that your final files (and composites) only contained the highest quality observations over land. That meant that waterbodies (like the large area in the top left of this image) would always be empty:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(rsi)</span>
+<span id="cb2-2">future<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plan</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"multisession"</span>)</span>
+<span id="cb2-3"></span>
+<span id="cb2-4">aoi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_point</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">-</span><span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">76.1376841</span>, <span class="fl" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">43.0351335</span>))</span>
+<span id="cb2-5">aoi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_set_crs</span>(sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_sfc</span>(aoi), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">4326</span>)</span>
+<span id="cb2-6">aoi <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_buffer</span>(sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_transform</span>(aoi, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">5070</span>), <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10000</span>)</span>
+<span id="cb2-7"></span>
+<span id="cb2-8">landsat <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_landsat_imagery</span>(</span>
+<span id="cb2-9">  aoi,</span>
+<span id="cb2-10">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">start_date =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-06-01"</span>,</span>
+<span id="cb2-11">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">end_date =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-08-31"</span>,</span>
+<span id="cb2-12">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb2-13">)</span>
+<span id="cb2-14"></span>
+<span id="cb2-15">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(landsat))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-03-29-rsi-020/index_files/figure-html/unnamed-chunk-1-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This works great if you only care about land observations, but has an obvious flaw otherwise. Thanks to <span class="citation" data-cites="mateuszrydzik">@mateuszrydzik</span>, <code>landsat_mask_function()</code> starting in version 0.2.0 now has an argument, <code>include</code>, which you can use to also include high quality observations over water in your final outputs:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">landsat <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_landsat_imagery</span>(</span>
+<span id="cb3-2">  aoi,</span>
+<span id="cb3-3">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">start_date =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-06-01"</span>,</span>
+<span id="cb3-4">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">end_date =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-08-31"</span>,</span>
+<span id="cb3-5">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mask_function =</span> \(r) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">landsat_mask_function</span>(r, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">include =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"both"</span>),</span>
+<span id="cb3-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb3-7">)</span>
+<span id="cb3-8"></span>
+<span id="cb3-9">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(landsat))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-03-29-rsi-020/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>You can also set <code>include = "water"</code> to <em>only</em> include data over waterbodies, and exclude all data over land.</p>
+</section>
+<section id="downloading-even-more-data" class="level2">
+<h2 class="anchored" data-anchor-id="downloading-even-more-data">Downloading even more data</h2>
+<p>Two new functions</p>
+<p>First, thanks to <span class="citation" data-cites="h-a-graham">@h-a-graham</span>, the new <code>get_alos_palsar_imagery()</code> function provides a wrapper for accessing data from ALOS PALSAR:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">alos <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_alos_palsar_imagery</span>(</span>
+<span id="cb4-2">  aoi,</span>
+<span id="cb4-3">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-06-01"</span>,</span>
+<span id="cb4-4">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-09-01"</span></span>
+<span id="cb4-5">)</span>
+<span id="cb4-6"></span>
+<span id="cb4-7">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(alos))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-03-29-rsi-020/index_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>And separately, the new <code>get_naip_imagery()</code> function provides access to data from the National Agricultural Imagery Program across the United States:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">naip <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_naip_imagery</span>(</span>
+<span id="cb5-2">  aoi,</span>
+<span id="cb5-3">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2018-01-01"</span>,</span>
+<span id="cb5-4">  <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2021-01-01"</span>,</span>
+<span id="cb5-5">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pixel_x_size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">30</span>,</span>
+<span id="cb5-6">  <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">pixel_y_size =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">30</span></span>
+<span id="cb5-7">)</span>
+<span id="cb5-8"></span>
+<span id="cb5-9">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plotRGB</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(naip))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-03-29-rsi-020/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="new-vignette" class="level2">
+<h2 class="anchored" data-anchor-id="new-vignette">New vignette</h2>
+<p>One of the last significant user-facing changes is the addition of <a href="https://permian-global-research.github.io/rsi/articles/How-can-I-.html">a new vignette, called “How can I…?”</a>. This vignette is meant to collect common use-cases into a single document, providing users with a “cookbook” containing methods they might use to approach their current problems. If you’ve got a use-case that took you a moment to figure out, or a problem that you think rsi <em>should</em> be able to solve, let me know through an issue on GitHub so I can incorporate it into this vignette!</p>
+<p>The other improvements in this release focus mostly on bug squashing – including a nasty bug where downloading multiple tiles using <code>composite_function = NULL</code> could fail – and simplifying the internals of <code>get_stac_data()</code> to make it more maintainable and extensible into the future.</p>
+</section>
+<section id="acknowledgments" class="level2">
+<h2 class="anchored" data-anchor-id="acknowledgments">Acknowledgments</h2>
+<p>As always, huge thanks to the folks who have been involved in testing and improving this package since our last release: <a href="https://github.com/agronomofiorentini">@agronomofiorentini</a>, <a href="https://github.com/h-a-graham">@h-a-graham</a>, and <a href="https://github.com/mateuszrydzik">@mateuszrydzik</a>. It’s extremely appreciated.</p>
+
+
+</section>
+
+ ]]></description>
+  <category>R</category>
+  <category>Spatial</category>
+  <category>geospatial data</category>
+  <category>R packages</category>
+  <guid>https://mm218.dev/posts/2024-03-29-rsi-020/</guid>
+  <pubDate>Fri, 29 Mar 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2024-03-29-rsi-020/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>rsi is now on CRAN!</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -6810,111 +7089,6 @@ font-style: inherit;">workers =</span> cl)</span></code></pre></div>
   <category>Data science</category>
   <guid>https://mm218.dev/posts/2023-03-03-parallel/</guid>
   <pubDate>Fri, 03 Mar 2023 00:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>Commands I Use</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-02-20-tools/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p><a href="https://third-bit.com/2023/01/24/commands-i-use/">Greg Wilson posted this</a> and then <a href="https://www.cs.uni.edu/~wallingf/blog/archives/monthly/2023-02.html#e2023-02-20T10_18_38.htm">Eugene Wallingford posted this</a> and it seemed like fun: what are the most common shell commands I use?</p>
-<p>Counting command usage is pretty straightforward:</p>
-<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><span class="ex" style="color: null;
-background-color: null;
-font-style: inherit;">$</span> history <span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">|</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">awk</span> <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">'{print $2}'</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">|</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sort</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">|</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">uniq</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-c</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">|</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">sort</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-nr</span> <span class="kw" style="color: #003B4F;
-background-color: null;
-font-style: inherit;">|</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">head</span> <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">-n</span> 50</span></code></pre></div>
-<p>And my list winds up looking like this:</p>
-<pre><code>git # Though of course, this is a bunch of different commands
-cd # Did you know you don't need to use cd in zsh? 
-# You can just type the directory. I learned this last week, evidently.
-sudo
-ls
-find
-quarto # I don't think this includes rendering from RStudio! 
-grep
-rm
-gdalwarp # -multi -co NUM_THREADS=ALL_CPUS -co COMPRESS=DEFLATE \ 
-# -co PREDICTOR=3 -co BIGTIFF=YES
-ra # My alias for radian -- https://github.com/randy3k/radian
-nano # Possibly from teaching Software Carpentry lessons
-cat
-docker # I always teach using https://hub.docker.com/r/rocker/rstudio
-rsync
-cargo
-htop
-xkill # No, *you're* cheating at Crusader Kings
-pip
-ssh
-R # Interesting to me that I have three separate R calls here
-Rscript
-curl
-mkdir
-labrador # Alias to SSH into another computer
-convert # Have done a _lot_ of image processing work for the PhD
-tmux # Highly, highly recommend https://github.com/tmux/tmux
-qvm # The _only_ way to use Quarto https://github.com/dpastoor/qvm
-ping # I break my local network more than I care to admit
-gdal_calc.py 
-killall # "Whoops, accidentally used all threads for that job again"
-echo
-co # Alias to SSH into another computer
-cp
-ogr2ogr # Called a lot, but called _correctly_ very rarely
-mv
-python # More often called from inside an IDE
-ogrinfo
-history
-which
-touch
-wc
-source
-gdalinfo
-du # Doing spatial modeling on local compute resources is... rough
-sshpi # Alias to SSH into another computer
-sed
-gdal_translate
-ffmpeg # Surprisingly useful for conference talks
-wget
-scp</code></pre>
-<p>I’m surprised by how much more I use gdalwarp than the rest of the suite! But otherwise, this all makes pretty intuitive sense to me.</p>
-
-
-
- ]]></description>
-  <category>shell</category>
-  <guid>https://mm218.dev/posts/2023-02-20-tools/</guid>
-  <pubDate>Mon, 20 Feb 2023 00:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>
