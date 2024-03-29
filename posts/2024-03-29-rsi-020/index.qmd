@@ -1,0 +1,103 @@
+---
+title: "rsi 0.2.0 is now on CRAN!"
+description: "More data products, fewer bugs, less time wasted on data management slop."
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2024-03-29"
+categories: [R, Spatial, geospatial data, R packages]
+image: banner.jpg
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+I'm deligted to announce that version 0.2.0 of rsi, my package for handling common spatial ML data pre-processing tasks, is [now officially on CRAN](https://cran.r-project.org/package=rsi). rsi aims to handle downloading, masking, rescaling, and compositing data from STAC endpoints, computing spectral indices from that same data, amd wrangling the outputs into bricks ready for modeling workflows -- and to do so in a user-friendly and extensible way. This release adds wrappers for more data sources, makes it easier to download high-quality water data from Landsat, and fixes some bugs while simplifying the internals of the package.
+
+You can install rsi from CRAN via:
+
+```r
+install.packages("rsi")
+```
+
+This post will walk through a few of the most user-visible changes, starting with...
+
+## Downloading water data
+
+In older versions of rsi, the default `landsat_mask_function()` would mask your data so that your final files (and composites) only contained the highest quality observations over land. That meant that waterbodies (like the large area in the top left of this image) would always be empty:
+
+```{r}
+library(rsi)
+future::plan("multisession")
+
+aoi <- sf::st_point(c(-76.1376841, 43.0351335))
+aoi <- sf::st_set_crs(sf::st_sfc(aoi), 4326)
+aoi <- sf::st_buffer(sf::st_transform(aoi, 5070), 10000)
+
+landsat <- get_landsat_imagery(
+  aoi,
+  start_date = "2021-06-01",
+  end_date = "2021-08-31",
+  output_filename = tempfile(fileext = ".tif")
+)
+
+terra::plot(terra::rast(landsat))
+```
+
+This works great if you only care about land observations, but has an obvious flaw otherwise. Thanks to @mateuszrydzik, `landsat_mask_function()` starting in version 0.2.0 now has an argument, `include`, which you can use to also include high quality observations over water in your final outputs:
+
+```{r}
+landsat <- get_landsat_imagery(
+  aoi,
+  start_date = "2021-06-01",
+  end_date = "2021-08-31",
+  mask_function = \(r) landsat_mask_function(r, include = "both"),
+  output_filename = tempfile(fileext = ".tif")
+)
+
+terra::plot(terra::rast(landsat))
+```
+
+You can also set `include = "water"` to _only_ include data over waterbodies, and exclude all data over land.
+
+## Downloading even more data
+
+Two new functions 
+
+First, thanks to @h-a-graham, the new `get_alos_palsar_imagery()` function provides a wrapper for accessing data from ALOS PALSAR:
+
+```{r}
+alos <- get_alos_palsar_imagery(
+  aoi,
+  "2021-06-01",
+  "2021-09-01"
+)
+
+terra::plot(terra::rast(alos))
+```
+
+And separately, the new `get_naip_imagery()` function provides access to data from the National Agricultural Imagery Program across the United States:
+
+```{r}
+naip <- get_naip_imagery(
+  aoi,
+  "2018-01-01",
+  "2021-01-01",
+  pixel_x_size = 30,
+  pixel_y_size = 30
+)
+
+terra::plotRGB(terra::rast(naip))
+```
+
+
+## New vignette
+
+One of the last significant user-facing changes is the addition of [a new vignette, called "How can I...?"](https://permian-global-research.github.io/rsi/articles/How-can-I-.html). This vignette is meant to collect common use-cases into a single document, providing users with a "cookbook" containing methods they might use to approach their current problems. If you've got a use-case that took you a moment to figure out, or a problem that you think rsi _should_ be able to solve, let me know through an issue on GitHub so I can incorporate it into this vignette!
+
+The other improvements in this release focus mostly on bug squashing -- including a nasty bug where downloading multiple tiles using `composite_function = NULL` could fail -- and simplifying the internals of `get_stac_data()` to make it more maintainable and extensible into the future.
+
+## Acknowledgments
+
+As always, huge thanks to the folks who have been involved in testing and improving this package since our last release: [&#x0040;agronomofiorentini](https://github.com/agronomofiorentini), [&#x0040;h-a-graham](https://github.com/h-a-graham), and [&#x0040;mateuszrydzik](https://github.com/mateuszrydzik). It's extremely appreciated.
