@@ -63,7 +63,7 @@ You can also set `include = "water"` to _only_ include data over waterbodies, an
 
 ## Downloading even more data
 
-Two new functions 
+Two new functions in this release provide friendly wrappers around `get_stac_data()` to help you access specific data sources.
 
 First, thanks to @h-a-graham, the new `get_alos_palsar_imagery()` function provides a wrapper for accessing data from ALOS PALSAR:
 
