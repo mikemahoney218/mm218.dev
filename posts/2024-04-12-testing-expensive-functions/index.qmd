@@ -1,0 +1,92 @@
+---
+title: "Test warnings faster"
+description: "If the function sucks, hit da bricks"
+author:
+  - name: Mike Mahoney
+    url: {}
+date: "2024-04-12"
+categories: [R, Tutorials, Package development]
+image: banner.jpg
+format: 
+  html:
+    toc: true
+engine: knitr
+---
+
+Here's another small little note from package development corner (see also [using classed errors in rlang](https://www.mm218.dev/posts/2023-11-07-classed-errors/), [executing untrusted code in minimal environments](https://www.mm218.dev/posts/2023-10-27-minimal-environments/), and [not pre-allocating vectors isn't as bad as it used to be](https://www.mm218.dev/posts/2023-08-29-allocations/)). Say you've got some function in your package that takes a _long_ time to execute:
+
+```{r}
+func <- function(x) {
+  Sys.sleep(3)
+  x * 2L
+}
+```
+
+Maybe the function is downloading data over a network connection, maybe it's doing a _ton_ of computations, maybe it's not written super efficiently but you've got other priorities right now -- the point is, this function takes a long time to execute, and that's not going to change.
+
+But you still want to properly check user inputs and throw warnings/errors as appropriate. For instance, a clear issue with this function is that it will overflow to NA when given a large integer `x`:
+
+```{r}
+func(.Machine$integer.max)
+```
+
+So maybe we add some code to give a friendly warning about this situation, to hopefully make the specific issue clearer for our users:
+
+```{r}
+func <- function(x) {
+  if (x > (.Machine$integer.max / 2L)) {
+    rlang::warn(
+      "`x` is too large, so this function will return NA",
+      class = "big_x"
+    )
+  }
+  
+  Sys.sleep(3)
+  x * 2L
+}
+```
+
+And because we're diligent package developers, we want to test to make sure that this warning fires when we'd expect. Since we're [using a classed error](https://www.mm218.dev/posts/2023-11-07-classed-errors/), we can write a test to make sure that specifically our `big_x` warning fires when we pass an `x` that's too big:^[I've been bitten so many times by tests that expect _a_ warning, rather than a _specific_ warning. Giving functions malformed input often triggers multiple warnings, so if you aren't checking for your specific warning message or class, you might be surprised that your custom warning never actually fires!]
+
+```{r}
+library(testthat)
+suppressMessages(testthat::local_edition(3))
+
+test_that("large integers get a custom warning", {
+  expect_warning(
+    func(.Machine$integer.max),
+    class = "big_x"
+  )
+})
+```
+
+This is all good practice!^[Well, the classed warnings and testing specifically for that warning. The function is a mess.] But it has one big downside: whenever we run this function, we need to wait for the entire function to finish before our test passes. Which means for expensive functions, these can be pretty expensive tests:
+
+```{r}
+tictoc::tic()
+test_that("large integers get a custom warning", {
+  expect_warning(
+    func(.Machine$integer.max),
+    class = "big_x"
+  )
+})
+tictoc::toc()
+```
+
+What we can do instead is use `tryCatch()` to promote this specific warning into an error, aborting the function (and not triggering any of the expensive code). By giving that new error its own class, and using `expect_error()` to check for an error of that class, we're able to make sure that our warning has fired (and no other errors happened) without needing to wait:
+
+```{r}
+tictoc::tic()
+test_that("large integers get a custom warning", {
+  expect_error(
+    tryCatch(
+      func(.Machine$integer.max),
+      big_x = rlang::abort("the warning fired", class = "success")
+    ),
+    class = "success"
+  )
+})
+tictoc::toc()
+```
+
+Now, an obvious downside is that we're no longer testing to make sure the function works _after_ the warning gets fired. In this case, where we're expecting that triggering this warning means this function will return `NA`, we should probably be testing to make sure that this function actually _does_ return `NA` after the warning fires. But in plenty of other situations this can be a useful way to speed up your test suites while still making sure that you're giving your users as much feedback as possible, when you're expecting to give it.
