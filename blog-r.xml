@@ -9,8 +9,251 @@
 <link>https://mm218.dev/blog.html#category=R</link>
 <atom:link href="https://mm218.dev/blog-r.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
-<generator>quarto-1.4.552</generator>
-<lastBuildDate>Fri, 29 Mar 2024 00:00:00 GMT</lastBuildDate>
+<generator>quarto-1.4.553</generator>
+<lastBuildDate>Fri, 12 Apr 2024 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Test warnings faster</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2024-04-12-testing-expensive-functions/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Here’s another small little note from package development corner (see also <a href="https://www.mm218.dev/posts/2023-11-07-classed-errors/">using classed errors in rlang</a>, <a href="https://www.mm218.dev/posts/2023-10-27-minimal-environments/">executing untrusted code in minimal environments</a>, and <a href="https://www.mm218.dev/posts/2023-08-29-allocations/">not pre-allocating vectors isn’t as bad as it used to be</a>). Say you’ve got some function in your package that takes a <em>long</em> time to execute:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">func <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(x) {</span>
+<span id="cb1-2">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">Sys.sleep</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>)</span>
+<span id="cb1-3">  x <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>L</span>
+<span id="cb1-4">}</span></code></pre></div>
+</div>
+<p>Maybe the function is downloading data over a network connection, maybe it’s doing a <em>ton</em> of computations, maybe it’s not written super efficiently but you’ve got other priorities right now – the point is, this function takes a long time to execute, and that’s not going to change.</p>
+<p>But you still want to properly check user inputs and throw warnings/errors as appropriate. For instance, a clear issue with this function is that it will overflow to NA when given a large integer <code>x</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">func</span>(.Machine<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>integer.max)</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning in x * 2L: NAs produced by integer overflow</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] NA</code></pre>
+</div>
+</div>
+<p>So maybe we add some code to give a friendly warning about this situation, to hopefully make the specific issue clearer for our users:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">func <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">function</span>(x) {</span>
+<span id="cb5-2">  <span class="cf" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">if</span> (x <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">&gt;</span> (.Machine<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>integer.max <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">/</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>L)) {</span>
+<span id="cb5-3">    rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">warn</span>(</span>
+<span id="cb5-4">      <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"`x` is too large, so this function will return NA"</span>,</span>
+<span id="cb5-5">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">class =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"big_x"</span></span>
+<span id="cb5-6">    )</span>
+<span id="cb5-7">  }</span>
+<span id="cb5-8">  </span>
+<span id="cb5-9">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">Sys.sleep</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>)</span>
+<span id="cb5-10">  x <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">*</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">2</span>L</span>
+<span id="cb5-11">}</span></code></pre></div>
+</div>
+<p>And because we’re diligent package developers, we want to test to make sure that this warning fires when we’d expect. Since we’re <a href="https://www.mm218.dev/posts/2023-11-07-classed-errors/">using a classed error</a>, we can write a test to make sure that specifically our <code>big_x</code> warning fires when we pass an <code>x</code> that’s too big:<sup>1</sup></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(testthat)</span>
+<span id="cb6-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">suppressMessages</span>(testthat<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">local_edition</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">3</span>))</span>
+<span id="cb6-3"></span>
+<span id="cb6-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">test_that</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"large integers get a custom warning"</span>, {</span>
+<span id="cb6-5">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expect_warning</span>(</span>
+<span id="cb6-6">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">func</span>(.Machine<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>integer.max),</span>
+<span id="cb6-7">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">class =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"big_x"</span></span>
+<span id="cb6-8">  )</span>
+<span id="cb6-9">})</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Test passed </code></pre>
+</div>
+</div>
+<p>This is all good practice!<sup>2</sup> But it has one big downside: whenever we run this function, we need to wait for the entire function to finish before our test passes. Which means for expensive functions, these can be pretty expensive tests:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1">tictoc<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tic</span>()</span>
+<span id="cb8-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">test_that</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"large integers get a custom warning"</span>, {</span>
+<span id="cb8-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expect_warning</span>(</span>
+<span id="cb8-4">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">func</span>(.Machine<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>integer.max),</span>
+<span id="cb8-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">class =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"big_x"</span></span>
+<span id="cb8-6">  )</span>
+<span id="cb8-7">})</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Test passed </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1">tictoc<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">toc</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>3.056 sec elapsed</code></pre>
+</div>
+</div>
+<p>What we can do instead is use <code>tryCatch()</code> to promote this specific warning into an error, aborting the function (and not triggering any of the expensive code). By giving that new error its own class, and using <code>expect_error()</code> to check for an error of that class, we’re able to make sure that our warning has fired (and no other errors happened) without needing to wait:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1">tictoc<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tic</span>()</span>
+<span id="cb12-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">test_that</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"large integers get a custom warning"</span>, {</span>
+<span id="cb12-3">  <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">expect_error</span>(</span>
+<span id="cb12-4">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tryCatch</span>(</span>
+<span id="cb12-5">      <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">func</span>(.Machine<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>integer.max),</span>
+<span id="cb12-6">      <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">big_x =</span> rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">abort</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"the warning fired"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">class =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"success"</span>)</span>
+<span id="cb12-7">    ),</span>
+<span id="cb12-8">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">class =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"success"</span></span>
+<span id="cb12-9">  )</span>
+<span id="cb12-10">})</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Test passed </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1">tictoc<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">toc</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>0.028 sec elapsed</code></pre>
+</div>
+</div>
+<p>Now, an obvious downside is that we’re no longer testing to make sure the function works <em>after</em> the warning gets fired. In this case, where we’re expecting that triggering this warning means this function will return <code>NA</code>, we should probably be testing to make sure that this function actually <em>does</em> return <code>NA</code> after the warning fires. But in plenty of other situations this can be a useful way to speed up your test suites while still making sure that you’re giving your users as much feedback as possible, when you’re expecting to give it.</p>
+
+
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>I’ve been bitten so many times by tests that expect <em>a</em> warning, rather than a <em>specific</em> warning. Giving functions malformed input often triggers multiple warnings, so if you aren’t checking for your specific warning message or class, you might be surprised that your custom warning never actually fires!↩︎</p></li>
+<li id="fn2"><p>Well, the classed warnings and testing specifically for that warning. The function is a mess.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>R</category>
+  <category>Tutorials</category>
+  <category>Package development</category>
+  <guid>https://mm218.dev/posts/2024-04-12-testing-expensive-functions/</guid>
+  <pubDate>Fri, 12 Apr 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2024-04-12-testing-expensive-functions/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>rsi 0.2.0 is now on CRAN!</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -2239,6 +2482,7 @@ font-style: inherit;">"wrong_class"</span>))</span></code></pre></div>
 </section></div> ]]></description>
   <category>R</category>
   <category>Tutorials</category>
+  <category>Package development</category>
   <guid>https://mm218.dev/posts/2023-11-07-classed-errors/</guid>
   <pubDate>Tue, 07 Nov 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-11-07-classed-errors/banner.jpg" medium="image" type="image/jpeg"/>
@@ -3862,6 +4106,7 @@ font-style: inherit;">".tif"</span>)</span>
 </section></div> ]]></description>
   <category>R</category>
   <category>Tutorials</category>
+  <category>Package development</category>
   <guid>https://mm218.dev/posts/2023-10-27-minimal-environments/</guid>
   <pubDate>Fri, 27 Oct 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-10-27-minimal-environments/banner.jpg" medium="image" type="image/jpeg"/>
@@ -5265,6 +5510,7 @@ font-style: inherit;">"Memory allocation (bytes)"</span>)</span></code></pre></d
 </section></div> ]]></description>
   <category>R</category>
   <category>Tutorials</category>
+  <category>Package development</category>
   <guid>https://mm218.dev/posts/2023-08-29-allocations/</guid>
   <pubDate>Tue, 29 Aug 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-08-29-allocations/banner.jpg" medium="image" type="image/jpeg"/>
@@ -7007,112 +7253,6 @@ font-style: inherit;">workers =</span> cl)</span></code></pre></div>
   <category>Data science</category>
   <guid>https://mm218.dev/posts/2023-03-03-parallel/</guid>
   <pubDate>Fri, 03 Mar 2023 00:00:00 GMT</pubDate>
-</item>
-<item>
-  <title>spatialsample 0.3.0 is now on CRAN</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-01-17-spatialsample/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<div class="quarto-figure quarto-figure-center">
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2023-01-17-spatialsample/map.jpg" class="img-fluid figure-img"></p>
-<figcaption>Photo by <a href="https://unsplash.com/@tjump">Nik Shuliahin 💛💙</a> on <a href="https://unsplash.com/photos/rkFIIE9PxH0">Unsplash</a></figcaption>
-</figure>
-</div>
-<p>A new release of <a href="https://spatialsample.tidymodels.org/">spatialsample</a> – an R package extending the <a href="https://rsample.tidymodels.org/">rsample</a> framework to handle spatial resampling and cross-validation – just landed on CRAN. This post will describe the new breaking changes to the <code>spatial_clustering_cv()</code> function, as well as improvements made to how spatialsample handles repeated cross-validation, as well as improvements made to how spatialsample handles repeated cross-validation; for a full list of changes, check out <a href="https://spatialsample.tidymodels.org/news/index.html">this release’s NEWS entry</a></p>
-<p>You can install the package from CRAN via:</p>
-<div class="sourceCode" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">install.packages</span>(<span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"spatialsample"</span>)</span></code></pre></div>
-<section id="breaking-changes-to-spatial_clustering_cv" class="level2">
-<h2 class="anchored" data-anchor-id="breaking-changes-to-spatial_clustering_cv">Breaking changes to <code>spatial_clustering_cv()</code></h2>
-<p>The only (intentional!) breaking changes in this version are to the function <code>spatial_clustering_cv()</code>. This function is the oldest part of the package, and as such didn’t quite work like any of the other parts of the package: distance calculations sometimes used <code>dist()</code> instead of <code>sf::st_distance()</code>, distances used centroids instead of polygon edges, and trying to adapt this function to work with both <code>sf</code> and non-spatial data had made the internals a bit hairy.</p>
-<p>As of <a href="https://rsample.tidymodels.org/news/index.html#rsample-111">rsample 1.1.1</a>, all of those non-spatial elements have been outsourced to <code>rsample::clustering_cv()</code>. If you’ve been using <code>spatial_clustering_cv()</code> for non-spatial data, this function is pretty close to a drop-in replacement, and you should migrate code over.</p>
-<p>For spatial point data, <code>spatial_clustering_cv()</code> should work identically to past versions. For other geometry types however, note that distance calculations have now changed to use edge-to-edge distance between geometries, rather than centroids as in past versions. This means this function now uses distances in a way that’s more consistent with the rest of the package, and more consistent with what I personally view as best practice; two polygons sharing a lot of perimeter but with centroids separated by a decent margin are still likely to be highly similar.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">library</span>(spatialsample)</span>
-<span id="cb2-2"><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">spatial_clustering_cv</span>(boston_canopy, <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">2</span>)</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>#  2-fold spatial cross-validation 
-# A tibble: 2 × 2
-  splits            id   
-  &lt;list&gt;            &lt;chr&gt;
-1 &lt;split [277/405]&gt; Fold1
-2 &lt;split [405/277]&gt; Fold2</code></pre>
-</div>
-</div>
-</section>
-<section id="repetition-repetition-repetition" class="level2">
-<h2 class="anchored" data-anchor-id="repetition-repetition-repetition">Repetition, repetition, repetition<sup>1</sup></h2>
-<p>I think the most exciting part of this release is that all spatialsample functions can now handle cross-validation with repeats. Simply pass your desired number of repeats to the <code>repeats</code> argument of any function.<sup>2</sup> The <code>autoplot()</code> function will now also automatically detect when you’ve used repeated cross-validation, and facet plots accordingly:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1">boston_canopy <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb4-2">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">spatial_block_cv</span>(<span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">v =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">5</span>, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">repeats =</span> <span class="dv" style="color: #AD0000;
-background-color: null;
-font-style: inherit;">4</span>) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb4-3">  <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">autoplot</span>()</span></code></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="https://mm218.dev/posts/2023-01-17-spatialsample/index_files/figure-html/unnamed-chunk-2-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-</section>
-<section id="and-more" class="level2">
-<h2 class="anchored" data-anchor-id="and-more">…and more!</h2>
-<p>This is just scratching the surface of the new features and improvements in this release of spatialsample. You can see a full list in <a href="https://spatialsample.tidymodels.org/news/index.html">this release’s NEWS entry</a>.</p>
-</section>
-<section id="repetition" class="level2">
-<h2 class="anchored" data-anchor-id="repetition">Repetition!</h2>
-
-
-</section>
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>This joke I keep making is stolen from <a href="https://www.youtube.com/watch?v=g4GRYQHccLo">an old Kurt Braunohler video</a>. Or potentially, <a href="https://www.youtube.com/watch?v=Lvd6MBsiDBo">this other Kurt Braunohler video</a>. Or potentially, <a href="https://www.youtube.com/watch?v=g4GRYQHccLo">that first Kurt Braunohler video</a>.↩︎</p></li>
-<li id="fn2"><p>Though note that spatialsample should error if repeats would return the same exact folds, such as when using <code>spatial_leave_location_out_cv()</code> with <code>v = NULL</code>. This behavior might change in the future if anyone complains, but for the modeling projects I’ve worked on, you’d only repeat identical CV folds by accident.↩︎</p></li>
-</ol>
-</section></div> ]]></description>
-  <category>R</category>
-  <category>spatialsample</category>
-  <category>tidymodels</category>
-  <category>R packages</category>
-  <category>geospatial data</category>
-  <guid>https://mm218.dev/posts/2023-01-17-spatialsample/</guid>
-  <pubDate>Tue, 17 Jan 2023 00:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2023-01-17-spatialsample/map.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>
