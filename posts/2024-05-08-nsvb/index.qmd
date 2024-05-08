@@ -6,7 +6,7 @@ author:
     url: {}
 date: "2024-05-08"
 categories: ["ecology", "papers", "remote sensing", "machine learning", "earth science", "AGB"]
-image: banner.jpg
+image: banner.png
 format: 
   html:
     toc: true
