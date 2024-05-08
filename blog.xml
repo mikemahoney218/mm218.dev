@@ -9,8 +9,47 @@
 <link>https://mm218.dev/blog.html</link>
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
-<generator>quarto-1.4.553</generator>
-<lastBuildDate>Fri, 12 Apr 2024 00:00:00 GMT</lastBuildDate>
+<generator>quarto-1.4.554</generator>
+<lastBuildDate>Wed, 08 May 2024 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>New allometric models for the USA create a step-change in forest carbon estimation, modeling, and mapping</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2024-05-08-nsvb/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>Late last year, the United States Department of Agriculture’s Forest Inventory and Analysis Program (FIA) quietly announced that they were changing how they calculated vegetation structural parameters – specifically the volume, biomass, and carbon content of trees across the USA – to use a <a href="https://www.fs.usda.gov/research/programs/fia/nsvb">brand-new set of allometric models</a>. These models seem great! They do a much better job of accounting for the non-merchantable parts of a tree and provide a nationally consistent method for how we calculate these values, replacing the old system which had sharp deviations across regional (not ecological) boundaries.</p>
+<p>But fundamentally, this change means that going forward FIA is providing a brand new set of estimates, and anyone who’s building models from FIA data is going to need to update their workflows to adapt. In <a href="https://arxiv.org/abs/2405.04507">a new preprint out today</a>, we – a team led by Lucas Johnson and with Grant Domke and Colin Beier – start exploring what that might mean for model-based carbon estimates and maps.</p>
+<p>What we find is that, generally, the shift to these new allometrics is complicated! The new values aren’t pure rescalings of old estimates – while you can get <em>close</em> by using a linear model to update old estimates to the new allometrics, it’s not a perfect match, and some of the remaining variation is likely due to environmental factors and species composition across the landscape. And while model-based estimation approaches are still effective at interpolating from field measurements to point-in-time carbon estimates across the landscape, we find that the new allometrics attribute a lot of forest growth to forests with full crowns, where passive remote sensing based models tend to saturate. That means that these models, even though they’re good at making point-in-time estimates, are worse at tracking growth over time in mature forested landscapes.</p>
+<div id="fig-stockchange" class="quarto-figure quarto-figure-center quarto-float anchored" alt="Three maps of New York State, showing estimates of carbon stock changes between 2005 and 2019 under old allometrics and new allometrics, as well as the difference between these two maps.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-stockchange-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="https://mm218.dev/posts/2024-05-08-nsvb/stock_change_maps.png" class="img-fluid figure-img" alt="Three maps of New York State, showing estimates of carbon stock changes between 2005 and 2019 under old allometrics and new allometrics, as well as the difference between these two maps.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-stockchange-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Stock-change map comparison. a) 15-year NSVB stock-change map (<img src="https://latex.codecogs.com/png.latex?%5CDelta"> NSVB; 2019 AGB - 2005 AGB). b) 15-year CRM stock-change map (<img src="https://latex.codecogs.com/png.latex?%5CDelta"> CRM; 2019 AGB - 2005 AGB). c) Stock-change difference map computed as <img src="https://latex.codecogs.com/png.latex?%5CDelta"> NSVB minus <img src="https://latex.codecogs.com/png.latex?%5CDelta"> CRM. Mapped values capped at +/- 40 <img src="https://latex.codecogs.com/png.latex?%5Coperatorname%7BMg%5C%20ha%5E%7B-1%7D%7D">.
+</figcaption>
+</figure>
+</div>
+<p>There’s plenty of more information about these challenges, alongside other explorations of what the new allometrics will mean for model-based estimation workflows, <a href="https://arxiv.org/abs/2405.04507">in the preprint</a>.</p>
+<p>This was a really fun paper to write – and as is tradition, we originally thought it would be a “quick hit” sort of project when we started on it back in Novemeber, when the new allometrics were released. It’s also (I think!) my first time actually “co-writing” a paper, where I wrote the Introduction and Methods section and then handed that shell to Lucas so he could actually do the real work involved. I enjoyed that process and think it produced a good result here; I’m really happy to see this preprint go out!</p>
+
+
+
+ ]]></description>
+  <category>ecology</category>
+  <category>papers</category>
+  <category>remote sensing</category>
+  <category>machine learning</category>
+  <category>earth science</category>
+  <category>AGB</category>
+  <guid>https://mm218.dev/posts/2024-05-08-nsvb/</guid>
+  <pubDate>Wed, 08 May 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2024-05-08-nsvb/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>Test warnings faster</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -7195,40 +7234,6 @@ font-style: inherit;">.by =</span> status</span>
   <guid>https://mm218.dev/posts/2023-04-01-fitting_models/</guid>
   <pubDate>Sat, 01 Apr 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-04-01-fitting_models/nests.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>waywiser is now a part of rOpenSci</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-03-21-waywiser-ropensci/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p>I’m thrilled to share that <a href="https://docs.ropensci.org/waywiser/">waywiser</a>, my R package focused on providing framework-agnostic (but tidymodels-friendly) methods for assessing models fit to spatial data,<sup>1</sup> has passed peer review and been accepted to <a href="https://ropensci.org/">rOpenSci</a>. As always, <a href="https://github.com/ropensci/software-review/issues/571">the review process</a> improved the package immensely, thanks to the thoughtful reviews of <a href="https://becarioprecario.github.io/">Virgilio Gómez-Rubio</a> and <a href="https://jakubnowosad.com/">Jakub Nowosad</a><sup>2</sup>, as well as the shepherding of <a href="https://www.r-rse.eu/">Anna Krystalli</a> and <a href="https://www.paulamoraga.com/">Paula Moraga</a> as editors.</p>
-<p>As of Monday, the reviewed version has officially <a href="https://cran.r-project.org/package=waywiser">made its way to CRAN</a>. This is a <a href="https://docs.ropensci.org/waywiser/news/index.html#waywiser-030">huge update</a>, bringing in a ton of new functions and improving consistency and speed across the package, and I’m excited to have it officially released.</p>
-<p>I’m also very excited to have put out a <a href="https://arxiv.org/abs/2303.11312">preprint describing the package</a>, which goes a bit deeper into the logic of why and how the package implements the features it does. This is my first solo-authored paper,<sup>3</sup> and by far and away the one with the most equations.<sup>4</sup> Despite both of those, I’m pretty pleased with how this paper turned out; I think it’s a useful addition to the package documentation for users who want a more thorough explication of the scholarly background of package features.</p>
-
-
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>I use this terminology in a number of places throughout the documentation to try and emphasize that nothing about the models themselves need to be spatial. The models don’t need to incorporate spatial information at all for these methods to be useful. I’ll admit that it’s a bit clunky, though, and have a habit of lapsing back to “spatial models”.↩︎</p></li>
-<li id="fn2"><p>Only a little intimidating having my package reviewed by the authors of two of the best books on using R for spatial analysis!↩︎</p></li>
-<li id="fn3"><p>And frankly, I don’t intend to make it a habit. I highly appreciate working with collaborators, particularly with my current research group, and know that my work is usually better for having gone through multiple rounds of revisions before being released. I really missed that process while working on this paper!↩︎</p></li>
-<li id="fn4"><p>23 numbered equations! My undergraduate degree is in ecology, where <a href="https://www.pnas.org/doi/abs/10.1073/pnas.1205259109">each additional equation per page is associated with 28% fewer citations</a>; four years ago I’d never have expected I’d be writing a paper that looks like this↩︎</p></li>
-</ol>
-</section></div> ]]></description>
-  <category>R</category>
-  <category>waywiser</category>
-  <category>Spatial</category>
-  <category>Data science</category>
-  <category>R packages</category>
-  <guid>https://mm218.dev/posts/2023-03-21-waywiser-ropensci/</guid>
-  <pubDate>Thu, 23 Mar 2023 00:00:00 GMT</pubDate>
 </item>
 </channel>
 </rss>

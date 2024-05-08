@@ -7,10 +7,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 <meta name="author" content="Mike Mahoney">
-<meta name="dcterms.date" content="2022-02-18">
-<meta name="description" content="Reflecting on another year.">
+<meta name="dcterms.date" content="2024-05-08">
+<meta name="description" content="New preprint with Lucas Johnson, Grant Domke, and Colin Beier">
 
-<title>Mike Mahoney - Progress, Purpose, Process</title>
+<title>Mike Mahoney - New allometric models for the USA create a step-change in forest carbon estimation, modeling, and mapping</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -70,21 +70,50 @@ ul.task-list li input[type="checkbox"] {
   }
 }</script>
 
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 <link rel="stylesheet" href="../../styles.css">
-<meta property="og:title" content="Mike Mahoney - Progress, Purpose, Process">
-<meta property="og:description" content="Reflecting on another year.">
-<meta property="og:image" content="https://mm218.dev/posts/2022-02-18-progress-purpose-process/pano.jpg">
+<meta property="og:title" content="Mike Mahoney - New allometric models for the USA create a step-change in forest carbon estimation, modeling, and mapping">
+<meta property="og:description" content="New preprint with Lucas Johnson, Grant Domke, and Colin Beier">
+<meta property="og:image" content="https://mm218.dev/posts/2024-05-08-nsvb/banner.jpg">
 <meta property="og:site_name" content="Mike Mahoney">
 <meta property="og:locale" content="en_US">
-<meta name="twitter:title" content="Mike Mahoney - Progress, Purpose, Process">
-<meta name="twitter:description" content="Reflecting on another year.">
-<meta name="twitter:image" content="https://mm218.dev/posts/2022-02-18-progress-purpose-process/pano.jpg">
+<meta name="twitter:title" content="Mike Mahoney - New allometric models for the USA create a step-change in forest carbon estimation, modeling, and mapping">
+<meta name="twitter:description" content="New preprint with Lucas Johnson, Grant Domke, and Colin Beier">
+<meta name="twitter:image" content="https://mm218.dev/posts/2024-05-08-nsvb/banner.jpg">
 <meta name="twitter:creator" content="@MikeMahoney218">
 <meta name="twitter:card" content="summary_large_image">
 </head>
 
-<body class="nav-fixed fullcontent">
+<body class="nav-fixed">
 
 <div id="quarto-search-results"></div>
   <header id="quarto-header" class="headroom fixed-top quarto-banner">
@@ -133,13 +162,21 @@ ul.task-list li input[type="checkbox"] {
 <header id="title-block-header" class="quarto-title-block default page-columns page-full">
   <div class="quarto-title-banner page-columns page-full">
     <div class="quarto-title column-body">
-      <h1 class="title">Progress, Purpose, Process</h1>
+      <h1 class="title">New allometric models for the USA create a step-change in forest carbon estimation, modeling, and mapping</h1>
                   <div>
         <div class="description">
-          <p>Reflecting on another year.</p>
+          New preprint with Lucas Johnson, Grant Domke, and Colin Beier
         </div>
       </div>
-                </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">ecology</div>
+                <div class="quarto-category">papers</div>
+                <div class="quarto-category">remote sensing</div>
+                <div class="quarto-category">machine learning</div>
+                <div class="quarto-category">earth science</div>
+                <div class="quarto-category">AGB</div>
+              </div>
+                  </div>
   </div>
     
   
@@ -155,7 +192,7 @@ ul.task-list li input[type="checkbox"] {
       <div>
       <div class="quarto-title-meta-heading">Published</div>
       <div class="quarto-title-meta-contents">
-        <p class="date">February 18, 2022</p>
+        <p class="date">May 8, 2024</p>
       </div>
     </div>
     
@@ -166,7 +203,9 @@ ul.task-list li input[type="checkbox"] {
   </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
 <!-- sidebar -->
 <!-- margin-sidebar -->
-    
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        
+    </div>
 <!-- main -->
 <main class="content quarto-banner-title-block" id="quarto-document-content">
 
@@ -174,22 +213,21 @@ ul.task-list li input[type="checkbox"] {
 
 
 
-<div class="cell">
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="pano.jpg" class="img-fluid figure-img" width="3059"></p>
+<p>Late last year, the United States Department of Agriculture’s Forest Inventory and Analysis Program (FIA) quietly announced that they were changing how they calculated vegetation structural parameters – specifically the volume, biomass, and carbon content of trees across the USA – to use a <a href="https://www.fs.usda.gov/research/programs/fia/nsvb">brand-new set of allometric models</a>. These models seem great! They do a much better job of accounting for the non-merchantable parts of a tree and provide a nationally consistent method for how we calculate these values, replacing the old system which had sharp deviations across regional (not ecological) boundaries.</p>
+<p>But fundamentally, this change means that going forward FIA is providing a brand new set of estimates, and anyone who’s building models from FIA data is going to need to update their workflows to adapt. In <a href="https://arxiv.org/abs/2405.04507">a new preprint out today</a>, we – a team led by Lucas Johnson and with Grant Domke and Colin Beier – start exploring what that might mean for model-based carbon estimates and maps.</p>
+<p>What we find is that, generally, the shift to these new allometrics is complicated! The new values aren’t pure rescalings of old estimates – while you can get <em>close</em> by using a linear model to update old estimates to the new allometrics, it’s not a perfect match, and some of the remaining variation is likely due to environmental factors and species composition across the landscape. And while model-based estimation approaches are still effective at interpolating from field measurements to point-in-time carbon estimates across the landscape, we find that the new allometrics attribute a lot of forest growth to forests with full crowns, where passive remote sensing based models tend to saturate. That means that these models, even though they’re good at making point-in-time estimates, are worse at tracking growth over time in mature forested landscapes.</p>
+<div id="fig-stockchange" class="quarto-figure quarto-figure-center quarto-float anchored" alt="Three maps of New York State, showing estimates of carbon stock changes between 2005 and 2019 under old allometrics and new allometrics, as well as the difference between these two maps.">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-stockchange-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="stock_change_maps.png" class="img-fluid figure-img" alt="Three maps of New York State, showing estimates of carbon stock changes between 2005 and 2019 under old allometrics and new allometrics, as well as the difference between these two maps.">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-stockchange-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;1: Stock-change map comparison. a) 15-year NSVB stock-change map (<span class="math inline">\(\Delta\)</span> NSVB; 2019 AGB - 2005 AGB). b) 15-year CRM stock-change map (<span class="math inline">\(\Delta\)</span> CRM; 2019 AGB - 2005 AGB). c) Stock-change difference map computed as <span class="math inline">\(\Delta\)</span> NSVB minus <span class="math inline">\(\Delta\)</span> CRM. Mapped values capped at +/- 40 <span class="math inline">\(\operatorname{Mg\ ha^{-1}}\)</span>.
+</figcaption>
 </figure>
 </div>
-</div>
-</div>
-<p>Today is my birthday, so please forgive me one of the most self-indulgent things I will ever write.</p>
-<p>Two years ago I was living in Boston, working in tech, and a good bit bored. I was recognizing that I had spent most of the past year focusing on goals I had because they were the obvious next step, not because they were building me a life I wanted to live. I had lost a sense of agency over the future.</p>
-<p>Luckily, at the time, I had just come across this podcast called “Cortex”. Over the holiday season, the hosts had discussed how they structure their goals around a “yearly theme” – not New Years’ Resolutions, not specific targets that you either achieve or fail at, but a broad concept that they use to inform their decisions over the course of the year. The point is to gently nudge your life in the direction you want it to go. <a href="https://www.youtube.com/watch?v=NVGuFdX5guE">Here’s a video with more information about this</a>; I recommend it.</p>
-<p>So I decided that 23 would be my year of Progress; that I’d try and make a habit of making decisions that helped build momentum and kept me moving forward. I quit my job, started a PhD, moved states, and started building the personal and professional networks I rely on today. It wasn’t all perfect – about a month in there was a global pandemic I really wish I could have done something to prevent – but it nudged my life’s trajectory in a direction I’ve been happy with.</p>
-<p>So when 24 came and it was time to change my theme, I decided to make it the year of Purpose. The year of Progress had involved saying yes to every opportunity that came my way; with Purpose, I wanted to make sure that I was being intentional with how I spent my time and making explicit decisions about where I’d invest my energy. I’m still not great at it, but I’ve gotten better at saying no when needed. I spent time improving my organization and time management to help me efficiently work through the things I said yes to. And I made a point of learning to consciously decide when to take time off, when to disconnect, and when to purposefully relax, so that I can now make those decisions without worrying about all the things I “should” be doing instead.</p>
-<p>Now it’s 25, and it’s time for a new theme. I think my plan is for the year of Process: I like where I am with my life right now, and I like how I spend my time. But I could be better and more careful about how I approach both of those things. I’m going to try to get better with details, to improve my memory around small things.</p>
-<p>I told you this would be indulgent. I know this sounds froofy. But it’s worked for me for two years now and I’m betting on round three. And I’m looking forward to seeing where this year takes me.</p>
+<p>There’s plenty of more information about these challenges, alongside other explorations of what the new allometrics will mean for model-based estimation workflows, <a href="https://arxiv.org/abs/2405.04507">in the preprint</a>.</p>
+<p>This was a really fun paper to write – and as is tradition, we originally thought it would be a “quick hit” sort of project when we started on it back in Novemeber, when the new allometrics were released. It’s also (I think!) my first time actually “co-writing” a paper, where I wrote the Introduction and Methods section and then handed that shell to Lucas so he could actually do the real work involved. I enjoyed that process and think it produced a good result here; I’m really happy to see this preprint go out!</p>
 
 
 

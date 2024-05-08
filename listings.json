@@ -2,6 +2,7 @@
   {
     "listing": "/blog.html",
     "items": [
+      "/posts/2024-05-08-nsvb/index.html",
       "/posts/2024-04-12-testing-expensive-functions/index.html",
       "/posts/2024-03-29-rsi-020/index.html",
       "/posts/2024-01-10-rsi-cran/index.html",
