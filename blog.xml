@@ -9,8 +9,1000 @@
 <link>https://mm218.dev/blog.html</link>
 <atom:link href="https://mm218.dev/blog.xml" rel="self" type="application/rss+xml"/>
 <description>Technology and the Environment</description>
-<generator>quarto-1.5.54</generator>
-<lastBuildDate>Wed, 08 May 2024 00:00:00 GMT</lastBuildDate>
+<generator>quarto-1.5.55</generator>
+<lastBuildDate>Fri, 19 Jul 2024 00:00:00 GMT</lastBuildDate>
+<item>
+  <title>Converting New York’s Forest Carbon Assessment to Tidymodels</title>
+  <dc:creator>Mike Mahoney</dc:creator>
+  <link>https://mm218.dev/posts/2024-07-19-tidymodels/</link>
+  <description><![CDATA[ 
+
+
+
+
+
+<p>We’ve been working this summer on version 2.0 of <a href="https://cafri-ny.org/new-york-forest-carbon-assessment/">the New York Forest Carbon Assessment</a>, incorporating changes in <a href="https://arxiv.org/abs/2405.04507">how the US estimates its forest carbon resources</a> and building on our past work using <a href="https://doi.org/10.1016/j.foreco.2023.121348">satellite imagery</a> and <a href="https://doi.org/10.1016/j.jag.2022.103059">LiDAR patchworks</a> to create wall-to-wall estimates of forest carbon stocks across New York for the last 30 years.</p>
+<p>One of the big themes of version 2.0 is operationalization. We’re working to automate as much of our modeling and mapping pipelines as possible, to streamline generating annual maps as time goes on and to make it easier to experiment with new models and data sources in the future. In practice, this means I’ve been spending a lot of time merging individual scripts into <a href="https://books.ropensci.org/targets/">targets</a> pipelines, and generally looking at ways to streamline our processes.</p>
+<p>The biggest change to come from this rewriting is that, while version 1.0 of our modeling pipeline used an internal library for tuning and <a href="https://www.mm218.dev/posts/2021/01/model-averaging/">creating stacked ensembles</a>, version 2.0 shifts these tasks over to the <a href="https://www.tidymodels.org/">tidymodels framework</a>.<sup>1</sup> Where we had previously only been using the <a href="https://rsample.tidymodels.org/">rsample</a> and <a href="https://yardstick.tidymodels.org/">yardstick</a> packages from tidymodels, we’ve now adopted the framework more-or-less wholesale in order to take advantage of a few advanced features.<sup>2</sup></p>
+<p>In this post, I want to walk through what that workflow looks like for us – how we get from our field measurements to prepped data for models, then through hyperparameter tuning, into our final ensemble model construction. And then I want to talk about a few rough edges we ran into through the process, and why we’re still using tidymodels despite those stubbed toes.</p>
+<p>So, without further ado, let’s start walking through how we’re building our ensemble models using tidymodels.</p>
+<section id="building-ensemble-models-using-tidymodels" class="level2">
+<h2 class="anchored" data-anchor-id="building-ensemble-models-using-tidymodels">Building ensemble models using tidymodels</h2>
+<section id="what-are-we-doing-here" class="level3">
+<h3 class="anchored" data-anchor-id="what-are-we-doing-here">What are we doing here?</h3>
+<p>My intent with this section is to give a pretty straightforward, if fast-paced, walkthrough of how we’re using tidymodels to build our ensemble models. In order to do that, I need to load quite a few packages:<sup>3</sup></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Used to download our predictor data</span></span>
+<span id="cb1-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(rsi)</span>
+<span id="cb1-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Contains our "field data", used for cross-validation</span></span>
+<span id="cb1-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(spatialsample)</span>
+<span id="cb1-5"></span>
+<span id="cb1-6"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Used to wrangle our predictor data</span></span>
+<span id="cb1-7"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(sf)</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Linking to GEOS 3.12.1, GDAL 3.8.4, PROJ 9.3.1; sf_use_s2() is TRUE</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(terra)</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>terra 1.7.71</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(exactextractr)</span>
+<span id="cb5-2"></span>
+<span id="cb5-3"><span class="co" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;"># Tidymodels libraries used to actually fit and tune models</span></span>
+<span id="cb5-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(tidymodels)</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching packages ────────────────────────────────────── tidymodels 1.2.0 ──</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>✔ broom        1.0.5      ✔ recipes      1.0.10
+✔ dials        1.2.1      ✔ rsample      1.2.1 
+✔ dplyr        1.1.4      ✔ tibble       3.2.1 
+✔ ggplot2      3.5.1      ✔ tidyr        1.3.1 
+✔ infer        1.0.7      ✔ tune         1.2.1 
+✔ modeldata    1.3.0      ✔ workflows    1.1.4 
+✔ parsnip      1.2.1      ✔ workflowsets 1.1.0 
+✔ purrr        1.0.2      ✔ yardstick    1.3.1 </code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Conflicts ───────────────────────────────────────── tidymodels_conflicts() ──
+✖ purrr::discard()  masks scales::discard()
+✖ tidyr::extract()  masks terra::extract()
+✖ dplyr::filter()   masks stats::filter()
+✖ dplyr::lag()      masks stats::lag()
+✖ recipes::step()   masks stats::step()
+✖ recipes::update() masks terra::update(), stats::update()
+• Use tidymodels_prefer() to resolve common conflicts.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(hardhat)</span>
+<span id="cb9-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(bonsai)</span>
+<span id="cb9-3"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(finetune)</span>
+<span id="cb9-4"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(stacks)</span></code></pre></div>
+</div>
+<p>In order to fit a stacked ensemble model, we first need to fit a number of “component” models. For our purposes today, we’ll fit a <a href="https://bradleyboehmke.github.io/HOML/mars.html">MARS model</a> using the <a href="https://cran.r-project.org/package=earth">earth package</a> and a <a href="https://bradleyboehmke.github.io/HOML/gbm.html">gradient boosting model</a> using <a href="https://cran.r-project.org/package=lightgbm">LightGBM</a>. While we don’t need functions from these packages, we do need them to be installed so that tidymodels packages can find them:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1">rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">check_installed</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"earth"</span>)</span>
+<span id="cb10-2">rlang<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">check_installed</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lightgbm"</span>)</span></code></pre></div>
+</div>
+<p>We also need some data worth modeling. While the actual field data we use for our models is non-public,<sup>4</sup> we can demonstrate the workflow using pretty much any example data. For our purposes, we’ll build our models to predict the amount of tree canopy in Boston in 2019, using data shipped with the spatialsample package:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(ggplot2)</span>
+<span id="cb11-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">ggplot</span>(spatialsample<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>boston_canopy, <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">aes</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fill =</span> canopy_percentage_2019)) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb11-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">geom_sf</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">+</span> </span>
+<span id="cb11-4">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">scale_fill_distiller</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">palette =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"Greens"</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">direction =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-07-19-tidymodels/index_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This will be our outcome variable for our models.</p>
+</section>
+<section id="data-preprocessing" class="level3">
+<h3 class="anchored" data-anchor-id="data-preprocessing">Data preprocessing</h3>
+<p>In order to actually fit the models, we’re going to need predictor data too! We’ll derive our predictors from Landsat imagery taken in the summer of 2019, when all the trees in Boston were at their greenest.</p>
+<p>To actually download this data, we’ll use the <a href="https://permian-global-research.github.io/rsi/index.html">rsi package</a>. In order to make the download go faster, we’ll first use <a href="https://future.futureverse.org/">future</a> to register a parallel backend, letting us download multiple pieces of data at the same time:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">library</span>(future)</span>
+<span id="cb12-2"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plan</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"multisession"</span>)</span></code></pre></div>
+</div>
+<p>And we can then actually download our Landsat imagery using <code>rsi::get_landsat_imagery()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1">landsat_imagery <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> rsi<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">get_landsat_imagery</span>(</span>
+<span id="cb13-2">    spatialsample<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>boston_canopy,</span>
+<span id="cb13-3">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2019-06-01"</span>,</span>
+<span id="cb13-4">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"2019-09-01"</span>,</span>
+<span id="cb13-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">platforms =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">c</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"landsat-8"</span>, <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"landsat-9"</span>),</span>
+<span id="cb13-6">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb13-7">)</span>
+<span id="cb13-8"></span>
+<span id="cb13-9">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(landsat_imagery))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-07-19-tidymodels/index_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>This winds up generating a median-composite image, made up of all of the “good” data available for this time period.</p>
+<p>We normally don’t fit our models using these raw reflectance values, but rather use them to calculate a number of <a href="https://github.com/awesome-spectral-indices/awesome-spectral-indices">spectral indices</a> that we then use as predictors. We can automate this process using rsi as well; for instance, we can use this code to calculate every spectral index possible using the bands in the raster we downloaded:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1">landsat_indices <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> rsi<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">calculate_indices</span>(</span>
+<span id="cb14-2">    landsat_imagery,</span>
+<span id="cb14-3">    rsi<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">filter_bands</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">bands =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">names</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(landsat_imagery))),</span>
+<span id="cb14-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">output_filename =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tempfile</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">fileext =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">".tif"</span>)</span>
+<span id="cb14-5">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+|---------|---------|---------|---------|
+=========================================
+                                          </code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb16" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>(terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(landsat_indices))</span></code></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-07-19-tidymodels/index_files/figure-html/unnamed-chunk-7-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>Now we’ve got a raster with a ton of spectral indices that we can use as predictors. We now need to associate those with our canopy percentage measurements from spatialsample. Generally we accomplish this using <a href="https://github.com/isciences/exactextractr">exactextractr</a> to calculate the mean of all of these indices within our sample locations:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1">cell_values <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> exactextractr<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">exact_extract</span>(</span>
+<span id="cb17-2">    terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(landsat_indices),</span>
+<span id="cb17-3">    spatialsample<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>boston_canopy,</span>
+<span id="cb17-4">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"mean"</span>,</span>
+<span id="cb17-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">progress =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">FALSE</span>,</span>
+<span id="cb17-6">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">colname_fun =</span> \(values, ...) values</span>
+<span id="cb17-7">)</span>
+<span id="cb17-8"></span>
+<span id="cb17-9">cell_values <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">cbind</span>(</span>
+<span id="cb17-10">    spatialsample<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>boston_canopy[<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"canopy_percentage_2019"</span>], </span>
+<span id="cb17-11">    cell_values</span>
+<span id="cb17-12">    )</span>
+<span id="cb17-13"></span>
+<span id="cb17-14"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>(cell_values)[<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span><span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">:</span><span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">6</span>]</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Simple feature collection with 6 features and 6 fields
+Geometry type: MULTIPOLYGON
+Dimension:     XY
+Bounding box:  xmin: 749383.6 ymin: 2913059 xmax: 801174.4 ymax: 2965741
+Projected CRS: NAD83 / Massachusetts Mainland (ftUS)
+  canopy_percentage_2019  AFRI1600  AFRI2100      ANDWI       AVI     AWEInsh
+1              8.6786929 0.2429339 0.4686573 -0.2066887 0.2127504  0.09513274
+2             32.9273863 0.4255704 0.6931654 -0.5248111 0.3976697 -0.20890425
+3             12.2586142 0.4492964 0.7004566 -0.5057031 0.4135522 -0.17314616
+4             15.5646636 0.2985486 0.5540271 -0.3153332 0.2875552 -0.03299006
+5              0.4253207 0.1876189 0.3655822 -0.1460433 0.1548586  0.20539446
+6             43.3838631 0.4718267 0.7542459 -0.5869194 0.4660867 -0.31844634
+                        geometry
+1 MULTIPOLYGON (((781922.7 29...
+2 MULTIPOLYGON (((752945.6 29...
+3 MULTIPOLYGON (((800842.8 29...
+4 MULTIPOLYGON (((751419.1 29...
+5 MULTIPOLYGON (((772252.2 29...
+6 MULTIPOLYGON (((763631.7 29...</code></pre>
+</div>
+</div>
+<p>We’ve now got index values at each of our sampled polygons!</p>
+<p>Before we can start using these to predict canopy coverage, we need to do a bit more pre-processing. For instance, for some reason a few of our polygons are missing values in at least one spectral index. While in the real world we’d probably want to debug exactly why this is happening, for our purposes today it’s a lot easier to just drop those rows from our data frame:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1">cell_values <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> cell_values[</span>
+<span id="cb19-2">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">complete.cases</span>(sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_drop_geometry</span>(cell_values)), </span>
+<span id="cb19-3">]</span></code></pre></div>
+</div>
+<p>Similarly, a few indices have non-finite values in at least one row, and we’ll want to go ahead and drop those as well:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1">infinite_cols <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">vapply</span>(</span>
+<span id="cb20-2">    sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_drop_geometry</span>(cell_values), </span>
+<span id="cb20-3">    \(x) <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">any</span>(<span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">is.infinite</span>(x)),</span>
+<span id="cb20-4">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">logical</span>(<span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">1</span>)</span>
+<span id="cb20-5">)</span>
+<span id="cb20-6">cell_values[infinite_cols] <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">NULL</span></span></code></pre></div>
+</div>
+</section>
+<section id="model-fitting" class="level3">
+<h3 class="anchored" data-anchor-id="model-fitting">Model fitting</h3>
+<p>We’ve now got our <code>cell_values</code> object fully ready for modeling workflows. We’re now able to start the actual model-fitting process.</p>
+<p>Our first step is to define the formula we’re using to fit our models. Because I’ve got the <code>cell_values</code> dataframe structured with our outcome column in front, followed by all the predictor columns, I can create this formula using the neat <code>DF2formula()</code> utility:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1">formula <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">DF2formula</span>(sf<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">st_drop_geometry</span>(cell_values))</span></code></pre></div>
+</div>
+<p>Did you know that’s a function in base R? What a wild language.</p>
+<p>Anyway, with our formula built, we’re ready to start actually using tidymodels packages. Our first step is to create a recipe that uses our formula, and will pass that information on to the other tidymodels packages:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1">recipe <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> recipes<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">recipe</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">formula =</span> formula, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">data =</span> cell_values)</span></code></pre></div>
+</div>
+<p>Up next, we’ll create the model specifications that define what models we want to fit, and pass <code>hardhat::tune()</code> to every hyperparameter that we want to be tuned.<sup>5</sup> We’ll also set the “engine” that we want to use (the package for fitting the models), and the mode of model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1">lightgbm_spec <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> parsnip<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">boost_tree</span>(</span>
+<span id="cb23-2">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">tree_depth =</span> hardhat<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tune</span>(),</span>
+<span id="cb23-3">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">trees =</span> hardhat<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tune</span>(),</span>
+<span id="cb23-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">learn_rate =</span> hardhat<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tune</span>(),</span>
+<span id="cb23-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mtry =</span> hardhat<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tune</span>(),</span>
+<span id="cb23-6">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">min_n =</span> hardhat<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tune</span>(),</span>
+<span id="cb23-7">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">loss_reduction =</span> hardhat<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tune</span>()</span>
+<span id="cb23-8">  ) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb23-9">    parsnip<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set_engine</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">engine =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"lightgbm"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb23-10">    parsnip<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set_mode</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mode =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"regression"</span>)</span>
+<span id="cb23-11"></span>
+<span id="cb23-12">mars_spec <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> parsnip<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">mars</span>(</span>
+<span id="cb23-13">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">num_terms =</span> hardhat<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tune</span>(),</span>
+<span id="cb23-14">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">prod_degree =</span> hardhat<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">tune</span>()</span>
+<span id="cb23-15">) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb23-16">    parsnip<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set_engine</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"earth"</span>) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb23-17">    parsnip<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">set_mode</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"regression"</span>)</span></code></pre></div>
+</div>
+<p>We’ve now got our recipe and our model specifications created, meaning we’ve defined all the preprocessing and modeling we’re asking tidymodels to perform.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1">workflow_set <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> workflowsets<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">workflow_set</span>(</span>
+<span id="cb24-2">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(recipe),</span>
+<span id="cb24-3">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">list</span>(</span>
+<span id="cb24-4">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">lightgbm =</span> lightgbm_spec,</span>
+<span id="cb24-5">        <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">mars =</span> mars_spec</span>
+<span id="cb24-6">    )</span>
+<span id="cb24-7">)</span>
+<span id="cb24-8">workflow_set</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A workflow set/tibble: 2 × 4
+  wflow_id        info             option    result    
+  &lt;chr&gt;           &lt;list&gt;           &lt;list&gt;    &lt;list&gt;    
+1 recipe_lightgbm &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;
+2 recipe_mars     &lt;tibble [1 × 4]&gt; &lt;opts[0]&gt; &lt;list [0]&gt;</code></pre>
+</div>
+</div>
+<p>I’ll talk about this a bit more later, but I think it’s worth noting how complex the thing we just did is. The <code>workflow_set()</code> function just created a “workflowset”, which is a tibble that contains multiple “workflows”<sup>6</sup> which each contain our “recipe” and “model specification” which has some arguments “marked for tuning”<sup>7</sup>. The code we’ve written is pretty minimal – something like 20 lines of code to create the workflowset itself – but it winds up producing quite a number of abstractions that we need to reason around to actually understand what we’re doing.</p>
+<p>But with our workflowset created, we’re now able to actually tune our component models! Before we do so, <strong>we need to set our future strategy back to sequential processing</strong>. The LightGBM implementation in bonsai uses parallel processing by default, and our tuning code will also try and run in parallel if we have a future backend registered, resulting in thread contention and making tuning never finish. As such, we’ll run <code>plan("sequential")</code> before tuning:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plan</span>(<span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"sequential"</span>)</span></code></pre></div>
+</div>
+<p>And then we’ll perform our tuning. We need to tune each row of our workflowset – each unique recipe/model combination – separately.</p>
+<p>Luckily, this is pretty easy using <code>workflowsets::workflow_map()</code>, which can apply a function to each workflow separately. Here, we’ll use this to use <code>finetune::tune_race_anova()</code> to evaluate our models against 10 different sets of hyperparameters<sup>8</sup> – making a point to save the predictions and workflows from each set, as we’ll need those to build our ensemble model later on.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1">resamples <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> spatialsample<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">spatial_clustering_cv</span>(cell_values, <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>)</span>
+<span id="cb27-2">tuning <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> workflowsets<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">workflow_map</span>(</span>
+<span id="cb27-3">    workflow_set,</span>
+<span id="cb27-4">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"tune_race_anova"</span>,</span>
+<span id="cb27-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">resamples =</span> resamples,</span>
+<span id="cb27-6">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">grid =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>,</span>
+<span id="cb27-7">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">metrics =</span> yardstick<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">metric_set</span>(yardstick<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>rmse),</span>
+<span id="cb27-8">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">control =</span> finetune<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">control_race</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">save_pred =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">save_workflow =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span>
+<span id="cb27-9">)</span></code></pre></div>
+</div>
+<p>Our <code>tuning</code> object now contains the outputs from the tuning process. We could use this to, for example, find the best evaluated set of hyperparameters for each of our models:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1">tuning<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>result <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb28-2">    <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(tune<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>select_best, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">metric =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rmse"</span>)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[[1]]
+# A tibble: 1 × 7
+   mtry trees min_n tree_depth learn_rate loss_reduction .config              
+  &lt;int&gt; &lt;int&gt; &lt;int&gt;      &lt;int&gt;      &lt;dbl&gt;          &lt;dbl&gt; &lt;chr&gt;                
+1   114   562    12          8    0.00372           18.6 Preprocessor1_Model09
+
+[[2]]
+# A tibble: 1 × 3
+  num_terms prod_degree .config             
+      &lt;int&gt;       &lt;int&gt; &lt;chr&gt;               
+1         3           2 Preprocessor1_Model5</code></pre>
+</div>
+</div>
+<p>But we aren’t actually all that interested in just-the-best. Because we’re going to be combining these models into ensembles, we can actually use all the models fit using <em>good enough</em> hyperparameter sets. That process can happen more or less automatically thanks to <a href="https://stacks.tidymodels.org/">stacks</a>, which will fit a lasso regression to determine which of the candidate models are better than useless and combine them into a final prediction:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1">ensemble <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> stacks<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stacks</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb30-2">  stacks<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">add_candidates</span>(tuning) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb30-3">  stacks<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">blend_predictions</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb30-4">  stacks<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">fit_members</span>()</span>
+<span id="cb30-5"></span>
+<span id="cb30-6">ensemble</span></code></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── A stacked ensemble model ─────────────────────────────────────
+
+
+Out of 8 possible candidate members, the ensemble retained 4.
+
+Penalty: 0.1.
+
+Mixture: 1.
+
+
+The 4 highest weighted members are:</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+  member               type       weight
+  &lt;chr&gt;                &lt;chr&gt;       &lt;dbl&gt;
+1 recipe_lightgbm_1_09 boost_tree  0.418
+2 recipe_mars_1_4      mars        0.315
+3 recipe_lightgbm_1_05 boost_tree  0.169
+4 recipe_mars_1_6      mars        0.132</code></pre>
+</div>
+</div>
+<p>Now, the best thing about stacks<sup>9</sup> is that predicting with this model is dead simple. Even though predicting with our ensemble requires predicting with each of the selected earth and LightGBM models, and then predicting with the final lasso regression, from our perspective as users we can just call a single, typical <code>predict()</code>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(ensemble, cell_values) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">head</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 1
+  .pred
+  &lt;dbl&gt;
+1  7.81
+2 33.6 
+3 27.2 
+4 16.6 
+5  1.25
+6 43.8 </code></pre>
+</div>
+</div>
+<p>For our carbon mapping workflows, however, we wind up generating predictions using the same 30 meter raster we grabbed our original predictor values from. Ensembles from stacks also work pretty well with this workflow:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1">terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">predict</span>(</span>
+<span id="cb35-2">    terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">rast</span>(landsat_indices),</span>
+<span id="cb35-3">    ensemble</span>
+<span id="cb35-4">) <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb35-5">    terra<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">plot</span>()</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+|---------|---------|---------|---------|
+=========================================
+                                          </code></pre>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="https://mm218.dev/posts/2024-07-19-tidymodels/index_files/figure-html/unnamed-chunk-20-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>We’ve also been using <a href="https://rstudio.github.io/bundle/">bundle</a> to help us serialize these ensemble models and load them in new R sessions. The flexibility of bundle is another great plus of leaning in with tidymodels.</p>
+</section>
+</section>
+<section id="some-complaints" class="level2">
+<h2 class="anchored" data-anchor-id="some-complaints">Some complaints</h2>
+<p>That said, as I mentioned at the start, I’ve certainly had a few unpleasant experiences through this transition, and I want to talk about them now.</p>
+<p>I want to be clear at the start – I’m not intending for this to be some sort of “tidymodels skeptic” post. We’re still using tidymodels, and I think our codebase is more maintainable and – with some caveats – understandable following this ground-up rewrite. These are just the things that bit us during that rewriting process.</p>
+<p>Another disclaimer here is that I interned with the tidymodels team back in 2022<sup>10</sup> and deeply enjoyed my time with the team. As a result, my experience with this rewrite was pretty nonstandard; I was already pretty familiar with some corners of the ecosystem (especially the parts touching rsample), am pretty willing to push past frustration with other packages based on my trust in the people developing them, and could DM a team member if I was ever particularly stuck. So this isn’t the most objective outsider experience you could ever imagine; it’s just the one I had.</p>
+<section id="learning-one-thing-requires-learning-everything" class="level3">
+<h3 class="anchored" data-anchor-id="learning-one-thing-requires-learning-everything">Learning one thing requires learning everything</h3>
+<p>A recurring challenge I have with the tidymodels framework is that often, to understand one part of tidymodels, it can feel like you need to know all of it.</p>
+<p>For example: if we want to automatically tune a hyperparameter, we need to set it to <code>tune()</code> inside of our model specification. But what does <code>tune()</code> actually do – how does it determine the hyperparameter values worth searching?</p>
+<p>Well, the <code>tune()</code> function itself comes from the <a href="https://hardhat.tidymodels.org/">hardhat</a> package, which describes itself as a “developer focused package designed to ease the creation of new modeling packages”. That means that if I’m trying to figure out what this <code>tune()</code> function actually does, running <code>?tune()</code> winds up getting me the help page <a href="https://hardhat.tidymodels.org/reference/tune.html">of a developer-focused package</a>, and I start wondering how much of that developer-focused documentation I need to read and learn in order to tune my models.</p>
+<p>For its part, the <code>tune()</code> help page actually points you to <code>tune::tune_grid()</code> and <code>tune::tune_bayes()</code> for more information on how these parameter values are being set. I don’t see any section here that explicitly says how parameter ranges are set when using <code>tune()</code> but the “Parameter Grids” section of <code>tune_grid()</code> and “Parameter Ranges and Values” section of <code>tune_bayes</code> do both discuss tuning parameter ranges. These sections don’t mention <code>tune()</code>,<sup>11</sup> but <em>do</em> mention that <code>dials::finalize()</code> “can be used to derive the data-dependent parameters”.</p>
+<p>We don’t call <code>dials::finalize()</code> ourselves – we don’t actually load <code>dials</code> at all – but if we go to the dials website, we could read the <a href="https://dials.tidymodels.org/articles/dials.html">Getting Started vignette</a><sup>12</sup> which starts to explain how parameter ranges are estimated. The “Unknown Values” section sort of explains how some ranges – like the max value for <code>mtry</code> and so on – are calculated, but I’m still a bit lost on how our <code>hardhat::tune()</code> gets turned into a dials function (if it does) and when these parameter ranges are set.</p>
+<p>So I haven’t entirely figured out how these grids are made, but I do have five tabs open from three different package websites. At this point, I’m starting to get a little bit buried by the different layers going on here – and I don’t know how much of hardhat, dials, or tune I need to understand before things start making a bit more sense. I also don’t have an obvious first point of attack to answer this question, as the packages all link back to each other as places to get further information.<sup>13</sup></p>
+<p>A bit of speculation: I think the issue I run into here is that the boundaries between the packages – where the logical breaks between concepts are <em>for developers</em> – don’t line up with where the logical breaks between concepts are for me, as a user. There’s no one package that owns the concept of “tuning a hyperparameter” – tune owns the grid searching, hardhat owns the infrastructure, dials owns the grid construction. As a result, each package’s documentation explains the piece of tuning that package covers, but none of them explain the concept as a whole.</p>
+</section>
+<section id="hidden-options-can-cause-delayed-failures" class="level3">
+<h3 class="anchored" data-anchor-id="hidden-options-can-cause-delayed-failures">Hidden options can cause delayed failures</h3>
+<p>This particular issue is more likely my fault – the behavior I’m about to complain about is documented, and is a valid design for an interface to have, but I got badly bitten by it and want to whinge.</p>
+<p>The default arguments to tuning functions – specifically, those in <code>control_grid()</code> – are set (I think) to create small, efficient objects. This is a sensible goal to have. The problem is that it also makes these objects less useful, in a way that you can’t fix after the fact. You’ll only learn that your pipeline is broken after already spending a lot of time running computationally intensive tuning code.</p>
+<p>To be more specific: say that you tried to tune the same workflow that we used above, but didn’t know that you needed to specify that you wanted to save the workflow:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1">tuning <span class="ot" style="color: #003B4F;
+background-color: null;
+font-style: inherit;">&lt;-</span> workflowsets<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">workflow_map</span>(</span>
+<span id="cb37-2">    workflow_set,</span>
+<span id="cb37-3">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"tune_race_anova"</span>,</span>
+<span id="cb37-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">resamples =</span> resamples,</span>
+<span id="cb37-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">grid =</span> <span class="dv" style="color: #AD0000;
+background-color: null;
+font-style: inherit;">10</span>,</span>
+<span id="cb37-6">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">metrics =</span> yardstick<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">metric_set</span>(yardstick<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>rmse)</span>
+<span id="cb37-7">)</span></code></pre></div>
+</div>
+<p>If we then want to fit the best model, the obvious choice would be to use <code>tune::fit_best()</code>. But if we call it on our tuning results:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(</span>
+<span id="cb38-2">    tuning<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">$</span>result <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span> </span>
+<span id="cb38-3">        <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">lapply</span>(tune<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>fit_best, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">metric =</span> <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"rmse"</span>)</span>
+<span id="cb38-4">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in FUN(X[[i]], ...) : 
+  ✖ The control option `save_workflow = TRUE` should be used when tuning.</code></pre>
+</div>
+</div>
+<p>We get an error. Now, if we had read the documentation for <code>fit_best()</code>, we’d see that the documentation for the <code>x</code> argument ends by saying “The control option <code>save_workflow = TRUE</code> should have been used” – so this <em>is</em> documented. But if you missed that, or if you’re writing your pipeline as you go,<sup>14</sup> you’re just told – in past tense – that you did the wrong thing and need to try again, throwing out the computational time you spent tuning the first time around.<sup>15</sup></p>
+<p>Now, the version of this that actually bit me came when I tried to add my tuned models to an ensemble using <code>add_candidate()</code>. This function has a similar pattern to <code>fit_best()</code>, except it wants you to have saved both your workflow and your predictions:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">try</span>(</span>
+<span id="cb40-2">    stacks<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">stacks</span>() <span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">|&gt;</span></span>
+<span id="cb40-3">        stacks<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">add_candidates</span>(tuning)</span>
+<span id="cb40-4">)</span></code></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Error in .f(out, .x[[x_i]], .y[[y_i]], ...) : 
+  The inputted `candidates` argument was not generated with the
+appropriate control settings. Please see `control_stack()`
+(`?stacks::control_stack()`).</code></pre>
+</div>
+</div>
+<p>And again, this is documented, for instance in the <a href="https://stacks.tidymodels.org/articles/basics.html#define-candidate-ensemble-members">“define candidate ensemble members”</a> section of one vignette<sup>16</sup> and in <a href="https://stacks.tidymodels.org/reference/add_candidates.html">one of the argument definitions for <code>add_candidates()</code></a>. But I didn’t see it when I skimmed the stacks documentation initially, and as a result I wound up wasting about ~26 hours spent tuning without saving workflows or predictions. The defaults here are good for making your objects smaller, but mean that tidymodels workflows fail <em>extremely</em> slowly.</p>
+<p>Part of the issue with this particular example is that the way these options get set is pretty indirect, and I get a bit lost in the documentation. My tuning here is controlled by <code>workflowsets::workflow_map()</code>, which has <a href="https://workflowsets.tidymodels.org/reference/workflow_map.html">five documented arguments</a>: the workflow set, the tuning function to run, a flag for verbosity and a random seed, and then <code>...</code>, documented as “Options to pass to the modeling function”. The word “control” doesn’t appear on this page.</p>
+<p>A minor nit is that I don’t think of <code>tune_*</code> as being <em>modeling</em> functions, but rather <em>tuning</em> functions, so <code>...</code> doesn’t jump out at me as a place to set my <code>save_pred</code> and <code>save_workflow</code> arguments. But I think a bigger problem I had is that if I <em>do</em> click over into the documentation for my tuning function, in this case <a href="https://finetune.tidymodels.org/reference/tune_race_anova.html"><code>finetune::tune_race_anova</code></a>, I still don’t see obvious places to set these arguments.</p>
+<p>Instead, the <code>tune_*</code> functions have a <code>control</code> argument which itself takes the output of another function. There are a surprising number of these control functions – at least <a href="https://finetune.tidymodels.org/reference/control_race.html"><code>control_race()</code></a> and <a href="https://finetune.tidymodels.org/reference/control_sim_anneal.html"><code>control_sim_anneal()</code></a> from finetune, plus <a href="https://tune.tidymodels.org/reference/control_bayes.html"><code>control_bayes()</code></a> and <a href="https://tune.tidymodels.org/reference/control_grid.html"><code>control_grid()</code></a> from tune<sup>17</sup> – which I <em>think</em> are paired 1:1 with tuning functions.</p>
+<p>I’ll be honest, I don’t actually know what these functions do at a fundamental level,<sup>18</sup> or if they’re sharing some plumbing under the hood which makes this indirection much more efficient for the developers. All I know is that I need to go through a decent number of man pages and a bit of guesswork to land on this final chunk of code:</p>
+<div class="sourceCode" id="cb42" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1">workflowsets<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">workflow_map</span>(</span>
+<span id="cb42-2">    workflow_set,</span>
+<span id="cb42-3">    <span class="st" style="color: #20794D;
+background-color: null;
+font-style: inherit;">"tune_race_anova"</span>,</span>
+<span id="cb42-4">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">resamples =</span> resamples,</span>
+<span id="cb42-5">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">grid =</span> grid,</span>
+<span id="cb42-6">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">metrics =</span> yardstick<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">metric_set</span>(yardstick<span class="sc" style="color: #5E5E5E;
+background-color: null;
+font-style: inherit;">::</span>rmse),</span>
+<span id="cb42-7">    <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">control =</span> <span class="fu" style="color: #4758AB;
+background-color: null;
+font-style: inherit;">control_race</span>(<span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">verbose =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">save_workflow =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>, <span class="at" style="color: #657422;
+background-color: null;
+font-style: inherit;">save_pred =</span> <span class="cn" style="color: #8f5902;
+background-color: null;
+font-style: inherit;">TRUE</span>)</span>
+<span id="cb42-8">  )</span></code></pre></div>
+<p>So, in order to override the default arguments so that I can fit my models or create an ensemble after tuning, I need to pass the new values to <code>control_race()</code>, and then pass the output from <code>control_race()</code> to <code>tune_race_anova</code> by providing it as a named argument <code>metrics</code> to <code>...</code>. That’s a lot of deep magic to learn – and a lot of concepts to be thinking about at the same time in order to use this function.</p>
+<p>In some sense, this is another flavor of “learning one thing requires learning everything”. Because a lot of functions that you’d use later in a workflow require specific non-default arguments in earlier steps, you need to know every function you intend on using when you start writing a pipeline. And as understanding the arguments to these functions generally requires understanding multiple other functions in multiple other packages, it becomes difficult to learn the framework as you go, or to think about modeling pipelines in smaller chunks.</p>
+</section>
+</section>
+<section id="were-still-using-tidymodels" class="level2">
+<h2 class="anchored" data-anchor-id="were-still-using-tidymodels">We’re still using tidymodels</h2>
+<p>With those complaints now vented, I wanted to close by saying that the pipeline I was building – the one that originally motivated this post – is still using tidymodels, and is going to keep using the framework for the forseeable future. There’s a few really nice features of the framework that motivated the switch:</p>
+<ul>
+<li>First, <a href="https://finetune.tidymodels.org/">finetune</a> is really cool. We’ve been using finetune to conduct a much more thorough grid search than would be possible if we needed to see every set of hyperparameters through to the end, and to do so faster than we could do the smaller searches we had been using.</li>
+<li>Second, <a href="https://stacks.tidymodels.org/">stacks</a> is also great. A generic interface to fit ensemble models (<a href="https://www.mm218.dev/posts/2021/01/model-averaging/">something I’ve written about before</a>), which easily accepts new models and writes its own predict methods? Sign me up. Wanting to use these two packages then motivated us to use tune, and deal with the pain points I mentioned above.<sup>19</sup></li>
+<li>Third, even before we adopted the full tidymodels framework, we were already using packages like <a href="https://rsample.tidymodels.org/">rsample</a> and <a href="https://yardstick.tidymodels.org/">yardstick</a> (not to mention my extensions for these packages, <a href="https://spatialsample.tidymodels.org/">spatialsample</a> and <a href="https://docs.ropensci.org/waywiser/">waywiser</a><sup>20</sup>) to assess our models. We’ve always found a number of individual tidymodels packages to be extremely useful; most of our pain points (and most of the complaints above) come when we need to hand things off between two packages.</li>
+<li>And finally, I do think our final pipeline here is more readable, and will likely be more maintainable moving forward. Only time will tell, of course, but I’d rather be reading code that included a lot of <code>tune_race_anova()</code> and <code>boost_tree()</code> than the model-specific interfaces and nested <code>lapply()</code> calls that it replaced.</li>
+</ul>
+<p>So given all that, we’re still using the tidymodels framework. By my estimation, the benefits have been worth the growing pains so far, and with our modeling pipelines now operational we’re hoping that we’re mostly finished with the worst of the surprises. We’re just making extra sure to highlight the bandaids we’ve had to add to the pipeline, wherever we got caught on a rough edge – and hopefully this post helps flag a few of them for you as well!</p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>A slightly less relevant change is that I wrote most of the pipeline while <a href="https://github.com/posit-dev/positron">beta testing Posit’s new Positron IDE</a>, which I mention mostly as a humblebrag. I generally really like Positron – this post was written using it – though I have a really hard time specifying why. It just <em>feels</em> nice to use.↩︎</p></li>
+<li id="fn2"><p>By the way – if you work on a package I mention in this post, and it would be useful for you to say “Used in New York State’s Forest Carbon Assessment” somewhere, drop me a line. We’re part of New York’s <a href="https://climate.ny.gov/resources/scoping-plan">Climate Act Scoping Plan</a> and <a href="https://dec.ny.gov/nature/forests-trees/climate-change/climate-smart-farms-forests">partner with the state DEC</a> on our mapping, and your work is helping make that possible.↩︎</p></li>
+<li id="fn3"><p>I’m throwing this in a footnote because it doesn’t <em>really</em> fit anywhere else: There’s a trendy sort of post where people talk about how the tidyverse or tidymodels ecosystem being made up of many packages is itself inherently bad. I think this is a bad opinion. We’re asking these ecosystems to do a lot of complicated things for us, which typically means we’re asking them to include a lot of functions and code. It’s natural – and good practice – for these functions to get broken up into logical units, each providing an interface for users and the rest of the ecosystem to build upon. As such, I think that measuring supply-chain risk based on a pure count of dependencies is the wrong approach. If you’re worried about dependencies changing their interfaces or getting archived and breaking your workflows, I personally think you should be more concerned about multitool-packages developed by non-tenured academics than about the ecosystem maintained by a small team of professional software engineers.↩︎</p></li>
+<li id="fn4"><p>I’m realizing now, four-ish years into this job, that I don’t actually know the right phrasing for FIA data. It’s not “confidential”, as no one in our group has a security clearance, but we have access to plot locations under an MOU with the Forest Service. I guess “non-public” is the best I’ve got at the moment.↩︎</p></li>
+<li id="fn5"><p>There’s a note in the tune documentation that some models – specifically earth models, but presumbably LightGBM could do the same thing – <a href="https://tune.tidymodels.org/articles/extras/optimizations.html#sub-model-speed-ups">can evalute more models than are fit, speeding up tuning times</a>. I don’t actually see any information on how to combine this trick with tune itself, though, so we’re just going to pretend I didn’t see that part of the docs.↩︎</p></li>
+<li id="fn6"><p>Which come from a package, workflows, that we won’t ever call explicitly here.↩︎</p></li>
+<li id="fn7"><p>With parameter values determined by the dials package which, again, we won’t call explicitly here↩︎</p></li>
+<li id="fn8"><p>Which is a small number chosen to run quickly for this blog post; in practice we tune with a much, much larger grid.↩︎</p></li>
+<li id="fn9"><p>I mean, in my opinion.↩︎</p></li>
+<li id="fn10"><p>Go <a href="https://github.com/tidymodels/spatialsample">star spatialsample on GitHub</a>↩︎</p></li>
+<li id="fn11"><p>In the context of grid creation – <code>tune_grid()</code> mentions <code>tune()</code> in the context of user-provided grids.↩︎</p></li>
+<li id="fn12"><p>Not linked from the <code>finalize()</code> page, but in the top navigation bar.↩︎</p></li>
+<li id="fn13"><p>For what it’s worth, a full explanation of how tuning works is in <a href="https://www.tmwr.org/tuning">the tidymodels book</a>, but I didn’t see that linked anywhere in this chain.↩︎</p></li>
+<li id="fn14"><p>Meaning you didn’t look up the code you needed post-tuning until you were done tuning.↩︎</p></li>
+<li id="fn15"><p>If you’re tuning a workflow, I think there <em>is</em> a workaround where you can use <code>select_best()</code>, <code>finalize_workflow()</code>, <code>fit()</code>, and <code>extract_workflow()</code> to get your fitted workflow without needing to retune everything here. I’m not entirely sure– I’m guessing based off of the “Details” and “See also” sections of the <code>fit_best()</code> documentation, and this doesn’t seem to work with workflowsets.↩︎</p></li>
+<li id="fn16"><p>Though isn’t spelled out in either other vignette, or the README↩︎</p></li>
+<li id="fn17"><p>I <em>think</em> it’s most fair to not include <code>control_resamples()</code> or <code>control_last_fit()</code> here, because I <em>think</em> they’re not used for tuning, but I don’t actually know. A particular oddity is that <code>control_grid()</code> is listed in the tune reference as a developer function, but is used throughout the documentation, while <code>control_last_fit()</code> is listed as a “function for tuning” and isn’t used in any examples.↩︎</p></li>
+<li id="fn18"><p>Creating a list with a finite set of named elements, with some default values? The print method just says <code>&lt;x&gt; control object</code>.↩︎</p></li>
+<li id="fn19"><p>We had been hand-rolling our own ensemble code, which was <em>mostly</em> painless. The hardest part initially was writing a predict method that would generate predictions from all of our component models, and then combine those into a final ensemble prediction. The function we wrote to handle this could easily extend to use multiple models from the same package – if we wanted to use add another LightGBM to the mix, for instance – but adding new packages required adding new complicated chunks to the predict method. We were interested in making future extensions easier, so stacks seemed like an obvious choice – but our home-rolled grid search code was a lot more straightforward than tune, so we were initially resistant to making the jump.↩︎</p></li>
+<li id="fn20"><p>The waywiser package was originally developed explicitly for the NYS carbon mapping project, as it happens; we use just about every function in waywiser as part of our assessment process.↩︎</p></li>
+</ol>
+</section></div> ]]></description>
+  <category>tidymodels</category>
+  <category>R</category>
+  <category>Tutorials</category>
+  <category>AGB</category>
+  <category>Data science</category>
+  <category>Spatial</category>
+  <category>geospatial data</category>
+  <category>machine learning</category>
+  <guid>https://mm218.dev/posts/2024-07-19-tidymodels/</guid>
+  <pubDate>Fri, 19 Jul 2024 00:00:00 GMT</pubDate>
+  <media:content url="https://mm218.dev/posts/2024-07-19-tidymodels/banner.jpg" medium="image" type="image/jpeg"/>
+</item>
 <item>
   <title>New allometric models for the USA create a step-change in forest carbon estimation, modeling, and mapping</title>
   <dc:creator>Mike Mahoney</dc:creator>
@@ -6967,318 +7959,6 @@ font-style: inherit;">|</span></span>
   <guid>https://mm218.dev/posts/2023-04-10-quarto_citation_use_count/</guid>
   <pubDate>Mon, 10 Apr 2023 00:00:00 GMT</pubDate>
   <media:content url="https://mm218.dev/posts/2023-04-10-quarto_citation_use_count/books.jpg" medium="image" type="image/jpeg"/>
-</item>
-<item>
-  <title>Using in-line grouping to fit many models</title>
-  <dc:creator>Mike Mahoney</dc:creator>
-  <link>https://mm218.dev/posts/2023-04-01-fitting_models/</link>
-  <description><![CDATA[ 
-
-
-
-
-
-<p>Tim Tiefenbach <a href="https://tim-tiefenbach.de/post/2023-dplyr-many-models/">has a post</a> on using dplyr and other tidymodels tools to fit many models in relatively few lines of code. Tim’s post walks through a lot of interesting functions for more complicated model fitting, which I’m not going to talk about at all. What I want to talk about is that I recently realized I don’t do much nesting in R anymore!</p>
-<p>The building block in Tim’s post uses the new-ish <code>dplyr::nest_by()</code> to create a nested data frame, then fits models using the new <code>data</code> list column:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1">dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>storms <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb1-2">  dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nest_by</span>(status) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb1-3">  dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mutate</span>(</span>
-<span id="cb1-4">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">mod =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">list</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(wind <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> pressure, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> data))</span>
-<span id="cb1-5">  )</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 9 × 3
-# Rowwise:  status
-  status                                data mod   
-  &lt;fct&gt;                  &lt;list&lt;tibble[,12]&gt;&gt; &lt;list&gt;
-1 disturbance                     [146 × 12] &lt;lm&gt;  
-2 extratropical                 [2,068 × 12] &lt;lm&gt;  
-3 hurricane                     [4,684 × 12] &lt;lm&gt;  
-4 other low                     [1,405 × 12] &lt;lm&gt;  
-5 subtropical depression          [151 × 12] &lt;lm&gt;  
-6 subtropical storm               [292 × 12] &lt;lm&gt;  
-7 tropical depression           [3,525 × 12] &lt;lm&gt;  
-8 tropical storm                [6,684 × 12] &lt;lm&gt;  
-9 tropical wave                   [111 × 12] &lt;lm&gt;  </code></pre>
-</div>
-</div>
-<p>This is a pattern I used to use all the time<sup>1</sup> – my <a href="https://www.mm218.dev/posts/2019/03/">undergrad thesis</a> and <a href="https://www.mm218.dev/papers/mahoney_stella_2020.pdf">eventual first pub from the same</a> were built from strings of nesting and unnesting data and models. But over the years, I’ve realized that you can often get the same results using grouped data frames in the place of nested ones, and have shifted to using <code>dplyr::summarise()</code> and friends instead of nesting:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1">dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>storms <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb3-2">  dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summarise</span>(</span>
-<span id="cb3-3">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">mod =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">list</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(wind <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> pressure, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">pick</span>(dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">everything</span>()))),</span>
-<span id="cb3-4">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">.by =</span> status</span>
-<span id="cb3-5">  )</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 9 × 2
-  status                 mod   
-  &lt;fct&gt;                  &lt;list&gt;
-1 tropical depression    &lt;lm&gt;  
-2 tropical storm         &lt;lm&gt;  
-3 extratropical          &lt;lm&gt;  
-4 hurricane              &lt;lm&gt;  
-5 subtropical storm      &lt;lm&gt;  
-6 subtropical depression &lt;lm&gt;  
-7 disturbance            &lt;lm&gt;  
-8 other low              &lt;lm&gt;  
-9 tropical wave          &lt;lm&gt;  </code></pre>
-</div>
-</div>
-<p>Now, the obvious downside of using a grouped data frame instead of a nested one is that future function calls no longer have access to your raw data frame. The slightly less obvious downside is that the output of <code>dplyr::nest_by()</code> is a <em>rowwise</em> data frame, which makes it easy to pass our model objects directly to other functions like <code>broom::tidy()</code>:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1">dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>storms <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb5-2">  dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">nest_by</span>(status) <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb5-3">  dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">mutate</span>(</span>
-<span id="cb5-4">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">mod =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">list</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(wind <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> pressure, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> data)),</span>
-<span id="cb5-5">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">res =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">list</span>(broom<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">tidy</span>(mod))</span>
-<span id="cb5-6">  )</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 9 × 4
-# Rowwise:  status
-  status                                data mod    res             
-  &lt;fct&gt;                  &lt;list&lt;tibble[,12]&gt;&gt; &lt;list&gt; &lt;list&gt;          
-1 disturbance                     [146 × 12] &lt;lm&gt;   &lt;tibble [2 × 5]&gt;
-2 extratropical                 [2,068 × 12] &lt;lm&gt;   &lt;tibble [2 × 5]&gt;
-3 hurricane                     [4,684 × 12] &lt;lm&gt;   &lt;tibble [2 × 5]&gt;
-4 other low                     [1,405 × 12] &lt;lm&gt;   &lt;tibble [2 × 5]&gt;
-5 subtropical depression          [151 × 12] &lt;lm&gt;   &lt;tibble [2 × 5]&gt;
-6 subtropical storm               [292 × 12] &lt;lm&gt;   &lt;tibble [2 × 5]&gt;
-7 tropical depression           [3,525 × 12] &lt;lm&gt;   &lt;tibble [2 × 5]&gt;
-8 tropical storm                [6,684 × 12] &lt;lm&gt;   &lt;tibble [2 × 5]&gt;
-9 tropical wave                   [111 × 12] &lt;lm&gt;   &lt;tibble [2 × 5]&gt;</code></pre>
-</div>
-</div>
-<p>The outputs of the grouped data frame method are <em>not</em> rowwise data frames, which means we need to use another function to iterate through each element of <code>mod</code>. I usually use <code>purrr::map()</code> for this:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1">dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>storms <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb7-2">  dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summarise</span>(</span>
-<span id="cb7-3">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">mod =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">list</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(wind <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> pressure, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">pick</span>(dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">everything</span>()))),</span>
-<span id="cb7-4">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">res =</span> purrr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">map</span>(mod, broom<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>glance),</span>
-<span id="cb7-5">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">.by =</span> status</span>
-<span id="cb7-6">  )</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 9 × 3
-  status                 mod    res              
-  &lt;fct&gt;                  &lt;list&gt; &lt;list&gt;           
-1 tropical depression    &lt;lm&gt;   &lt;tibble [1 × 12]&gt;
-2 tropical storm         &lt;lm&gt;   &lt;tibble [1 × 12]&gt;
-3 extratropical          &lt;lm&gt;   &lt;tibble [1 × 12]&gt;
-4 hurricane              &lt;lm&gt;   &lt;tibble [1 × 12]&gt;
-5 subtropical storm      &lt;lm&gt;   &lt;tibble [1 × 12]&gt;
-6 subtropical depression &lt;lm&gt;   &lt;tibble [1 × 12]&gt;
-7 disturbance            &lt;lm&gt;   &lt;tibble [1 × 12]&gt;
-8 other low              &lt;lm&gt;   &lt;tibble [1 × 12]&gt;
-9 tropical wave          &lt;lm&gt;   &lt;tibble [1 × 12]&gt;</code></pre>
-</div>
-</div>
-<p>Part of the reason I use <code>purrr</code> for this is that <code>purrr</code> provides plenty of other helper functions for working with list columns; for instance, I tend to use <code>purrr::chuck()</code> to extract model fit statistics:</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9" style="background: #f1f3f5;"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1">dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>storms <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">|&gt;</span> </span>
-<span id="cb9-2">  dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">summarise</span>(</span>
-<span id="cb9-3">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">mod =</span> <span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">list</span>(<span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">lm</span>(wind <span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">~</span> pressure, <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">data =</span> dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">pick</span>(dplyr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">everything</span>()))),</span>
-<span id="cb9-4">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">res =</span> purrr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">map</span>(mod, broom<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>glance),</span>
-<span id="cb9-5">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">rsquared =</span> purrr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span><span class="fu" style="color: #4758AB;
-background-color: null;
-font-style: inherit;">map_dbl</span>(res, purrr<span class="sc" style="color: #5E5E5E;
-background-color: null;
-font-style: inherit;">::</span>chuck, <span class="st" style="color: #20794D;
-background-color: null;
-font-style: inherit;">"r.squared"</span>),</span>
-<span id="cb9-6">    <span class="at" style="color: #657422;
-background-color: null;
-font-style: inherit;">.by =</span> status</span>
-<span id="cb9-7">  )</span></code></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 9 × 4
-  status                 mod    res               rsquared
-  &lt;fct&gt;                  &lt;list&gt; &lt;list&gt;               &lt;dbl&gt;
-1 tropical depression    &lt;lm&gt;   &lt;tibble [1 × 12]&gt;   0.0369
-2 tropical storm         &lt;lm&gt;   &lt;tibble [1 × 12]&gt;   0.485 
-3 extratropical          &lt;lm&gt;   &lt;tibble [1 × 12]&gt;   0.631 
-4 hurricane              &lt;lm&gt;   &lt;tibble [1 × 12]&gt;   0.807 
-5 subtropical storm      &lt;lm&gt;   &lt;tibble [1 × 12]&gt;   0.473 
-6 subtropical depression &lt;lm&gt;   &lt;tibble [1 × 12]&gt;   0.214 
-7 disturbance            &lt;lm&gt;   &lt;tibble [1 × 12]&gt;   0.299 
-8 other low              &lt;lm&gt;   &lt;tibble [1 × 12]&gt;   0.332 
-9 tropical wave          &lt;lm&gt;   &lt;tibble [1 × 12]&gt;   0.126 </code></pre>
-</div>
-</div>
-<p>Anyway – there’s nothing better or worse (as far as I’m concerned) with either nesting or grouping for fitting many models; I just think it’s interesting that my personal style has shifted over time to use much more grouping, and much less nesting.</p>
-<p>And as I said at the start, Tim’s post walks through a lot of interesting functions for more complicated model fitting, which I’m not going to talk about at all; <a href="https://tim-tiefenbach.de/post/2023-dplyr-many-models/">here’s the link again if you’re interested</a>.</p>
-
-
-
-
-<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
-
-<ol>
-<li id="fn1"><p>Using <code>tidyr::nest()</code>, though.↩︎</p></li>
-</ol>
-</section></div> ]]></description>
-  <category>R</category>
-  <category>Tutorials</category>
-  <category>Data science</category>
-  <guid>https://mm218.dev/posts/2023-04-01-fitting_models/</guid>
-  <pubDate>Sat, 01 Apr 2023 00:00:00 GMT</pubDate>
-  <media:content url="https://mm218.dev/posts/2023-04-01-fitting_models/nests.jpg" medium="image" type="image/jpeg"/>
 </item>
 </channel>
 </rss>
